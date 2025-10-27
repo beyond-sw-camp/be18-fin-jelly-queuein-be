@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.diffplug.spotless' version '6.24.0'
 }
 
 group = 'com.beyond'
@@ -76,9 +77,14 @@ dependencies {
 
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+spotless {
+    java {
+        importOrder()         // import문 순서 정리
+        removeUnusedImports() // 안 쓰는 import문 자동 삭제
+        cleanthat()           // 자동 리팩토링 (e.g. 불필요한 .toString()제거)
+        palantirJavaFormat()  // 구글포매터로 코드 변환
+        formatAnnotations()   // 어노테이션 순서 정렬
+        targetExclude("src/main/generated/**/*.java") // querydsl 파일들 대상 제외
     }
 }
 
@@ -104,3 +110,24 @@ sourceSets {
 clean {
     delete file(querydslSrcDir)
 }
+
+tasks.register('updateGitHooks', Copy) {
+    from 'scripts/pre-commit'        // 현재 폴더의 scripts 디렉터리
+    into './.git/hooks'              // 실제 git hooks 폴더 위치
+}
+
+tasks.register('makeGitHooksExecutable') {
+    dependsOn updateGitHooks
+    doLast {
+        def osName = System.getProperty("os.name").toLowerCase()
+        if (osName.contains("windows")) {
+            println "Skipping chmod (Windows detected) — Git hooks assumed already executable."
+        } else {
+            exec {
+                commandLine 'chmod', '+x', './.git/hooks/pre-commit'
+            }
+        }
+    }
+}
+
+compileJava.dependsOn makeGitHooksExecutable

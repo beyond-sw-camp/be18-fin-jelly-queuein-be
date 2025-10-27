@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class QiinApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(QiinApplication.class, args);
-  }
-
+    public static void main(String[] args) {
+        SpringApplication.run(QiinApplication.class, args);
+    }
 }

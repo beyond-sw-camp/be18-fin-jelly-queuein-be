@@ -9,16 +9,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-    info = @Info(
-        title = "Queuein Service API Test",
-        description = "회사 내 자원 예약 일정 관리 시스템",
-        version = "v1.0.0"
-    )
-)
+        info = @Info(title = "Queuein Service API Test", description = "회사 내 자원 예약 일정 관리 시스템", version = "v1.0.0"))
 public class SwaggerConfig {
-  @Bean
-  public OpenAPI openAPI() {
-    return new OpenAPI()
-        .components(new Components());
-  }
+    @Bean
+    public OpenAPI openAPI() {
+        return new OpenAPI().components(new Components());
+    }
 }
