@@ -113,7 +113,7 @@ clean {
 
 tasks.register('updateGitHooks', Copy) {
     from 'scripts/pre-commit'        // 현재 폴더의 scripts 디렉터리
-    into './.git/hooks'              // 실제 git hooks 폴더 위치
+    into '../.git/hooks'              // 실제 git hooks 폴더 위치
 }
 
 tasks.register('makeGitHooksExecutable') {
