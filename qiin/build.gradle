@@ -40,7 +40,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // QueryDsl
-    // Open Feign QueryDSL (latest security patched version)
+    // Open Feign QueryDSL (latAest security patched version)
     implementation("io.github.openfeign.querydsl:querydsl-core:${queryDslVersion}")
     implementation("io.github.openfeign.querydsl:querydsl-jpa:$queryDslVersion")
 
@@ -50,7 +50,7 @@ dependencies {
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
 
     // AI Integration
-    implementation 'org.springframework.ai:spring-ai-starter-model-anthropic'
+//    implementation 'org.springframework.ai:spring-ai-starter-model-anthropic'
 
     // Utility & Annotation Processing
     compileOnly 'org.projectlombok:lombok'
@@ -59,12 +59,11 @@ dependencies {
     // Development & Hot-Reload
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-    developmentOnly 'org.springframework.ai:spring-ai-spring-boot-docker-compose'
 
     // Runtime Database Drivers
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'com.h2database:h2'   // 여기로 이동
 
     // Testing Dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -81,7 +80,6 @@ dependencyManagement {
 }
 
 tasks.named('test') {
-    runtimeOnly 'com.h2database:h2'
     useJUnitPlatform()
 }
 
