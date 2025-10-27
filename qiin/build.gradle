@@ -59,8 +59,6 @@ dependencies {
     // Development & Hot-Reload
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-    developmentOnly 'org.springframework.ai:spring-ai-spring-boot-docker-compose'
 
     // Runtime Database Drivers
     runtimeOnly 'com.mysql:mysql-connector-j'
