@@ -1,0 +1,26 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  # Spring 표준 URL을 H2 인메모리 DB 주소로 강제 재정의
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MariaDB;DB_CLOSE_DELAY=-1;
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MariaDBDialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+  kafka:
+    listener:
+      auto-startup: false
+
+  data:
+    redis:
+      host: 0
+      port: 0
