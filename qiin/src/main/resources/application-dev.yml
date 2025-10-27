@@ -1,0 +1,22 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  # Spring 표준 URL을 Docker Compose 내부 주소로 덮어씀
+  datasource:
+    url: jdbc:mariadb://mariadb:3306/qiin # mariadb는 Docker 서비스 이름
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  # Redis 및 Kafka는 Docker Compose 서비스 이름으로 설정 (Host만 재정의)
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+  kafka:
+    bootstrap-servers: kafka:9092
