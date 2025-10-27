@@ -123,8 +123,9 @@ tasks.register('makeGitHooksExecutable') {
         if (osName.contains("windows")) {
             println "Skipping chmod (Windows detected) — Git hooks assumed already executable."
         } else {
-            exec {
-                commandLine 'chmod', '+x', './.git/hooks/pre-commit'
+            def execOps = getServices().get(org.gradle.process.ExecOperations.class)
+            execOps.exec {
+                commandLine 'chmod', '+x', '.git/hooks/pre-commit'
             }
         }
     }
