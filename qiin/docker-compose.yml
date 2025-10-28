@@ -12,6 +12,13 @@ services:
       - "3309:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD-SHELL", "for i in $(seq 1 20); do mariadb-admin ping -uroot -p${SPRING_DATASOURCE_PASSWORD} -h localhost && break; sleep 5; done; mariadb-admin ping -uroot -p${SPRING_DATASOURCE_PASSWORD} -h localhost" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
 
   redis:
     image: redis:7.2
@@ -44,12 +51,15 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   app:
-    build: . # 현재 디렉토리의 Dockerfile을 사용하여 이미지 빌드
+    build: .
     container_name: qiin-app
     depends_on:
-      - mariadb
-      - redis
-      - kafka
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
     ports:
       - "8080:8080"
     environment:
@@ -62,7 +72,7 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION}
       JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION}
-    restart: "no"
+    restart: on-failure
 
 volumes:
   mariadb_data:
