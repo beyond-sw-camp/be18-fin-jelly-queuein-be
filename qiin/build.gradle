@@ -81,9 +81,7 @@ spotless {
     java {
         importOrder()         // import문 순서 정리
         removeUnusedImports() // 안 쓰는 import문 자동 삭제
-        cleanthat()           // 자동 리팩토링 (e.g. 불필요한 .toString()제거)
         palantirJavaFormat()  // 구글포매터로 코드 변환
-        formatAnnotations()   // 어노테이션 순서 정렬
         targetExclude("src/main/generated/**/*.java") // querydsl 파일들 대상 제외
     }
 }
