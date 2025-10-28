@@ -21,14 +21,14 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "user")
 @SQLRestriction("deleted_at = null")
-public class Users extends BaseEntity {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
 
-    public static Users create() {
-        return Users.builder().build();
+    public static User create() {
+        return User.builder().build();
     }
 }
