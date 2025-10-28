@@ -123,7 +123,7 @@ tasks.register('makeGitHooksExecutable') {
         } else {
             def execOps = getServices().get(org.gradle.process.ExecOperations.class)
             execOps.exec {
-                commandLine 'chmod', '+x', '..git/hooks/pre-commit'
+                commandLine 'chmod', '+x', '../.git/hooks/pre-commit'
             }
         }
     }
