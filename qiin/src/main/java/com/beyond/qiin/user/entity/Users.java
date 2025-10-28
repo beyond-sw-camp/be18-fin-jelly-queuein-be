@@ -23,17 +23,12 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at = null")
 public class Users extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "user_id")
-  private Long userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Long userId;
 
-
-  public static Users create() {
-    return Users.builder()
-        .build();
-  }
-
-
+    public static Users create() {
+        return Users.builder().build();
+    }
 }
-
