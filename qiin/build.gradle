@@ -131,4 +131,6 @@ tasks.register('makeGitHooksExecutable') {
     }
 }
 
-compileJava.dependsOn makeGitHooksExecutable
+if (!System.getenv().containsKey('DOCKER_BUILD')) {
+    compileJava.dependsOn makeGitHooksExecutable
+}
