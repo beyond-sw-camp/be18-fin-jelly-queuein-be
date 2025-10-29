@@ -1,11 +1,13 @@
 package com.beyond.qiin.user.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,15 +22,25 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "user")
+@AttributeOverride(name = "id", column = @Column(name = "user_id"))
 @SQLRestriction("deleted_at = null")
 public class User extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long userId;
+//  // TODO: 부서 FK이므로 ManyToOne 추가
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "dpt_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+//  private Department department;
 
-    public static User create() {
-        return User.builder().build();
-    }
+  @Column(name = "dpt_id", nullable = false)
+  private Long dptId;
+
+  @Column(name = "user_no", length = 50, nullable = false, unique = true)
+  private String userNo;
+
+  @Column(name = "email", length = 100, nullable = false, unique = true)
+  private String email;
+
+  @Column(name = "password", length = 255, nullable = false)
+  private String password;
+
 }
