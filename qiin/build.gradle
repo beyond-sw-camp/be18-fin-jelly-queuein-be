@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.diffplug.spotless' version '6.24.0'
 }
 
 group = 'com.beyond'
@@ -31,16 +32,19 @@ ext {
 dependencies {
     // Spring Boot Starter Dependencies
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.12'
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // QueryDsl
-    // Open Feign QueryDSL (latAest security patched version)
+    // Open Feign QueryDSL (latest security patched version)
     implementation("io.github.openfeign.querydsl:querydsl-core:${queryDslVersion}")
     implementation("io.github.openfeign.querydsl:querydsl-jpa:$queryDslVersion")
 
@@ -68,14 +72,17 @@ dependencies {
     // Testing Dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
-    testImplementation 'org.springframework.security:spring-security-test'
+    // testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+spotless {
+    java {
+        importOrder()         // import문 순서 정리
+        removeUnusedImports() // 안 쓰는 import문 자동 삭제
+        palantirJavaFormat()  // 구글포매터로 코드 변환
+        targetExclude("src/main/generated/**/*.java") // querydsl 파일들 대상 제외
     }
 }
 
@@ -100,4 +107,28 @@ sourceSets {
 // gradle clean 시에 QClass 디렉토리 삭제
 clean {
     delete file(querydslSrcDir)
+}
+
+tasks.register('updateGitHooks', Copy) {
+    from 'scripts/pre-commit'        // 현재 폴더의 scripts 디렉터리
+    into '../.git/hooks'              // 실제 git hooks 폴더 위치
+}
+
+tasks.register('makeGitHooksExecutable') {
+    dependsOn updateGitHooks
+    doLast {
+        def osName = System.getProperty("os.name").toLowerCase()
+        if (osName.contains("windows")) {
+            println "Skipping chmod (Windows detected) — Git hooks assumed already executable."
+        } else {
+            def execOps = getServices().get(org.gradle.process.ExecOperations.class)
+            execOps.exec {
+                commandLine 'chmod', '+x', '../.git/hooks/pre-commit'
+            }
+        }
+    }
+}
+
+if (!System.getenv().containsKey('DOCKER_BUILD')) {
+    compileJava.dependsOn makeGitHooksExecutable
 }

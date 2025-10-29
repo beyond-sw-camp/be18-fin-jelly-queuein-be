@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# === Git 루트 경로 가져오기 ===
+PROJECT_ROOT=$(git rev-parse --show-toplevel)
+
+# === gradlew 자동 탐색 ===
+GRADLEW_PATH=$(find "$PROJECT_ROOT" -maxdepth 3 -type f \( -name "gradlew" -o -name "gradlew.bat" \) | head -n 1)
+
+# === gradlew 유효성 검사 ===
+if [ -z "$GRADLEW_PATH" ]; then
+  echo "gradlew(.bat) not found anywhere under project root!"
+  exit 1
+fi
+
+GRADLE_DIR=$(dirname "$GRADLEW_PATH")
+
+# === Spotless 실행 ===
+echo "Running spotlessApply. Formatting code..."
+cd "$GRADLE_DIR" && "$GRADLEW_PATH" spotlessApply
+
+if [ $? -ne 0 ]; then
+  echo "Spotless apply failed!"
+  exit 1
+fi
+
+# === 변경 파일 다시 add ===
+stagedFiles=$(git diff --staged --name-only)
+for file in $stagedFiles; do
+  if [ -f "$file" ]; then
+    git add "$file"
+  fi
+done
