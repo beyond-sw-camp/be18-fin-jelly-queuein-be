@@ -7,7 +7,7 @@ plugins {
 
 group = 'com.beyond'
 version = '0.0.1-SNAPSHOT'
-description = 'qiin'
+description = 'qiin-be'
 
 java {
     toolchain {
