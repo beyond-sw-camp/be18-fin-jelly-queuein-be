@@ -2,6 +2,9 @@ package com.beyond.qiin.common;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import java.time.Instant;
 import lombok.AccessLevel;
@@ -20,10 +23,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", columnDefinition = "bigint")
+    private Long id;
+
     @Comment("생성자")
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
-    private Long createdBy;
+    private Long createdBy = 0L;
 
     @Comment("생성 시각")
     @CreatedDate
@@ -33,7 +41,7 @@ public abstract class BaseEntity {
     @Comment("수정자")
     @LastModifiedBy
     @Column(name = "updated_by", nullable = false)
-    private Long updatedBy;
+    private Long updatedBy = 0L;
 
     @Comment("수정 시각")
     @LastModifiedDate
