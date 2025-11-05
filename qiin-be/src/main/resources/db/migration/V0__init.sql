@@ -245,8 +245,9 @@ CREATE TABLE `usage_history`
 CREATE INDEX idx_user_dpt_id ON user (dpt_id);
 
 -- 부서 closure
-CREATE UNIQUE INDEX idx_department_closure_ancestor_id ON department_closure (ancestor_id);
-CREATE UNIQUE INDEX idx_department_closure_descendant_id ON department_closure (descendant_id);
+CREATE UNIQUE INDEX idx_department_closure_ancestor_descendant_id ON department_closure (ancestor_id, descendant_id);
+CREATE INDEX idx_department_closure_ancestor_id ON department_closure (ancestor_id);
+CREATE INDEX idx_department_closure_descendant_id ON department_closure (descendant_id);
 
 -- 사용자 역할
 CREATE INDEX idx_user_role_user_id ON user_role (user_id);
@@ -266,8 +267,9 @@ CREATE INDEX idx_asset_history_parent_id ON asset_history (parent_id); -- 필요
 CREATE INDEX idx_asset_history_category_id ON asset_history (category_id);
 
 -- 자원 closure
-CREATE UNIQUE INDEX idx_asset_closure_ancestor_id ON asset_closure (ancestor_id);
-CREATE UNIQUE INDEX idx_asset_closure_descendant_id ON asset_closure (descendant_id);
+CREATE UNIQUE INDEX idx_asset_closure_ancestor_descendant_id ON asset_closure (ancestor_id);
+CREATE INDEX idx_asset_closure_ancestor_id ON asset_closure (ancestor_id);
+CREATE INDEX idx_asset_closure_descendant_id ON asset_closure (descendant_id);
 
 -- 자원 사용 기록
 CREATE INDEX idx_usage_history_asset_id ON usage_history (asset_id);
