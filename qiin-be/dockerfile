@@ -6,7 +6,7 @@ ENV DOCKER_BUILD=true
 RUN gradle clean bootJar --no-daemon
 
 # 2. 실행
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk-jammy
 WORKDIR /app
 COPY --from=builder /home/gradle/src/build/libs/*.jar app.jar
 EXPOSE 8080
