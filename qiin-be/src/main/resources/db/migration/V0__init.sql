@@ -246,7 +246,7 @@ CREATE INDEX idx_user_dpt_id ON user (dpt_id);
 
 -- 부서 closure
 CREATE UNIQUE INDEX idx_department_closure_ancestor_id ON department_closure (ancestor_id);
-CREATE INDEX idx_department_closure_descendant_id ON department_closure (descendant_id);
+CREATE UNIQUE INDEX idx_department_closure_descendant_id ON department_closure (descendant_id);
 
 -- 사용자 역할
 CREATE INDEX idx_user_role_user_id ON user_role (user_id);
