@@ -267,7 +267,7 @@ CREATE INDEX idx_asset_history_parent_id ON asset_history (parent_id); -- 필요
 CREATE INDEX idx_asset_history_category_id ON asset_history (category_id);
 
 -- 자원 closure
-CREATE UNIQUE INDEX idx_asset_closure_ancestor_descendant_id ON asset_closure (ancestor_id);
+CREATE UNIQUE INDEX idx_asset_closure_ancestor_descendant_id ON asset_closure (ancestor_id, descendant_id);
 CREATE INDEX idx_asset_closure_ancestor_id ON asset_closure (ancestor_id);
 CREATE INDEX idx_asset_closure_descendant_id ON asset_closure (descendant_id);
 
