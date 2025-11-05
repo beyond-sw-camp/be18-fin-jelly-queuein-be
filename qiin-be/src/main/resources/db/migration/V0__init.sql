@@ -7,30 +7,36 @@ CREATE TABLE `user` (
                         `password`	VARCHAR(255)	NOT NULL	COMMENT '비밀번호',
                         `phone`	VARCHAR(20)	NULL	COMMENT '연락처',
                         `birth`	VARCHAR(10)	NULL	COMMENT '생년월일',
+                        `hire_date`	TIMESTAMP(6)	NOT NULL	COMMENT '입사일자',
+                        `retire_date`	TIMESTAMP(6)	NULL	COMMENT '퇴사일자',
                         `created_at`	TIMESTAMP(6)	NOT NULL	COMMENT '생성 시각',
                         `created_by`	BIGINT(20)	NOT NULL	COMMENT '생성자',
                         `updated_at`	TIMESTAMP(6)	NULL	COMMENT '수정 시각',
                         `updated_by`	BIGINT(20)	NULL	COMMENT '수정자',
                         `deleted_at`	TIMESTAMP(6)	NULL	COMMENT '삭제 시각',
-                        `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자'
+                        `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자',
+                        PRIMARY KEY (user_id)
 );
 
 CREATE TABLE `user_rev` (
                             `user_rev_id`	BIGINT(20)	NOT NULL	COMMENT '참여자 PK',
                             `reservation_id`	BIGINT(20)	NOT NULL	COMMENT '예약 FK',
-                            `user_id`	BIGINT(20)	NOT NULL	COMMENT '사용자 FK'
+                            `user_id`	BIGINT(20)	NOT NULL	COMMENT '사용자 FK',
+                            PRIMARY KEY (user_rev_id)
 );
 
 CREATE TABLE `user_role` (
                              `user_role_id`	BIGINT(20)	NOT NULL	COMMENT '사용자-역할 매핑 PK',
                              `user_id`	BIGINT(20)	NOT NULL	COMMENT '사용자 FK',
-                             `role_id`	BIGINT(20)	NOT NULL	COMMENT '역할 FK'
+                             `role_id`	BIGINT(20)	NOT NULL	COMMENT '역할 FK',
+                             PRIMARY KEY (user_role_id)
 );
 
 CREATE TABLE `user_history` (
                                 `user_history_id`	BIGINT(20)	NOT NULL	COMMENT '실제 참여자PK',
                                 `user_id`	BIGINT(20)	NOT NULL	COMMENT '사용자FK',
-                                `usage_history_id`	BIGINT(20)	NOT NULL	COMMENT '자원사용기록 PK'
+                                `usage_history_id`	BIGINT(20)	NOT NULL	COMMENT '자원사용기록 PK',
+                                PRIMARY KEY (user_history_id)
 );
 
 CREATE TABLE `permission` (
@@ -42,7 +48,8 @@ CREATE TABLE `permission` (
                               `updated_at`	TIMESTAMP(6)	NULL	COMMENT '수정 시각',
                               `updated_by`	BIGINT(20)	NULL	COMMENT '수정자',
                               `deleted_at`	TIMESTAMP(6)	NULL	COMMENT '삭제 시각',
-                              `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자'
+                              `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자',
+                              PRIMARY KEY (permission_id)
 );
 
 CREATE TABLE `department` (
@@ -53,7 +60,8 @@ CREATE TABLE `department` (
                               `updated_at`	TIMESTAMP(6)	NULL	COMMENT '수정 시각',
                               `updated_by`	BIGINT(20)	NULL	COMMENT '수정자',
                               `deleted_at`	TIMESTAMP(6)	NULL	COMMENT '삭제 시각',
-                              `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자'
+                              `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자',
+                              PRIMARY KEY (dpt_id)
 );
 
 CREATE TABLE `department_closure` (
@@ -64,14 +72,15 @@ CREATE TABLE `department_closure` (
 
 CREATE TABLE `role` (
                         `role_id`	BIGINT(20)	NOT NULL	COMMENT '역할 PK',
-                        `role_name`	VARCHAR(50)	NOT NULL	COMMENT '역할명 UNIQUE('MASTER','ADMIN','MANAGER','USER')',
+                        `role_name`	VARCHAR(50)	NOT NULL	COMMENT '역할명',
                         `role_description`	VARCHAR(255)	NOT NULL	COMMENT '역할 설명',
                         `created_at`	TIMESTAMP(6)	NOT NULL	COMMENT '생성 시각',
                         `created_by`	BIGINT(20)	NOT NULL	COMMENT '생성자',
                         `updated_at`	TIMESTAMP(6)	NULL	COMMENT '수정 시각',
                         `updated_by`	BIGINT(20)	NULL	COMMENT '수정자',
                         `deleted_at`	TIMESTAMP(6)	NULL	COMMENT '삭제 시각',
-                        `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자'
+                        `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자',
+                        PRIMARY KEY (role_id)
 );
 
 CREATE TABLE `role_permission` (
@@ -87,7 +96,7 @@ CREATE TABLE `asset` (
                          `name`	VARCHAR(100)	NOT NULL	COMMENT '자원 이름 (예: 고성능 현미경 #1)',
                          `description`	VARCHAR(500)	NULL	COMMENT '자원 설명',
                          `image`	VARCHAR(255)	NULL	COMMENT '자원 이미지',
-                         `status`	INT	NOT NULL	DEFAULT 'AVAILABLE'	COMMENT '자원 상태',
+                         `status`	INT	NOT NULL	DEFAULT '0'	COMMENT '자원 상태',
                          `type`	INT	NOT NULL	COMMENT '자원 유형(동적, 정적)',
                          `access_level`	INT	NOT NULL	COMMENT '자원에 대한 인가 수준',
                          `approval_status`	BOOLEAN	NOT NULL	DEFAULT FALSE	COMMENT '자원 예약시 승인이 필요한지',
@@ -99,7 +108,8 @@ CREATE TABLE `asset` (
                          `updated_at`	TIMESTAMP(6)	NULL	DEFAULT CURRENT_TIMESTAMP	COMMENT '수정 시각',
                          `updated_by`	BIGINT(20)	NULL	COMMENT '수정자',
                          `deleted_at`	TIMESTAMP(6)	NULL	COMMENT '삭제 시각',
-                         `delete_by`	BIGINT(20)	NULL	COMMENT '삭제자'
+                         `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자',
+                         PRIMARY KEY (asset_id)
 );
 
 CREATE TABLE `asset_history` (
@@ -110,7 +120,7 @@ CREATE TABLE `asset_history` (
                                  `name`	VARCHAR(100)	NOT NULL	COMMENT '자원 이름 (예: 고성능 현미경 #1)',
                                  `description`	VARCHAR(500)	NULL	COMMENT '자원 설명',
                                  `image`	VARCHAR(255)	NULL	COMMENT '자원 이미지',
-                                 `status`	INT	NULL	DEFAULT 'AVAILABLE'	COMMENT '자원 상태',
+                                 `status`	INT	NULL	DEFAULT '0'	COMMENT '자원 상태',
                                  `type`	INT	NOT NULL	COMMENT '자원 유형(동적, 정적)',
                                  `access_level`	INT	NULL	COMMENT '자원에 대한 인가 수준',
                                  `approval_status`	BOOLEAN	NULL	DEFAULT FALSE	COMMENT '자원 예약시 승인이 필요한지',
@@ -122,9 +132,10 @@ CREATE TABLE `asset_history` (
                                  `updated_at`	TIMESTAMP(6)	NULL	DEFAULT CURRENT_TIMESTAMP	COMMENT '수정 시각',
                                  `updated_by`	BIGINT(20)	NULL	COMMENT '수정자',
                                  `deleted_at`	TIMESTAMP(6)	NULL	DEFAULT CURRENT_TIMESTAMP	COMMENT '삭제 시각',
-                                 `delete_by`	BIGINT(20)	NULL	COMMENT '삭제자',
+                                 `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자',
                                  `changed_at`	TIMESTAMP(6)	NULL	DEFAULT CURRENT_TIMESTAMP	COMMENT '변경 발생 시각',
-                                 `changed_by`	BIGINT(20)	NULL	COMMENT '이번 변경(수정)을 일으킨 사용자'
+                                 `changed_by`	BIGINT(20)	NULL	COMMENT '이번 변경(수정)을 일으킨 사용자',
+                                 PRIMARY KEY (asset_history_id)
 );
 
 CREATE TABLE `asset_closure` (
@@ -142,7 +153,8 @@ CREATE TABLE `category` (
                             `updated_at`	TIMESTAMP(6)	NULL	DEFAULT CURRENT_TIMESTAMP	COMMENT '수정 시각',
                             `updated_by`	BIGINT(20)	NULL	COMMENT '수정자',
                             `deleted_at`	TIMESTAMP(6)	NULL	DEFAULT CURRENT_TIMESTAMP	COMMENT '삭제 시각',
-                            `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자'
+                            `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자',
+                            PRIMARY KEY (category_id)
 );
 
 CREATE TABLE `reservation` (
@@ -164,7 +176,8 @@ CREATE TABLE `reservation` (
                                `updated_at`	TIMESTAMP(6)	NULL	COMMENT '수정시간',
                                `updated_by`	BIGINT(20)	NULL	COMMENT '수정자',
                                `deleted_at`	TIMESTAMP(6)	NULL	COMMENT '삭제시간',
-                               `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자'
+                               `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자',
+                               PRIMARY KEY (reservation_id)
 );
 
 CREATE TABLE `settlement` (
@@ -179,14 +192,16 @@ CREATE TABLE `settlement` (
                               `created_at`	TIMESTAMP(6)	NULL	COMMENT '생성시간',
                               `created_by`	BIGINT(20)	NULL	COMMENT '생성자',
                               `deleted_at`	TIMESTAMP(6)	NULL	COMMENT '삭제시간',
-                              `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자'
+                              `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자',
+                              PRIMARY KEY (settlement_id)
 );
 
 CREATE TABLE `notification` (
                                 `event_outbox_id`	BIGINT(20)	NOT NULL	COMMENT '이벤트PK',
                                 `event_type`	VARCHAR(100)	NOT NULL	COMMENT '이벤트 타입 (예: USAGE_COMPLETED)',
                                 `payload`	JSON	NOT NULL	COMMENT '이벤트 데이터(JSON)',
-                                `is_published`	BOOLEAN	NOT NULL	DEFAULT FALSE	COMMENT '발행 여부'
+                                `is_published`	BOOLEAN	NOT NULL	DEFAULT FALSE	COMMENT '발행 여부',
+                                PRIMARY KEY (event_outbox_id)
 );
 
 CREATE TABLE `usage_history` (
@@ -203,78 +218,8 @@ CREATE TABLE `usage_history` (
                                  `created_at`	TIMESTAMP(6)	NULL	COMMENT '생성시간',
                                  `created_by`	BIGINT(20)	NULL	COMMENT '생성자',
                                  `deleted_at`	TIMESTAMP(6)	NULL	COMMENT '삭제시간',
-                                 `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자'
-);
-
-ALTER TABLE `user` ADD CONSTRAINT `PK_USER` PRIMARY KEY (
-                                                         `user_id`
-);
-
-ALTER TABLE `role_permission` ADD CONSTRAINT `PK_ROLE_PERMISSION` PRIMARY KEY (
-                                                                               `role_permission_id`
-);
-
-ALTER TABLE `role` ADD CONSTRAINT `PK_ROLE` PRIMARY KEY (
-                                                         `role_id`
-);
-
-ALTER TABLE `user_rev` ADD CONSTRAINT `PK_USER_REV` PRIMARY KEY (
-                                                                 `user_rev_id`
-);
-
-ALTER TABLE `permission` ADD CONSTRAINT `PK_PERMISSION` PRIMARY KEY (
-                                                                     `permission_id`
-);
-
-ALTER TABLE `user_role` ADD CONSTRAINT `PK_USER_ROLE` PRIMARY KEY (
-                                                                   `user_role_id`
-);
-
-
-ALTER TABLE `department` ADD CONSTRAINT `PK_DEPARTMENT` PRIMARY KEY (
-                                                                     `dpt_id`
-);
-
-ALTER TABLE `asset` ADD CONSTRAINT `PK_ASSET` PRIMARY KEY (
-                                                           `asset_id`
-);
-
-ALTER TABLE `department_closure` ADD CONSTRAINT `PK_DEPARTMENT_CLOSURE` PRIMARY KEY (
-                                                                                     `ancestor_id`,
-                                                                                     `descendant_id`
-);
-
-ALTER TABLE `user_history` ADD CONSTRAINT `PK_USER_HISTORY` PRIMARY KEY (
-                                                                         `user_history_id`
-);
-
-ALTER TABLE `category` ADD CONSTRAINT `PK_CATEGORY` PRIMARY KEY (
-                                                                 `category_id`
-);
-
-ALTER TABLE `asset_closure` ADD CONSTRAINT `PK_ASSET_CLOSURE` PRIMARY KEY (
-                                                                           `ancestor_id`,
-                                                                           `descendant_id`
-);
-
-ALTER TABLE `reservation` ADD CONSTRAINT `PK_RESERVATION` PRIMARY KEY (
-                                                                       `reservation_id`
-);
-
-ALTER TABLE `notification` ADD CONSTRAINT `PK_NOTIFICATION` PRIMARY KEY (
-                                                                         `event_outbox_id`
-);
-
-ALTER TABLE `asset_history` ADD CONSTRAINT `PK_ASSET_HISTORY` PRIMARY KEY (
-                                                                           `asset_history_id`
-);
-
-ALTER TABLE `settlement` ADD CONSTRAINT `PK_SETTLEMENT` PRIMARY KEY (
-                                                                     `settlement_id`
-);
-
-ALTER TABLE `usage_history` ADD CONSTRAINT `PK_USAGE_HISTORY` PRIMARY KEY (
-                                                                           `usage_history_id`
+                                 `deleted_by`	BIGINT(20)	NULL	COMMENT '삭제자',
+                                 PRIMARY KEY (usage_history_id)
 );
 
 -- 인덱스
