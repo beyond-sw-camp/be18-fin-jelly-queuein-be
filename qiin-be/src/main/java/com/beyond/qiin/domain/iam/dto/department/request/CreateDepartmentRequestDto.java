@@ -9,6 +9,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CreateDepartmentRequestDto {
 
-  private String dptName;
-
+    private String dptName;
 }
