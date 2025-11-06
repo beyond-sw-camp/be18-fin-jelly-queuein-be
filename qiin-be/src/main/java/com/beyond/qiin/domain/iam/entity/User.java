@@ -1,4 +1,4 @@
-package com.beyond.qiin.user.entity;
+package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
 import jakarta.persistence.AttributeOverride;
