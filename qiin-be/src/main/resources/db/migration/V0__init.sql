@@ -242,7 +242,7 @@ CREATE TABLE `usage_history`
 
 -- 인덱스
 -- 사용자
-CREATE INDEX idx_user_dpt_id ON user (dpt_id);
+CREATE INDEX idx_user_dpt_id ON `user` (dpt_id);
 
 -- 부서 closure
 CREATE UNIQUE INDEX idx_department_closure_ancestor_descendant_id ON department_closure (ancestor_id, descendant_id);
