@@ -1,5 +1,3 @@
 package com.beyond.qiin.domain.iam.repository;
 
-public class DepartmentJpaRepository {
-
-}
+public class DepartmentJpaRepository {}

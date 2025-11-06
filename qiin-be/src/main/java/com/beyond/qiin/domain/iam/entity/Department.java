@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.iam.entity;
 
-
 import com.beyond.qiin.common.BaseEntity;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -23,7 +22,6 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at = null")
 public class Department extends BaseEntity {
 
-  @Column(name = "dpt_name", length = 50, nullable = false)
-  private String dptName;
-
+    @Column(name = "dpt_name", length = 50, nullable = false)
+    private String dptName;
 }

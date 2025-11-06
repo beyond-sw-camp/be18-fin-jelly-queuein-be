@@ -1,8 +1,5 @@
 package com.beyond.qiin.domain.iam.dto.department.request;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,8 +9,5 @@ import lombok.Getter;
 @Builder
 public class CreateDepartmentRequestDto {
 
-  private String dptName;
-
-
-
+    private String dptName;
 }
