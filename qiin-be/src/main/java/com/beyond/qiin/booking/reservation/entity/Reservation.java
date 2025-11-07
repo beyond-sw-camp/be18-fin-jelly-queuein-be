@@ -3,8 +3,15 @@ package com.beyond.qiin.booking.reservation.entity;
 import com.beyond.qiin.common.BaseEntity;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,10 +30,19 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at = null")
 public class Reservation extends BaseEntity {
   //신청자
-
-  //승인자
-
-  //자원
+//  @OneToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "applicant_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+//  private User applicant;
+//
+//  //승인자
+//  @OneToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "respondent_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+//  private User respondent;
+//
+//  //자원
+//  @OneToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "asset_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+//  private Asset asset;
 
   @Column(name = "start_at", nullable = false)
   private Instant startAt;
@@ -48,8 +64,8 @@ public class Reservation extends BaseEntity {
   private String description;
 
   @Column(name = "version", nullable = false)
-  @Builder.Default
-  private int version = 0;
+  @Version
+  private Long version;
 
   @Column(name = "is_approved", nullable = false)
   @Builder.Default
