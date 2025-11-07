@@ -1,4 +1,4 @@
-# Spring Boot 실행용 Dockerfile
+# Spring Boot 실행용 dockerfile
 FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
