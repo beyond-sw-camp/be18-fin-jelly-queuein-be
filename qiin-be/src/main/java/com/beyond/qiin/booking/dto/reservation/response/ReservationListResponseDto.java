@@ -12,6 +12,6 @@ import lombok.Getter;
 @Getter
 public class ReservationListResponseDto {
 
-  @Builder.Default
-  List<ReservationResponseDto> reservationList = new ArrayList<>();
+    @Builder.Default
+    List<ReservationResponseDto> reservationList = new ArrayList<>();
 }
