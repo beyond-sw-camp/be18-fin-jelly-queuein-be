@@ -11,9 +11,12 @@ spring:
       - classpath:db/migration
       - classpath:db/seed/dev
 
-  # Spring 표준 URL을 Docker Compose 내부 주소로 덮어씀
+  # DB 설정: Spring 표준 키 사용 (Doppler에 있는 키와 매칭)
   datasource:
-    url: jdbc:mariadb://mariadb:3306/qiin # mariadb는 Docker 서비스 이름
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
 
   jpa:
     hibernate:
