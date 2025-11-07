@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jpa:
+    hibernate:
+      ddl-auto: validate # 스키마 변경 방지 (운영 표준)
+    show-sql: false
+
+logging:
+  level:
+    root: WARN
+    com.beyond.qiin: INFO

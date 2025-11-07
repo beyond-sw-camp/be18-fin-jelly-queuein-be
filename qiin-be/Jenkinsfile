@@ -1,0 +1,84 @@
+pipeline {
+	agent any
+
+	environment {
+		DOPPLER_TOKEN = credentials('DOPPLER_TOKEN')
+	}
+
+	stages {
+		stage('docker-compose 설치 확인') {
+			steps {
+				echo 'docker-compose 설치 여부를 확인합니다...'
+				sh '''
+                if command -v docker-compose >/dev/null 2>&1; then
+                    echo "✅ docker-compose가 이미 설치되어 있습니다."
+                    docker-compose version
+                else
+                    echo "⚠️ docker-compose 명령어를 찾을 수 없습니다."
+                    echo "Jenkins Docker 이미지 빌드 시 docker-compose를 미리 설치해야 합니다."
+                    exit 1
+                fi
+                '''
+			}
+		}
+
+		stage('Doppler CLI 설치 확인') {
+			steps {
+				echo 'Doppler CLI 설치 여부를 확인합니다...'
+				sh '''
+                if ! command -v doppler >/dev/null 2>&1; then
+                    echo "🚀 doppler CLI가 설치되어 있지 않습니다. 설치를 진행합니다..."
+                    curl -Ls https://cli.doppler.com/install.sh | sh
+                    echo "✅ doppler CLI 설치 완료"
+                else
+                    echo "✅ doppler CLI가 이미 설치되어 있습니다."
+                fi
+                doppler --version
+                '''
+			}
+		}
+
+		stage('Fetch Environment') {
+			steps {
+				echo "🔧 Setting up Doppler..."
+				sh '''
+                doppler setup --token $DOPPLER_TOKEN --no-interactive
+                '''
+			}
+		}
+
+		stage('Build with Doppler Envs') {
+			steps {
+				echo "🏗️ Running Gradle build with Doppler envs"
+				sh '''
+                cd qiin-be
+                doppler run --command "./gradlew clean build -x test"
+                '''
+			}
+		}
+
+		stage('Archive Build') {
+			steps {
+				archiveArtifacts artifacts: 'qiin-be/build/libs/*.jar', fingerprint: true
+			}
+		}
+
+		stage('Deploy with Docker Compose') {
+			steps {
+				echo "🚀 Starting deployment via Docker Compose..."
+				sh '''
+                cd qiin-be
+
+                echo "🧹 Stopping previous containers..."
+                docker-compose down || true
+
+                echo "🐳 Building and starting new containers..."
+                doppler run -- bash -c "docker-compose up -d --build"
+
+                echo "✅ Deployment completed successfully!"
+                '''
+			}
+		}
+	}
+
+}

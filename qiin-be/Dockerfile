@@ -1,0 +1,13 @@
+# Spring Boot 실행용 Dockerfile
+FROM eclipse-temurin:21-jdk
+
+WORKDIR /app
+
+# gradle 빌드 결과 jar 복사
+COPY build/libs/*.jar app.jar
+
+# JVM 환경 변수 (옵션)
+ENV TZ=Asia/Seoul
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

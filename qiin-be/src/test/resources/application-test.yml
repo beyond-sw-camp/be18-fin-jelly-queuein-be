@@ -1,0 +1,25 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MariaDB;DB_CLOSE_DELAY=-1;
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect   # 변경
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  kafka:
+    listener:
+      auto-startup: false
+
+  data:
+    redis:
+      host: 0
+      port: 0
