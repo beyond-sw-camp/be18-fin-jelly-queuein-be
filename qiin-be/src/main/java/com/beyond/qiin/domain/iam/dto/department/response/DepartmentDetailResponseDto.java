@@ -11,13 +11,13 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DepartmentDetailResponseDto {
 
-    private Long departmentId;
-    private String departmentName;
+    private Long dptId;
+    private String dptName;
 
     public static DepartmentDetailResponseDto fromEntity(final Department department) {
         return DepartmentDetailResponseDto.builder()
-                .departmentId(department.getId())
-                .departmentName(department.getDptName())
+                .dptId(department.getId())
+                .dptName(department.getDptName())
                 .build();
     }
 }
