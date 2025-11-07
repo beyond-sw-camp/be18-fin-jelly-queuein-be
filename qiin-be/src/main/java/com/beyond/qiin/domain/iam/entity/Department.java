@@ -12,7 +12,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 
 @Entity
 @Getter
@@ -28,9 +27,6 @@ public class Department extends BaseEntity {
     private String dptName;
 
     public static Department create(final CreateDepartmentRequestDto request) {
-        return Department.builder()
-            .dptName(request.getDptName())
-            .build();
+        return Department.builder().dptName(request.getDptName()).build();
     }
-
 }
