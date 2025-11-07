@@ -7,4 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/departments")
 @RequiredArgsConstructor
-public class DepartmentQueryController {}
+public class DepartmentQueryController {
+
+
+}

@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.iam.dto.department.request.CreateDepartmentRequestDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 
 @Entity
 @Getter
@@ -24,4 +26,11 @@ public class Department extends BaseEntity {
 
     @Column(name = "dpt_name", length = 50, nullable = false)
     private String dptName;
+
+    public static Department create(final CreateDepartmentRequestDto request) {
+        return Department.builder()
+            .dptName(request.getDptName())
+            .build();
+    }
+
 }
