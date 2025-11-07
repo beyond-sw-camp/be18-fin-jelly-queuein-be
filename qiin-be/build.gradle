@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.flywaydb:flyway-core:10.17.0'
+        classpath 'org.flywaydb:flyway-mysql:10.17.0'
+        classpath 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.4'
@@ -8,6 +19,7 @@ plugins {
 
 flyway {
     url = 'jdbc:mariadb://localhost:3309/qiin'
+//    url = System.getenv("SPRING_DATASOURCE_URL")
     user = System.getenv("SPRING_DATASOURCE_USERNAME")
     password = System.getenv("SPRING_DATASOURCE_PASSWORD")
     driver = 'org.mariadb.jdbc.Driver'
@@ -63,7 +75,6 @@ dependencies {
     implementation 'org.flywaydb:flyway-mysql'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-
     // QueryDSL annotation processor
     annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:$queryDslVersion:jpa")
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
@@ -78,7 +89,6 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // Runtime Database Drivers
-    runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     runtimeOnly 'com.h2database:h2'   // 여기로 이동
 

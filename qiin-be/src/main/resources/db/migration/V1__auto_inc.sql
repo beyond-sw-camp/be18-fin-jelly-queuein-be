@@ -1,3 +1,6 @@
+ALTER TABLE `role_permission`
+    ADD PRIMARY KEY (`role_permission_id`);
+
 ALTER TABLE `user` MODIFY `user_id` BIGINT(20) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `user_rev` MODIFY `user_rev_id` BIGINT(20) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `user_role` MODIFY `user_role_id` BIGINT(20) NOT NULL AUTO_INCREMENT;
