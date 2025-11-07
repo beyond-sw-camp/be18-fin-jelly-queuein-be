@@ -8,6 +8,4 @@ import lombok.Getter;
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class CreateReservationRequestDto {
-
-}
+public class CreateReservationRequestDto {}

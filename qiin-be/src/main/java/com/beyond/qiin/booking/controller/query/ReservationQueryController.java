@@ -1,8 +1,8 @@
-//package com.beyond.qiin.booking.controller.query;
+// package com.beyond.qiin.booking.controller.query;
 //
-//import org.springframework.web.bind.annotation.RestController;
+// import org.springframework.web.bind.annotation.RestController;
 //
-//@RestController
-//public class ReservationQueryController {
+// @RestController
+// public class ReservationQueryController {
 //
-//}
+// }
