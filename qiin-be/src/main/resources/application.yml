@@ -5,13 +5,6 @@ spring:
   profiles:
     default: dev
 
-  # DB 설정: Spring 표준 키 사용 (Doppler에 있는 키와 매칭)
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: org.mariadb.jdbc.Driver
-
   # JPA 공통 설정
   jpa:
     open-in-view: false
