@@ -3,6 +3,13 @@ spring:
     activate:
       on-profile: prod
 
+  flyway:
+    enabled: false #cicd에서 실행 담당하도록 자동 실행 방지, flywayMigrate으로 반영
+    baseline-on-migrate: true #기존 테이블 있는 경우를 포함해 적용
+    baseline-version: "0" #테이블 없으면 0부터 시작
+    locations:
+      - classpath:db/migration
+
   # DB 설정: Spring 표준 키 사용 (Doppler에 있는 키와 매칭)
   datasource:
     url: ${SPRING_DATASOURCE_URL}
