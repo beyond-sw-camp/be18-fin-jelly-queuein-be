@@ -2,9 +2,9 @@ name: Discord Notifications
 
 on:
   issues:
-    types: [ opened ]
+    types: [opened]
   pull_request:
-    types: [ opened ]
+    types: [opened, closed]   # closed 추가로 merge 감지
   push:
     branches:
       - develop
@@ -23,49 +23,70 @@ jobs:
       PR_TITLE: ${{ github.event.pull_request.title }}
       PR_BRANCH: ${{ github.head_ref }}
       PR_URL: ${{ github.event.pull_request.html_url }}
+      PR_MERGED: ${{ github.event.pull_request.merged }}
+      BASE_BRANCH: ${{ github.base_ref }}
       COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
       COMMIT_URL: ${{ github.event.head_commit.url }}
       BRANCH: ${{ github.ref_name }}
+
     steps:
       - name: Send Discord Notification
         run: |
           echo "Triggered event: $EVENT"
 
+          COMMIT_MESSAGE=${COMMIT_MESSAGE:-"(no commit message)"}
+          COMMIT_URL=${COMMIT_URL:-""}
+          PR_BRANCH=${PR_BRANCH:-"(unknown branch)"}
+          BASE_BRANCH=${BASE_BRANCH:-"(unknown base)"}
+
           if [ "$EVENT" = "issues" ]; then
             JSON=$(jq -n \
               --arg username "GitHub Actions" \
-              --argjson embeds "[{
+              --arg embeds "[{
                 \"title\": \"📝 New Issue Created\",
                 \"description\": \"**$ISSUE_TITLE**\",
                 \"url\": \"$ISSUE_URL\",
                 \"color\": 3447003,
                 \"author\": {\"name\": \"$ACTOR\"}
               }]" \
-              '{username: $username, embeds: $embeds}')
+              '{username: $username, embeds: ($embeds | fromjson)}')
 
           elif [ "$EVENT" = "pull_request" ]; then
-            JSON=$(jq -n \
-              --arg username "GitHub Actions" \
-              --argjson embeds "[{
-                \"title\": \"🔀 Pull Request Opened\",
-                \"description\": \"PR: **$PR_TITLE**\\nBranch: \`$PR_BRANCH\`\",
-                \"url\": \"$PR_URL\",
-                \"color\": 15105570,
-                \"author\": {\"name\": \"$ACTOR\"}
-              }]" \
-              '{username: $username, embeds: $embeds}')
+            if [ "$PR_MERGED" = "true" ]; then
+              JSON=$(jq -n \
+                --arg username "GitHub Actions" \
+                --arg embeds "[{
+                  \"title\": \"✅ Pull Request Merged\",
+                  \"description\": \"**$PR_TITLE**\\nMerged into \`$BASE_BRANCH\` by $ACTOR\",
+                  \"url\": \"$PR_URL\",
+                  \"color\": 3066993,
+                  \"author\": {\"name\": \"$ACTOR\"}
+                }]" \
+                '{username: $username, embeds: ($embeds | fromjson)}')
+            else
+              JSON=$(jq -n \
+                --arg username "GitHub Actions" \
+                --arg embeds "[{
+                  \"title\": \"🔀 Pull Request Opened\",
+                  \"description\": \"PR: **$PR_TITLE**\\nBranch: \`$PR_BRANCH\`\",
+                  \"url\": \"$PR_URL\",
+                  \"color\": 15105570,
+                  \"author\": {\"name\": \"$ACTOR\"}
+                }]" \
+                '{username: $username, embeds: ($embeds | fromjson)}')
+            fi
 
           elif [ "$EVENT" = "push" ]; then
             JSON=$(jq -n \
               --arg username "GitHub Actions" \
-              --argjson embeds "[{
+              --arg embeds "[{
                 \"title\": \"🚀 New Commit on $BRANCH\",
                 \"description\": \"$COMMIT_MESSAGE\",
                 \"url\": \"$COMMIT_URL\",
                 \"color\": 5814783,
                 \"author\": {\"name\": \"$ACTOR\"}
               }]" \
-              '{username: $username, embeds: $embeds}')
+              '{username: $username, embeds: ($embeds | fromjson)}')
           fi
 
           curl -H "Content-Type: application/json" \
