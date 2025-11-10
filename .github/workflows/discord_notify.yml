@@ -2,14 +2,13 @@ name: Discord Notifications
 
 on:
   issues:
-    types: [opened]
+    types: [ opened ]
   pull_request:
-    types: [opened, closed]   # closed 추가로 merge 감지
+    types: [ opened, closed ]
   push:
     branches:
       - develop
       - main
-      - feature/41-workflow-bug
 
 jobs:
   notify:
@@ -39,6 +38,7 @@ jobs:
           PR_BRANCH=${PR_BRANCH:-"(unknown branch)"}
           BASE_BRANCH=${BASE_BRANCH:-"(unknown base)"}
 
+          # Issue open
           if [ "$EVENT" = "issues" ]; then
             JSON=$(jq -n \
               --arg username "GitHub Actions" \
@@ -51,6 +51,7 @@ jobs:
               }]" \
               '{username: $username, embeds: ($embeds | fromjson)}')
 
+          # PR open, merge
           elif [ "$EVENT" = "pull_request" ]; then
             if [ "$PR_MERGED" = "true" ]; then
               JSON=$(jq -n \
@@ -76,19 +77,39 @@ jobs:
                 '{username: $username, embeds: ($embeds | fromjson)}')
             fi
 
+          # push
           elif [ "$EVENT" = "push" ]; then
+            # squash / merge commit 메시지 확인 후 skip
+            if echo "$COMMIT_MESSAGE" | grep -qiE "^Merge pull request|^Merge branch"; then
+              echo "🟡 Skipping push notification for merge/squash commit."
+              exit 0
+            fi
+
+            # 줄바꿈 포함 메시지 안전하게 escape 처리
+            SANITIZED_COMMIT_MESSAGE=$(echo "$COMMIT_MESSAGE" | jq -Rs . | sed 's/^"//;s/"$//')
+
             JSON=$(jq -n \
               --arg username "GitHub Actions" \
-              --arg embeds "[{
-                \"title\": \"🚀 New Commit on $BRANCH\",
-                \"description\": \"$COMMIT_MESSAGE\",
-                \"url\": \"$COMMIT_URL\",
-                \"color\": 5814783,
-                \"author\": {\"name\": \"$ACTOR\"}
-              }]" \
-              '{username: $username, embeds: ($embeds | fromjson)}')
+              --arg branch "$BRANCH" \
+              --arg commit_message "$SANITIZED_COMMIT_MESSAGE" \
+              --arg url "$COMMIT_URL" \
+              --arg actor "$ACTOR" \
+              '{
+                username: $username,
+                embeds: [{
+                  title: "🚀 New Commit on " + $branch,
+                  description: $commit_message,
+                  url: $url,
+                  color: 5814783,
+                  author: { name: $actor }
+                }]
+              }')
           fi
 
-          curl -H "Content-Type: application/json" \
-               -d "$JSON" \
-               "$DISCORD_WEBHOOK_URL"
+          # Send Discord message
+          
+          if [ -n "$JSON" ]; then
+            curl -H "Content-Type: application/json" \
+                 -d "$JSON" \
+                 "$DISCORD_WEBHOOK_URL"
+          fi
