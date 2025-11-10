@@ -1,0 +1,72 @@
+name: Discord Notifications
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+  push:
+    branches:
+      - feature/31-workflow-discord
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          EVENT=${{ github.event_name }}
+
+          if [ "$EVENT" = "issues" ]; then
+            AUTHOR=${{ github.actor }}
+            TITLE=${{ github.event.issue.title }}
+            URL=${{ github.event.issue.html_url }}
+            JSON=$(jq -n \
+              --arg username "GitHub Actions" \
+              --argjson embeds "[{
+                \"title\": \"📝 New Issue Created\",
+                \"description\": \"**$TITLE**\",
+                \"url\": \"$URL\",
+                \"color\": 3447003,
+                \"author\": {\"name\": \"$AUTHOR\"}
+              }]" \
+              '{username: $username, embeds: $embeds}')
+
+          elif [ "$EVENT" = "pull_request" ]; then
+            AUTHOR=${{ github.actor }}
+            TITLE=${{ github.event.pull_request.title }}
+            BRANCH=${{ github.head_ref }}
+            URL=${{ github.event.pull_request.html_url }}
+            JSON=$(jq -n \
+              --arg username "GitHub Actions" \
+              --argjson embeds "[{
+                \"title\": \"🔀 Pull Request Opened\",
+                \"description\": \"**$TITLE**\\nBranch: \`$BRANCH\`\",
+                \"url\": \"$URL\",
+                \"color\": 15105570,
+                \"author\": {\"name\": \"$AUTHOR\"}
+              }]" \
+              '{username: $username, embeds: $embeds}')
+
+          elif [ "$EVENT" = "push" ]; then
+            AUTHOR=${{ github.actor }}
+            BRANCH=${{ github.ref_name }}
+            MESSAGE=$(echo "${{ github.event.head_commit.message }}" | sed 's/"/\\"/g')
+            URL=${{ github.event.head_commit.url }}
+            JSON=$(jq -n \
+              --arg username "GitHub Actions" \
+              --argjson embeds "[{
+                \"title\": \"🚀 New Commit on $BRANCH\",
+                \"description\": \"$MESSAGE\",
+                \"url\": \"$URL\",
+                \"color\": 5814783,
+                \"author\": {\"name\": \"$AUTHOR\"}
+              }]" \
+              '{username: $username, embeds: $embeds}')
+          fi
+
+          curl -H "Content-Type: application/json" \
+               -d "$JSON" \
+               "$DISCORD_WEBHOOK_URL"
