@@ -2,13 +2,14 @@ name: Discord Notifications
 
 on:
   issues:
-    types: [opened]
+    types: [ opened ]
   pull_request:
-    types: [opened]
+    types: [ opened ]
   push:
     branches:
       - develop
       - main
+      - feature/41-workflow-bug
 
 jobs:
   notify:
