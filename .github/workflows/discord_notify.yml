@@ -2,9 +2,9 @@ name: Discord Notifications
 
 on:
   issues:
-    types: [ opened ]
+    types: [opened]
   pull_request:
-    types: [ opened, closed ]
+    types: [opened, closed]
   push:
     branches:
       - develop
@@ -38,55 +38,78 @@ jobs:
           PR_BRANCH=${PR_BRANCH:-"(unknown branch)"}
           BASE_BRANCH=${BASE_BRANCH:-"(unknown base)"}
 
-          # Issue open
+          # === ISSUE OPEN ===
           if [ "$EVENT" = "issues" ]; then
+            SANITIZED_ISSUE_TITLE=$(printf "%b" "$ISSUE_TITLE" | sed 's/^/• /' | sed 's/\n/\n• /g')
             JSON=$(jq -n \
               --arg username "GitHub Actions" \
-              --arg embeds "[{
-                \"title\": \"📝 New Issue Created\",
-                \"description\": \"**$ISSUE_TITLE**\",
-                \"url\": \"$ISSUE_URL\",
-                \"color\": 3447003,
-                \"author\": {\"name\": \"$ACTOR\"}
-              }]" \
-              '{username: $username, embeds: ($embeds | fromjson)}')
+              --arg title "📝 New Issue Created" \
+              --arg desc "$SANITIZED_ISSUE_TITLE" \
+              --arg url "$ISSUE_URL" \
+              --arg actor "$ACTOR" \
+              '{
+                username: $username,
+                embeds: [{
+                  title: $title,
+                  description: $desc,
+                  url: $url,
+                  color: 3447003,
+                  author: { name: $actor }
+                }]
+              }')
 
-          # PR open, merge
+          # === PR OPEN / MERGE ===
           elif [ "$EVENT" = "pull_request" ]; then
+            SANITIZED_PR_TITLE=$(printf "%b" "$PR_TITLE" | sed 's/^/• /' | sed 's/\n/\n• /g')
+
             if [ "$PR_MERGED" = "true" ]; then
+              SANITIZED_DESC=$(printf "%b" "**$PR_TITLE**\nMerged into \`$BASE_BRANCH\` by $ACTOR" | sed 's/^/• /' | sed 's/\n/\n• /g')
               JSON=$(jq -n \
                 --arg username "GitHub Actions" \
-                --arg embeds "[{
-                  \"title\": \"✅ Pull Request Merged\",
-                  \"description\": \"**$PR_TITLE**\\nMerged into \`$BASE_BRANCH\` by $ACTOR\",
-                  \"url\": \"$PR_URL\",
-                  \"color\": 3066993,
-                  \"author\": {\"name\": \"$ACTOR\"}
-                }]" \
-                '{username: $username, embeds: ($embeds | fromjson)}')
+                --arg title "✅ Pull Request Merged" \
+                --arg desc "$SANITIZED_DESC" \
+                --arg url "$PR_URL" \
+                --arg actor "$ACTOR" \
+                '{
+                  username: $username,
+                  embeds: [{
+                    title: $title,
+                    description: $desc,
+                    url: $url,
+                    color: 3066993,
+                    author: { name: $actor }
+                  }]
+                }')
             else
+              SANITIZED_DESC=$(printf "%b" "PR: **$PR_TITLE**\nBranch: \`$PR_BRANCH\`" | sed 's/^/• /' | sed 's/\n/\n• /g')
               JSON=$(jq -n \
                 --arg username "GitHub Actions" \
-                --arg embeds "[{
-                  \"title\": \"🔀 Pull Request Opened\",
-                  \"description\": \"PR: **$PR_TITLE**\\nBranch: \`$PR_BRANCH\`\",
-                  \"url\": \"$PR_URL\",
-                  \"color\": 15105570,
-                  \"author\": {\"name\": \"$ACTOR\"}
-                }]" \
-                '{username: $username, embeds: ($embeds | fromjson)}')
+                --arg title "🔀 Pull Request Opened" \
+                --arg desc "$SANITIZED_DESC" \
+                --arg url "$PR_URL" \
+                --arg actor "$ACTOR" \
+                '{
+                  username: $username,
+                  embeds: [{
+                    title: $title,
+                    description: $desc,
+                    url: $url,
+                    color: 15105570,
+                    author: { name: $actor }
+                  }]
+                }')
             fi
 
-          # push
+          # === PUSH EVENT ===
           elif [ "$EVENT" = "push" ]; then
             # squash / merge commit 메시지 확인 후 skip
-            if echo "$COMMIT_MESSAGE" | grep -qiE "^Merge pull request|^Merge branch"; then
+            if echo "$COMMIT_MESSAGE" | grep -qiE "^Merge pull request|^Merge branch|[(]#[0-9]+[)]$"; then
               echo "🟡 Skipping push notification for merge/squash commit."
               exit 0
             fi
 
-            # 줄바꿈 포함 메시지 안전하게 escape 처리
-            SANITIZED_COMMIT_MESSAGE=$(echo "$COMMIT_MESSAGE" | jq -Rs . | sed 's/^"//;s/"$//')
+            # 실제 줄바꿈 적용 + 각 줄 앞에 • 추가
+            SANITIZED_COMMIT_MESSAGE=$(printf "%b" "$COMMIT_MESSAGE" | sed 's/^/• /' | sed 's/\n/\n• /g')
 
             JSON=$(jq -n \
               --arg username "GitHub Actions" \
@@ -97,7 +120,7 @@ jobs:
               '{
                 username: $username,
                 embeds: [{
-                  title: "🚀 New Commit on " + $branch,
+                  title: "🚀 New Commit on \($branch)",
                   description: $commit_message,
                   url: $url,
                   color: 5814783,
@@ -106,9 +129,11 @@ jobs:
               }')
           fi
 
-          # Send Discord message
-          
+
+
+          # === SEND DISCORD MESSAGE ===
           if [ -n "$JSON" ]; then
+            echo "Sending message to Discord..."
             curl -H "Content-Type: application/json" \
                  -d "$JSON" \
                  "$DISCORD_WEBHOOK_URL"
