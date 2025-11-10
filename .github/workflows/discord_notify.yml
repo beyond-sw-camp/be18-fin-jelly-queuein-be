@@ -7,62 +7,62 @@ on:
     types: [opened]
   push:
     branches:
-      - feature/31-workflow-discord
+      - develop
+      - main
 
 jobs:
   notify:
     runs-on: ubuntu-latest
+    env:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      EVENT: ${{ github.event_name }}
+      ACTOR: ${{ github.actor }}
+      ISSUE_TITLE: ${{ github.event.issue.title }}
+      ISSUE_URL: ${{ github.event.issue.html_url }}
+      PR_TITLE: ${{ github.event.pull_request.title }}
+      PR_BRANCH: ${{ github.head_ref }}
+      PR_URL: ${{ github.event.pull_request.html_url }}
+      COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+      COMMIT_URL: ${{ github.event.head_commit.url }}
+      BRANCH: ${{ github.ref_name }}
     steps:
       - name: Send Discord Notification
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          EVENT=${{ github.event_name }}
+          echo "Triggered event: $EVENT"
 
           if [ "$EVENT" = "issues" ]; then
-            AUTHOR=${{ github.actor }}
-            TITLE=${{ github.event.issue.title }}
-            URL=${{ github.event.issue.html_url }}
             JSON=$(jq -n \
               --arg username "GitHub Actions" \
               --argjson embeds "[{
                 \"title\": \"📝 New Issue Created\",
-                \"description\": \"**$TITLE**\",
-                \"url\": \"$URL\",
+                \"description\": \"**$ISSUE_TITLE**\",
+                \"url\": \"$ISSUE_URL\",
                 \"color\": 3447003,
-                \"author\": {\"name\": \"$AUTHOR\"}
+                \"author\": {\"name\": \"$ACTOR\"}
               }]" \
               '{username: $username, embeds: $embeds}')
 
           elif [ "$EVENT" = "pull_request" ]; then
-            AUTHOR=${{ github.actor }}
-            TITLE=${{ github.event.pull_request.title }}
-            BRANCH=${{ github.head_ref }}
-            URL=${{ github.event.pull_request.html_url }}
             JSON=$(jq -n \
               --arg username "GitHub Actions" \
               --argjson embeds "[{
                 \"title\": \"🔀 Pull Request Opened\",
-                \"description\": \"**$TITLE**\\nBranch: \`$BRANCH\`\",
-                \"url\": \"$URL\",
+                \"description\": \"**$PR_TITLE**\\nBranch: \`$PR_BRANCH\`\",
+                \"url\": \"$PR_URL\",
                 \"color\": 15105570,
-                \"author\": {\"name\": \"$AUTHOR\"}
+                \"author\": {\"name\": \"$ACTOR\"}
               }]" \
               '{username: $username, embeds: $embeds}')
 
           elif [ "$EVENT" = "push" ]; then
-            AUTHOR=${{ github.actor }}
-            BRANCH=${{ github.ref_name }}
-            MESSAGE=$(echo "${{ github.event.head_commit.message }}" | sed 's/"/\\"/g')
-            URL=${{ github.event.head_commit.url }}
             JSON=$(jq -n \
               --arg username "GitHub Actions" \
               --argjson embeds "[{
                 \"title\": \"🚀 New Commit on $BRANCH\",
-                \"description\": \"$MESSAGE\",
-                \"url\": \"$URL\",
+                \"description\": \"$COMMIT_MESSAGE\",
+                \"url\": \"$COMMIT_URL\",
                 \"color\": 5814783,
-                \"author\": {\"name\": \"$AUTHOR\"}
+                \"author\": {\"name\": \"$ACTOR\"}
               }]" \
               '{username: $username, embeds: $embeds}')
           fi
