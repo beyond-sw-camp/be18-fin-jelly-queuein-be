@@ -47,7 +47,7 @@ jobs:
               --arg username "GitHub Actions" \
               --argjson embeds "[{
                 \"title\": \"🔀 Pull Request Opened\",
-                \"description\": \"**$PR_TITLE**\\nBranch: \`$PR_BRANCH\`\",
+                \"description\": \"PR: **$PR_TITLE**\\nBranch: \`$PR_BRANCH\`\",
                 \"url\": \"$PR_URL\",
                 \"color\": 15105570,
                 \"author\": {\"name\": \"$ACTOR\"}
