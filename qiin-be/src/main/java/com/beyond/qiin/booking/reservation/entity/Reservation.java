@@ -1,12 +1,16 @@
 package com.beyond.qiin.booking.reservation.entity;
 
+import com.beyond.qiin.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.common.BaseEntity;
 import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.time.Instant;
+import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +19,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
+@Builder(toBuilder = true)
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -37,6 +41,10 @@ public class Reservation extends BaseEntity {
     //  @OneToOne(fetch = FetchType.LAZY)
     //  @JoinColumn(name = "asset_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     //  private Asset asset;
+
+    // //참여자들
+//    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Attendant> attendants = new ArrayList<>();
 
     @Column(name = "start_at", nullable = false)
     private Instant startAt;
@@ -67,4 +75,13 @@ public class Reservation extends BaseEntity {
 
     @Column(name = "reason", nullable = true)
     private String reason;
+
+    public static Reservation createReservation(CreateReservationRequestDto createReservationRequestDto) {
+        Reservation reservation = Reservation.builder()
+            .applicant()
+            .respondent()
+            .asset()
+
+            .build();
+    }
 }
