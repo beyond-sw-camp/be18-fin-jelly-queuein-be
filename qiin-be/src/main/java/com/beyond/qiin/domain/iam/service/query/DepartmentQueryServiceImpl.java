@@ -5,4 +5,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class DepartmentQueryServiceImpl implements DepartmentQueryService {}
+public class DepartmentQueryServiceImpl implements DepartmentQueryService {
+
+}

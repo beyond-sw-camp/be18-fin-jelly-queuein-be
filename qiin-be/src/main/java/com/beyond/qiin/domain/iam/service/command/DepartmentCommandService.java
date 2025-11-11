@@ -5,6 +5,7 @@ import com.beyond.qiin.domain.iam.dto.department.response.DepartmentDetailRespon
 
 public interface DepartmentCommandService {
 
-    // 부서 생성
-    DepartmentDetailResponseDto createDepartment(final CreateDepartmentRequestDto request);
+  // 부서 생성
+  DepartmentDetailResponseDto createDepartment(final CreateDepartmentRequestDto request);
+
 }

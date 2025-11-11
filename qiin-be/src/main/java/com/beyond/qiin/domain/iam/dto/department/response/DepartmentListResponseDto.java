@@ -8,4 +8,6 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class DepartmentListResponseDto {}
+public class DepartmentListResponseDto {
+
+}

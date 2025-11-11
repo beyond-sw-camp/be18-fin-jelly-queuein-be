@@ -11,8 +11,8 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DepartmentDetailResponseDto {
 
-    private Long dptId;
-    private String dptName;
+    private final Long dptId;
+    private final String dptName;
 
     public static DepartmentDetailResponseDto fromEntity(final Department department) {
         return DepartmentDetailResponseDto.builder()
