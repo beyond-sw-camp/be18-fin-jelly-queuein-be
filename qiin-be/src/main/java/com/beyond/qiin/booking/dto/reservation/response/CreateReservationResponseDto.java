@@ -7,28 +7,22 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-//예약에 대한 상세 조회
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class ReservationResponseDto {
+//예약 생성 시에 대한 응답용
+public class CreateReservationResponseDto {
 
   //예약 id
   @NotNull
-  private String reservationId;
+  private Long reservationId;
 
   //신청자 이름
   @NotNull
   private String applicantName;
 
-  //자원 유형
-  private String assetType;
-
   //자원 이름
   private String assetName;
-
-  //카테고리명
-  private String categoryName;
 
   //예약 시작 시간
   @NotNull
@@ -59,5 +53,6 @@ public class ReservationResponseDto {
   //문자열로 주지 않으면 프론트에서 그 값을 알고 처리해야하는 단점
   @NotNull
   private String status;
+
 
 }

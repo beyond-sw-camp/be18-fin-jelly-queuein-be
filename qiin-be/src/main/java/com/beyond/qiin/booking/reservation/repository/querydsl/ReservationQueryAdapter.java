@@ -1,3 +1,3 @@
 package com.beyond.qiin.booking.reservation.repository.querydsl;
 
-public class ReservationQueryAdapter {}
+public interface ReservationQueryAdapter {}

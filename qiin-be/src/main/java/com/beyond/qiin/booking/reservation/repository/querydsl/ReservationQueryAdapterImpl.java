@@ -1,3 +1,8 @@
 package com.beyond.qiin.booking.reservation.repository.querydsl;
 
-public class ReservationQueryAdapterImpl {}
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+@Repository
+@RequiredArgsConstructor
+public class ReservationQueryAdapterImpl implements ReservationQueryAdapter {}
