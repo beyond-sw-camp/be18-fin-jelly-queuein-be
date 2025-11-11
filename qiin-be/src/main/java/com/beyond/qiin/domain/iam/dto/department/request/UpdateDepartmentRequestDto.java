@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.iam.dto.department.request;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +9,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UpdateDepartmentRequestDto {
 
-  private String dptName;
-
+    private String dptName;
 }
