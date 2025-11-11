@@ -13,35 +13,33 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class DepartmentCommandServiceImpl implements DepartmentCommandService {
 
-  private final DepartmentJpaRepository departmentJpaRepository;
+    private final DepartmentJpaRepository departmentJpaRepository;
 
-  // 부서 생성
-  @Override
-  @Transactional
-  public DepartmentDetailResponseDto createDepartment(final CreateDepartmentRequestDto request) {
+    // 부서 생성
+    @Override
+    @Transactional
+    public DepartmentDetailResponseDto createDepartment(final CreateDepartmentRequestDto request) {
 
-    final Department savedDepartment = departmentJpaRepository.save(Department.create(request));
+        final Department savedDepartment = departmentJpaRepository.save(Department.create(request));
 
-    return DepartmentDetailResponseDto.fromEntity(savedDepartment);
-  }
+        return DepartmentDetailResponseDto.fromEntity(savedDepartment);
+    }
 
-  // 부서명 수정
-  @Override
-  @Transactional
-  public void updateDepartment(final UpdateDepartmentRequestDto request) {
-  }
+    // 부서명 수정
+    @Override
+    @Transactional
+    public void updateDepartment(final UpdateDepartmentRequestDto request) {}
 
-  // 부서 관계 수정
-  @Override
-  @Transactional
-  public void updateDepartmentRelation(final UpdateDepartmentRequestDto request) {
-  }
+    // 부서 관계 수정
+    @Override
+    @Transactional
+    public void updateDepartmentRelation(final UpdateDepartmentRequestDto request) {}
 
-  // 부서 삭제
-  @Override
-  @Transactional
-  public void deleteDepartment(final Long departmentId) {
-    final Department department = departmentJpaRepository.findDepartmentById(departmentId);
-    department.delete(departmentId);
-  }
+    // 부서 삭제
+    @Override
+    @Transactional
+    public void deleteDepartment(final Long departmentId) {
+        final Department department = departmentJpaRepository.findDepartmentById(departmentId);
+        department.delete(departmentId);
+    }
 }

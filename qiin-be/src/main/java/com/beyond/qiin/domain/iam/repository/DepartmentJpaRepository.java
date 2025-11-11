@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DepartmentJpaRepository extends JpaRepository<Department, Long>, DepartmentQueryAdapter {
 
-  Department findDepartmentById(Long id);
+    Department findDepartmentById(Long id);
 }
