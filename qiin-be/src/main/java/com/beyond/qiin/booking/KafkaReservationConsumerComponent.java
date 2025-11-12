@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class KafkaConsumerComponent {
-    private final KafkaConsumerService kafkaConsumerService;
+public class KafkaReservationConsumerComponent {
+    private final KafkaReservationConsumerService kafkaReservationConsumerService;
 
     @KafkaListener(topics = "#{@kafkaTopicProperties.getReservation()}", groupId = "reservation-group")
     public void listen(String message) {
         try {
             log.info("메시지 수신: {}", message);
             // 비즈니스 로직 처리
-            String processedMessage = kafkaConsumerService.processMessage(message);
+            String processedMessage = kafkaReservationConsumerService.processMessage(message);
             log.info("메시지 처리 완료: {}", processedMessage);
 
         } catch (Exception e) {
