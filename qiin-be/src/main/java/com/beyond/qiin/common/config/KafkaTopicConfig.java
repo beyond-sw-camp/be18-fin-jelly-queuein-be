@@ -16,19 +16,18 @@ public class KafkaTopicConfig {
                 .replicas(1) // 복제 팩터 설정 (1)
                 .config( // 추가 설정
                         TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60 * 1000L) // 7일
-                )
+                        )
                 .build();
     }
 
-  @Bean
-  public NewTopic notificationTopic() {
-    return TopicBuilder.name("notification-topic")
-        .partitions(3) // 파티션 수 설정
-        .replicas(1) // 복제 팩터 설정 (1)
-        .config( // 추가 설정
-            TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60 * 1000L) // 7일
-        )
-        .build();
-  }
-
+    @Bean
+    public NewTopic notificationTopic() {
+        return TopicBuilder.name("notification-topic")
+                .partitions(3) // 파티션 수 설정
+                .replicas(1) // 복제 팩터 설정 (1)
+                .config( // 추가 설정
+                        TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60 * 1000L) // 7일
+                        )
+                .build();
+    }
 }
