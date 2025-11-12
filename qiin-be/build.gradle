@@ -118,6 +118,23 @@ spotless {
 
 tasks.named('test') {
     useJUnitPlatform()
+    systemProperty "spring.profiles.active", "test"
+
+    // DB (H2로 격리)
+    environment "SPRING_DATASOURCE_URL", "jdbc:h2:mem:testdb;MODE=MariaDB;DB_CLOSE_DELAY=-1"
+    environment "SPRING_DATASOURCE_USERNAME", "sa"
+    environment "SPRING_DATASOURCE_PASSWORD", ""
+    environment "SPRING_DATASOURCE_DRIVER_CLASS_NAME", "org.h2.Driver"
+
+    // Redis, Kafka
+    environment "REDIS_HOST", "localhost"
+    environment "REDIS_PORT", "6379"
+    environment "KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"
+
+    // JWT
+    environment "JWT_SECRET_KEY", "test-secret-key-for-jwt-signing-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    environment "JWT_ACCESS_TOKEN_EXPIRATION", "60000"
+    environment "JWT_REFRESH_TOKEN_EXPIRATION", "120000"
 }
 
 // Querydsl 설정
