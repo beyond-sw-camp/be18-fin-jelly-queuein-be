@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-//메시지 수신용
+// 메시지 수신용
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
