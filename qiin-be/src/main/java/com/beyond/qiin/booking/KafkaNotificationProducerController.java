@@ -1,4 +1,4 @@
-package com.beyond.qiin.common.config;
+package com.beyond.qiin.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController("/api/v1/kafka")
 @RequiredArgsConstructor
-public class KafkaProducerController {
+public class KafkaNotificationProducerController {
     private final KafkaNotificationProducerService kafkaNotificationProducerService;
 
     @PostMapping("/messages")

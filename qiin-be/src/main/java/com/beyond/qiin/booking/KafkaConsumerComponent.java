@@ -1,17 +1,17 @@
-package com.beyond.qiin.common.config;
+package com.beyond.qiin.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-
+//메시지 수신용
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class KafkaConsumerComponent {
     private final KafkaConsumerService kafkaConsumerService;
 
-    @KafkaListener(topics = "test-topic-1")
+    @KafkaListener(topics = "#{@kafkaTopicProperties.getReservation()}", groupId = "reservation-group")
     public void listen(String message) {
         try {
             log.info("메시지 수신: {}", message);

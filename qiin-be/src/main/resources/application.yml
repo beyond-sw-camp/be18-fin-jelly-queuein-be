@@ -18,16 +18,6 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
 
-  # Kafka 설정
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}                                      # Kafka 접속 정보 지정
-    producer:
-      #직렬화
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer   
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer  
-    topic:
-      reservation-topic: reservation-topic
-      notification-topic: notification-topic
     consumer:
       group-id: my-group
       auto-offset-reset: earliest
