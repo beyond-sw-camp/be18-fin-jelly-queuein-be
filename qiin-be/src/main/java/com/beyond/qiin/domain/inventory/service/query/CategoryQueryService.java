@@ -2,7 +2,6 @@ package com.beyond.qiin.domain.inventory.service.query;
 
 import com.beyond.qiin.domain.inventory.dto.category.response.CategoryDropdownResponseDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.CategoryManageResponseDto;
-
 import java.util.List;
 
 public interface CategoryQueryService {

@@ -4,14 +4,12 @@ import com.beyond.qiin.domain.inventory.dto.category.response.CategoryDropdownRe
 import com.beyond.qiin.domain.inventory.dto.category.response.CategoryManageResponseDto;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
-import com.querydsl.core.QueryFactory;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,9 +23,7 @@ public class CategoryQueryAdapterImpl implements CategoryQueryAdapter {
     @Override
     public List<CategoryDropdownResponseDto> findAllForDropdown() {
         return jpaQueryFactory
-                .select(Projections.constructor(CategoryDropdownResponseDto.class,
-                                                category.id,
-                                                category.name))
+                .select(Projections.constructor(CategoryDropdownResponseDto.class, category.id, category.name))
                 .from(category)
                 .where(category.deletedAt.isNull())
                 .orderBy(category.name.asc())
@@ -37,23 +33,17 @@ public class CategoryQueryAdapterImpl implements CategoryQueryAdapter {
     @Override
     public List<CategoryManageResponseDto> findAllForManage() {
         return jpaQueryFactory
-                .select(Projections.constructor(CategoryManageResponseDto.class,
-                                                category.id,
-                                                category.name,
-                                                category.description,
-                                                JPAExpressions
-                                                        .select(asset.count())
-                                                        .from(asset)
-                                                        .where(asset.category.id.eq(category.id)),
-                                                category.createdAt,
-                                                category.createdBy
-                                                ))
+                .select(Projections.constructor(
+                        CategoryManageResponseDto.class,
+                        category.id,
+                        category.name,
+                        category.description,
+                        JPAExpressions.select(asset.count()).from(asset).where(asset.category.id.eq(category.id)),
+                        category.createdAt,
+                        category.createdBy))
                 .from(category)
                 .where(category.deletedAt.isNull())
                 .orderBy(category.id.asc())
                 .fetch();
     }
-
-
-
 }
