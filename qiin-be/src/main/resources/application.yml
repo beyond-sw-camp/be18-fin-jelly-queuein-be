@@ -22,12 +22,19 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}                                      # Kafka 접속 정보 지정
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer    # 문자열 형태로 메시지 키 값 직렬화
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer  # 문자열 형태로 메시지 값 직렬화
-  topic:
-    user-topic: user-topic
-    reservation-topic: reservation-topic
-    settlement-topic: settlement-topic
+      #직렬화
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer   
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer  
+    topic:
+      reservation-topic: reservation-topic
+      notification-topic: notification-topic
+    consumer:
+      group-id: my-group
+      auto-offset-reset: earliest
+      #역직렬화
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer     
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer   
+
 
 # JWT 설정
 jwt:
