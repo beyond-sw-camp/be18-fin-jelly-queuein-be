@@ -19,9 +19,9 @@ public class CreateCategoryResponseDto {
 
     public static CreateCategoryResponseDto fromEntity(Category category) {
         return CreateCategoryResponseDto.builder()
-                                        .categoryId(category.getId())
-                                        .name(category.getName())
-                                        .description(category.getDescription())
-                                        .build();
+                .categoryId(category.getId())
+                .name(category.getName())
+                .description(category.getDescription())
+                .build();
     }
 }

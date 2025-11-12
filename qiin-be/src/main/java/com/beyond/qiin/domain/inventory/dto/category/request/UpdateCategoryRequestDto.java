@@ -11,8 +11,6 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UpdateCategoryRequestDto {
 
-    private Long categoryId;
-
     @NotBlank
     private String name;
 

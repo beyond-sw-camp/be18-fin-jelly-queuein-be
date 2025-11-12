@@ -23,8 +23,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @AttributeOverrides({
-        @AttributeOverride(name = "assetClosureId.ancestorId", column = @Column(name = "ancestor_id")),
-        @AttributeOverride(name = "assetClosureId.descendantId", column = @Column(name = "descendant_id"))
+    @AttributeOverride(name = "assetClosureId.ancestorId", column = @Column(name = "ancestor_id")),
+    @AttributeOverride(name = "assetClosureId.descendantId", column = @Column(name = "descendant_id"))
 })
 @Table(name = "asset_closure")
 public class AssetClosure {
@@ -33,16 +33,21 @@ public class AssetClosure {
     private AssetClosureId assetClosureId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ancestor_id", insertable = false, updatable = false,
-                foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(
+            name = "ancestor_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Asset ancestor;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "descendant_id", insertable = false, updatable = false,
-                foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(
+            name = "descendant_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Asset descendant;
 
-    @Column(name = "depth",  nullable = false)
+    @Column(name = "depth", nullable = false)
     private int depth;
-
 }

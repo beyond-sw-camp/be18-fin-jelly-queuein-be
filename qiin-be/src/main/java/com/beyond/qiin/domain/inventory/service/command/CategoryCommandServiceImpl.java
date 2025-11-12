@@ -11,33 +11,49 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-
 public class CategoryCommandServiceImpl implements CategoryCommandService {
 
     private final CategoryJpaRepository categoryJpaRepository;
 
+    // 생성
     @Override
     @Transactional
     public CreateCategoryResponseDto createCategory(CreateCategoryRequestDto requestDto) {
 
-        //권한 검증
+        // 나중에 권한 검증 추가
 
+        // 나중에 이름 중복이면 예외처리 추가
 
-        Category category = requestDto.createCategory();
+        Category category = Category.createFromDto(requestDto);
 
         categoryJpaRepository.save(category);
-
 
         return CreateCategoryResponseDto.fromEntity(category);
     }
 
+    // 수정
     @Override
-    public void updateCategory(UpdateCategoryRequestDto requestDto) {
+    @Transactional
+    public void updateCategory(UpdateCategoryRequestDto requestDto, Long categoryId) {
 
+        // 나중에 권한 검증 추가
+
+        // 나중에 이름 중복이면 예외처리 추가
+
+        Category category = categoryJpaRepository.findById(categoryId).orElse(null);
+
+        category.updateFromDto(requestDto);
     }
 
+    // 삭제
     @Override
-    public void deleteCategory(String categoryId) {
+    @Transactional
+    public void deleteCategory(Long categoryId, Long userId) {
 
+        // 나중에 권한 검증 추가
+
+        Category category = categoryJpaRepository.findById(categoryId).orElse(null);
+
+        category.delete(userId);
     }
 }

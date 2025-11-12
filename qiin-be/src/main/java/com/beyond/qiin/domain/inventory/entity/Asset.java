@@ -11,14 +11,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
-
-import java.math.BigDecimal;
 
 @Entity
 @Getter
@@ -34,18 +33,25 @@ public class Asset extends BaseEntity {
     private Long parentAssetId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_asset_id", insertable = false, updatable = false, foreignKey = @ForeignKey(
-            ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(
+            name = "parent_asset_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Asset parentAsset;
 
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id",  insertable = false, updatable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(
+            name = "category_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Category category;
 
-    @Column(name = "name",  length = 100, nullable = false, unique = true)
+    @Column(name = "name", length = 100, nullable = false, unique = true)
     private String name;
 
     @Column(name = "description", length = 500)
@@ -75,5 +81,4 @@ public class Asset extends BaseEntity {
     @Version
     @Column(name = "version", nullable = false)
     private Long version;
-
 }

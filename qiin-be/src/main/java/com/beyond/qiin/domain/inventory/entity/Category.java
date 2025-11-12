@@ -1,6 +1,8 @@
 package com.beyond.qiin.domain.inventory.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.inventory.dto.category.request.CreateCategoryRequestDto;
+import com.beyond.qiin.domain.inventory.dto.category.request.UpdateCategoryRequestDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,5 +30,15 @@ public class Category extends BaseEntity {
     @Column(name = "description", length = 500)
     private String description;
 
+    public static Category createFromDto(CreateCategoryRequestDto requestDto) {
+        return Category.builder()
+                .name(requestDto.getName())
+                .description(requestDto.getDescription())
+                .build();
+    }
 
+    public void updateFromDto(UpdateCategoryRequestDto requestDto) {
+        this.name = requestDto.getName();
+        this.description = requestDto.getDescription();
+    }
 }

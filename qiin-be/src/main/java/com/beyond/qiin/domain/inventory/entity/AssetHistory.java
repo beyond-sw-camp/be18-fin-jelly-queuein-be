@@ -6,14 +6,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.Instant;
 
 @Entity
 @Getter
@@ -21,7 +20,7 @@ import java.time.Instant;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "asset_history")
-//@SQLRestriction("deleted_at = null")
+// @SQLRestriction("deleted_at = null")
 public class AssetHistory {
 
     @Id
@@ -38,7 +37,7 @@ public class AssetHistory {
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
 
-    @Column(name = "name",  length = 100, nullable = false, unique = true)
+    @Column(name = "name", length = 100, nullable = false, unique = true)
     private String name;
 
     @Column(name = "description", length = 500)
@@ -85,5 +84,4 @@ public class AssetHistory {
 
     @Column(name = "deleted_at")
     private Instant deletedAt;
-
 }

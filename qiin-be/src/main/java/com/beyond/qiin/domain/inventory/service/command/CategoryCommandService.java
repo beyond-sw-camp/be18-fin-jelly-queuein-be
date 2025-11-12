@@ -6,13 +6,12 @@ import com.beyond.qiin.domain.inventory.dto.category.response.CreateCategoryResp
 
 public interface CategoryCommandService {
 
-    //create
+    // create
     CreateCategoryResponseDto createCategory(CreateCategoryRequestDto requestDto);
 
-    //update
-    void updateCategory(UpdateCategoryRequestDto requestDto);
+    // update
+    void updateCategory(UpdateCategoryRequestDto requestDto, Long categoryId);
 
-    //delete
-    void deleteCategory(String categoryId);
-
+    // delete
+    void deleteCategory(Long categoryId, Long userId);
 }
