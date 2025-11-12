@@ -20,7 +20,14 @@ spring:
 
   # Kafka 설정
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}                                      # Kafka 접속 정보 지정
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer    # 문자열 형태로 메시지 키 값 직렬화
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer  # 문자열 형태로 메시지 값 직렬화
+  topic:
+    user-topic: user-topic
+    reservation-topic: reservation-topic
+    settlement-topic: settlement-topic
 
 # JWT 설정
 jwt:
@@ -31,3 +38,7 @@ jwt:
 logging:
   level:
     org.springframework: INFO
+    com.adjh.springbootkafka: DEBUG
+    org:
+      apache.kafka: INFO
+      springframework.kafka: INFO
