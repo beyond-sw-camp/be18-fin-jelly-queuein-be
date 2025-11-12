@@ -1,5 +1,3 @@
 package com.beyond.qiin.security;
 
-public class SecurityUtils {
-
-}
+public class SecurityUtils {}
