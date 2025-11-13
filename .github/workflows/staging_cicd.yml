@@ -1,4 +1,5 @@
 name: CI/CD for Staging (Doppler)
+
 on:
   push:
     branches:
@@ -32,24 +33,28 @@ jobs:
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
             powershell -NoProfile -Command "
-              $ErrorActionPreference = 'Stop';
+              try {
+                  \$ErrorActionPreference = 'Stop'
 
-              cd 'C:\Users\Playdata\qiin-staging';
+                  Write-Output '[1] 최신 코드 동기화'
+                  Set-Location 'C:\Users\Playdata\qiin-staging'
+                  git fetch --all
+                  git reset --hard origin/feature/52-staging
 
-              echo '[1] 최신 코드 동기화';
-              git fetch --all;
-              git reset --hard origin/feature/52-staging';
+                  Write-Output '[2] Doppler 환경변수 주입 (.env 생성)'
+                  doppler secrets download --token ${{ secrets.DOPPLER_STAGING_TOKEN }} --no-file --format env > .env
 
-              echo '[2] Doppler 환경변수 주입 (.env 생성)';
-              doppler secrets download --token ${{ secrets.DOPPLER_STAGING_TOKEN }} --no-file --format env > .env;
+                  Write-Output '[3] 기존 컨테이너 종료'
+                  docker compose -f docker-compose.staging.yml down
 
-              echo '[3] 기존 컨테이너 종료';
-              docker compose -f docker-compose.staging.yml down;
+                  Write-Output '[4] 새로운 컨테이너 빌드 및 실행'
+                  docker compose -f docker-compose.staging.yml up -d --build
 
-              echo '[4] 새로운 컨테이어 빌드 및 실행';
-              docker compose -f docker-compose.staging.yml up -d --build;
-
-              echo '[5] 컨테이너 상태 확인';
-              docker ps -a;
+                  Write-Output '[5] 컨테이너 상태 확인'
+                  docker ps -a
+              }
+              catch {
+                  Write-Error \"배포 중 오류 발생: \$($_.Exception.Message)\"
+                  exit 1
+              }
             "
-          
