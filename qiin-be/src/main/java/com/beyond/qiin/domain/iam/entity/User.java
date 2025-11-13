@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -51,6 +52,12 @@ public class User extends BaseEntity {
     @Builder.Default
     private List<UserRole> userRoles = new ArrayList<>();
 
+    @Column(name = "password_expired", nullable = false)
+    private Boolean passwordExpired;
+
+    @Column(name = "last_login_at", columnDefinition = "TIMESTAMP(6)")
+    private Instant lastLoginAt;
+
     public static User createFromDto(final CreateUserRequestDto request) {
         return User.builder()
                 .dptId(request.getDptId())
@@ -58,5 +65,10 @@ public class User extends BaseEntity {
                 .email(request.getEmail())
                 .password(request.getPassword())
                 .build();
+    }
+
+    public void updatePassword(final String encrypted) {
+        this.password = encrypted;
+        this.passwordExpired = false;
     }
 }
