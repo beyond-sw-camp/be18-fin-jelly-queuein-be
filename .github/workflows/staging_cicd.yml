@@ -31,12 +31,14 @@ jobs:
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
-            powershell -Command "
+            powershell -NoProfile -Command "
+              $ErrorActionPreference = 'Stop';
+
               cd 'C:\Users\Playdata\qiin-staging';
 
               echo '[1] 최신 코드 동기화';
               git fetch --all;
-              git reset --hard origin/feature/52-staging;
+              git reset --hard origin/feature/52-staging';
 
               echo '[2] Doppler 환경변수 주입 (.env 생성)';
               doppler secrets download --token ${{ secrets.DOPPLER_STAGING_TOKEN }} --no-file --format env > .env;
@@ -44,7 +46,7 @@ jobs:
               echo '[3] 기존 컨테이너 종료';
               docker compose -f docker-compose.staging.yml down;
 
-              echo '[4] 새로운 컨테이너 빌드 및 실행';
+              echo '[4] 새로운 컨테이어 빌드 및 실행';
               docker compose -f docker-compose.staging.yml up -d --build;
 
               echo '[5] 컨테이너 상태 확인';
