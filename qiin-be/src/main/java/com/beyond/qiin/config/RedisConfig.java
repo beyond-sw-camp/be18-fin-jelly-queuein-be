@@ -1,4 +1,4 @@
-package com.beyond.qiin.common.config;
+package com.beyond.qiin.config;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
