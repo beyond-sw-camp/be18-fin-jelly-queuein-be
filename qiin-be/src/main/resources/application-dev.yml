@@ -13,8 +13,7 @@ spring:
 
   # Kafka 설정
   kafka:
-#    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
-    bootstrap-servers: kafka:9092 # Kafka 접속 정보 지정
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS} # Kafka 접속 정보 지정
     producer:
       #직렬화
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
