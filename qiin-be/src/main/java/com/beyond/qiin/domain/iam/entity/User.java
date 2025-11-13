@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,4 +50,13 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @Builder.Default
     private List<UserRole> userRoles = new ArrayList<>();
+
+    public static User createFromDto(final CreateUserRequestDto request) {
+        return User.builder()
+                .dptId(request.getDptId())
+                .userNo(request.getUserNo())
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .build();
+    }
 }
