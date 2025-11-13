@@ -1,4 +1,4 @@
-package com.beyond.qiin.common.config;
+package com.beyond.qiin.config;
 
 import java.util.Optional;
 import org.springframework.data.domain.AuditorAware;
