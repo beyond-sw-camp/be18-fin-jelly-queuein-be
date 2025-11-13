@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
-            cd C:/Users/Playdata/qiin-staging
+            cd /c/Users/Playdata/qiin-staging
 
             echo "[1] 최신 코드 동기화"
             git fetch --all
