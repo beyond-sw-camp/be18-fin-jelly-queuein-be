@@ -25,12 +25,12 @@ import org.hibernate.annotations.SQLRestriction;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "asset", indexes = {
-        @Index(name = "idx_asset_parent_asset_id", columnList = "parent_asset_id"),
-        @Index(name = "idx_asset_category_id", columnList = "category_id")
-})
-
-
+@Table(
+        name = "asset",
+        indexes = {
+            @Index(name = "idx_asset_parent_asset_id", columnList = "parent_asset_id"),
+            @Index(name = "idx_asset_category_id", columnList = "category_id")
+        })
 @AttributeOverride(name = "id", column = @Column(name = "asset_id"))
 @SQLRestriction("deleted_at = null")
 public class Asset extends BaseEntity {

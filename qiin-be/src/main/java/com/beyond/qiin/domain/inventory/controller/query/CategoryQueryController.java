@@ -3,14 +3,13 @@ package com.beyond.qiin.domain.inventory.controller.query;
 import com.beyond.qiin.domain.inventory.dto.category.response.CategoryDropdownResponseDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.CategoryManageResponseDto;
 import com.beyond.qiin.domain.inventory.service.query.CategoryQueryService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/assets/categories")
@@ -34,5 +33,4 @@ public class CategoryQueryController {
 
         return ResponseEntity.status(HttpStatus.OK).body(categories);
     }
-
 }

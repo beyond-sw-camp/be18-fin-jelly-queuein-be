@@ -20,11 +20,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "asset_history", indexes = {
-        @Index(name = "idx_asset_history_asset_id", columnList = "asset_id"),
-        @Index(name = "idx_asset_history_parent_id", columnList = "parent_id"),
-        @Index(name = "idx_asset_history_category_id", columnList = "category_id")
-})
+@Table(
+        name = "asset_history",
+        indexes = {
+            @Index(name = "idx_asset_history_asset_id", columnList = "asset_id"),
+            @Index(name = "idx_asset_history_parent_id", columnList = "parent_id"),
+            @Index(name = "idx_asset_history_category_id", columnList = "category_id")
+        })
 // @SQLRestriction("deleted_at = null")
 public class AssetHistory {
 
