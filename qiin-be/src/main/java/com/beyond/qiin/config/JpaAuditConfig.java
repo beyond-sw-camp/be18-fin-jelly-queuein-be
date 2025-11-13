@@ -1,4 +1,4 @@
-package com.beyond.qiin.common.config;
+package com.beyond.qiin.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
