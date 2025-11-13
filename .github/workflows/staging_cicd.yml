@@ -2,8 +2,8 @@ name: CI/CD for Staging (Doppler)
 on:
   push:
     branches:
-      - feature/52-staging
-
+      - develop
+#      - feature/52-staging
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
