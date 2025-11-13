@@ -31,30 +31,24 @@ jobs:
           host: ${{ secrets.STAGING_HOST }}
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.STAGING_SSH_KEY }}
+
+          # ⬇️ 여기 cmd.exe 로 바꿔서 escape 다 해결됨
           script: |
-            powershell -NoProfile -Command "
-              try {
-                  \$ErrorActionPreference = 'Stop'
+            cmd.exe /C "
+              echo [1] 최신 코드 동기화 &&
+              cd C:\Users\Playdata\qiin-staging &&
+              git fetch --all || exit 1 &&
+              git reset --hard origin/feature/52-staging || exit 1 &&
 
-                  Write-Output '[1] 최신 코드 동기화'
-                  Set-Location 'C:\Users\Playdata\qiin-staging'
-                  git fetch --all
-                  git reset --hard origin/feature/52-staging
+              echo [2] Doppler 환경변수 생성 &&
+              doppler secrets download --token=${{ secrets.DOPPLER_STAGING_TOKEN }} --no-file --format env > .env || exit 1 &&
 
-                  Write-Output '[2] Doppler 환경변수 주입 (.env 생성)'
-                  doppler secrets download --token ${{ secrets.DOPPLER_STAGING_TOKEN }} --no-file --format env > .env
+              echo [3] 기존 컨테이너 종료 &&
+              docker compose -f docker-compose.staging.yml down || exit 1 &&
 
-                  Write-Output '[3] 기존 컨테이너 종료'
-                  docker compose -f docker-compose.staging.yml down
+              echo [4] 새로운 컨테이너 빌드 및 실행 &&
+              docker compose -f docker-compose.staging.yml up -d --build || exit 1 &&
 
-                  Write-Output '[4] 새로운 컨테이너 빌드 및 실행'
-                  docker compose -f docker-compose.staging.yml up -d --build
-
-                  Write-Output '[5] 컨테이너 상태 확인'
-                  docker ps -a
-              }
-              catch {
-                  Write-Error \"배포 중 오류 발생: \$($_.Exception.Message)\"
-                  exit 1
-              }
+              echo [5] 컨테이너 상태 확인 &&
+              docker ps -a
             "
