@@ -5,6 +5,7 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
@@ -21,7 +22,9 @@ import org.hibernate.annotations.SQLRestriction;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "user")
+@Table(
+        name = "user",
+        indexes = {@Index(name = "idx_user_dpt_id", columnList = "dpt_id")})
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
 @SQLRestriction("deleted_at = null")
 public class User extends BaseEntity {

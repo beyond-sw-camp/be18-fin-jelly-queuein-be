@@ -8,6 +8,7 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -21,9 +22,14 @@ import org.hibernate.annotations.SQLRestriction;
 @Entity
 @Getter
 @Builder
-@Table(name = "role_permission")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(
+        name = "role_permission",
+        indexes = {
+            @Index(name = "idx_role_permission_role_id", columnList = "role_id"),
+            @Index(name = "idx_role_permission_permission_id", columnList = "permission_id")
+        })
 @SQLRestriction("deleted_at = null")
 public class RolePermission {
 

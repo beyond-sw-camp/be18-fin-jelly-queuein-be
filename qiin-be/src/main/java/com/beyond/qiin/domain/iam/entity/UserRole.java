@@ -7,6 +7,7 @@ import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -18,11 +19,16 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "user_role")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
+@Table(
+        name = "user_role",
+        indexes = {
+            @Index(name = "idx_user_role_user_id", columnList = "user_id"),
+            @Index(name = "idx_user_role_role_id", columnList = "role_id")
+        })
 @AttributeOverride(name = "id", column = @Column(name = "user_role_id"))
 @SQLRestriction("deleted_at = null")
 public class UserRole extends BaseEntity {
