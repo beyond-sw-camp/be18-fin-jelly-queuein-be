@@ -18,14 +18,6 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
 
-    consumer:
-      group-id: my-group
-      auto-offset-reset: earliest
-      #역직렬화
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer     
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer   
-
-
 # JWT 설정
 jwt:
   secret-key: ${JWT_SECRET_KEY}

@@ -23,6 +23,12 @@ spring:
       reservation: reservation-topic-dev
       notification: notification-topic-dev
 
+    consumer:
+      auto-offset-reset: earliest
+      #역직렬화
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
   # DB 설정: Spring 표준 키 사용 (Doppler에 있는 키와 매칭)
   datasource:
     url: ${SPRING_DATASOURCE_URL}

@@ -1,4 +1,4 @@
-package com.beyond.qiin.booking;
+package com.beyond.qiin.kafka;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
