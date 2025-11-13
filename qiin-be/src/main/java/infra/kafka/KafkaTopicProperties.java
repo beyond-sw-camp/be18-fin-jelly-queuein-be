@@ -1,4 +1,4 @@
-package com.beyond.qiin.kafka;
+package infra.kafka;
 
 import lombok.Getter;
 import lombok.Setter;

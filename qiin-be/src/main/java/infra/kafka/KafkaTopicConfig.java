@@ -1,4 +1,4 @@
-package com.beyond.qiin.kafka;
+package infra.kafka;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;

@@ -1,4 +1,4 @@
-package com.beyond.qiin.kafka;
+package infra.kafka;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
