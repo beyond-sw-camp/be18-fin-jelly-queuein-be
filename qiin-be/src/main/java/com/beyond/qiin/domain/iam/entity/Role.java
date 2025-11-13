@@ -17,11 +17,11 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@Table(name = "role")
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
+@Table(name = "role")
 @AttributeOverride(name = "id", column = @Column(name = "role_id"))
 @SQLRestriction("deleted_at = null")
 public class Role extends BaseEntity {
