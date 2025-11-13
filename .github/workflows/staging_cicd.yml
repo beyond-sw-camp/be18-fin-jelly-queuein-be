@@ -1,4 +1,46 @@
-name: staging_CICD.yml
+name: CI/CD for Staging (Doppler)
 on:
+  push:
+    branches:
+      - feature/52-staging
 
 jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Validate build
+        run: |
+          cd qiin-be
+          chmod +x gradlew
+          ./gradlew clean build -x test
+
+      - name: Deploy to Staging Server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/qiin-staging
+
+            echo "[1] 최신 코드 동기화"
+            git fetch --all
+            git reset --hard origin/feature/52-staging
+
+            echo "[2] Doppler 환경변수 사용하여 컨테이너 실행"
+            doppler run --token ${{ secrets.DOPPLER_STAGING_TOKEN }} \
+              --project qiin --config staging \
+              --command "docker-compose -f docker-compose.staging.yml down && docker-compose -f docker-compose.staging.yml up -d --build"
+
+            echo "[3] 컨테이너 상태 확인"
+            docker ps -a
