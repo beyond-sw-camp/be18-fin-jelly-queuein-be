@@ -2,8 +2,8 @@ name: CI/CD for Staging (Doppler)
 on:
   push:
     branches:
-      - develop
-#      - feature/52-staging
+      - feature/52-staging
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.STAGING_USER }}
           key: ${{ secrets.STAGING_SSH_KEY }}
           script: |
-            cd /home/ubuntu/qiin-staging
+            cd C:/Users/Playdata/qiin-staging
 
             echo "[1] 최신 코드 동기화"
             git fetch --all
@@ -40,7 +40,7 @@ jobs:
             echo "[2] Doppler 환경변수 사용하여 컨테이너 실행"
             doppler run --token ${{ secrets.DOPPLER_STAGING_TOKEN }} \
               --project qiin --config staging \
-              --command "docker-compose -f docker-compose.staging.yml down && docker-compose -f docker-compose.staging.yml up -d --build"
+              --command "docker compose -f docker-compose.staging.yml down && docker compose -f docker-compose.staging.yml up -d --build"
 
             echo "[3] 컨테이너 상태 확인"
             docker ps -a
