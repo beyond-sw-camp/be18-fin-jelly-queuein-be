@@ -1,0 +1,35 @@
+name: Staging CI/CD
+
+on:
+  push:
+    branches:
+      - feature/52-staging
+
+jobs:
+  staging:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Backend
+        run: |
+          cd C:\Users\Playdata\develop\be18-fin-jelly-queuein-be\qiin-be
+          ./gradlew clean bootJar --no-daemon
+
+      - name: Build Docker Image
+        run: |
+          cd C:\Users\Playdata\develop\be18-fin-jelly-queuein-be\qiin-be
+          docker build -t qiin-backend:staging .
+
+      - name: Deploy Staging Containers
+        run: |
+          cd C:\Users\Playdata\develop\be18-fin-jelly-queuein-be\qiin-be
+
+          echo "Stopping running containers..."
+          docker compose -f docker-compose.staging.yml down
+
+          echo "Starting staging containers with Doppler..."
+          $Env:DOPPLER_TOKEN="${{ secrets.DOPPLER_STAGING_TOKEN }}"
+          doppler run --config staging -- docker compose -f docker-compose.staging.yml up -d
