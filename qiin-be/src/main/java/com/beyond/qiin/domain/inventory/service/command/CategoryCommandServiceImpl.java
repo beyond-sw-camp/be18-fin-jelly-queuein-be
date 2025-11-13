@@ -18,7 +18,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
     // 생성
     @Override
     @Transactional
-    public CreateCategoryResponseDto createCategory(CreateCategoryRequestDto requestDto) {
+    public CreateCategoryResponseDto createCategory(final CreateCategoryRequestDto requestDto) {
 
         // 나중에 권한 검증 추가
 
@@ -34,7 +34,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
     // 수정
     @Override
     @Transactional
-    public void updateCategory(UpdateCategoryRequestDto requestDto, Long categoryId) {
+    public void updateCategory(final UpdateCategoryRequestDto requestDto, final Long categoryId) {
 
         // 나중에 권한 검증 추가
 
@@ -48,7 +48,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
     // 삭제
     @Override
     @Transactional
-    public void deleteCategory(Long categoryId, Long userId) {
+    public void deleteCategory(final Long categoryId, final Long userId) {
 
         // 나중에 권한 검증 추가
 

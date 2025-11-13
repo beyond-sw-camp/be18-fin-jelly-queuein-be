@@ -10,6 +10,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,16 +22,17 @@ public class CategoryQueryAdapterImpl implements CategoryQueryAdapter {
     private final QAsset asset = QAsset.asset;
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryDropdownResponseDto> findAllForDropdown() {
         return jpaQueryFactory
                 .select(Projections.constructor(CategoryDropdownResponseDto.class, category.id, category.name))
                 .from(category)
-                .where(category.deletedAt.isNull())
                 .orderBy(category.name.asc())
                 .fetch();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryManageResponseDto> findAllForManage() {
         return jpaQueryFactory
                 .select(Projections.constructor(
@@ -42,7 +44,6 @@ public class CategoryQueryAdapterImpl implements CategoryQueryAdapter {
                         category.createdAt,
                         category.createdBy))
                 .from(category)
-                .where(category.deletedAt.isNull())
                 .orderBy(category.id.asc())
                 .fetch();
     }

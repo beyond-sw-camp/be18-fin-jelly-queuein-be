@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -19,7 +20,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "asset_history")
+@Table(name = "asset_history", indexes = {
+        @Index(name = "idx_asset_history_asset_id", columnList = "asset_id"),
+        @Index(name = "idx_asset_history_parent_id", columnList = "parent_id"),
+        @Index(name = "idx_asset_history_category_id", columnList = "category_id")
+})
 // @SQLRestriction("deleted_at = null")
 public class AssetHistory {
 
