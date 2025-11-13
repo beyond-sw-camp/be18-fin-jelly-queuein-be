@@ -38,12 +38,16 @@ jobs:
               git fetch --all;
               git reset --hard origin/feature/52-staging;
 
-              echo '[2] Doppler 환경변수 사용하여 컨테이너 실행';
-              doppler run --token ${{ secrets.DOPPLER_STAGING_TOKEN }} `
-                --project qiin --config staging `
-                --command \"docker compose -f docker-compose.staging.yml down && docker compose -f docker-compose.staging.yml up -d --build\";
+              echo '[2] Doppler 환경변수 주입 (.env 생성)';
+              doppler secrets download --token ${{ secrets.DOPPLER_STAGING_TOKEN }} --no-file --format env > .env;
 
-              echo '[3] 컨테이너 상태 확인';
+              echo '[3] 기존 컨테이너 종료';
+              docker compose -f docker-compose.staging.yml down;
+
+              echo '[4] 새로운 컨테이너 빌드 및 실행';
+              docker compose -f docker-compose.staging.yml up -d --build;
+
+              echo '[5] 컨테이너 상태 확인';
               docker ps -a;
             "
           
