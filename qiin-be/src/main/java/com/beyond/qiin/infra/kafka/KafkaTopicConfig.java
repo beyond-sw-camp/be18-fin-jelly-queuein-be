@@ -1,17 +1,15 @@
 package com.beyond.qiin.infra.kafka;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.config.TopicConfig;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 // 토픽 생성 자동화
 
 @Configuration
-@EnableConfigurationProperties(KafkaTopicProperties.class)
+// @EnableConfigurationProperties(KafkaTopicProperties.class)
 @RequiredArgsConstructor
 public class KafkaTopicConfig {
 
