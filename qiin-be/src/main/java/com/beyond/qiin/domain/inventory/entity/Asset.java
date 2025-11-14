@@ -78,8 +78,8 @@ public class Asset extends BaseEntity {
     public void apply(UpdateAssetRequestDto requestDto) {
         if (requestDto.getCategoryId() != null) this.categoryId = requestDto.getCategoryId();
         if (requestDto.getName() != null) this.name = requestDto.getName();
-        this.description = requestDto.getDescription();
-        this.image = requestDto.getImage();
+        if (requestDto.getDescription() != null)this.description = requestDto.getDescription();
+        if (requestDto.getImage() != null) this.image = requestDto.getImage();
         if (requestDto.getStatus() != null) this.status = requestDto.getStatus();
         if (requestDto.getType() != null) this.type = requestDto.getType();
         if (requestDto.getAccessLevel() != null) this.accessLevel = requestDto.getAccessLevel();

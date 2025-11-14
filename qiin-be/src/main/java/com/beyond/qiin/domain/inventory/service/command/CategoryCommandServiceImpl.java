@@ -28,7 +28,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
             throw CategoryException.duplicateName();
         }
 
-        Category category = Category.createFromDto(requestDto);
+        Category category = requestDto.toEntity();
 
         categoryJpaRepository.save(category);
 
@@ -49,7 +49,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
 
         Category category = categoryJpaRepository.findById(categoryId).orElseThrow(CategoryException::notFound);
 
-        category.updateFromDto(requestDto);
+        category.apply(requestDto);
     }
 
     // 삭제
