@@ -40,7 +40,6 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         // 클로저 관련 자신 → 자신 (depth=0) 저장 추가
 
-
         // parentId가 있을 경우
         // 부모의 조상들 조회
         // depth+1 해서 closure 테이블에 INSERT

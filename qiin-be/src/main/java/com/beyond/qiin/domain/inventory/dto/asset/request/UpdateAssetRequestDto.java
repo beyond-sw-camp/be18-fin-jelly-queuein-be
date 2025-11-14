@@ -2,12 +2,11 @@ package com.beyond.qiin.domain.inventory.dto.asset.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.math.BigDecimal;
 
 @Getter
 @Builder
@@ -41,5 +40,4 @@ public class UpdateAssetRequestDto {
 
     @NotNull
     private BigDecimal periodCost;
-
 }

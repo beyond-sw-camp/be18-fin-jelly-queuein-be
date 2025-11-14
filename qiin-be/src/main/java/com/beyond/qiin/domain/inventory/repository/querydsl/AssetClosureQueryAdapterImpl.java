@@ -3,11 +3,10 @@ package com.beyond.qiin.domain.inventory.repository.querydsl;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -40,9 +39,7 @@ public class AssetClosureQueryAdapterImpl implements AssetClosureQueryAdapter {
         return queryFactory
                 .select(assetClosure.assetClosureId.descendantId)
                 .from(assetClosure)
-                .where(assetClosure.assetClosureId.ancestorId.eq(ancestorId),
-                       assetClosure.depth.eq(1)
-                )
+                .where(assetClosure.assetClosureId.ancestorId.eq(ancestorId), assetClosure.depth.eq(1))
                 .fetch();
     }
 
