@@ -12,11 +12,8 @@ import org.springframework.stereotype.Component;
 public class KafkaReservationConsumerComponent {
     private final KafkaReservationConsumerService kafkaReservationConsumerService;
 
-//    @KafkaListener(topics = "#{@kafkaTopicProperties.getReservation()}", groupId = "reservation-group")
-    @KafkaListener(
-        topics = "${spring.kafka.topic.reservation}",
-        groupId = "reservation-group"
-    )
+    //    @KafkaListener(topics = "#{@kafkaTopicProperties.getReservation()}", groupId = "reservation-group")
+    @KafkaListener(topics = "${spring.kafka.topic.reservation}", groupId = "reservation-group")
     public void listen(String message) {
         try {
             log.info("메시지 수신: {}", message);
