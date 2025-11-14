@@ -9,9 +9,6 @@ jobs:
   staging:
     runs-on: self-hosted
 
-    env:
-      DOPPLER_TOKEN: ${{ secrets.DOPPLER_STAGING_TOKEN }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,6 +23,15 @@ jobs:
           cd C:\Users\Playdata\develop\be18-fin-jelly-queuein-be\qiin-be
           docker build -t qiin-backend:staging .
 
+      # ------------------------------
+      # 🔥 Doppler Token이 정상인지 먼저 테스트
+      # ------------------------------
+      - name: Test Doppler Token Access
+        run: |
+          echo "Testing Doppler token..."
+          doppler --token "${{ secrets.DOPPLER_STAGING_TOKEN }}" secrets get --config staging --plain SPRING_DATASOURCE_URL
+        shell: pwsh
+
       - name: Deploy Staging Containers
         run: |
           cd C:\Users\Playdata\develop\be18-fin-jelly-queuein-be\qiin-be
@@ -34,4 +40,5 @@ jobs:
           docker compose -f docker-compose.staging.yml down
 
           echo "Starting staging containers with Doppler..."
-          doppler run --config staging -- docker compose -f docker-compose.staging.yml up -d
+          doppler --token "${{ secrets.DOPPLER_STAGING_TOKEN }}" run --config staging -- docker compose -f docker-compose.staging.yml up -d
+        shell: pwsh
