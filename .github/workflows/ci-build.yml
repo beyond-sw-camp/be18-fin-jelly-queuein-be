@@ -1,0 +1,31 @@
+name: CI Build
+
+on:
+  pull_request:
+    branches:
+      - "**"
+
+  push:
+    branches:
+      - main
+      - develop
+      - staging
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build Backend (Skip Tests)
+        run: |
+          cd qiin-be
+          ./gradlew clean build -x test --no-daemon
