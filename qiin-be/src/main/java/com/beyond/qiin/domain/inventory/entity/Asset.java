@@ -76,15 +76,15 @@ public class Asset extends BaseEntity {
     private Long version;
 
     public void apply(UpdateAssetRequestDto requestDto) {
-        this.categoryId = requestDto.getCategoryId();
-        this.name = requestDto.getName();
+        if (requestDto.getCategoryId() != null) this.categoryId = requestDto.getCategoryId();
+        if (requestDto.getName() != null) this.name = requestDto.getName();
         this.description = requestDto.getDescription();
         this.image = requestDto.getImage();
-        this.status = requestDto.getStatus();
-        this.type = requestDto.getType();
-        this.accessLevel = requestDto.getAccessLevel();
-        this.approvalStatus = requestDto.getApprovalStatus();
-        this.costPerHour = requestDto.getCostPerHour();
-        this.periodCost = requestDto.getPeriodCost();
+        if (requestDto.getStatus() != null) this.status = requestDto.getStatus();
+        if (requestDto.getType() != null) this.type = requestDto.getType();
+        if (requestDto.getAccessLevel() != null) this.accessLevel = requestDto.getAccessLevel();
+        if (requestDto.getApprovalStatus() != null) this.approvalStatus = requestDto.getApprovalStatus();
+        if (requestDto.getCostPerHour() != null) this.costPerHour = requestDto.getCostPerHour();
+        if (requestDto.getPeriodCost() != null) this.periodCost = requestDto.getPeriodCost();
     }
 }

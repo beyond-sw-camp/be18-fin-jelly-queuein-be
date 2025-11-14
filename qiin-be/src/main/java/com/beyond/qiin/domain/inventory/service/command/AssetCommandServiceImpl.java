@@ -37,7 +37,9 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         Asset asset = requestDto.toEntity();
 
         assetJpaRepository.save(asset);
+
         // 클로저 관련 자신 → 자신 (depth=0) 저장 추가
+
 
         // parentId가 있을 경우
         // 부모의 조상들 조회
@@ -60,7 +62,6 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         // categoryId 존재 여부 검증
         categoryCommandService.validateCategoryId(requestDto.getCategoryId());
 
-        // 나중에 에러 처리 추가
         Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
 
         asset.apply(requestDto);
