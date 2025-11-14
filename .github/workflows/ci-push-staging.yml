@@ -1,0 +1,31 @@
+name: CI Push (Staging)
+
+on:
+  push:
+    branches:
+      - staging
+      - feature/52-staging   # 임시로 유지
+
+jobs:
+  ci-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build Backend
+        run: |
+          cd qiin-be
+          ./gradlew clean bootJar --no-daemon
+
+      - name: Build Docker Image
+        run: |
+          cd qiin-be
+          docker build -t qiin-backend:staging .
