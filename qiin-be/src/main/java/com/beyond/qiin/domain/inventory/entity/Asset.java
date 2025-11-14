@@ -1,6 +1,8 @@
 package com.beyond.qiin.domain.inventory.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
+import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -28,23 +30,11 @@ import org.hibernate.annotations.SQLRestriction;
 @Table(
         name = "asset",
         indexes = {
-            @Index(name = "idx_asset_parent_asset_id", columnList = "parent_asset_id"),
             @Index(name = "idx_asset_category_id", columnList = "category_id")
         })
 @AttributeOverride(name = "id", column = @Column(name = "asset_id"))
 @SQLRestriction("deleted_at = null")
 public class Asset extends BaseEntity {
-
-    @Column(name = "parent_asset_id")
-    private Long parentAssetId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "parent_asset_id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Asset parentAsset;
 
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
@@ -87,4 +77,19 @@ public class Asset extends BaseEntity {
     @Version
     @Column(name = "version", nullable = false)
     private Long version;
+
+
+    public void apply(UpdateAssetRequestDto requestDto) {
+        this.categoryId = requestDto.getCategoryId();
+        this.name = requestDto.getName();
+        this.description = requestDto.getDescription();
+        this.image = requestDto.getImage();
+        this.status = requestDto.getStatus();
+        this.type = requestDto.getType();
+        this.accessLevel = requestDto.getAccessLevel();
+        this.approvalStatus = requestDto.getApprovalStatus();
+        this.costPerHour = requestDto.getCostPerHour();
+        this.periodCost = requestDto.getPeriodCost();
+
+    }
 }

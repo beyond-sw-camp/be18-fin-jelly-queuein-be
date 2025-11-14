@@ -1,7 +1,7 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
-import com.beyond.qiin.domain.inventory.dto.category.response.CategoryDropdownResponseDto;
-import com.beyond.qiin.domain.inventory.dto.category.response.CategoryManageResponseDto;
+import com.beyond.qiin.domain.inventory.dto.category.response.DropdownCategoryResponseDto;
+import com.beyond.qiin.domain.inventory.dto.category.response.ManageCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.querydsl.core.types.Projections;
@@ -9,6 +9,9 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,14 +21,14 @@ public class CategoryQueryAdapterImpl implements CategoryQueryAdapter {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    private final QCategory category = QCategory.category;
-    private final QAsset asset = QAsset.asset;
+    private static final QCategory category = QCategory.category;
+    private static final QAsset asset = QAsset.asset;
 
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryDropdownResponseDto> findAllForDropdown() {
+    public List<DropdownCategoryResponseDto> findAllForDropdown() {
         return jpaQueryFactory
-                .select(Projections.constructor(CategoryDropdownResponseDto.class, category.id, category.name))
+                .select(Projections.constructor(DropdownCategoryResponseDto.class, category.id, category.name))
                 .from(category)
                 .orderBy(category.name.asc())
                 .fetch();
@@ -33,18 +36,28 @@ public class CategoryQueryAdapterImpl implements CategoryQueryAdapter {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CategoryManageResponseDto> findAllForManage() {
-        return jpaQueryFactory
-                .select(Projections.constructor(
-                        CategoryManageResponseDto.class,
-                        category.id,
-                        category.name,
-                        category.description,
-                        JPAExpressions.select(asset.count()).from(asset).where(asset.category.id.eq(category.id)),
-                        category.createdAt,
-                        category.createdBy))
+    public Page<ManageCategoryResponseDto> findAllForManage(Pageable pageable) {
+        List<ManageCategoryResponseDto> content =
+                jpaQueryFactory
+                    .select(Projections.constructor(
+                            ManageCategoryResponseDto.class,
+                            category.id,
+                            category.name,
+                            category.description,
+                            JPAExpressions.select(asset.count()).from(asset).where(asset.category.id.eq(category.id)),
+                            category.createdAt,
+                            category.createdBy))
+                    .from(category)
+                    .orderBy(category.id.asc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
+
+        Long totalCount = jpaQueryFactory
+                .select(category.count())
                 .from(category)
-                .orderBy(category.id.asc())
-                .fetch();
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, totalCount);
     }
 }

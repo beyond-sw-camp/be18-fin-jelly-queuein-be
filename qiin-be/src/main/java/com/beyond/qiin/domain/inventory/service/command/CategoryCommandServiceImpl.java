@@ -4,6 +4,7 @@ import com.beyond.qiin.domain.inventory.dto.category.request.CreateCategoryReque
 import com.beyond.qiin.domain.inventory.dto.category.request.UpdateCategoryRequestDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.CreateCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Category;
+import com.beyond.qiin.domain.inventory.exception.CategoryException;
 import com.beyond.qiin.domain.inventory.repository.CategoryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,10 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
 
         // 나중에 권한 검증 추가
 
-        // 나중에 이름 중복이면 예외처리 추가
+        // 이름 중복이면 예외 처리
+        if(categoryJpaRepository.existsByName(requestDto.getName())) {
+            throw CategoryException.duplicateName();
+        }
 
         Category category = Category.createFromDto(requestDto);
 
@@ -38,9 +42,13 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
 
         // 나중에 권한 검증 추가
 
-        // 나중에 이름 중복이면 예외처리 추가
+        // 이름 중복이면 예외 처리
+        if(categoryJpaRepository.existsByName(requestDto.getName())) {
+            throw CategoryException.duplicateName();
+        }
 
-        Category category = categoryJpaRepository.findById(categoryId).orElse(null);
+        Category category = categoryJpaRepository.findById(categoryId)
+                                                 .orElseThrow(CategoryException::notFound);
 
         category.updateFromDto(requestDto);
     }
@@ -52,8 +60,18 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
 
         // 나중에 권한 검증 추가
 
-        Category category = categoryJpaRepository.findById(categoryId).orElse(null);
+        Category category = categoryJpaRepository.findById(categoryId)
+                                                 .orElseThrow(CategoryException::notFound);
 
         category.delete(userId);
+    }
+
+    // 카테고리 id 존재 검증 메소드
+    @Override
+    @Transactional
+    public void validateCategoryId(final Long categoryId) {
+        if(!categoryJpaRepository.existsById(categoryId)) {
+            throw CategoryException.notFound();
+        }
     }
 }
