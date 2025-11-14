@@ -1,11 +1,11 @@
-package com.beyond.qiin.infra.kafka;
+package com.beyond.qiin.infra.kafka.reservation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class KafkaNotificationConsumerService {
+public class KafkaReservationConsumerService {
     public String processMessage(String message) {
         try {
             // 비즈니스 로직 처리 : 메시지를 대문자로 변환하여 이를 반환

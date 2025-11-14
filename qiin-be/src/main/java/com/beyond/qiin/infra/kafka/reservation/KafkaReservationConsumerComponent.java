@@ -1,4 +1,4 @@
-package com.beyond.qiin.infra.kafka;
+package com.beyond.qiin.infra.kafka.reservation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class KafkaNotificationConsumerComponent {
-    private final KafkaNotificationConsumerService kafkaNotificationConsumerService;
+public class KafkaReservationConsumerComponent {
+    private final KafkaReservationConsumerService kafkaReservationConsumerService;
 
-    @KafkaListener(topics = "${spring.kafka.topic.notification}", groupId = "reservation-group")
+    @KafkaListener(topics = "${spring.kafka.topic.reservation}", groupId = "reservation-group")
     public void listen(String message) {
         try {
             log.info("메시지 수신: {}", message);
             // 비즈니스 로직 처리
-            String processedMessage = kafkaNotificationConsumerService.processMessage(message);
+            String processedMessage = kafkaReservationConsumerService.processMessage(message);
             log.info("메시지 처리 완료: {}", processedMessage);
 
         } catch (Exception e) {

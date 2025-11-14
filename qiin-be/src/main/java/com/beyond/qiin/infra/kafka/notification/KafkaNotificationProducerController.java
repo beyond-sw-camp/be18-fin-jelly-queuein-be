@@ -1,5 +1,6 @@
-package com.beyond.qiin.infra.kafka;
+package com.beyond.qiin.infra.kafka.notification;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/kafka/notifications")
+@RequestMapping("/api/v1/notifications")
 public class KafkaNotificationProducerController {
     private final KafkaNotificationProducerService kafkaNotificationProducerService;
 
