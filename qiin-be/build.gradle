@@ -71,8 +71,8 @@ dependencies {
 
     // QueryDsl
     // Open Feign QueryDSL (latest security patched version)
-    implementation("io.github.openfeign.querydsl:querydsl-core:${queryDslVersion}")
-    implementation("io.github.openfeign.querydsl:querydsl-jpa:$queryDslVersion")
+    implementation("io.github.openfeign.querydsl:querydsl-core:7.0")
+    implementation("io.github.openfeign.querydsl:querydsl-jpa:7.0")
 
     // mysql
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -83,7 +83,7 @@ dependencies {
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
     // QueryDSL annotation processor
-    annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:$queryDslVersion:jpa")
+    annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:7.0:jpa")
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
 
