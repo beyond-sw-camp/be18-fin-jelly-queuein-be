@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 public class KafkaNotificationConsumerComponent {
     private final KafkaNotificationConsumerService kafkaNotificationConsumerService;
 
-    //    @KafkaListener(topics = "#{@kafkaTopicProperties.getNotification()}", groupId = "notification-group")
     @KafkaListener(topics = "${spring.kafka.topic.notification}", groupId = "reservation-group")
     public void listen(String message) {
         try {

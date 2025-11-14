@@ -9,7 +9,6 @@ import org.springframework.kafka.config.TopicBuilder;
 // 토픽 생성 자동화
 
 @Configuration
-// @EnableConfigurationProperties(KafkaTopicProperties.class)
 @RequiredArgsConstructor
 public class KafkaTopicConfig {
 

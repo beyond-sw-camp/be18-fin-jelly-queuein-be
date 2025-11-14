@@ -9,7 +9,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "spring.kafka.topic")
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-// @Setter
 public class KafkaTopicProperties {
 
     private String reservation;
