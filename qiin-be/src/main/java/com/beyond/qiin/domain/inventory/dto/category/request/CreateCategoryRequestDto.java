@@ -18,9 +18,6 @@ public class CreateCategoryRequestDto {
     private String description;
 
     public Category toEntity() {
-        return Category.builder()
-                       .name(name)
-                       .description(description)
-                       .build();
+        return Category.builder().name(name).description(description).build();
     }
 }

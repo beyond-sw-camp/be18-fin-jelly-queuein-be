@@ -29,7 +29,6 @@ public class Category extends BaseEntity {
     @Column(name = "description", length = 500)
     private String description;
 
-
     public void apply(UpdateCategoryRequestDto requestDto) {
         this.name = requestDto.getName();
         this.description = requestDto.getDescription();
