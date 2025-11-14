@@ -10,7 +10,6 @@ on:
       - main
       - develop
       - staging
-      - feature/52-staging
 
 jobs:
   build:
