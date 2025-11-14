@@ -18,6 +18,9 @@ spring:
   kafka:
     listener:
       auto-startup: false
+    topic:
+      reservation: reservation-topic-dev
+      notification: notification-topic-dev
 
   data:
     redis:
