@@ -9,6 +9,9 @@ jobs:
   staging:
     runs-on: self-hosted
 
+    env:
+      DOPPLER_TOKEN: ${{ secrets.DOPPLER_STAGING_TOKEN }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,5 +34,4 @@ jobs:
           docker compose -f docker-compose.staging.yml down
 
           echo "Starting staging containers with Doppler..."
-          $Env:DOPPLER_TOKEN="${{ secrets.DOPPLER_STAGING_TOKEN }}"
           doppler run --config staging -- docker compose -f docker-compose.staging.yml up -d
