@@ -29,7 +29,7 @@ jobs:
       - name: Test Doppler Token Access
         run: |
           echo "Testing Doppler token..."
-          doppler --token "${{ secrets.DOPPLER_STAGING_TOKEN }}" secrets get --config staging --plain SPRING_DATASOURCE_URL
+          doppler --token "${{ secrets.DOPPLER_STAGING_TOKEN }}" secrets get --config stg --plain SPRING_DATASOURCE_URL
         shell: pwsh
 
       - name: Deploy Staging Containers
@@ -40,5 +40,5 @@ jobs:
           docker compose -f docker-compose.staging.yml down
 
           echo "Starting staging containers with Doppler..."
-          doppler --token "${{ secrets.DOPPLER_STAGING_TOKEN }}" run --config staging -- docker compose -f docker-compose.staging.yml up -d
+          doppler --token "${{ secrets.DOPPLER_STAGING_TOKEN }}" run --config stg -- docker compose -f docker-compose.staging.yml up -d
         shell: pwsh
