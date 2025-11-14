@@ -35,9 +35,9 @@ services:
     ports:
       - "2181:2181"
     tmpfs: #임시 볼륨, 개발용 -> zookeeper과 kafka 사용환경 맞춰주는 용도
+      #운영 시 볼륨은 도커 컴포즈가 아니라 aws ebs 활용
       - /var/lib/zookeeper/data:rw,uid=1000,gid=1000
       - /var/lib/zookeeper/log:rw,uid=1000,gid=1000
-    #볼륨
 
   kafka:
     image: confluentinc/cp-kafka:7.6.0
@@ -53,7 +53,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS:-PLAINTEXT://kafka:9092}
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     tmpfs: #임시 볼륨, 개발용
-      - /var/lib/kafka/data:rw,uid=1000,gid=1000
+        - /var/lib/kafka/data:rw,uid=1000,gid=1000
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -89,6 +89,3 @@ services:
 
 volumes:
   mariadb_data:
-#  kafka_data: #운영시에서는 필요
-#  zk_data:
-#  zk_log:
