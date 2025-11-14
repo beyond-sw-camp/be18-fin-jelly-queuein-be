@@ -7,7 +7,6 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to AWS ECS
     runs-on: ubuntu-latest
 
     steps:
@@ -38,23 +37,43 @@ jobs:
         run: |
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      # ⭐⭐⭐ Task Definition 자동 생성
-      - name: Render Amazon ECS task definition
+      # ⭐ 원본 Task Definition 파일 가져오기
+      - name: Get current task definition
         id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition-family: qiin-backend-task
-          container-name: qiin-container
-          image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition qiin-backend-task \
+            | jq '.taskDefinition
+              | del(.taskDefinitionArn)
+              | del(.revision)
+              | del(.status)
+              | del(.requiresAttributes)
+              | del(.compatibilities)
+              | del(.registeredAt)
+              | del(.registeredBy)' \
+            > task-def.json
 
-      - name: Write updated task definition to file
-        run: echo '${{ steps.task-def.outputs.task-definition }}' > ecs-task-def.json
+      # ⭐ Task Definition 이미지 업데이트
+      - name: Update task definition image
+        run: |
+          jq --arg IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" \
+            '.containerDefinitions[0].image = $IMAGE' \
+            task-def.json > new-task-def.json
 
-      # ⭐⭐⭐ 배포 (container-name, image 제거됨)
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ecs-task-def.json
-          service: qiin-service
-          cluster: qiin-cluster
-          wait-for-service-stability: true
+      # ⭐ 새로운 Task Definition 등록
+      - name: Register new task definition
+        id: register-task
+        run: |
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://new-task-def.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
+
+      # ⭐ ECS 서비스 업데이트
+      - name: Update ECS service
+        run: |
+          aws ecs update-service \
+            --cluster qiin-cluster \
+            --service qiin-service \
+            --task-definition "$NEW_TASK_DEF_ARN"
