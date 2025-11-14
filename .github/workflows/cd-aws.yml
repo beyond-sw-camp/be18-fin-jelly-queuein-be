@@ -38,7 +38,7 @@ jobs:
         run: |
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      # ⭐⭐⭐ 반드시 필요한 Step (Task Definition 자동 생성)
+      # ⭐⭐⭐ Task Definition 자동 생성
       - name: Render Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -50,12 +50,11 @@ jobs:
       - name: Write updated task definition to file
         run: echo '${{ steps.task-def.outputs.task-definition }}' > ecs-task-def.json
 
-      # ECS 배포
+      # ⭐⭐⭐ 배포 (container-name, image 제거됨)
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ecs-task-def.json
           service: qiin-service
           cluster: qiin-cluster
-          container-name: qiin-container
-          image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          wait-for-service-stability: true
