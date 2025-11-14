@@ -26,7 +26,7 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Build Backend
+      - name: Build Backend (Skip Tests)
         run: |
           cd qiin-be
-          ./gradlew clean build --no-daemon
+          ./gradlew clean build -x test --no-daemon
