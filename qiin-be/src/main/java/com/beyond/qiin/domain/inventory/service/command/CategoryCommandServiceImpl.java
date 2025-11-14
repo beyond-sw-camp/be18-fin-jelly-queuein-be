@@ -24,7 +24,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
         // 나중에 권한 검증 추가
 
         // 이름 중복이면 예외 처리
-        if(categoryJpaRepository.existsByName(requestDto.getName())) {
+        if (categoryJpaRepository.existsByName(requestDto.getName())) {
             throw CategoryException.duplicateName();
         }
 
@@ -43,12 +43,11 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
         // 나중에 권한 검증 추가
 
         // 이름 중복이면 예외 처리
-        if(categoryJpaRepository.existsByName(requestDto.getName())) {
+        if (categoryJpaRepository.existsByName(requestDto.getName())) {
             throw CategoryException.duplicateName();
         }
 
-        Category category = categoryJpaRepository.findById(categoryId)
-                                                 .orElseThrow(CategoryException::notFound);
+        Category category = categoryJpaRepository.findById(categoryId).orElseThrow(CategoryException::notFound);
 
         category.updateFromDto(requestDto);
     }
@@ -60,8 +59,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
 
         // 나중에 권한 검증 추가
 
-        Category category = categoryJpaRepository.findById(categoryId)
-                                                 .orElseThrow(CategoryException::notFound);
+        Category category = categoryJpaRepository.findById(categoryId).orElseThrow(CategoryException::notFound);
 
         category.delete(userId);
     }
@@ -70,7 +68,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
     @Override
     @Transactional
     public void validateCategoryId(final Long categoryId) {
-        if(!categoryJpaRepository.existsById(categoryId)) {
+        if (!categoryJpaRepository.existsById(categoryId)) {
             throw CategoryException.notFound();
         }
     }

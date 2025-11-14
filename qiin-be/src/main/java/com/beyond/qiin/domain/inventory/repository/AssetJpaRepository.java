@@ -8,5 +8,4 @@ import org.springframework.stereotype.Repository;
 public interface AssetJpaRepository extends JpaRepository<Asset, Long> {
 
     boolean existsByName(String name);
-
 }

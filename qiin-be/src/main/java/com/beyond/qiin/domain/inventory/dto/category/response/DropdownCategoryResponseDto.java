@@ -13,5 +13,4 @@ public class DropdownCategoryResponseDto {
     private Long categoryId;
 
     private String name;
-
 }

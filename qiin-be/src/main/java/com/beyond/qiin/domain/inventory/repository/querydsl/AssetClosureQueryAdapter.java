@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
-
 import java.util.List;
 
 public interface AssetClosureQueryAdapter {
@@ -20,5 +19,4 @@ public interface AssetClosureQueryAdapter {
 
     // 특정 자손이 포함된 관계 전체 삭제
     void deleteAllByDescendantId(Long descendantId);
-
 }

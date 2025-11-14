@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-
 public class AssetCommandServiceImpl implements AssetCommandService {
 
     private final AssetJpaRepository assetJpaRepository;
@@ -28,13 +27,12 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         // 나중에 권한 검증 추가
 
         // 이름 중복이면 예외처리
-        if(assetJpaRepository.existsByName(requestDto.getName())){
+        if (assetJpaRepository.existsByName(requestDto.getName())) {
             throw AssetException.duplicateName();
         }
 
         // categoryId 존재 여부 검증
         categoryCommandService.validateCategoryId(requestDto.getCategoryId());
-
 
         Asset asset = requestDto.toEntity();
 
@@ -44,7 +42,6 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         // parentId가 있을 경우
         // 부모의 조상들 조회
         // depth+1 해서 closure 테이블에 INSERT
-
 
         return CreateAssetResponseDto.fromEntity(asset, requestDto.getParentId());
     }
@@ -56,7 +53,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         // 나중에 권한 검증 추가
 
         // 이름 중복이면 예외처리
-        if(assetJpaRepository.existsByName(requestDto.getName())){
+        if (assetJpaRepository.existsByName(requestDto.getName())) {
             throw AssetException.duplicateName();
         }
 
@@ -64,8 +61,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         categoryCommandService.validateCategoryId(requestDto.getCategoryId());
 
         // 나중에 에러 처리 추가
-        Asset asset = assetJpaRepository.findById(assetId)
-                                        .orElseThrow(AssetException::notFound);
+        Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
 
         asset.apply(requestDto);
 
@@ -78,15 +74,12 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         // 나중에 권한 검증 추가
 
-        Asset asset = assetJpaRepository.findById(assetId)
-                                        .orElseThrow(AssetException::notFound);
+        Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
 
         asset.delete(userId);
     }
 
     @Override
     @Transactional
-    public void moveAsset(final Long assetId, final Long newParentId) {
-
-    }
+    public void moveAsset(final Long assetId, final Long newParentId) {}
 }

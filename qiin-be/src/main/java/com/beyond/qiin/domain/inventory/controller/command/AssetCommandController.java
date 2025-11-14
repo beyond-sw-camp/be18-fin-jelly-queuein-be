@@ -35,8 +35,7 @@ public class AssetCommandController {
 
     @PatchMapping("/{assetId}")
     public ResponseEntity<UpdateAssetResponseDto> updateAsset(
-            @PathVariable Long assetId,
-            @Valid @RequestBody UpdateAssetRequestDto updateAssetRequestDto) {
+            @PathVariable Long assetId, @Valid @RequestBody UpdateAssetRequestDto updateAssetRequestDto) {
 
         UpdateAssetResponseDto updateAssetResponseDto = assetCommandService.updateAsset(updateAssetRequestDto, assetId);
 
@@ -44,22 +43,18 @@ public class AssetCommandController {
     }
 
     @DeleteMapping("/{assetId}")
-    public ResponseEntity<Void> deleteAsset(
-            @PathVariable Long assetId
-//            ,@AuthenticationPrincipal UserDetailsDto user
+    public ResponseEntity<Void> deleteAsset(@PathVariable Long assetId
+            //            ,@AuthenticationPrincipal UserDetailsDto user
             ) {
 
-//        assetCommandService.deleteAsset(assetId, userId);
+        //        assetCommandService.deleteAsset(assetId, userId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
     @PatchMapping("/{assetId}/move")
-    public ResponseEntity<Void>  moveAsset(
-            @PathVariable Long assetId
-    ) {
+    public ResponseEntity<Void> moveAsset(@PathVariable Long assetId) {
 
-        return  null;
+        return null;
     }
-
 }

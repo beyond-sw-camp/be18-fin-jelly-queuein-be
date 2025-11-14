@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.inventory.entity;
 
 import com.beyond.qiin.common.BaseEntity;
-import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -29,9 +28,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(
         name = "asset",
-        indexes = {
-            @Index(name = "idx_asset_category_id", columnList = "category_id")
-        })
+        indexes = {@Index(name = "idx_asset_category_id", columnList = "category_id")})
 @AttributeOverride(name = "id", column = @Column(name = "asset_id"))
 @SQLRestriction("deleted_at = null")
 public class Asset extends BaseEntity {
@@ -78,7 +75,6 @@ public class Asset extends BaseEntity {
     @Column(name = "version", nullable = false)
     private Long version;
 
-
     public void apply(UpdateAssetRequestDto requestDto) {
         this.categoryId = requestDto.getCategoryId();
         this.name = requestDto.getName();
@@ -90,6 +86,5 @@ public class Asset extends BaseEntity {
         this.approvalStatus = requestDto.getApprovalStatus();
         this.costPerHour = requestDto.getCostPerHour();
         this.periodCost = requestDto.getPeriodCost();
-
     }
 }

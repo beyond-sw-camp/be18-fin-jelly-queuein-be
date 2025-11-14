@@ -37,26 +37,23 @@ public class CategoryQueryAdapterImpl implements CategoryQueryAdapter {
     @Override
     @Transactional(readOnly = true)
     public Page<ManageCategoryResponseDto> findAllForManage(Pageable pageable) {
-        List<ManageCategoryResponseDto> content =
-                jpaQueryFactory
-                    .select(Projections.constructor(
-                            ManageCategoryResponseDto.class,
-                            category.id,
-                            category.name,
-                            category.description,
-                            JPAExpressions.select(asset.count()).from(asset).where(asset.category.id.eq(category.id)),
-                            category.createdAt,
-                            category.createdBy))
-                    .from(category)
-                    .orderBy(category.id.asc())
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .fetch();
-
-        Long totalCount = jpaQueryFactory
-                .select(category.count())
+        List<ManageCategoryResponseDto> content = jpaQueryFactory
+                .select(Projections.constructor(
+                        ManageCategoryResponseDto.class,
+                        category.id,
+                        category.name,
+                        category.description,
+                        JPAExpressions.select(asset.count()).from(asset).where(asset.category.id.eq(category.id)),
+                        category.createdAt,
+                        category.createdBy))
                 .from(category)
-                .fetchOne();
+                .orderBy(category.id.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long totalCount =
+                jpaQueryFactory.select(category.count()).from(category).fetchOne();
 
         return new PageImpl<>(content, pageable, totalCount);
     }

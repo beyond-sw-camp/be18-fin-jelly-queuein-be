@@ -30,9 +30,7 @@ public class CategoryQueryController {
 
     @GetMapping("/manage")
     public ResponseEntity<PageResponseDto<ManageCategoryResponseDto>> getManageCategory(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "010") int size
-    ) {
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "010") int size) {
 
         PageResponseDto<ManageCategoryResponseDto> categories = categoryQueryService.getManageList(page, size);
 

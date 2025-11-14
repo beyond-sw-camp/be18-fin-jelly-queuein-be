@@ -22,5 +22,4 @@ public class ManageCategoryResponseDto {
     private Instant createdAt;
 
     private Long createdBy;
-
 }
