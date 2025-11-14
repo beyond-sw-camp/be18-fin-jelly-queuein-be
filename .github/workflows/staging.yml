@@ -23,15 +23,6 @@ jobs:
           cd C:\Users\Playdata\develop\be18-fin-jelly-queuein-be\qiin-be
           docker build -t qiin-backend:staging .
 
-      # ------------------------------
-      # 🔥 Doppler Token이 정상인지 먼저 테스트
-      # ------------------------------
-      - name: Test Doppler Token Access
-        run: |
-          echo "Testing Doppler token..."
-          doppler --token "${{ secrets.DOPPLER_STAGING_TOKEN }}" secrets get --config stg --plain SPRING_DATASOURCE_URL
-        shell: pwsh
-
       - name: Deploy Staging Containers
         run: |
           cd C:\Users\Playdata\develop\be18-fin-jelly-queuein-be\qiin-be
