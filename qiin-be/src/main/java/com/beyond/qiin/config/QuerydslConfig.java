@@ -1,4 +1,4 @@
-package com.beyond.qiin.common.config;
+package com.beyond.qiin.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

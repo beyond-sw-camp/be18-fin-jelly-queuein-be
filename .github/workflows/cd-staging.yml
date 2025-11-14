@@ -1,0 +1,27 @@
+name: CD Staging Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI Push (Staging)"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Staging Containers
+        run: |
+          cd C:\Users\Playdata\develop\be18-fin-jelly-queuein-be\qiin-be
+
+          echo "Stopping running containers..."
+          docker compose -f docker-compose.staging.yml down
+
+          echo "Starting staging containers with Doppler..."
+          doppler --token "${{ secrets.DOPPLER_STAGING_TOKEN }}" run --config stg -- docker compose -f docker-compose.staging.yml up -d
+        shell: pwsh
