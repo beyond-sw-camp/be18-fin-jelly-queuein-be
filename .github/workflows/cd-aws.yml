@@ -75,5 +75,5 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster qiin-cluster \
-            --service qiin-service \
+            --service qiin-backend-task-service-4ljix7dn \
             --task-definition "$NEW_TASK_DEF_ARN"
