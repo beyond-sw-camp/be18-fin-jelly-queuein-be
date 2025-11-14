@@ -101,11 +101,12 @@
       <a href="https://www.erdcloud.com/d/fFbaSvk2sHJQgE6RS">ERD Cloud</a>
     </div>
     <div markdown="1">
-      <img width="1424" height="819" alt="image" src="https://github.com/user-attachments/assets/47731f6d-a1fb-471f-8608-724b616ea702" />
+        <img width="1077" height="817" alt="KakaoTalk_20251114_170311228" src="https://github.com/user-attachments/assets/4b6862ac-1109-47e6-b0e4-ebf882e34457" />
     </div>
   </details>
   <br>
-  
+
+
 ## <a id="requirements"></a>6. 화면 설계서
   
   <details>
