@@ -14,7 +14,19 @@ public class CreateUserRequestDto {
 
     private String userNo;
 
+    private String userName;
+
     private String email;
 
     private String password;
+
+    public static User toEntity(final CreateUserRequestDto dto) {
+        return User.builder()
+                .dptId(dto.getDptId())
+                .userNo(dto.getUserNo())
+                .userName(dto.getUserName())
+                .email(dto.getEmail())
+                .password(dto.getPassword())
+                .build();
+    }
 }

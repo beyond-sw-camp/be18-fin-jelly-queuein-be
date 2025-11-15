@@ -122,7 +122,7 @@ public class JwtTokenProvider {
     }
 
     // Claims 공통 조회
-    private Claims getClaims(final String token) {
+    Claims getClaims(final String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

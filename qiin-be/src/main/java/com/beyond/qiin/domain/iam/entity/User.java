@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
-import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,10 +30,9 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at = null")
 public class User extends BaseEntity {
 
-    //  // TODO: 부서 FK이므로 ManyToOne 추가
-    //  @ManyToOne(fetch = FetchType.LAZY)
-    //  @JoinColumn(name = "dpt_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    //  private Department department;
+    //      @ManyToOne(fetch = FetchType.LAZY)
+    //      @JoinColumn(name = "dpt_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    //      private Department department;
 
     @Column(name = "dpt_id", nullable = false)
     private Long dptId;
@@ -60,15 +58,6 @@ public class User extends BaseEntity {
 
     @Column(name = "last_login_at", columnDefinition = "TIMESTAMP(6)")
     private Instant lastLoginAt;
-
-    public static User createFromDto(final CreateUserRequestDto request) {
-        return User.builder()
-                .dptId(request.getDptId())
-                .userNo(request.getUserNo())
-                .email(request.getEmail())
-                .password(request.getPassword())
-                .build();
-    }
 
     public void updatePassword(final String encrypted) {
         this.password = encrypted;
