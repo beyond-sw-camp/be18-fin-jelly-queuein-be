@@ -17,7 +17,7 @@ public class AuthCommandController {
 
     private final AuthCommandService authCommandService;
 
-    @PostMapping("/signup/master")
+    @PostMapping("/signup/masters")
     public ResponseEntity<SignupResponseDto> createMaster(@RequestBody final SignupRequestDto request) {
         return ResponseEntity.ok(authCommandService.createMaster(request));
     }

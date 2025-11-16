@@ -1,5 +1,6 @@
 package com.beyond.qiin.domain.iam.dto.user.request;
 
+import com.beyond.qiin.domain.iam.entity.User;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,13 +21,13 @@ public class CreateUserRequestDto {
 
     private String password;
 
-    public static User toEntity(final CreateUserRequestDto dto) {
+    public static User toEntity(final CreateUserRequestDto request) {
         return User.builder()
-                .dptId(dto.getDptId())
-                .userNo(dto.getUserNo())
-                .userName(dto.getUserName())
-                .email(dto.getEmail())
-                .password(dto.getPassword())
+                .dptId(request.getDptId())
+                .userNo(request.getUserNo())
+                .userName(request.getUserName())
+                .email(request.getEmail())
+                .password(request.getPassword())
                 .build();
     }
 }

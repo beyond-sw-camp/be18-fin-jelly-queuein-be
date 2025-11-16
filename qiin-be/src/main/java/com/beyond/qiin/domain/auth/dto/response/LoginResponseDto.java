@@ -1,3 +1,30 @@
 package com.beyond.qiin.domain.auth.dto.response;
 
-public class LoginResponseDto {}
+import com.beyond.qiin.domain.iam.entity.User;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+public class LoginResponseDto {
+
+    private Long userId;
+    private String userName;
+    private String email;
+    private String role;
+    private Boolean passwordExpired;
+    private String accessToken;
+    private String refreshToken;
+
+    public static LoginResponseDto of(User user, String role, String accessToken, String refreshToken) {
+        return LoginResponseDto.builder()
+                .userId(user.getId())
+                .userName(user.getUserName())
+                .email(user.getEmail())
+                .role(role)
+                .passwordExpired(user.getPasswordExpired())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+}

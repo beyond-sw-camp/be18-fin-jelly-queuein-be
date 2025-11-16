@@ -2,6 +2,8 @@ package com.beyond.qiin.domain.auth.service.command;
 
 import com.beyond.qiin.domain.auth.dto.request.SignupRequestDto;
 import com.beyond.qiin.domain.auth.dto.response.SignupResponseDto;
+import com.beyond.qiin.domain.auth.exception.AuthException;
+import com.beyond.qiin.domain.auth.exception.AuthException.AuthErrorCode;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.entity.UserRole;
@@ -28,42 +30,29 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     @Transactional
     public SignupResponseDto createMaster(final SignupRequestDto request) {
 
-        // 1. 임시 비밀번호 생성
-        String tempPassword = PasswordGenerator.generate();
+        // 임시 비밀번호 생성
+        final String tempPassword = PasswordGenerator.generate();
 
-        // 2. 암호화 (SecurityConfig 만들면 PasswordEncoder 주입)
-        String encrypted = "{noop}" + tempPassword; // 임시로 NoOp
-        // 실제는 passwordEncoder.encode(tempPassword)
+        // 비밀번호 암호화 (NoOp 임시 사용)
+        final String encrypted = "{noop}" + tempPassword;
 
-        // 3. 유저 생성
-        User user = User.builder()
-                .dptId(request.getDptId())
-                .userNo(request.getUserNo())
-                .email(request.getEmail())
-                .password(encrypted)
-                .passwordExpired(true)
-                .build();
+        // DTO → User 엔티티 변환
+        final User user = request.toEntity(encrypted);
+        final User saved = userJpaRepository.save(user);
 
-        User saved = userJpaRepository.save(user);
-
-        // 4. 역할(MASTER) 조회
-        Role masterRole = roleJpaRepository
+        // MASTER 역할 조회
+        final Role masterRole = roleJpaRepository
                 .findByRoleName("MASTER")
-                .orElseThrow(() -> new RuntimeException("MASTER role not found"));
+                .orElseThrow(() -> new AuthException(AuthErrorCode.ROLE_NOT_FOUND));
 
-        // 5. UserRole 저장
-        UserRole mapping = UserRole.builder().role(masterRole).user(saved).build();
+        // UserRole 매핑 저장
+        userRoleJpaRepository.save(
+                UserRole.builder().role(masterRole).user(saved).build());
 
-        userRoleJpaRepository.save(mapping);
-
-        // 6. Redis에 임시 비밀번호 저장 (10분 TTL)
+        // Redis에 임시 비밀번호 저장 (10분)
         redisTemplate.opsForValue().set("TEMP_PASSWORD:" + saved.getId(), tempPassword, Duration.ofMinutes(10));
 
-        // 7. 반환
-        return SignupResponseDto.builder()
-                .userId(saved.getId())
-                .email(saved.getEmail())
-                .role(masterRole.getRoleName())
-                .build();
+        // 응답 생성
+        return SignupResponseDto.fromEntity(saved, masterRole);
     }
 }
