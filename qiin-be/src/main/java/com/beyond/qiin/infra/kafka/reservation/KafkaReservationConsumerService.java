@@ -9,22 +9,24 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-//mariadb에서 redis cache로
+// mariadb에서 redis cache로
 public class KafkaReservationConsumerService {
     private final ReservationRepository reservationRepository;
     private final ReservationRedisService redisService;
 
     public void handleCreated(ReservationCreatedEvent event) {
-        Reservation reservation = reservationRepository.findById(event.getReservationId())
-            .orElseThrow(() -> new IllegalStateException("Reservation not found"));
+        Reservation reservation = reservationRepository
+                .findById(event.getReservationId())
+                .orElseThrow(() -> new IllegalStateException("Reservation not found"));
 
         redisService.save(reservation);
         log.info("Redis updated after reservation created: {}", event.getReservationId());
     }
 
     public void handleUpdated(ReservationUpdatedEvent event) {
-        Reservation reservation = reservationRepository.findById(event.getReservationId())
-            .orElseThrow(() -> new IllegalStateException("Reservation not found"));
+        Reservation reservation = reservationRepository
+                .findById(event.getReservationId())
+                .orElseThrow(() -> new IllegalStateException("Reservation not found"));
 
         redisService.save(reservation);
         log.info("Redis updated after reservation updated: {}", event.getReservationId());

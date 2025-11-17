@@ -10,9 +10,9 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ReservationCreatedEvent {
-  private final Long reservationId;
+    private final Long reservationId;
 
-  public static ReservationCreatedEvent from(Reservation reservation) {
-    return new ReservationCreatedEvent(reservation.getId());
-  }
+    public static ReservationCreatedEvent from(Reservation reservation) {
+        return new ReservationCreatedEvent(reservation.getId());
+    }
 }

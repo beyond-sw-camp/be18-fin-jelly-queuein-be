@@ -1,23 +1,23 @@
-//package com.beyond.qiin.infra.kafka.reservation;
+// package com.beyond.qiin.infra.kafka.reservation;
 //
-//import com.beyond.qiin.infra.kafka.KafkaProducerService;
-//import com.beyond.qiin.infra.kafka.KafkaTopicProperties;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.kafka.core.KafkaTemplate;
-//import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.PostMapping;
-//import org.springframework.web.bind.annotation.RequestBody;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RequestParam;
-//import org.springframework.web.bind.annotation.RestController;
-////테스트용 controller
-//@Slf4j
-//@RestController
-//@RequestMapping("/api/v1/reservations")
-//@RequiredArgsConstructor
-//public class KafkaReservationProducerController {
+// import com.beyond.qiin.infra.kafka.KafkaProducerService;
+// import com.beyond.qiin.infra.kafka.KafkaTopicProperties;
+// import lombok.RequiredArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
+// import org.springframework.http.ResponseEntity;
+// import org.springframework.kafka.core.KafkaTemplate;
+// import org.springframework.web.bind.annotation.PathVariable;
+// import org.springframework.web.bind.annotation.PostMapping;
+// import org.springframework.web.bind.annotation.RequestBody;
+// import org.springframework.web.bind.annotation.RequestMapping;
+// import org.springframework.web.bind.annotation.RequestParam;
+// import org.springframework.web.bind.annotation.RestController;
+//// 테스트용 controller
+// @Slf4j
+// @RestController
+// @RequestMapping("/api/v1/reservations")
+// @RequiredArgsConstructor
+// public class KafkaReservationProducerController {
 //    private final KafkaProducerService kafkaProducerService;
 //    private final KafkaTopicProperties topics;
 //
@@ -44,4 +44,4 @@
 //        kafkaProducerService.sendMessageWithCallback(topics.getReservation(), message);
 //        return ResponseEntity.ok("비동기 메시지 전송 요청 완료");
 //    }
-//}
+// }

@@ -19,14 +19,11 @@ public class KafkaTopicConfig {
     @Bean
     public List<NewTopic> createTopics() {
         return kafkaTopicProperties.getTopics().values().stream()
-            .map(topicName ->
-                TopicBuilder.name(topicName)
-                    .partitions(3)
-                    .replicas(1)
-                    .config(TopicConfig.RETENTION_MS_CONFIG,
-                        String.valueOf(7 * 24 * 60 * 60 * 1000L))  // 7일
-                    .build()
-            )
-            .toList();
+                .map(topicName -> TopicBuilder.name(topicName)
+                        .partitions(3)
+                        .replicas(1)
+                        .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60 * 1000L)) // 7일
+                        .build())
+                .toList();
     }
 }

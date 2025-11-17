@@ -11,11 +11,11 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReservationRequestDto {
-  @NotNull
-  private final Instant startAt;   // not null
+    @NotNull
+    private final Instant startAt; // not null
 
-  @NotNull
-  private final Instant endAt;     // not null
+    @NotNull
+    private final Instant endAt; // not null
 
-  private final String description;
+    private final String description;
 }

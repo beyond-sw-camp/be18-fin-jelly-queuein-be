@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ReservationEventListener {
-  private final KafkaReservationConsumerService consumerService;
+    private final KafkaReservationConsumerService consumerService;
 
-  @KafkaListener(topics = "${spring.kafka.topic.reservationCreated}")
-  public void onCreated(ReservationCreatedEvent event) {
-    consumerService.handleCreated(event);
-  }
+    @KafkaListener(topics = "${spring.kafka.topic.reservationCreated}")
+    public void onCreated(ReservationCreatedEvent event) {
+        consumerService.handleCreated(event);
+    }
 
-  @KafkaListener(topics = "${spring.kafka.topic.reservationUpdated}")
-  public void onUpdated(ReservationUpdatedEvent event) {
-    consumerService.handleUpdated(event);
-  }
+    @KafkaListener(topics = "${spring.kafka.topic.reservationUpdated}")
+    public void onUpdated(ReservationUpdatedEvent event) {
+        consumerService.handleUpdated(event);
+    }
 }
