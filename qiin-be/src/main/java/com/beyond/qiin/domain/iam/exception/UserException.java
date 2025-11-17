@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 
 public class UserException extends BaseException {
 
-    public UserException(ErrorCode code) {
+    private UserException(final UserErrorCode code) {
         super(code);
     }
 
@@ -16,15 +16,15 @@ public class UserException extends BaseException {
         return new UserException(UserErrorCode.USER_NOT_FOUND);
     }
 
-    public static UserException userDuplicateName() {
-        return new UserException(UserErrorCode.USER_DUPLICATE_NAME);
+    public static UserException userAlreadyExists() {
+        return new UserException(UserErrorCode.USER_ALREADY_EXISTS);
     }
 
     // ErrorCode 내부에 정의
     @Getter
     public enum UserErrorCode implements ErrorCode {
-        USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "해당 직원을 찾을 수 없습니다."),
-        USER_DUPLICATE_NAME(HttpStatus.CONFLICT, "USER_DUPLICATE_NAME", "이미 존재하는 사원명입니다.");
+        USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "해당 사용자를 찾을 수 없습니다."),
+        USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS", "이미 존재하는 사용자입니다.");
 
         private final HttpStatus status;
         private final String error;

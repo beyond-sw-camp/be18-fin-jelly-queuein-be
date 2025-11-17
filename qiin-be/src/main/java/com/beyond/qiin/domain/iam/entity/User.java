@@ -59,6 +59,12 @@ public class User extends BaseEntity {
     @Column(name = "last_login_at", columnDefinition = "TIMESTAMP(6)")
     private Instant lastLoginAt;
 
+    @Column(name = "hire_date", columnDefinition = "TIMESTAMP(6)", nullable = false)
+    private Instant hireDate;
+
+    @Column(name = "retire_date", columnDefinition = "TIMESTAMP(6)")
+    private Instant retireDate;
+
     public void updatePassword(final String encrypted) {
         this.password = encrypted;
         this.passwordExpired = false;

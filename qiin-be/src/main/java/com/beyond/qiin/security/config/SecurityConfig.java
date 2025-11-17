@@ -30,6 +30,8 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/api/v1/auth/**")
                         .permitAll()
+                        .requestMatchers("/internal/**")
+                        .permitAll()
                         .anyRequest()
                         .authenticated())
                 .exceptionHandling(e -> {
