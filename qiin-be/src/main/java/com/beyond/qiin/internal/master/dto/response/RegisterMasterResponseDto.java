@@ -10,13 +10,15 @@ import lombok.Getter;
 public class RegisterMasterResponseDto { // 처음에 MASTER 발급 시 추후 명칭 변경
     private Long userId;
     private String email;
-    private String role; // MASTER 고정
+    private String role;
+    private String tempPassword;
 
-    public static RegisterMasterResponseDto fromEntity(final User user, final Role role) {
+    public static RegisterMasterResponseDto fromEntity(final User user, final Role role, final String tempPassword) {
         return RegisterMasterResponseDto.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
                 .role(role.getRoleName())
+                .tempPassword(tempPassword)
                 .build();
     }
 }

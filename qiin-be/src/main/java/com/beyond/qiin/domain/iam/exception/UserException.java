@@ -20,11 +20,21 @@ public class UserException extends BaseException {
         return new UserException(UserErrorCode.USER_ALREADY_EXISTS);
     }
 
+    public static UserException invalidPassword() {
+        return new UserException(UserErrorCode.INVALID_PASSWORD);
+    }
+
+    public static UserException passwordExpired() {
+        return new UserException(UserErrorCode.PASSWORD_EXPIRED);
+    }
+
     // ErrorCode 내부에 정의
     @Getter
     public enum UserErrorCode implements ErrorCode {
         USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "해당 사용자를 찾을 수 없습니다."),
-        USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS", "이미 존재하는 사용자입니다.");
+        USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS", "이미 존재하는 사용자입니다."),
+        INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "INVALID_PASSWORD", "비밀번호가 일치하지 않습니다."),
+        PASSWORD_EXPIRED(HttpStatus.UNAUTHORIZED, "PASSWORD_EXPIRED", "임시 비밀번호 사용자는 비밀번호를 변경해야 합니다.");
 
         private final HttpStatus status;
         private final String error;

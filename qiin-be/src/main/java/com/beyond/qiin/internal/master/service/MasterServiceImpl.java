@@ -58,6 +58,6 @@ public class MasterServiceImpl implements MasterService {
         redisTemplate.opsForValue().set("TEMP_PASSWORD:" + saved.getId(), tempPassword, Duration.ofMinutes(10));
 
         // 응답 생성
-        return RegisterMasterResponseDto.fromEntity(saved, masterRole);
+        return RegisterMasterResponseDto.fromEntity(saved, masterRole, tempPassword);
     }
 }

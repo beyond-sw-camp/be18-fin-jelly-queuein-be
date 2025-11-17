@@ -69,4 +69,9 @@ public class User extends BaseEntity {
         this.password = encrypted;
         this.passwordExpired = false;
     }
+
+    // 로그인 시 시간 기록
+    public void updateLastLoginAt(final Instant now) {
+        this.lastLoginAt = now;
+    }
 }
