@@ -53,8 +53,9 @@ public class User extends BaseEntity {
     @Builder.Default
     private List<UserRole> userRoles = new ArrayList<>();
 
+    @Builder.Default
     @Column(name = "password_expired", nullable = false)
-    private Boolean passwordExpired;
+    private Boolean passwordExpired = false;
 
     @Column(name = "last_login_at", columnDefinition = "TIMESTAMP(6)")
     private Instant lastLoginAt;

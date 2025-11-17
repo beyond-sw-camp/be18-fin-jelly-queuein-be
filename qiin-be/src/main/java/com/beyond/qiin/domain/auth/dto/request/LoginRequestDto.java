@@ -12,7 +12,7 @@ public class LoginRequestDto {
     private String password;
 
     // email 기반으로 로그인 시 검색 키 생성
-    public String loginKey() {
+    public String getLoginKey() {
         return this.email;
     }
 }

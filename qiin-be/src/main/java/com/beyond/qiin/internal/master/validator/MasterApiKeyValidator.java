@@ -11,6 +11,7 @@ public class MasterApiKeyValidator {
     @Value("${INTERNAL_MASTER_KEY}")
     private String internalMasterKey;
 
+    // TODO: 개발 끝나면 x-api-key 로깅에서 제외
     public boolean isValid(final HttpServletRequest request) {
         String key = request.getHeader("x-api-key");
 

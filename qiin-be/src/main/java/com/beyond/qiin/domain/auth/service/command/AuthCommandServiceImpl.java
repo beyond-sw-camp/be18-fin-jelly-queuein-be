@@ -28,7 +28,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     public LoginResponseDto login(final LoginRequestDto request) {
 
         // 로그인 키 확장성 유지 (현재는 email 기반)
-        final String loginKey = request.loginKey();
+        final String loginKey = request.getLoginKey();
 
         // 사용자 조회
         final User user = userJpaRepository.findByEmail(loginKey).orElseThrow(UserException::userNotFound);
