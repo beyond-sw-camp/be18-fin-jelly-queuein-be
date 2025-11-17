@@ -30,7 +30,7 @@ import org.hibernate.annotations.SQLRestriction;
             @Index(name = "idx_role_permission_role_id", columnList = "role_id"),
             @Index(name = "idx_role_permission_permission_id", columnList = "permission_id")
         })
-@SQLRestriction("deleted_at = null")
+@SQLRestriction("deleted_at IS NULL")
 public class RolePermission {
 
     @Id

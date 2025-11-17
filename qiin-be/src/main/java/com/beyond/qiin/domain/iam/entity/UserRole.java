@@ -30,7 +30,7 @@ import org.hibernate.annotations.SQLRestriction;
             @Index(name = "idx_user_role_role_id", columnList = "role_id")
         })
 @AttributeOverride(name = "id", column = @Column(name = "user_role_id"))
-@SQLRestriction("deleted_at = null")
+@SQLRestriction("deleted_at IS NULL")
 public class UserRole extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
