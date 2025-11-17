@@ -39,8 +39,13 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         }
 
         // 임시 비밀번호 사용 여부 확인
+        // 최초 로그인(lastLoginAt == null) → 로그인 허용
+        // 그 이후 → 로그인 차단
         if (Boolean.TRUE.equals(user.getPasswordExpired())) {
-            throw UserException.passwordExpired();
+            if (user.getLastLoginAt() != null) {
+                // 최초 로그인이 아니라면 로그인 차단
+                throw UserException.passwordExpired();
+            }
         }
 
         // 사용자 역할 조회 (v1: 단일 역할)

@@ -1,5 +1,6 @@
 package com.beyond.qiin.security;
 
+import com.beyond.qiin.domain.auth.exception.AuthException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SecurityUtils {
@@ -12,6 +13,6 @@ public class SecurityUtils {
             return details.getUserId();
         }
 
-        throw new IllegalStateException("인증 정보가 존재하지 않습니다.");
+        throw AuthException.unauthorized();
     }
 }
