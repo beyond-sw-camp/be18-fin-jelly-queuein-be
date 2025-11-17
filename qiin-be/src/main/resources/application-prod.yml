@@ -24,6 +24,9 @@ spring:
     locations:
       - classpath:db/migration
 
+  cache:
+    type: none   # ← prod에서 캐시 완전히 비활성화 (RedisCacheManager 생성 안 됨!)
+
 jwt:
   secret-key: ${JWT_SECRET_KEY}
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
