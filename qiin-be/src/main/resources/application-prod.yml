@@ -18,8 +18,8 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
     topic:
-      reservation: reservation-topic-prod
-      notification: notification-topic-prod
+      reservationCreated: reservation-created-topic
+      reservationUpdated: reservation-updated-topic
 
     consumer:
       auto-offset-reset: earliest

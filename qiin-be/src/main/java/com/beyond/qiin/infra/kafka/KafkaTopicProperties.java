@@ -1,5 +1,8 @@
 package com.beyond.qiin.infra.kafka;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,9 +11,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "spring.kafka.topic")
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class KafkaTopicProperties {
 
-    private String reservation;
-    private String notification;
+    private final Map<String, String> topics = new HashMap<>();
+
+    public String get(String key) {
+        return topics.get(key);
+    }
+
+    public Set<String> keys() {
+        return topics.keySet();
+    }
 }

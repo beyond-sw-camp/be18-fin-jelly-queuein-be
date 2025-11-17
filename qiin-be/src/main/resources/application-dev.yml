@@ -4,7 +4,7 @@ spring:
       on-profile: dev
 
   flyway:
-    enabled: true
+    enabled: false #임시로 false
     baseline-on-migrate: true
     baseline-version: "0"
     locations:
@@ -19,8 +19,8 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
     topic:
-      reservation: reservation-topic-dev
-      notification: notification-topic-dev
+      reservationCreated: reservation-created-topic
+      reservationUpdated: reservation-updated-topic
 
     consumer:
       auto-offset-reset: earliest

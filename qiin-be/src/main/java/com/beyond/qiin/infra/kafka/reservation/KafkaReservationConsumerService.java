@@ -1,18 +1,32 @@
 package com.beyond.qiin.infra.kafka.reservation;
 
+import com.beyond.qiin.infra.kafka.reservation.event.ReservationCreatedEvent;
+import com.beyond.qiin.infra.kafka.reservation.event.ReservationUpdatedEvent;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
+//mariadb에서 redis cache로
 public class KafkaReservationConsumerService {
-    public String processMessage(String message) {
-        try {
-            // 비즈니스 로직 처리 : 메시지를 대문자로 변환하여 이를 반환
-            return message.toUpperCase();
-        } catch (Exception e) {
-            log.error("메시지 처리 중 오류 발생: {}", e.getMessage(), e);
-            throw new RuntimeException("메시지 처리 실패", e);
-        }
+    private final ReservationRepository reservationRepository;
+    private final ReservationRedisService redisService;
+
+    public void handleCreated(ReservationCreatedEvent event) {
+        Reservation reservation = reservationRepository.findById(event.getReservationId())
+            .orElseThrow(() -> new IllegalStateException("Reservation not found"));
+
+        redisService.save(reservation);
+        log.info("Redis updated after reservation created: {}", event.getReservationId());
+    }
+
+    public void handleUpdated(ReservationUpdatedEvent event) {
+        Reservation reservation = reservationRepository.findById(event.getReservationId())
+            .orElseThrow(() -> new IllegalStateException("Reservation not found"));
+
+        redisService.save(reservation);
+        log.info("Redis updated after reservation updated: {}", event.getReservationId());
     }
 }

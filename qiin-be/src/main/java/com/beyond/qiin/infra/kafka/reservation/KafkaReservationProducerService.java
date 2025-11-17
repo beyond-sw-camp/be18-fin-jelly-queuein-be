@@ -1,42 +1,28 @@
 package com.beyond.qiin.infra.kafka.reservation;
 
+import com.beyond.qiin.infra.kafka.KafkaProducerService;
 import com.beyond.qiin.infra.kafka.KafkaTopicProperties;
+import com.beyond.qiin.infra.kafka.reservation.event.ReservationCreatedEvent;
+import com.beyond.qiin.infra.kafka.reservation.event.ReservationUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
+//reservation service에서 호출
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class KafkaReservationProducerService {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final KafkaTopicProperties topicProperties;
+    private final KafkaProducerService kafkaProducerService;
+    private final KafkaTopicProperties topics;
 
-    // message
-    public void sendMessage(String message) {
-        kafkaTemplate.send(topicProperties.getReservation(), message);
+    public void publishReservationCreated(ReservationCreatedEvent e){
+        kafkaProducerService.sendMessage(topics.get("reservationCreated"), e);
     }
 
-    // topic key, message
-    public void sendMessageWithKey(String key, String message) {
-        kafkaTemplate.send(topicProperties.getReservation(), key, message);
+    public void publishReservationUpdated(ReservationUpdatedEvent e){
+        kafkaProducerService.sendMessage(topics.get("reservationUpdated"), e);
     }
 
-    // 특정 partition으로
-    public void sendMessageToPartition(String message, int partition) {
-        kafkaTemplate.send(topicProperties.getReservation(), partition, null, message);
-    }
-
-    // 비동기 전송 결과 처리
-    public void sendMessageWithCallback(String message) {
-        kafkaTemplate.send(topicProperties.getReservation(), message).whenComplete((result, ex) -> {
-            if (ex == null) {
-                log.debug("Success: {} ", result.getRecordMetadata());
-            } else {
-                log.error("Failed: {}", ex.getMessage());
-            }
-        });
-    }
 }

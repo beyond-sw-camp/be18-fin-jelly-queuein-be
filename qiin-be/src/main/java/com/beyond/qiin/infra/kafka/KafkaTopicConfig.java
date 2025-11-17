@@ -1,5 +1,6 @@
 package com.beyond.qiin.infra.kafka;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.config.TopicConfig;
@@ -16,24 +17,16 @@ public class KafkaTopicConfig {
     private final KafkaTopicProperties kafkaTopicProperties;
 
     @Bean
-    public NewTopic reservationTopic() {
-        return TopicBuilder.name(kafkaTopicProperties.getReservation())
-                .partitions(3) // 파티션 수 설정
-                .replicas(1) // 복제 팩터 설정 (1)
-                .config( // 추가 설정
-                        TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60 * 1000L) // 7일
-                        )
-                .build();
-    }
-
-    @Bean
-    public NewTopic notificationTopic() {
-        return TopicBuilder.name(kafkaTopicProperties.getNotification())
-                .partitions(3) // 파티션 수 설정
-                .replicas(1) // 복제 팩터 설정 (1)
-                .config( // 추가 설정
-                        TopicConfig.RETENTION_MS_CONFIG, String.valueOf(7 * 24 * 60 * 60 * 1000L) // 7일
-                        )
-                .build();
+    public List<NewTopic> createTopics() {
+        return kafkaTopicProperties.getTopics().values().stream()
+            .map(topicName ->
+                TopicBuilder.name(topicName)
+                    .partitions(3)
+                    .replicas(1)
+                    .config(TopicConfig.RETENTION_MS_CONFIG,
+                        String.valueOf(7 * 24 * 60 * 60 * 1000L))  // 7일
+                    .build()
+            )
+            .toList();
     }
 }
