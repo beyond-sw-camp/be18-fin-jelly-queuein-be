@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.auth.dto.request;
+package com.beyond.qiin.domain.iam.dto.user.request;
 
 import lombok.AccessLevel;
 import lombok.Getter;

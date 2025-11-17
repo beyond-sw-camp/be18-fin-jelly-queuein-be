@@ -10,6 +10,7 @@ import com.beyond.qiin.domain.iam.repository.UserRoleJpaRepository;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     private final UserJpaRepository userJpaRepository;
     private final UserRoleJpaRepository userRoleJpaRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -31,8 +33,8 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         // 사용자 조회
         final User user = userJpaRepository.findByEmail(loginKey).orElseThrow(UserException::userNotFound);
 
-        // 비밀번호 검증 (현재 {noop})
-        if (!user.getPassword().equals("{noop}" + request.getPassword())) {
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw UserException.invalidPassword();
         }
 
