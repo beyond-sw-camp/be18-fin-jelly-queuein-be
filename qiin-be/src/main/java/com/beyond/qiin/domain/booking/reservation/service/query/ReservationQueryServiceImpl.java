@@ -147,7 +147,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Override
     @Transactional(readOnly = true)
     public MonthReservationListResponseDto getMonthlyReservations(
-        final Long userId, final YearMonth yearMonth) { // 일까지 포함 X이므로 달까지 포함하는 자료형 사용
+            final Long userId, final YearMonth yearMonth) { // 일까지 포함 X이므로 달까지 포함하는 자료형 사용
         // user 있는지 확인
 
         // 비어있을 수 있음

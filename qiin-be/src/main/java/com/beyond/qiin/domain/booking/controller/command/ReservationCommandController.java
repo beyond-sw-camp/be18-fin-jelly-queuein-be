@@ -76,8 +76,7 @@ public class ReservationCommandController {
     // 예약 자원 사용 시작
     @PatchMapping("/{reservationId}/check-in")
     public ResponseEntity<ReservationResponseDto> startUsingReservation(
-            @PathVariable("reservationId") Long reservationId,
-            @RequestParam Instant startAt) {
+            @PathVariable("reservationId") Long reservationId, @RequestParam Instant startAt) {
         ReservationResponseDto reservationResponseDto =
                 reservationCommandService.startUsingReservation(reservationId, startAt);
 
@@ -89,8 +88,7 @@ public class ReservationCommandController {
     // 예약 자원 사용 종료
     @PatchMapping("/{reservationId}/check-out")
     public ResponseEntity<ReservationResponseDto> endUsingReservation(
-            @PathVariable("reservationId") Long reservationId,
-            @RequestParam Instant endAt) {
+            @PathVariable("reservationId") Long reservationId, @RequestParam Instant endAt) {
         ReservationResponseDto reservationResponseDto =
                 reservationCommandService.endUsingReservation(reservationId, endAt);
 
