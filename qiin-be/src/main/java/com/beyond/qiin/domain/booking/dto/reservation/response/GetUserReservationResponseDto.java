@@ -1,10 +1,7 @@
 package com.beyond.qiin.domain.booking.dto.reservation.response;
 
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
-import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,29 +31,26 @@ public class GetUserReservationResponseDto {
 
     private final String reservationStatus;
 
-    //응답 시 필수 x
+    // 응답 시 필수 x
     private final Instant actualStartAt;
 
     private final Instant actualEndAt;
 
     public static GetUserReservationResponseDto fromEntity(
-        Reservation reservation,
-        String reservationStatus,
-        String assetType,
-        String assetStatus) {
+            Reservation reservation, String reservationStatus, String assetType, String assetStatus) {
 
         return GetUserReservationResponseDto.builder()
-            .reservationId(reservation.getId().toString())
-        .assetType(assetType)                  //TODO: Enum -> String
-        .assetName(reservation.getAsset().getName())
-        .categoryName(reservation.getAsset().getCategory().getName())
-        .assetStatus(assetStatus)               //TODO: Enum -> String
-        .isApproved(reservation.isApproved())            // Boolean (null 가능)
-        .startAt(reservation.getStartAt())
-        .endAt(reservation.getEndAt())
-        .reservationStatus(reservationStatus)
-        .actualStartAt(reservation.getActualStartAt())
-        .actualEndAt(reservation.getActualEndAt())
-        .build();
-}
+                .reservationId(reservation.getId().toString())
+                .assetType(assetType) // TODO: Enum -> String
+                .assetName(reservation.getAsset().getName())
+                .categoryName(reservation.getAsset().getCategory().getName())
+                .assetStatus(assetStatus) // TODO: Enum -> String
+                .isApproved(reservation.isApproved()) // Boolean (null 가능)
+                .startAt(reservation.getStartAt())
+                .endAt(reservation.getEndAt())
+                .reservationStatus(reservationStatus)
+                .actualStartAt(reservation.getActualStartAt())
+                .actualEndAt(reservation.getActualEndAt())
+                .build();
+    }
 }

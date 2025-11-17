@@ -14,5 +14,4 @@ public class GetAppliedReservationListResponseDto {
 
     @Builder.Default
     private final List<GetAppliedReservationResponseDto> reservations = new ArrayList<>();
-
 }

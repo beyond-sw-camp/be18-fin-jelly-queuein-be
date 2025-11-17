@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.booking.dto.reservation.response;
 
-import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -13,6 +12,6 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeekReservationListResponseDto {
 
-  @Builder.Default
-  private final List<WeekReservationResponseDto> reservations = new ArrayList<>();
+    @Builder.Default
+    private final List<WeekReservationResponseDto> reservations = new ArrayList<>();
 }

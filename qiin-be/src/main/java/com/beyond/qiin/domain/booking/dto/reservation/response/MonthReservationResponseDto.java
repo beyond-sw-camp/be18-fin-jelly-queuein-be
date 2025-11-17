@@ -12,17 +12,17 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MonthReservationResponseDto {
 
-  private final Long reservationId;
+    private final Long reservationId;
 
-  private final Instant startAt;
+    private final Instant startAt;
 
-  private final String assetName;
+    private final String assetName;
 
-  public static MonthReservationResponseDto fromEntity(Reservation reservation){
-    return MonthReservationResponseDto.builder()
-        .reservationId(reservation.getId())
-        .startAt(reservation.getStartAt())
-        .assetName(reservation.getAsset().getName())
-        .build();
-  }
+    public static MonthReservationResponseDto fromEntity(Reservation reservation) {
+        return MonthReservationResponseDto.builder()
+                .reservationId(reservation.getId())
+                .startAt(reservation.getStartAt())
+                .assetName(reservation.getAsset().getName())
+                .build();
+    }
 }
