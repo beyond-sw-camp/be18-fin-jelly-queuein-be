@@ -5,6 +5,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationR
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.reservation.service.command.ReservationCommandService;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class ReservationCommandController {
     @PostMapping("/{assetId}/apply")
     public ResponseEntity<ReservationResponseDto> createReservationApply(
             @PathVariable("assetId") Long assetId,
-            @RequestBody CreateReservationRequestDto createReservationRequestDto) {
+            @Valid @RequestBody CreateReservationRequestDto createReservationRequestDto) {
         ReservationResponseDto createReservationResponseDto =
                 reservationCommandService.applyReservation(assetId, createReservationRequestDto);
         return ResponseEntity.status(201).body(createReservationResponseDto);
@@ -38,7 +39,7 @@ public class ReservationCommandController {
     @PostMapping("/{assetId}/instant-confirm")
     public ResponseEntity<ReservationResponseDto> createReservationInstantConfirm(
             @PathVariable("assetId") Long assetId,
-            @RequestBody CreateReservationRequestDto createReservationRequestDto) {
+            @Valid @RequestBody CreateReservationRequestDto createReservationRequestDto) {
         ReservationResponseDto createReservationResponseDto =
                 reservationCommandService.instantConfirmReservation(assetId, createReservationRequestDto);
         return ResponseEntity.status(201).body(createReservationResponseDto);
@@ -48,7 +49,7 @@ public class ReservationCommandController {
     @PatchMapping("/{reservationId}/approve")
     public ResponseEntity<ReservationResponseDto> approveReservation(
             @PathVariable("reservationId") Long reservationId,
-            @RequestBody ConfirmReservationRequestDto confirmReservationRequestDto) {
+            @Valid @RequestBody ConfirmReservationRequestDto confirmReservationRequestDto) {
         // 담당자 권한인 경우
         ReservationResponseDto reservationResponseDto =
                 reservationCommandService.approveReservation(reservationId, confirmReservationRequestDto);
@@ -62,7 +63,7 @@ public class ReservationCommandController {
     @PatchMapping("/{reservationId}/reject")
     public ResponseEntity<ReservationResponseDto> rejectReservation(
             @PathVariable("reservationId") Long reservationId,
-            @RequestBody ConfirmReservationRequestDto confirmReservationRequestDto) {
+            @Valid @RequestBody ConfirmReservationRequestDto confirmReservationRequestDto) {
         // 담당자 권한인 경우
         ReservationResponseDto reservationResponseDto =
                 reservationCommandService.rejectReservation(reservationId, confirmReservationRequestDto);
@@ -75,7 +76,8 @@ public class ReservationCommandController {
     // 예약 자원 사용 시작
     @PatchMapping("/{reservationId}/check-in")
     public ResponseEntity<ReservationResponseDto> startUsingReservation(
-            @PathVariable("reservationId") Long reservationId, @RequestParam Instant startAt) {
+            @PathVariable("reservationId") Long reservationId,
+            @RequestParam Instant startAt) {
         ReservationResponseDto reservationResponseDto =
                 reservationCommandService.startUsingReservation(reservationId, startAt);
 
@@ -87,7 +89,8 @@ public class ReservationCommandController {
     // 예약 자원 사용 종료
     @PatchMapping("/{reservationId}/check-out")
     public ResponseEntity<ReservationResponseDto> endUsingReservation(
-            @PathVariable("reservationId") Long reservationId, @RequestParam Instant endAt) {
+            @PathVariable("reservationId") Long reservationId,
+            @RequestParam Instant endAt) {
         ReservationResponseDto reservationResponseDto =
                 reservationCommandService.endUsingReservation(reservationId, endAt);
 
@@ -100,7 +103,7 @@ public class ReservationCommandController {
     @PatchMapping("/{reservationId}")
     public ResponseEntity<ReservationResponseDto> updateReservation(
             @PathVariable("reservationId") Long reservationId,
-            @RequestBody UpdateReservationRequestDto updateReservationRequestDto) {
+            @Valid @RequestBody UpdateReservationRequestDto updateReservationRequestDto) {
         ReservationResponseDto reservationResponseDto =
                 reservationCommandService.updateReservation(reservationId, updateReservationRequestDto);
 

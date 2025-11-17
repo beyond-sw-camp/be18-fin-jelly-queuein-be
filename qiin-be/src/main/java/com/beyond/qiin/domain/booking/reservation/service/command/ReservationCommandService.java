@@ -10,27 +10,27 @@ import java.util.List;
 
 public interface ReservationCommandService {
 
-    ReservationResponseDto applyReservation(Long assetId, CreateReservationRequestDto createReservationRequestDto);
+    ReservationResponseDto applyReservation(final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
 
     ReservationResponseDto instantConfirmReservation(
-            Long assetId, CreateReservationRequestDto createReservationRequestDto);
+        final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
 
     ReservationResponseDto approveReservation(
-            final Long reservationId, ConfirmReservationRequestDto confirmReservationRequestDto);
+            final Long reservationId, final ConfirmReservationRequestDto confirmReservationRequestDto);
 
     ReservationResponseDto rejectReservation(
-            final Long reservationId, ConfirmReservationRequestDto confirmReservationRequestDto);
+            final Long reservationId, final ConfirmReservationRequestDto confirmReservationRequestDto);
 
     ReservationResponseDto updateReservation(
-            Long reservationId, UpdateReservationRequestDto createReservationRequestDto);
+        final Long reservationId, final UpdateReservationRequestDto createReservationRequestDto);
 
-    ReservationResponseDto startUsingReservation(Long reservationId, Instant startAt);
+    ReservationResponseDto startUsingReservation(final Long reservationId, final Instant startAt);
 
-    ReservationResponseDto endUsingReservation(Long reservationId, Instant endAt);
+    ReservationResponseDto endUsingReservation(final Long reservationId, final Instant endAt);
 
-    ReservationResponseDto cancelReservation(Long reservationId);
+    ReservationResponseDto cancelReservation(final Long reservationId);
 
-    Reservation getReservationById(Long id);
+    Reservation getReservationById(final Long id);
 
-    List<Reservation> getReservationsByAssetId(Long assetId);
+    List<Reservation> getReservationsByAssetId(final Long assetId);
 }

@@ -38,7 +38,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // 예약 상세 조회 (api용)
     @Override
     @Transactional(readOnly = true)
-    public ReservationDetailResponseDto getReservation(Long id) {
+    public ReservationDetailResponseDto getReservation(final Long id) {
         Reservation reservation = getReservationById(id);
 
         ReservationDetailResponseDto reservationDetailResponseDto =
@@ -50,7 +50,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // 사용자 이름으로 예약 목록 조회
     @Transactional(readOnly = true)
     @Override
-    public GetUserReservationListResponseDto getReservationsByUserId(Long userId, LocalDate date) {
+    public GetUserReservationListResponseDto getReservationsByUserId(final Long userId, final LocalDate date) {
         // 사용자 있는지 확인
 
         List<Reservation> reservations = getReservationsByUserAndDate(userId, date);
@@ -73,7 +73,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // 예약 가능 자원 목록 조회, 날짜 기준의 조회
     @Override
     @Transactional(readOnly = true)
-    public ReservableAssetListResponseDto getReservableAssets(LocalDate date) {
+    public ReservableAssetListResponseDto getReservableAssets(final LocalDate date) {
         // 사용 가능 상태의 자원들을 가져옴 - 빌 수 있음
         List<Asset> assets = assetRepository.findAvailableAssets();
 
@@ -106,7 +106,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public ReservableAssetTimeResponseDto getReservableAssetTimes(Long assetId, LocalDate date) {
+    public ReservableAssetTimeResponseDto getReservableAssetTimes(final Long assetId, final LocalDate date) {
         // assetId 유효검증
         List<Reservation> reservations = getReservationsByAssetAndDate(assetId, date);
 
@@ -124,7 +124,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // TODO: 날짜
     @Override
     @Transactional(readOnly = true)
-    public WeekReservationListResponseDto getWeeklyReservations(Long userId, LocalDate date) { // 해당 주의 기준날짜
+    public WeekReservationListResponseDto getWeeklyReservations(final Long userId, final LocalDate date) { // 해당 주의 기준날짜
         // user 있는지 확인
 
         List<Reservation> reservations = getReservationsByUserAndDate(userId, date);
@@ -147,7 +147,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Override
     @Transactional(readOnly = true)
     public MonthReservationListResponseDto getMonthlyReservations(
-            Long userId, YearMonth yearMonth) { // 일까지 포함 X이므로 달까지 포함하는 자료형 사용
+        final Long userId, final YearMonth yearMonth) { // 일까지 포함 X이므로 달까지 포함하는 자료형 사용
         // user 있는지 확인
 
         // 비어있을 수 있음
@@ -169,7 +169,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public GetAppliedReservationListResponseDto getReservationApplies(LocalDate date) {
+    public GetAppliedReservationListResponseDto getReservationApplies(final LocalDate date) {
         // 관리자 권한 확인
 
         // status == pending인 경우
@@ -193,7 +193,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // 자원 자체 (예외처리 포함) -> command service용
     @Override
     @Transactional(readOnly = true)
-    public Reservation getReservationById(Long id) {
+    public Reservation getReservationById(final Long id) {
         Reservation reservation = reservationJpaRepository
                 .findById(id)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
@@ -202,7 +202,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Reservation> getReservationsByUserAndDate(Long userId, LocalDate date) {
+    public List<Reservation> getReservationsByUserAndDate(final Long userId, final LocalDate date) {
 
         DateRange dateRange = dayToInstant("Asia/Seoul", date);
 
@@ -213,7 +213,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Reservation> getReservationsByAssetAndDate(Long assetId, LocalDate date) {
+    public List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date) {
 
         // assetId 유효한지 확인
 
@@ -226,7 +226,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Reservation> getReservationsByUserAndYearMonth(Long userId, YearMonth yearMonth) {
+    public List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final YearMonth yearMonth) {
 
         // userId 유효한지 확인
 
@@ -239,7 +239,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Reservation> getReservationsPendingAndDate(LocalDate date) {
+    public List<Reservation> getReservationsPendingAndDate(final LocalDate date) {
 
         DateRange dateRange = dayToInstant("Asia/Seoul", date);
 
@@ -248,7 +248,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return reservations;
     }
 
-    public static String statusToString(Integer status) {
+    public static String statusToString(final Integer status) {
         if (status == 0) {
             return "PENDING";
         } else if (status == 1) {
@@ -264,14 +264,14 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         }
     }
 
-    public DateRange dayToInstant(String timezone, LocalDate date) {
+    public DateRange dayToInstant(final String timezone, final LocalDate date) {
         ZoneId zone = ZoneId.of(timezone); // Asia/Seoul
         Instant startOfDay = date.atStartOfDay().atZone(zone).toInstant();
         Instant endOfDay = date.plusDays(1).atStartOfDay(zone).toInstant();
         return DateRange.create(startOfDay, endOfDay);
     }
 
-    public DateRange monthToInstant(String timezone, YearMonth yearMonth) {
+    public DateRange monthToInstant(final String timezone, final YearMonth yearMonth) {
         ZoneId zone = ZoneId.of(timezone); // Asia/Seoul
         Instant startDay = yearMonth.atDay(1).atStartOfDay(zone).toInstant();
 
