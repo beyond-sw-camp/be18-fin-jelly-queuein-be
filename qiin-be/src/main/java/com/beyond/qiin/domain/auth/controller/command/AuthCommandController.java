@@ -1,7 +1,7 @@
 package com.beyond.qiin.domain.auth.controller.command;
 
 import com.beyond.qiin.domain.auth.dto.request.LoginRequestDto;
-import com.beyond.qiin.domain.auth.dto.response.LoginResponseDto;
+import com.beyond.qiin.domain.auth.dto.response.LoginResult;
 import com.beyond.qiin.domain.auth.service.command.AuthCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class AuthCommandController {
     private final AuthCommandService authCommandService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody final LoginRequestDto request) {
+    public ResponseEntity<LoginResult> login(@RequestBody final LoginRequestDto request) {
         return ResponseEntity.ok(authCommandService.login(request));
     }
 }

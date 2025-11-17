@@ -1,9 +1,9 @@
 package com.beyond.qiin.domain.auth.service.command;
 
 import com.beyond.qiin.domain.auth.dto.request.LoginRequestDto;
-import com.beyond.qiin.domain.auth.dto.response.LoginResponseDto;
+import com.beyond.qiin.domain.auth.dto.response.LoginResult;
 
 public interface AuthCommandService {
 
-    LoginResponseDto login(final LoginRequestDto request);
+    LoginResult login(final LoginRequestDto request);
 }

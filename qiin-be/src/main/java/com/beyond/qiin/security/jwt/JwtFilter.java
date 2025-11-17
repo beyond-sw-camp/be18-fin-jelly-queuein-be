@@ -9,9 +9,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -42,8 +44,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
                     User user = userJpaRepository.findById(userId).orElse(null);
 
+                    String role = (String) claims.get("role");
+
                     if (user != null) {
-                        CustomUserDetails userDetails = new CustomUserDetails(user);
+                        CustomUserDetails userDetails = new CustomUserDetails(
+                                userId, user.getEmail(), List.of(new SimpleGrantedAuthority(role)));
 
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());

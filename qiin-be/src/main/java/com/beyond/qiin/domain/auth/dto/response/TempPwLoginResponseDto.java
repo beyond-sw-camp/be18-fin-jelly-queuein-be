@@ -6,26 +6,23 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class LoginResponseDto implements LoginResult {
+public class TempPwLoginResponseDto implements LoginResult {
 
     private Long userId;
+    private String userNo;
     private String userName;
     private String email;
-    private String role;
-    private Boolean passwordExpired;
+    private Boolean mustChangePassword;
     private String accessToken;
-    private String refreshToken;
 
-    public static LoginResponseDto of(
-            final User user, final String role, final String accessToken, final String refreshToken) {
-        return LoginResponseDto.builder()
+    public static TempPwLoginResponseDto fromEntity(final User user, final String accessToken) {
+        return TempPwLoginResponseDto.builder()
                 .userId(user.getId())
+                .userNo(user.getUserNo())
                 .userName(user.getUserName())
                 .email(user.getEmail())
-                .role(role)
-                .passwordExpired(user.getPasswordExpired())
+                .mustChangePassword(user.getPasswordExpired())
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
                 .build();
     }
 }
