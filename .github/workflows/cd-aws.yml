@@ -46,6 +46,6 @@ jobs:
       - name: Deploy New Task Definition to ECS
         run: |
           aws ecs update-service \
-            --cluster qiin-cluster \
+            --cluster qiin-fargate-cluster \
             --service qiin-service \
             --force-new-deployment
