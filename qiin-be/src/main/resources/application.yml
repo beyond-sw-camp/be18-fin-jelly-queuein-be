@@ -12,15 +12,6 @@ spring:
       hibernate:
         format_sql: true
 
-  # Redis 설정
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-
-  # Kafka 설정
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
 
 # JWT 설정
 jwt:
