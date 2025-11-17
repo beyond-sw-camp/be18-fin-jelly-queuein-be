@@ -15,25 +15,25 @@ import java.util.List;
 public interface ReservationQueryService {
     Reservation getReservationById(Long id);
 
-    GetUserReservationListResponseDto getReservationsByUserId(Long userId, LocalDate date);
+    GetUserReservationListResponseDto getReservationsByUserId(final Long userId, final LocalDate date);
 
-    ReservableAssetListResponseDto getReservableAssets(LocalDate date);
+    ReservableAssetListResponseDto getReservableAssets(final LocalDate date);
 
-    ReservationDetailResponseDto getReservation(Long id);
+    ReservationDetailResponseDto getReservation(final Long id);
 
-    ReservableAssetTimeResponseDto getReservableAssetTimes(Long assetId, LocalDate date);
+    ReservableAssetTimeResponseDto getReservableAssetTimes(final Long assetId, final LocalDate date);
 
-    WeekReservationListResponseDto getWeeklyReservations(Long userId, LocalDate date);
+    WeekReservationListResponseDto getWeeklyReservations(final Long userId, final LocalDate date);
 
-    MonthReservationListResponseDto getMonthlyReservations(Long userId, YearMonth yearMonth);
+    MonthReservationListResponseDto getMonthlyReservations(final Long userId, final YearMonth yearMonth);
 
-    GetAppliedReservationListResponseDto getReservationApplies(LocalDate date);
+    GetAppliedReservationListResponseDto getReservationApplies(final LocalDate date);
 
-    List<Reservation> getReservationsByUserAndDate(Long userId, LocalDate date);
+    List<Reservation> getReservationsByUserAndDate(final Long userId, final LocalDate date);
 
-    List<Reservation> getReservationsByAssetAndDate(Long assetId, LocalDate date);
+    List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date);
 
-    List<Reservation> getReservationsByUserAndYearMonth(Long userId, YearMonth yearMonth);
+    List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final YearMonth yearMonth);
 
-    List<Reservation> getReservationsPendingAndDate(LocalDate date);
+    List<Reservation> getReservationsPendingAndDate(final LocalDate date);
 }

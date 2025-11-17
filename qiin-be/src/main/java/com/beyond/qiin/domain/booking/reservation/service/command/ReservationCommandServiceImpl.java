@@ -214,7 +214,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
     }
 
-    private void validateReservationCanceling(Reservation reservation) {
+    private void validateReservationCanceling(final Reservation reservation) {
         if (!isReservationCancelAvailable(reservation))
             // ddd -> 검증 / service 의 행동 결정(메시지 던짐)
             throw new ReservationException(ReservationErrorCode.RESERVATION_CANCEL_NOT_ALLOWED);
@@ -251,7 +251,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         return false;
     }
 
-    private String statusToString(Integer status) {
+    private String statusToString(final Integer status) {
         if (status == 0) {
             return "PENDING";
         } else if (status == 1) {
