@@ -10,10 +10,11 @@ import java.util.List;
 
 public interface ReservationCommandService {
 
-    ReservationResponseDto applyReservation(final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
+    ReservationResponseDto applyReservation(
+            final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
 
     ReservationResponseDto instantConfirmReservation(
-        final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
+            final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
 
     ReservationResponseDto approveReservation(
             final Long reservationId, final ConfirmReservationRequestDto confirmReservationRequestDto);
@@ -22,7 +23,7 @@ public interface ReservationCommandService {
             final Long reservationId, final ConfirmReservationRequestDto confirmReservationRequestDto);
 
     ReservationResponseDto updateReservation(
-        final Long reservationId, final UpdateReservationRequestDto createReservationRequestDto);
+            final Long reservationId, final UpdateReservationRequestDto createReservationRequestDto);
 
     ReservationResponseDto startUsingReservation(final Long reservationId, final Instant startAt);
 
