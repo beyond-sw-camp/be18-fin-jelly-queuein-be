@@ -6,20 +6,19 @@ import java.time.format.DateTimeFormatter;
 
 public class IntsantToStringUtil {
 
-  private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm");
-  private static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-  public static String date(Instant instant, String zone) {
-    return instant.atZone(ZoneId.of(zone)).format(DATE);
-  }
+    public static String date(Instant instant, String zone) {
+        return instant.atZone(ZoneId.of(zone)).format(DATE);
+    }
 
-  public static String time(Instant instant, String zone) {
-    return instant.atZone(ZoneId.of(zone)).format(TIME);
-  }
+    public static String time(Instant instant, String zone) {
+        return instant.atZone(ZoneId.of(zone)).format(TIME);
+    }
 
-  public static String dateTime(Instant instant, String zone) {
-    return instant.atZone(ZoneId.of(zone)).format(DATE_TIME);
-  }
-
+    public static String dateTime(Instant instant, String zone) {
+        return instant.atZone(ZoneId.of(zone)).format(DATE_TIME);
+    }
 }

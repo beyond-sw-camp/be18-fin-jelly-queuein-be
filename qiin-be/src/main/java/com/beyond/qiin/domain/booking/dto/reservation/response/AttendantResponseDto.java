@@ -10,6 +10,6 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AttendantResponseDto {
 
-  private final Long attendantId;
-  private final String attendantName;
+    private final Long attendantId;
+    private final String attendantName;
 }

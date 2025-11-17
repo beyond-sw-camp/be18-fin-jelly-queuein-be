@@ -12,17 +12,17 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeekReservationResponseDto {
 
-  private final Long reservationId;
+    private final Long reservationId;
 
-  private final Instant startAt;
+    private final Instant startAt;
 
-  private final String assetName;
+    private final String assetName;
 
-  public static WeekReservationResponseDto fromEntity(Reservation reservation){
-    return WeekReservationResponseDto.builder()
-        .reservationId(reservation.getId())
-        .startAt(reservation.getStartAt())
-        .assetName(reservation.getAsset().getName())
-        .build();
-  }
+    public static WeekReservationResponseDto fromEntity(Reservation reservation) {
+        return WeekReservationResponseDto.builder()
+                .reservationId(reservation.getId())
+                .startAt(reservation.getStartAt())
+                .assetName(reservation.getAsset().getName())
+                .build();
+    }
 }

@@ -12,6 +12,6 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MonthReservationListResponseDto {
 
-  @Builder.Default
-  private final List<MonthReservationResponseDto> reservations = new ArrayList<>();
+    @Builder.Default
+    private final List<MonthReservationResponseDto> reservations = new ArrayList<>();
 }

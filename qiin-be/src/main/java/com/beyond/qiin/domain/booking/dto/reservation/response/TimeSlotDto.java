@@ -8,20 +8,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-//가능한 시간
+// 가능한 시간
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
 public class TimeSlotDto {
-  private final String start; //"9:00"과 같은 형태로
-  private final String end;
+    private final String start; // "9:00"과 같은 형태로
+    private final String end;
 
-  public static TimeSlotDto create(TimeSlot timeSlot, String zone) {
-    ZoneId zoneId = ZoneId.of(zone);
+    public static TimeSlotDto create(TimeSlot timeSlot, String zone) {
+        ZoneId zoneId = ZoneId.of(zone);
 
-    return TimeSlotDto.builder()
-        .start(timeSlot.getStart().atZone(zoneId).format(DateTimeFormatter.ofPattern("HH:mm")))
-        .end(timeSlot.getEnd().atZone(zoneId).format(DateTimeFormatter.ofPattern("HH:mm")))
-        .build();
-  }
+        return TimeSlotDto.builder()
+                .start(timeSlot.getStart().atZone(zoneId).format(DateTimeFormatter.ofPattern("HH:mm")))
+                .end(timeSlot.getEnd().atZone(zoneId).format(DateTimeFormatter.ofPattern("HH:mm")))
+                .build();
+    }
 }

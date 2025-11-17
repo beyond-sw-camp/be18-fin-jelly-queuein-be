@@ -10,27 +10,23 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReservableAssetResponseDto {
 
-  private Long assetId;
+    private Long assetId;
 
-  private String assetName;
+    private String assetName;
 
-  private String assetType;
+    private String assetType;
 
-  private String categoryName;
+    private String categoryName;
 
-  private String needsApproval; //자원의 승인 필요 여부
+    private String needsApproval; // 자원의 승인 필요 여부
 
-  public static ReservableAssetResponseDto fromEntity(
-      Asset asset,
-      String assetType
-  ) {
-    return ReservableAssetResponseDto.builder()
-        .assetId(asset.getId())
-        .assetName(asset.getName())
-        .assetType(assetType)
-        .categoryName(asset.getCategory().getName()) //필수
-        .needsApproval(asset.getNeedsApproval())
-        .build();
-  }
-
+    public static ReservableAssetResponseDto fromEntity(Asset asset, String assetType) {
+        return ReservableAssetResponseDto.builder()
+                .assetId(asset.getId())
+                .assetName(asset.getName())
+                .assetType(assetType)
+                .categoryName(asset.getCategory().getName()) // 필수
+                .needsApproval(asset.getNeedsApproval())
+                .build();
+    }
 }

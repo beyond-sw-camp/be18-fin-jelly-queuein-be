@@ -20,19 +20,19 @@ public class ReservationDetailResponseDto {
     // 예약 id
     private final Long reservationId;
 
-    //자원명
+    // 자원명
     private final String assetName;
 
-    //승인자
+    // 승인자
     private final String respondentName;
 
     // 신청자 이름
     private final String applicantName;
 
-    //예약 상태
+    // 예약 상태
     private final String status;
 
-    private final LocalDate date; //날짜 표시용
+    private final LocalDate date; // 날짜 표시용
 
     // 예약 시작 시간
     private final Instant startAt;
@@ -57,11 +57,8 @@ public class ReservationDetailResponseDto {
     @Builder.Default
     private final List<AttendantResponseDto> attendants = new ArrayList<>();
 
-    public static ReservationDetailResponseDto fromEntity(
-        Reservation reservation,
-        String reservationStatus) {
-        ReservationDetailResponseDto reservationDetailResponseDto =
-            ReservationDetailResponseDto.builder()
+    public static ReservationDetailResponseDto fromEntity(Reservation reservation, String reservationStatus) {
+        ReservationDetailResponseDto reservationDetailResponseDto = ReservationDetailResponseDto.builder()
                 .reservationId(reservation.getId())
                 .applicantName(reservation.getApplicant().getUsername())
                 .assetType(reservation.getAsset().getType())
@@ -75,15 +72,13 @@ public class ReservationDetailResponseDto {
                 .reason(reservation.getReason())
                 .version(reservation.getVersion())
                 .isApproved(reservation.isApproved())
-                .attendants( //new ArrayList<>() 이므로 null 처리 생략
-                    //TODO: 참여자들
-                    reservation.getAttendants().stream()
-                        .map(attendant -> new AttendantResponseDto(
-                            attendant.getUser().getId(),
-                            attendant.getUser().getUsername()
-                        ))
-                        .toList()
-                )
+                .attendants( // new ArrayList<>() 이므로 null 처리 생략
+                        // TODO: 참여자들
+                        reservation.getAttendants().stream()
+                                .map(attendant -> new AttendantResponseDto(
+                                        attendant.getUser().getId(),
+                                        attendant.getUser().getUsername()))
+                                .toList())
                 .date(reservation.getStartAt().atZone(ZoneId.of("Asia/Seoul")).toLocalDate())
                 .status(reservationStatus)
                 .build();

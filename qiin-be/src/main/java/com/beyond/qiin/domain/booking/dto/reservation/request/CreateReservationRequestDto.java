@@ -5,7 +5,6 @@ import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import com.beyond.qiin.domain.entity.User;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -38,7 +37,7 @@ public class CreateReservationRequestDto {
     @NotNull
     private final String description;
 
-    //버전
+    // 버전
     @NotNull
     private final Long version;
 
@@ -51,25 +50,21 @@ public class CreateReservationRequestDto {
     private List<Long> attendantIds = new ArrayList<>();
 
     public Reservation toEntity(
-        final Asset asset,
-        final User applicant,
-        final List<Attendant> attendants,
-        final Integer status) {
+            final Asset asset, final User applicant, final List<Attendant> attendants, final Integer status) {
 
         Reservation reservation = Reservation.builder()
-            .asset(asset)
-            .applicant(applicant)
-            .startAt(startAt)
-            .endAt(endAt)
-            .description(description)
-            .version(version)
-            .status(status)
-            .attendants(attendants)
-            .build();
+                .asset(asset)
+                .applicant(applicant)
+                .startAt(startAt)
+                .endAt(endAt)
+                .description(description)
+                .version(version)
+                .status(status)
+                .attendants(attendants)
+                .build();
 
         reservation.addAttendants(attendants);
 
         return reservation;
-
     }
 }

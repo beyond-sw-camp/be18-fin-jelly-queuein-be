@@ -10,13 +10,10 @@ import lombok.Getter;
 @Builder
 @Getter
 public class TimeSlot {
-  private final Instant start;
-  private final Instant end;
+    private final Instant start;
+    private final Instant end;
 
-  public static TimeSlot create(Instant start, Instant end) {
-    return TimeSlot.builder()
-        .start(start)
-        .end(end)
-        .build();
-  }
+    public static TimeSlot create(Instant start, Instant end) {
+        return TimeSlot.builder().start(start).end(end).build();
+    }
 }

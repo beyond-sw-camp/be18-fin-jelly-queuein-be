@@ -11,6 +11,6 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class ReservableAssetListResponseDto {
-  @Builder.Default
-  private final List<ReservableAssetResponseDto> reservations = new ArrayList<>();
+    @Builder.Default
+    private final List<ReservableAssetResponseDto> reservations = new ArrayList<>();
 }
