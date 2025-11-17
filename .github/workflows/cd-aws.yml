@@ -1,4 +1,4 @@
-name: CD Deploy to ECS
+name: CD Deploy Production (Fargate)
 
 on:
   push:
@@ -10,70 +10,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1. Checkout
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+      # Step 2. AWS 인증
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
+      # Step 3. ECR 로그인
       - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Set environment variables
+      # Step 4. 환경 변수 설정
+      - name: Set ENV
         run: |
-          echo "ECR_REGISTRY=503561417533.dkr.ecr.ap-northeast-2.amazonaws.com" >> $GITHUB_ENV
-          echo "ECR_REPOSITORY=qiin-backend" >> $GITHUB_ENV
+          echo "ECR_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/qiin-backend" >> $GITHUB_ENV
           echo "IMAGE_TAG=latest" >> $GITHUB_ENV
 
-      - name: Build Docker image
+      # Step 5. Docker 이미지 빌드
+      - name: Build Docker Image
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./qiin-be
+          docker build -t $ECR_URI:$IMAGE_TAG ./qiin-be
 
-      - name: Push Docker image
+      # Step 6. Docker 이미지 Push
+      - name: Push Docker Image
         run: |
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_URI:$IMAGE_TAG
 
-      # ⭐ 원본 Task Definition 파일 가져오기
-      - name: Get current task definition
-        id: task-def
-        run: |
-          aws ecs describe-task-definition \
-            --task-definition qiin-backend-task \
-            | jq '.taskDefinition
-              | del(.taskDefinitionArn)
-              | del(.revision)
-              | del(.status)
-              | del(.requiresAttributes)
-              | del(.compatibilities)
-              | del(.registeredAt)
-              | del(.registeredBy)' \
-            > task-def.json
-
-      # ⭐ Task Definition 이미지 업데이트
-      - name: Update task definition image
-        run: |
-          jq --arg IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" \
-            '.containerDefinitions[0].image = $IMAGE' \
-            task-def.json > new-task-def.json
-
-      # ⭐ 새로운 Task Definition 등록
-      - name: Register new task definition
-        id: register-task
-        run: |
-          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
-            --cli-input-json file://new-task-def.json \
-            --query 'taskDefinition.taskDefinitionArn' \
-            --output text)
-          echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
-
-      # ⭐ ECS 서비스 업데이트
-      - name: Update ECS service
+      # Step 7. ECS 서비스 강제 업데이트
+      - name: Deploy New Task Definition to ECS
         run: |
           aws ecs update-service \
             --cluster qiin-cluster \
-            --service qiin-backend-task-service-4ljix7dn \
-            --task-definition "$NEW_TASK_DEF_ARN"
+            --service qiin-service \
+            --force-new-deployment

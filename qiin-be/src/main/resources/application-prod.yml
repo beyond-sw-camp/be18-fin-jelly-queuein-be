@@ -3,14 +3,6 @@ spring:
     activate:
       on-profile: prod
 
-  flyway:
-    enabled: false #cicd에서 실행 담당하도록 자동 실행 방지, flywayMigrate으로 반영
-    baseline-on-migrate: true #기존 테이블 있는 경우를 포함해 적용
-    baseline-version: "0" #테이블 없으면 0부터 시작
-    locations:
-      - classpath:db/migration
-
-  # DB 설정: Spring 표준 키 사용 (Doppler에 있는 키와 매칭)
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
@@ -19,8 +11,31 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate # 스키마 변경 방지 (운영 표준)
+      ddl-auto: validate
     show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+    baseline-version: "0"
+    locations:
+      - classpath:db/migration
+
+  data:
+    redis:
+      host: ${REDIS_HOST:}
+      port: ${REDIS_PORT:}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:}
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
 
 logging:
   level:
