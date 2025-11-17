@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -73,5 +74,13 @@ public class User extends BaseEntity {
     // 로그인 시 시간 기록
     public void updateLastLoginAt(final Instant now) {
         this.lastLoginAt = now;
+    }
+
+    // 사용자 정보 수정
+    public void updateUser(final UpdateUserRequestDto dto) {
+        if (dto.getDptId() != null) this.dptId = dto.getDptId();
+        if (dto.getUserName() != null) this.userName = dto.getUserName();
+        if (dto.getEmail() != null) this.email = dto.getEmail();
+        if (dto.getRetireDate() != null) this.retireDate = dto.getRetireDate();
     }
 }
