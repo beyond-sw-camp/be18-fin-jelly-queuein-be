@@ -17,15 +17,13 @@ spring:
       hibernate:
         format_sql: false
 
+  # Flyway 완전 비활성화
   flyway:
     enabled: false
-    baseline-on-migrate: true
-    baseline-version: "0"
-    locations:
-      - classpath:db/migration
 
+  # Redis 캐시 완전 비활성화
   cache:
-    type: none   # ← prod에서 캐시 완전히 비활성화 (RedisCacheManager 생성 안 됨!)
+    type: none
 
 jwt:
   secret-key: ${JWT_SECRET_KEY}
