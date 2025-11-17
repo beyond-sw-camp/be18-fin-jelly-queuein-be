@@ -17,7 +17,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Slf4j
 @Configuration
 @EnableCaching
-@Profile("!test")
+@Profile("dev")
 public class RedisConfig {
 
     @Value("${REDIS_HOST}")
