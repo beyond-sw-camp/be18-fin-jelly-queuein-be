@@ -5,6 +5,7 @@ import com.beyond.qiin.domain.auth.dto.response.LoginResult;
 import com.beyond.qiin.domain.auth.service.command.AuthCommandService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,5 +31,11 @@ public class AuthCommandController {
         authCommandService.logout(request);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResult> refresh(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+        return ResponseEntity.ok(authCommandService.refresh(refreshToken));
     }
 }

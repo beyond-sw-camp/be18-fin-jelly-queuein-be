@@ -100,4 +100,31 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         // Access Token 블랙리스트 추가
         redisTokenRepository.blacklistAccessToken(accessToken, Duration.ofMillis(expiresIn));
     }
+
+    @Override
+    @Transactional
+    public LoginResult refresh(final String refreshToken) {
+
+        if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
+            throw AuthException.tokenExpired();
+        }
+
+        final Long userId = jwtTokenProvider.getUserId(refreshToken);
+
+        final String storedToken = redisTokenRepository.getRefreshToken(userId);
+        if (storedToken == null || !storedToken.equals(refreshToken)) {
+            throw AuthException.unauthorized();
+        }
+
+        final User user = userReader.findById(userId);
+        final String role = userRoleReader.findRoleNameByUserId(userId);
+
+        final String newAccess = jwtTokenProvider.generateAccessToken(userId, role);
+        final String newRefresh = jwtTokenProvider.generateRefreshToken(userId, role);
+
+        redisTokenRepository.saveRefreshToken(
+                userId, newRefresh, Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidityMillis()));
+
+        return LoginResponseDto.of(user, role, newAccess, newRefresh);
+    }
 }

@@ -4,10 +4,14 @@ import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
+import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.iam.entity.UserRole;
 import com.beyond.qiin.domain.iam.exception.UserException;
+import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
+import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
 import com.beyond.qiin.security.PasswordGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommandServiceImpl implements UserCommandService {
 
     private final UserReader userReader;
+    private final RoleReader roleReader;
+
     private final UserWriter userWriter;
+    private final UserRoleWriter userRoleWriter;
+
     private final PasswordEncoder passwordEncoder;
 
     // 사용자 생성
@@ -40,6 +48,13 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .build();
 
         final User saved = userWriter.save(user);
+
+        final Role defaultRole = roleReader.findByRoleName("GENERAL");
+
+        final UserRole userRole =
+                UserRole.builder().user(saved).role(defaultRole).build();
+
+        userRoleWriter.save(userRole);
 
         return CreateUserResponseDto.fromEntity(saved, tempPassword);
     }

@@ -9,4 +9,6 @@ public interface AuthCommandService {
     LoginResult login(final LoginRequestDto request);
 
     void logout(final HttpServletRequest request);
+
+    LoginResult refresh(final String refreshToken);
 }

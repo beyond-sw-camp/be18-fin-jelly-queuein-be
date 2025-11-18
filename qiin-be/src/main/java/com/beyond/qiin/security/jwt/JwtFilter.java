@@ -12,9 +12,11 @@ import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -26,6 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserJpaRepository userJpaRepository;
     private final RedisTokenRepository redisTokenRepository;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -65,6 +68,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 } catch (Exception e) {
                     log.warn("[JwtFilter] Token processing failed: {}", e.getMessage());
+                    authenticationEntryPoint.commence(
+                            request, response, new InsufficientAuthenticationException("유효하지 않은 토큰입니다."));
+                    return;
                 }
             }
         }
