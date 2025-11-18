@@ -8,12 +8,12 @@ import lombok.Getter;
 @Builder
 public class TempPwLoginResponseDto implements LoginResult {
 
-    private Long userId;
-    private String userNo;
-    private String userName;
-    private String email;
-    private Boolean mustChangePassword;
-    private String accessToken;
+    private final Long userId;
+    private final String userNo;
+    private final String userName;
+    private final String email;
+    private final Boolean mustChangePassword;
+    private final String accessToken;
 
     public static TempPwLoginResponseDto fromEntity(final User user, final String accessToken) {
         return TempPwLoginResponseDto.builder()
