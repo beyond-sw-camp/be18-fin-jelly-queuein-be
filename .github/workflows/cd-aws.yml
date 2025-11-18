@@ -3,7 +3,7 @@ name: CD Deploy Production (Fargate)
 on:
   push:
     branches:
-      - feature/62-aws-cd
+      - main
 
 jobs:
   deploy:
