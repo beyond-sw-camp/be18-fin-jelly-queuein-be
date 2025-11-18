@@ -49,10 +49,6 @@ public class User extends BaseEntity {
     @Column(name = "password", length = 255, nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<UserRole> userRoles = new ArrayList<>();
-
     @Column(name = "password_expired", nullable = false)
     private Boolean passwordExpired;
 
