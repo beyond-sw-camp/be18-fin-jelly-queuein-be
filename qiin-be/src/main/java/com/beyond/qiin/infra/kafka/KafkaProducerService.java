@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class KafkaProducerService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    //message
+    // message
     public void sendMessage(String topic, Object message) {
         if (topic == null) {
             log.error("Kafka ERROR: topic is null. message={}", message);

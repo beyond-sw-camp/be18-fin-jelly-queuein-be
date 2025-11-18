@@ -1,12 +1,12 @@
-//package com.beyond.qiin.infra.kafka.reservation;
+// package com.beyond.qiin.infra.kafka.reservation;
 //
-//import com.beyond.qiin.infra.kafka.reservation.event.ReservationCreatedEvent;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
+// import com.beyond.qiin.infra.kafka.reservation.event.ReservationCreatedEvent;
+// import lombok.RequiredArgsConstructor;
+// import org.springframework.stereotype.Service;
 //
-//@Service
-//@RequiredArgsConstructor
-//public class ReservationService {
+// @Service
+// @RequiredArgsConstructor
+// public class ReservationService {
 //
 //    private final EventPublisherService eventPublisher;
 //    private final ReservationRepository reservationRepository;
@@ -31,4 +31,4 @@
 //    //    return reservation;
 //    //  }
 //
-//}
+// }

@@ -1,12 +1,12 @@
-//package com.beyond.qiin.infra.kafka.reservation;
+// package com.beyond.qiin.infra.kafka.reservation;
 //
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.data.redis.core.RedisTemplate;
-//import org.springframework.stereotype.Service;
+// import lombok.RequiredArgsConstructor;
+// import org.springframework.data.redis.core.RedisTemplate;
+// import org.springframework.stereotype.Service;
 //
-//@Service
-//@RequiredArgsConstructor
-//public class ReservationRedisService {
+// @Service
+// @RequiredArgsConstructor
+// public class ReservationRedisService {
 //    private final RedisTemplate<String, Object> redisTemplate;
 //
 //    public void save(Reservation reservation) {
@@ -17,4 +17,4 @@
 //    public void delete(Long id) {
 //        redisTemplate.delete("reservation:" + id);
 //    }
-//}
+// }
