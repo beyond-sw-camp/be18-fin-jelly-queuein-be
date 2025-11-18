@@ -6,6 +6,7 @@ import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.security.SecurityUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,7 +28,7 @@ public class UserCommandController {
     // 사용자 생성
     @PostMapping
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
-    public ResponseEntity<Void> createUser(@RequestBody final CreateUserRequestDto request) {
+    public ResponseEntity<Void> createUser(@Valid @RequestBody final CreateUserRequestDto request) {
         userCommandService.createUser(request);
         return ResponseEntity.ok().build();
     }
@@ -36,14 +37,14 @@ public class UserCommandController {
     @PatchMapping("/{userId}")
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
     public ResponseEntity<Void> updateUser(
-            @PathVariable final Long userId, @RequestBody final UpdateUserRequestDto request) {
+            @PathVariable final Long userId, @Valid @RequestBody final UpdateUserRequestDto request) {
         userCommandService.updateUser(userId, request);
         return ResponseEntity.ok().build();
     }
 
     // 임시 비밀번호 수정
     @PatchMapping("/temp-password")
-    public ResponseEntity<Void> changeTempPassword(@RequestBody final ChangeTempPwRequestDto request) {
+    public ResponseEntity<Void> changeTempPassword(@Valid @RequestBody final ChangeTempPwRequestDto request) {
 
         final Long userId = SecurityUtils.getCurrentUserId();
         userCommandService.changeTempPassword(userId, request.getNewPassword());
@@ -53,7 +54,7 @@ public class UserCommandController {
 
     // 본인 비밀번호 변경
     @PatchMapping("/me/password")
-    public ResponseEntity<Void> changeMyPassword(@RequestBody final ChangePwRequestDto request) {
+    public ResponseEntity<Void> changeMyPassword(@Valid @RequestBody final ChangePwRequestDto request) {
         final Long userId = SecurityUtils.getCurrentUserId();
         userCommandService.changePassword(userId, request);
         return ResponseEntity.ok().build();
@@ -62,7 +63,7 @@ public class UserCommandController {
     // 사용자 삭제
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable final Long userId) {
         userCommandService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }

@@ -10,15 +10,15 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class DetailUserResponseDto {
-    private Long userId;
-    private Long dptId;
-    private String userNo;
-    private String userName;
-    private String email;
-    private Boolean passwordExpired;
-    private Instant lastLoginAt;
-    private Instant hireDate;
-    private Instant retireDate;
+    private final Long userId;
+    private final Long dptId;
+    private final String userNo;
+    private final String userName;
+    private final String email;
+    private final Boolean passwordExpired;
+    private final Instant lastLoginAt;
+    private final Instant hireDate;
+    private final Instant retireDate;
 
     public static DetailUserResponseDto fromEntity(final User user) {
         return DetailUserResponseDto.builder()

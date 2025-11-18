@@ -4,6 +4,7 @@ import com.beyond.qiin.domain.auth.dto.request.LoginRequestDto;
 import com.beyond.qiin.domain.auth.dto.response.LoginResult;
 import com.beyond.qiin.domain.auth.service.command.AuthCommandService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +20,7 @@ public class AuthCommandController {
     private final AuthCommandService authCommandService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResult> login(@RequestBody final LoginRequestDto request) {
+    public ResponseEntity<LoginResult> login(@Valid @RequestBody final LoginRequestDto request) {
         return ResponseEntity.ok(authCommandService.login(request));
     }
 

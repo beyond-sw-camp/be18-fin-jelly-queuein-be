@@ -6,6 +6,7 @@ import com.beyond.qiin.internal.master.dto.response.RegisterMasterResponseDto;
 import com.beyond.qiin.internal.master.service.MasterService;
 import com.beyond.qiin.internal.master.validator.MasterApiKeyValidator;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,7 @@ public class MasterController {
     @RequireInternalMasterKey
     @PostMapping
     public ResponseEntity<RegisterMasterResponseDto> createMaster(
-            @RequestBody final RegisterMasterRequestDto request, final HttpServletRequest httpRequest) {
+            @Valid @RequestBody final RegisterMasterRequestDto request, final HttpServletRequest httpRequest) {
 
         // MASTER 생성
         RegisterMasterResponseDto response = masterService.createMaster(request);

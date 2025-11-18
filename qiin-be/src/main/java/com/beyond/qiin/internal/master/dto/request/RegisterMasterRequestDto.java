@@ -1,6 +1,7 @@
 package com.beyond.qiin.internal.master.dto.request;
 
 import com.beyond.qiin.domain.iam.entity.User;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,10 +10,18 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RegisterMasterRequestDto {
+
     private Long dptId;
+    // TODO: 사번 생성 로직으로 처리하기 or MASTER 명시
     private String userNo;
+
+    @NotBlank
     private String userName;
+
+    @NotBlank
     private String email;
+
+    @NotBlank
     private Instant hireDate;
 
     public User toEntity(final String encryptedPassword) {

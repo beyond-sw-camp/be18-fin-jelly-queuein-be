@@ -19,24 +19,24 @@ public class UserQueryController {
 
     private final UserQueryService userQueryService;
 
-    // 전체 조회 (MASTER, ADMIN, MANAGER)
+    // 사용자 목록 조회 (MASTER, ADMIN, MANAGER)
     @GetMapping
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
     public List<ListUserResponseDto> getUsers() {
         return userQueryService.getUsers();
     }
 
-    // 사용자 상세조회
+    // 사용자 상세 조회
     @GetMapping("/{userId}")
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER','GENERAL')")
-    public DetailUserResponseDto getUser(@PathVariable Long userId) {
+    public DetailUserResponseDto getUser(@PathVariable final Long userId) {
         return userQueryService.getUser(userId);
     }
 
     // 내 정보 조회
     @GetMapping("/me")
     public DetailUserResponseDto getMe() {
-        Long userId = SecurityUtils.getCurrentUserId();
+        final Long userId = SecurityUtils.getCurrentUserId();
         return userQueryService.getUser(userId);
     }
 }
