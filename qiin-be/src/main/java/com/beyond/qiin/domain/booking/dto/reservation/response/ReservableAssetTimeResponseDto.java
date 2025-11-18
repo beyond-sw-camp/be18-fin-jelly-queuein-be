@@ -17,7 +17,7 @@ public class ReservableAssetTimeResponseDto {
     @Builder.Default
     private final List<TimeSlotDto> timeSlots = new ArrayList<>();
 
-    public static ReservableAssetTimeResponseDto create(Long assetId, List<TimeSlotDto> timeSlots) {
+    public static ReservableAssetTimeResponseDto create(final Long assetId, final List<TimeSlotDto> timeSlots) {
         return ReservableAssetTimeResponseDto.builder()
                 .assetId(assetId)
                 .timeSlots(timeSlots)

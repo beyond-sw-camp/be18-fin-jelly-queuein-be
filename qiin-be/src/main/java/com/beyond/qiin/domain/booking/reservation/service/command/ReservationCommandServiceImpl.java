@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         // 참여자 전원 있는지에 대한 확인
 
-        List<Attendant> attendants = Attendant.create(users, reservation);
+        List<Attendant> attendants = users.stream()
+            .map(user -> Attendant.create(user))
+            .collect(Collectors.toList());
 
         // 자원 자체가 지금 사용 가능한가에 대한 확인
         if ((asset.getStatus() == 1) || (asset.getStatus() == 2))
@@ -77,7 +80,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             throw new IllegalArgumentException("asset not available");
 
         // 선착순 자원은 자동 승인
-        List<Attendant> attendants = Attendant.create(users, reservation);
+        List<Attendant> attendants = users.stream()
+            .map(user -> Attendant.create(user))
+            .collect(Collectors.toList());
 
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, attendants, 1);
 

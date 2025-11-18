@@ -18,7 +18,7 @@ public class WeekReservationResponseDto {
 
     private final String assetName;
 
-    public static WeekReservationResponseDto fromEntity(Reservation reservation) {
+    public static WeekReservationResponseDto fromEntity(final Reservation reservation) {
         return WeekReservationResponseDto.builder()
                 .reservationId(reservation.getId())
                 .startAt(reservation.getStartAt())

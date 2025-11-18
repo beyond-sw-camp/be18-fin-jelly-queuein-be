@@ -15,54 +15,54 @@ import lombok.Getter;
 public class ReservationResponseDto {
 
     // 예약 id
-    private Long reservationId;
+    private final Long reservationId;
 
     // 신청자 이름
-    private String applicantName;
+    private final String applicantName;
 
     // 자원 이름
-    private String assetName;
+    private final String assetName;
 
     // 예약 시작 시간
-    private Instant startAt;
+    private final Instant startAt;
 
     // 예약 종료 시간
-    private Instant endAt;
+    private final Instant endAt;
 
     // 실제 사용 시간
-    private Instant actualStartAt;
+    private final Instant actualStartAt;
 
     // 실제 종료 시간
-    private Instant actualEndAt;
+    private final Instant actualEndAt;
 
-    private String description;
+    private final String description;
 
-    private String reason;
+    private final String reason;
 
     // 버전
-    private Long version;
+    private final Long version;
 
     // 승인 여부
-    private Boolean isApproved;
+    private final Boolean isApproved;
 
     // 예약 상태 (문자열 or enum)
-    private String status;
+    private final String status;
 
     // 생성 정보
-    private Instant createdAt;
-    private Long createdBy;
+    private final Instant createdAt;
+    private final Long createdBy;
 
     // 수정 정보
-    private Instant updatedAt;
-    private Long updatedBy;
+    private final Instant updatedAt;
+    private final Long updatedBy;
 
     // 삭제 정보
-    private Instant deletedAt;
-    private Long deletedBy;
+    private final Instant deletedAt;
+    private final Long deletedBy;
 
     // 참여자 목록
     @Builder.Default
-    private List<AttendantResponseDto> attendants = new ArrayList<>();
+    private final List<AttendantResponseDto> attendants = new ArrayList<>();
 
     public static ReservationResponseDto fromEntity(final Reservation reservation, final String status) {
 

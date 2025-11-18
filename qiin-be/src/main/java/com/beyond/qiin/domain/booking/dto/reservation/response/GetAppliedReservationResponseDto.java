@@ -34,7 +34,7 @@ public class GetAppliedReservationResponseDto {
     // 사유
     private final String reason;
 
-    public static GetAppliedReservationResponseDto fromEntity(Reservation reservation) {
+    public static GetAppliedReservationResponseDto fromEntity(final Reservation reservation) {
 
         return GetAppliedReservationResponseDto.builder()
                 .assetName(reservation.getAsset().getName())

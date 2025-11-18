@@ -1,5 +1,6 @@
 package com.beyond.qiin.domain.booking.dto.reservation.request;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,9 +12,9 @@ import lombok.Getter;
 @Getter
 public class UpdateReservationRequestDto {
 
-    // 예약 시간 변경하는 경우
-    //    @NotNull
-    //    private Long version;
+    //update 충돌 방지용 (create용과 무관)
+    @NotNull
+    private Long version;
 
     private String description;
 
