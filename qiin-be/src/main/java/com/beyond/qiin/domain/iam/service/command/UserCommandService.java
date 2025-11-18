@@ -3,10 +3,11 @@ package com.beyond.qiin.domain.iam.service.command;
 import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 
 public interface UserCommandService {
 
-    void createUser(final CreateUserRequestDto request);
+    CreateUserResponseDto createUser(final CreateUserRequestDto request);
 
     void updateUser(final Long userId, final UpdateUserRequestDto request);
 

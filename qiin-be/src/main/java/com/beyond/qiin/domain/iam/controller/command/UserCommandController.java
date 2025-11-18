@@ -4,6 +4,7 @@ import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.ChangeTempPwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.security.SecurityUtils;
 import jakarta.validation.Valid;
@@ -28,9 +29,8 @@ public class UserCommandController {
     // 사용자 생성
     @PostMapping
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
-    public ResponseEntity<Void> createUser(@Valid @RequestBody final CreateUserRequestDto request) {
-        userCommandService.createUser(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<CreateUserResponseDto> createUser(@Valid @RequestBody final CreateUserRequestDto request) {
+        return ResponseEntity.ok(userCommandService.createUser(request));
     }
 
     // 사용자 수정

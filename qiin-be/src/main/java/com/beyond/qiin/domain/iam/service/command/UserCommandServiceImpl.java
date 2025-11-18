@@ -3,6 +3,7 @@ package com.beyond.qiin.domain.iam.service.command;
 import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
@@ -24,12 +25,11 @@ public class UserCommandServiceImpl implements UserCommandService {
     // 사용자 생성
     @Override
     @Transactional
-    public void createUser(final CreateUserRequestDto request) {
+    public CreateUserResponseDto createUser(final CreateUserRequestDto request) {
 
         final String tempPassword = PasswordGenerator.generate();
         final String encrypted = passwordEncoder.encode(tempPassword);
 
-        // 임시 비밀번호 생성은 서비스에서 / toEntity 제거
         final User user = User.builder()
                 .dptId(request.getDptId())
                 .userNo(request.getUserNo())
@@ -39,7 +39,9 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .passwordExpired(true)
                 .build();
 
-        userWriter.save(user);
+        final User saved = userWriter.save(user);
+
+        return CreateUserResponseDto.fromEntity(saved, tempPassword);
     }
 
     // 사용자 정보 수정
