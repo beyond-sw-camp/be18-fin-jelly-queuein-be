@@ -5,8 +5,10 @@ import java.util.Map;
 import java.util.Set;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-// yml별 topic의 key에 따른 value값을 하드코딩하지 않기 위한 용도
+import org.springframework.stereotype.Component;
 
+// yml별 topic의 key에 따른 value값을 하드코딩하지 않기 위한 용도
+@Component
 @ConfigurationProperties(prefix = "spring.kafka.topic")
 @Getter
 public class KafkaTopicProperties {

@@ -13,7 +13,6 @@ import org.springframework.kafka.config.TopicBuilder;
 @RequiredArgsConstructor
 public class KafkaTopicConfig {
 
-    // reservation: reservation-topic-dev과 같이 해당 value 값을 하드코딩하지 않는 용도로 사용
     private final KafkaTopicProperties kafkaTopicProperties;
 
     @Bean
