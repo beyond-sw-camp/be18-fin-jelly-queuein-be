@@ -19,7 +19,11 @@ spring:
 
   # Flyway 완전 비활성화
   flyway:
-    enabled: false
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: "0"
+    locations:
+      - classpath:db/migration  # 마이그레이션 파일 경로 설정
 
   # Redis 캐시 완전 비활성화
   cache:
@@ -27,7 +31,7 @@ spring:
 
 jwt:
   secret-key: ${JWT_SECRET_KEY}
-  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIR ATION}
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
 
 logging:
