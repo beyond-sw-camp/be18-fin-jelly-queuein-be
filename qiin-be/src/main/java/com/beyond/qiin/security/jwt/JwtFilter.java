@@ -25,6 +25,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserJpaRepository userJpaRepository;
+    private final RedisTokenRepository redisTokenRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -35,6 +36,12 @@ public class JwtFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")) {
 
             final String token = header.substring(7);
+
+            if (redisTokenRepository.isBlacklisted(token)) {
+                log.warn("[JwtFilter] 블랙리스트 토큰으로 요청 차단");
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             // RefreshToken은 인증에 사용하면 안 됨
             if (jwtTokenProvider.validateAccessToken(token)) {

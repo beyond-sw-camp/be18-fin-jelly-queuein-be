@@ -4,11 +4,15 @@ import com.beyond.qiin.domain.auth.dto.request.LoginRequestDto;
 import com.beyond.qiin.domain.auth.dto.response.LoginResponseDto;
 import com.beyond.qiin.domain.auth.dto.response.LoginResult;
 import com.beyond.qiin.domain.auth.dto.response.TempPwLoginResponseDto;
+import com.beyond.qiin.domain.auth.exception.AuthException;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleReader;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
+import com.beyond.qiin.security.jwt.RedisTokenRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +27,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     private final UserRoleReader userRoleReader;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final RedisTokenRepository redisTokenRepository;
 
     @Override
     @Transactional
@@ -62,10 +67,36 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         // 리프레시 토큰 발급
         final String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), role);
 
+        redisTokenRepository.saveRefreshToken(
+                user.getId(), refreshToken, Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidityMillis()));
+
         // 로그인 시각 업데이트
         user.updateLastLoginAt(Instant.now());
 
         // DTO 응답 생성
         return LoginResponseDto.of(user, role, accessToken, refreshToken);
+    }
+
+    @Override
+    @Transactional
+    public void logout(HttpServletRequest request) {
+
+        // Access Token 추출
+        String accessToken = jwtTokenProvider.resolveAccessToken(request);
+        if (accessToken == null) {
+            throw AuthException.unauthorized();
+        }
+
+        // 사용자 ID 추출
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
+        // Refresh Token 삭제
+        redisTokenRepository.deleteRefreshToken(userId);
+
+        // Access Token 남은 시간 계산
+        long expiresIn = jwtTokenProvider.getRemainingValidityMillis(accessToken);
+
+        // Access Token 블랙리스트 추가
+        redisTokenRepository.blacklistAccessToken(accessToken, Duration.ofMillis(expiresIn));
     }
 }
