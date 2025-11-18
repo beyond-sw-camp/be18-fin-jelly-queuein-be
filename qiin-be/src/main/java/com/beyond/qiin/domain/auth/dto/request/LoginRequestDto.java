@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginRequestDto {
 
+    // private String userNo;
     private String email;
     private String password;
 

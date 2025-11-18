@@ -7,6 +7,7 @@ import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
+import com.beyond.qiin.security.PasswordGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,9 +25,21 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Override
     @Transactional
     public void createUser(final CreateUserRequestDto request) {
-        User newUser = CreateUserRequestDto.toEntity(request);
-        // 기본 비밀번호 암호화 및 passwordExpired 설정 가능
-        userWriter.save(newUser);
+
+        final String tempPassword = PasswordGenerator.generate();
+        final String encrypted = passwordEncoder.encode(tempPassword);
+
+        // 임시 비밀번호 생성은 서비스에서 / toEntity 제거
+        final User user = User.builder()
+                .dptId(request.getDptId())
+                .userNo(request.getUserNo())
+                .userName(request.getUserName())
+                .email(request.getEmail())
+                .password(encrypted)
+                .passwordExpired(true)
+                .build();
+
+        userWriter.save(user);
     }
 
     // 사용자 정보 수정

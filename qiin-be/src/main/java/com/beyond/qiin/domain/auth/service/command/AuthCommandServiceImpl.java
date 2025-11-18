@@ -38,6 +38,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
         // 사용자 조회
         final User user = userReader.findByEmail(loginKey);
+        // final User user = userReader.findByUserNo(loginKey);
 
         // 비밀번호 검증
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
