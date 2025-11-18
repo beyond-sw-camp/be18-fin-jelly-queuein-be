@@ -57,7 +57,8 @@ public class ReservationDetailResponseDto {
     @Builder.Default
     private final List<AttendantResponseDto> attendants = new ArrayList<>();
 
-    public static ReservationDetailResponseDto fromEntity(final Reservation reservation, final String reservationStatus) {
+    public static ReservationDetailResponseDto fromEntity(
+            final Reservation reservation, final String reservationStatus) {
         ReservationDetailResponseDto reservationDetailResponseDto = ReservationDetailResponseDto.builder()
                 .reservationId(reservation.getId())
                 .applicantName(reservation.getApplicant().getUsername())

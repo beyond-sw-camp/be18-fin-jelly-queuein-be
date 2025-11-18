@@ -11,9 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,10 +48,8 @@ public class Attendant extends BaseEntity {
         this.userId = user.getId();
     }
 
-    public static Attendant create(User user){
-        return Attendant.builder()
-            .user(user)
-            .build();
+    public static Attendant create(User user) {
+        return Attendant.builder().user(user).build();
     }
 
     public void setReservation(Reservation reservation) {

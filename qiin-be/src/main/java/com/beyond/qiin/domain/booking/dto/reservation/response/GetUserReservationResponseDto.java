@@ -37,10 +37,10 @@ public class GetUserReservationResponseDto {
     private final Instant actualEndAt;
 
     public static GetUserReservationResponseDto fromEntity(
-        final Reservation reservation,
-        final String reservationStatus,
-        final String assetType,
-        final String assetStatus) {
+            final Reservation reservation,
+            final String reservationStatus,
+            final String assetType,
+            final String assetStatus) {
 
         return GetUserReservationResponseDto.builder()
                 .reservationId(reservation.getId().toString())

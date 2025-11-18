@@ -132,7 +132,6 @@ public class Reservation extends BaseEntity {
         attendant.setReservation(this);
     }
 
-
     public void addAttendants(List<Attendant> list) {
 
         list.forEach(this::addAttendant);
