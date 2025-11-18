@@ -14,7 +14,7 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateAssetRequestDto {
 
-    private Long parentId;
+    private String parentName;
 
     @NotNull
     private Long categoryId;

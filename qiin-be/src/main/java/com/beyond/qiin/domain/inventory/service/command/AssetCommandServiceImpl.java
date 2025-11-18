@@ -5,17 +5,26 @@ import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.CreateAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
+import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
+import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
+import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AssetCommandServiceImpl implements AssetCommandService {
 
     private final AssetJpaRepository assetJpaRepository;
+
+    private final AssetClosureJpaRepository assetClosureJpaRepository;
+
+    private final AssetClosureQueryAdapter assetClosureQueryAdapter;
 
     private final CategoryCommandService categoryCommandService;
 
@@ -38,13 +47,38 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         assetJpaRepository.save(asset);
 
+        Long assetId = asset.getId();
+
         // 클로저 관련 자신 → 자신 (depth=0) 저장 추가
+        assetClosureJpaRepository.save(
+                AssetClosure.of(assetId, assetId, 0)
+        );
 
-        // parentId가 있을 경우
+        Asset parentAsset = assetJpaRepository.findByName(requestDto.getParentName())
+                                              .orElseThrow(AssetException::notFound);
+
+
+        Long parentId = parentAsset.getId();
+
+        // parentId가 없으면(루트 노드이면) 바로 리턴
+        if(parentId == null) {
+            return CreateAssetResponseDto.fromEntity(asset, null);
+        }
+
         // 부모의 조상들 조회
-        // depth+1 해서 closure 테이블에 INSERT
+        List<AssetClosure> parentAncestors = assetClosureQueryAdapter.findAncestors(parentId);
 
-        return CreateAssetResponseDto.fromEntity(asset, requestDto.getParentId());
+        // 조상들에 대해 depth+1 계산 후 insert
+        for (AssetClosure ancestor : parentAncestors) {
+            Long ancestorId = ancestor.getAssetClosureId().getAncestorId();
+            int depth = ancestor.getDepth() + 1;
+
+            assetClosureJpaRepository.save(
+                    AssetClosure.of(ancestorId, assetId, depth)
+            );
+        }
+
+        return CreateAssetResponseDto.fromEntity(asset, parentId);
     }
 
     @Override
@@ -82,4 +116,14 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     @Override
     @Transactional
     public void moveAsset(final Long assetId, final Long newParentId) {}
+
+
+    ////일반 메소드들 모음
+
+    // 나중에 AssetQueryService로 옮기기
+    public Asset getAssetByName (final String assetName) {
+        return assetJpaRepository.findByName(assetName)
+                                 .orElseThrow(AssetException::notFound);
+    }
 }
+

@@ -53,10 +53,11 @@ public class AssetClosure {
 
     public static AssetClosure of(Long ancestorId, Long descendantId, int depth) {
         return AssetClosure.builder()
-                .assetClosureId(AssetClosureId.builder()
-                        .ancestorId(ancestorId)
-                        .descendantId(descendantId)
-                        .build())
+                .assetClosureId(
+                        AssetClosureId.builder()
+                                      .ancestorId(ancestorId)
+                                      .descendantId(descendantId)
+                                      .build())
                 .depth(depth)
                 .build();
     }

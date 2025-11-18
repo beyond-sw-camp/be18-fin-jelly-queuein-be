@@ -4,8 +4,12 @@ import com.beyond.qiin.domain.inventory.entity.Asset;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface AssetJpaRepository extends JpaRepository<Asset, Long> {
 
     boolean existsByName(String name);
+
+    Optional<Asset> findByName(String name);
 }
