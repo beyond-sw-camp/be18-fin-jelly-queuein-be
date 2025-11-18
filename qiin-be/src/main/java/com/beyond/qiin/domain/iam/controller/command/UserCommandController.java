@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.iam.controller.command;
 
-import com.beyond.qiin.domain.iam.dto.user.request.ChangePasswordRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.ChangeTempPwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
@@ -40,9 +41,19 @@ public class UserCommandController {
         return ResponseEntity.ok().build();
     }
 
+    // 임시 비밀번호 수정
+    @PatchMapping("/temp-password")
+    public ResponseEntity<Void> changeTempPassword(@RequestBody final ChangeTempPwRequestDto request) {
+
+        final Long userId = SecurityUtils.getCurrentUserId();
+        userCommandService.changeTempPassword(userId, request.getNewPassword());
+
+        return ResponseEntity.ok().build();
+    }
+
     // 본인 비밀번호 변경
     @PatchMapping("/me/password")
-    public ResponseEntity<Void> changeMyPassword(@RequestBody final ChangePasswordRequestDto request) {
+    public ResponseEntity<Void> changeMyPassword(@RequestBody final ChangePwRequestDto request) {
         final Long userId = SecurityUtils.getCurrentUserId();
         userCommandService.changePassword(userId, request);
         return ResponseEntity.ok().build();

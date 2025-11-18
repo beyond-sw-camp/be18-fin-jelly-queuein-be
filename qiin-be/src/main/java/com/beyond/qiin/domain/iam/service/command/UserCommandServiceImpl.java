@@ -1,6 +1,6 @@
 package com.beyond.qiin.domain.iam.service.command;
 
-import com.beyond.qiin.domain.iam.dto.user.request.ChangePasswordRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -29,6 +29,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         userWriter.save(newUser);
     }
 
+    // 사용자 정보 수정
     @Override
     @Transactional
     public void updateUser(final Long userId, final UpdateUserRequestDto request) {
@@ -37,10 +38,27 @@ public class UserCommandServiceImpl implements UserCommandService {
         userWriter.save(user);
     }
 
-    // 비밀번호 수정
+    // 임시 비밀번호 수정
     @Override
     @Transactional
-    public void changePassword(final Long userId, final ChangePasswordRequestDto request) {
+    public void changeTempPassword(final Long userId, final String newPassword) {
+
+        final User user = userReader.findById(userId);
+
+        // 임시 비밀번호 사용자만 허용
+        if (!Boolean.TRUE.equals(user.getPasswordExpired())) {
+            throw UserException.passwordChangeNotAllowed();
+        }
+
+        user.updatePassword(passwordEncoder.encode(newPassword));
+
+        userWriter.save(user);
+    }
+
+    // 평상시 비밀번호 수정
+    @Override
+    @Transactional
+    public void changePassword(final Long userId, final ChangePwRequestDto request) {
 
         User user = userReader.findById(userId);
 
