@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.inventory.controller.command;
 
 import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
+import com.beyond.qiin.domain.inventory.dto.asset.request.MoveAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.CreateAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDto;
@@ -53,8 +54,12 @@ public class AssetCommandController {
     }
 
     @PatchMapping("/{assetId}/move")
-    public ResponseEntity<Void> moveAsset(@PathVariable Long assetId) {
+    public ResponseEntity<Void> moveAsset(
+            @PathVariable Long assetId,
+            @Valid @RequestBody MoveAssetRequestDto moveAssetRequestDto) {
 
-        return null;
+        assetCommandService.moveAsset(assetId, moveAssetRequestDto.getParentName());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 }

@@ -17,5 +17,5 @@ public interface AssetCommandService {
     void deleteAsset(final Long assetId, final Long userId);
 
     // move
-    void moveAsset(final Long assetId, final Long newParentId);
+    void moveAsset(final Long assetId, final String newParentName);
 }

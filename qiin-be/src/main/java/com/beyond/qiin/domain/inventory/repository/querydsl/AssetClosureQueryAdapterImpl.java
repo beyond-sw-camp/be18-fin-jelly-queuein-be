@@ -14,7 +14,7 @@ public class AssetClosureQueryAdapterImpl implements AssetClosureQueryAdapter {
 
     private final JPAQueryFactory queryFactory;
 
-    private final QAssetClosure assetClosure = QAssetClosure.assetClosure;
+    private static final QAssetClosure assetClosure = QAssetClosure.assetClosure;
 
     @Override
     public List<AssetClosure> findAncestors(Long descendantId) {
