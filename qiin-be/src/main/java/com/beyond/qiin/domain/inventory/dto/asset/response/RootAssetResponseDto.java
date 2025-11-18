@@ -18,9 +18,8 @@ public class RootAssetResponseDto {
 
     public static RootAssetResponseDto fromEntity(Asset asset) {
         return RootAssetResponseDto.builder()
-                                   .assetId(asset.getId())
-                                   .name(asset.getName())
-                                   .build();
+                .assetId(asset.getId())
+                .name(asset.getName())
+                .build();
     }
-
 }

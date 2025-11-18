@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
-
 import java.util.List;
 
 public interface AssetQueryAdapter {

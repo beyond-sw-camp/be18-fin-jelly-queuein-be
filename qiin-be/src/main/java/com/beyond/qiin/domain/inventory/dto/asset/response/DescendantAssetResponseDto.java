@@ -30,14 +30,14 @@ public class DescendantAssetResponseDto {
 
     public static DescendantAssetResponseDto fromEntity(Asset asset) {
         return DescendantAssetResponseDto.builder()
-                                         .assetId(asset.getId())
-                                         .name(asset.getName())
-                                         .categoryId(asset.getCategoryId())
-                                         .status(asset.getStatus())
-                                         .type(asset.getType())
-                                         .needApproval(asset.isApprovalStatus()).reservable(asset.getStatus() == 0)
-                                         .version(asset.getVersion())
-                                         .build();
+                .assetId(asset.getId())
+                .name(asset.getName())
+                .categoryId(asset.getCategoryId())
+                .status(asset.getStatus())
+                .type(asset.getType())
+                .needApproval(asset.isApprovalStatus())
+                .reservable(asset.getStatus() == 0)
+                .version(asset.getVersion())
+                .build();
     }
-
 }

@@ -5,7 +5,6 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetRespon
 import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.RootAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.TreeAssetResponseDto;
-
 import java.util.List;
 
 public interface AssetQueryService {
@@ -21,5 +20,4 @@ public interface AssetQueryService {
 
     // 전체 트리 구조 조회
     TreeAssetResponseDto getAssetTree(final Long assetId);
-
 }

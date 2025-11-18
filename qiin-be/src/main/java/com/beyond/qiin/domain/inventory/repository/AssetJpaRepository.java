@@ -11,6 +11,4 @@ public interface AssetJpaRepository extends JpaRepository<Asset, Long> {
     boolean existsByName(String name);
 
     Optional<Asset> findByName(String name);
-
-
 }

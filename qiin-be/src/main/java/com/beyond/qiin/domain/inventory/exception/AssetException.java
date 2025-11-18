@@ -36,8 +36,7 @@ public class AssetException extends BaseException {
     public enum AssetErrorCode implements ErrorCode {
         ASSET_NOT_FOUND(HttpStatus.NOT_FOUND, "ASSET_NOT_FOUND", "해당 자원를 찾을 수 없습니다."),
         ASSET_DUPLICATE_NAME(HttpStatus.CONFLICT, "ASSET_DUPLICATE_NAME", "이미 존재하는 자원입니다."),
-        ASSET_CANNOT_MOVE_TO_CHILD(HttpStatus.BAD_REQUEST,"ASSET_CANNOT_MOVE_TO_CHILD","자식 자원으로 이동할 수 없습니다.")
-        ;
+        ASSET_CANNOT_MOVE_TO_CHILD(HttpStatus.BAD_REQUEST, "ASSET_CANNOT_MOVE_TO_CHILD", "자식 자원으로 이동할 수 없습니다.");
         private final HttpStatus status;
         private final String error;
         private final String message;

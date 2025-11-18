@@ -1,11 +1,10 @@
 package com.beyond.qiin.domain.inventory.dto.asset.response;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @Builder
@@ -21,9 +20,9 @@ public class TreeAssetResponseDto {
 
     public static TreeAssetResponseDto of(Long assetId, String name, List<TreeAssetResponseDto> children) {
         return TreeAssetResponseDto.builder()
-                                   .assetId(assetId)
-                                   .name(name)
-                                   .children(children)
-                                   .build();
+                .assetId(assetId)
+                .name(name)
+                .children(children)
+                .build();
     }
 }

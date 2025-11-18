@@ -108,7 +108,6 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         assetClosureQueryAdapter.deleteAllByAncestorId(assetId);
         assetClosureQueryAdapter.deleteAllByDescendantId(assetId);
-
     }
 
     @Override
@@ -117,7 +116,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
 
-        if(newParentName == null) {
+        if (newParentName == null) {
             moveToRoot(asset.getId());
             return;
         }
@@ -125,7 +124,6 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         Asset newParentAsset = assetJpaRepository.findByName(newParentName).orElseThrow(AssetException::notFound);
 
         Long newParentId = newParentAsset.getId();
-
 
         List<AssetClosure> descendants = assetClosureQueryAdapter.findDescendants(assetId);
 
@@ -139,7 +137,8 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         List<AssetClosure> subtree = assetClosureQueryAdapter.findDescendants(assetId);
 
         List<Long> subtreeIds = subtree.stream()
-                .map(c -> c.getAssetClosureId().getDescendantId()).toList();
+                .map(c -> c.getAssetClosureId().getDescendantId())
+                .toList();
 
         for (Long id : subtreeIds) {
             assetClosureQueryAdapter.deleteAllByAncestorId(id);
@@ -148,27 +147,24 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         List<AssetClosure> newParentAncestors = assetClosureQueryAdapter.findAncestors(newParentId);
 
-        for(AssetClosure parentAncestor : newParentAncestors) {
+        for (AssetClosure parentAncestor : newParentAncestors) {
             Long ancestorId = parentAncestor.getAssetClosureId().getAncestorId();
             int ancestorDepth = parentAncestor.getDepth();
 
-            for(AssetClosure subtreeNode : subtree) {
+            for (AssetClosure subtreeNode : subtree) {
 
                 Long descendantId = subtreeNode.getAssetClosureId().getDescendantId();
                 int subtreeDepth = subtreeNode.getDepth();
 
                 int newDepth = ancestorDepth + 1 + subtreeDepth;
 
-                assetClosureJpaRepository.save(
-                        AssetClosure.of(ancestorId, descendantId, newDepth)
-                );
+                assetClosureJpaRepository.save(AssetClosure.of(ancestorId, descendantId, newDepth));
             }
         }
 
         for (Long id : subtreeIds) {
             assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
         }
-
     }
 
     @Transactional
@@ -177,7 +173,8 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         List<AssetClosure> subtree = assetClosureQueryAdapter.findDescendants(assetId);
 
         List<Long> subtreeIds = subtree.stream()
-                .map(c -> c.getAssetClosureId().getDescendantId()).toList();
+                .map(c -> c.getAssetClosureId().getDescendantId())
+                .toList();
 
         for (Long id : subtreeIds) {
             assetClosureQueryAdapter.deleteAllByAncestorId(id);
@@ -187,9 +184,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         for (Long id : subtreeIds) {
             assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
         }
-
     }
-
 
     //// 일반 메소드들 모음
 
@@ -197,7 +192,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         return assetJpaRepository.findByName(assetName).orElseThrow(AssetException::notFound);
     }
 
-    //id
+    // id
     public Asset getAssetById(final Long assetId) {
         return assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
     }
@@ -205,7 +200,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     // 자원 사용 가능 여부
     public boolean isAvailable(final Long assetId) {
         Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
-        if(asset.getStatus() == 1 || asset.getStatus() == 2) {
+        if (asset.getStatus() == 1 || asset.getStatus() == 2) {
             return false;
         }
         return true;
@@ -213,11 +208,11 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
     // 자원 상태 변환 // 읽기용으로 옮길 예정
     public String assetStatusToString(Integer status) {
-        if(status == 0){
+        if (status == 0) {
             return "AVAILABLE";
-        }else if(status == 1){
+        } else if (status == 1) {
             return "UNAVAILABLE";
-        }else {
+        } else {
             return "MAINTENANCE";
         }
     }

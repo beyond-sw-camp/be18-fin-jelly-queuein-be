@@ -18,8 +18,8 @@ public class OneDepthAssetResponseDto {
 
     public static OneDepthAssetResponseDto fromEntity(Asset asset) {
         return OneDepthAssetResponseDto.builder()
-                                       .assetId(asset.getId())
-                                       .name(asset.getName())
-                                       .build();
+                .assetId(asset.getId())
+                .name(asset.getName())
+                .build();
     }
 }

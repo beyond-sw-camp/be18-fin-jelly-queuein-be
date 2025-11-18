@@ -5,7 +5,6 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetRespon
 import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.RootAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.TreeAssetResponseDto;
-
 import java.util.List;
 
 public class AssetQueryServiceImpl implements AssetQueryService {

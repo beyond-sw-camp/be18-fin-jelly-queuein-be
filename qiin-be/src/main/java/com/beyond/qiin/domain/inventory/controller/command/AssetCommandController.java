@@ -55,8 +55,7 @@ public class AssetCommandController {
 
     @PatchMapping("/{assetId}/move")
     public ResponseEntity<Void> moveAsset(
-            @PathVariable Long assetId,
-            @Valid @RequestBody MoveAssetRequestDto moveAssetRequestDto) {
+            @PathVariable Long assetId, @Valid @RequestBody MoveAssetRequestDto moveAssetRequestDto) {
 
         assetCommandService.moveAsset(assetId, moveAssetRequestDto.getParentName());
 
