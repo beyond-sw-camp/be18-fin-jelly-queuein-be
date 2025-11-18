@@ -43,7 +43,7 @@ public class UserCommandController {
     }
 
     // 임시 비밀번호 수정
-    @PatchMapping("/temp-password")
+    @PatchMapping("/me/temp-password")
     public ResponseEntity<Void> changeTempPassword(@Valid @RequestBody final ChangeTempPwRequestDto request) {
 
         final Long userId = SecurityUtils.getCurrentUserId();

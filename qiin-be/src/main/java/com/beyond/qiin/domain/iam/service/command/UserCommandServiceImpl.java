@@ -57,6 +57,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     public void changeTempPassword(final Long userId, final String newPassword) {
 
         final User user = userReader.findById(userId);
+        System.out.println("passwordExpired = " + user.getPasswordExpired());
 
         // 임시 비밀번호 사용자만 허용
         if (!Boolean.TRUE.equals(user.getPasswordExpired())) {
@@ -73,7 +74,8 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     public void changePassword(final Long userId, final ChangePwRequestDto request) {
 
-        User user = userReader.findById(userId);
+        final User user = userReader.findById(userId);
+        System.out.println("passwordExpired = " + user.getPasswordExpired());
 
         // 기존 비밀번호 검증
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
