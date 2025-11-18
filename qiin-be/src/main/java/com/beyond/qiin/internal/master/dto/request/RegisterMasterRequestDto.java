@@ -2,6 +2,7 @@ package com.beyond.qiin.internal.master.dto.request;
 
 import com.beyond.qiin.domain.iam.entity.User;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,7 +22,7 @@ public class RegisterMasterRequestDto {
     @NotBlank
     private String email;
 
-    @NotBlank
+    @NotNull
     private Instant hireDate;
 
     public User toEntity(final String encryptedPassword) {
