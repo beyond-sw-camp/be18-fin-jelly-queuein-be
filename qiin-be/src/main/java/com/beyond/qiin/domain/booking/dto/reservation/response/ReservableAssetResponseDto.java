@@ -10,17 +10,17 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReservableAssetResponseDto {
 
-    private Long assetId;
+    private final Long assetId;
 
-    private String assetName;
+    private final String assetName;
 
-    private String assetType;
+    private final String assetType;
 
-    private String categoryName;
+    private final String categoryName;
 
-    private String needsApproval; // 자원의 승인 필요 여부
+    private final String needsApproval; // 자원의 승인 필요 여부
 
-    public static ReservableAssetResponseDto fromEntity(Asset asset, String assetType) {
+    public static ReservableAssetResponseDto fromEntity(final Asset asset, final String assetType) {
         return ReservableAssetResponseDto.builder()
                 .assetId(asset.getId())
                 .assetName(asset.getName())

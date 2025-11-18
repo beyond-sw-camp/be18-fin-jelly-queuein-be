@@ -19,30 +19,24 @@ public class CreateReservationRequestDto {
 
     // 신청자
     @NotNull
-    private final String applicantName;
+    private String applicantName;
 
     // 자원명
     @NotNull
-    private final String assetName;
+    private String assetName;
 
     // 예약 시작 시간
     @NotNull
-    private final Instant startAt;
+    private Instant startAt;
 
     // 예약 종료 시간
     @NotNull
-    private final Instant endAt;
+    private Instant endAt;
 
     // 예약 설명
-    @NotNull
-    private final String description;
+    private String description;
 
-    // 버전
-    @NotNull
-    private final Long version;
-
-    @NotNull
-    private final String status;
+    // 버전 : 생성 시 x
 
     // 참여자들
     @NotNull

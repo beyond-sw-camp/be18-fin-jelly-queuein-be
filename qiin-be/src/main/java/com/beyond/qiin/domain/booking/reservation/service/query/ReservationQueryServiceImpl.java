@@ -248,7 +248,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return reservations;
     }
 
-    public static String statusToString(final Integer status) {
+    public static String statusToString(final int status) {
         if (status == 0) {
             return "PENDING";
         } else if (status == 1) {

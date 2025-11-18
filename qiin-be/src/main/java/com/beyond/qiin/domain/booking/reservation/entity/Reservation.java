@@ -39,7 +39,7 @@ import org.hibernate.annotations.SQLRestriction;
             @Index(name = "idx_reservation_asset_id", columnList = "asset_id")
         })
 @AttributeOverride(name = "id", column = @Column(name = "reservation_id"))
-@SQLRestriction("deleted_at = null")
+@SQLRestriction("deleted_at is null")
 public class Reservation extends BaseEntity {
 
     @Column(name = "applicant_id")
@@ -132,8 +132,9 @@ public class Reservation extends BaseEntity {
         attendant.setReservation(this);
     }
 
-    // TODO: ?
+
     public void addAttendants(List<Attendant> list) {
+
         list.forEach(this::addAttendant);
     }
 

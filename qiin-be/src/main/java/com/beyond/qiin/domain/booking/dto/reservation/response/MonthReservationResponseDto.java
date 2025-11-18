@@ -18,7 +18,7 @@ public class MonthReservationResponseDto {
 
     private final String assetName;
 
-    public static MonthReservationResponseDto fromEntity(Reservation reservation) {
+    public static MonthReservationResponseDto fromEntity(final Reservation reservation) {
         return MonthReservationResponseDto.builder()
                 .reservationId(reservation.getId())
                 .startAt(reservation.getStartAt())
