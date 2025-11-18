@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 public class UpdateReservationRequestDto {
 
-    //update 충돌 방지용 (create용과 무관)
+    // update 충돌 방지용 (create용과 무관)
     @NotNull
     private Long version;
 
