@@ -109,7 +109,10 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
     @Override
     @Transactional
-    public void moveAsset(final Long assetId, final Long newParentId) {}
+    public void moveAsset(final Long assetId, final Long newParentId) {
+
+
+    }
 
     //// 일반 메소드들 모음
 

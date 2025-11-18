@@ -20,7 +20,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "category")
 @AttributeOverride(name = "id", column = @Column(name = "category_id"))
-@SQLRestriction("deleted_at = null")
+@SQLRestriction("deleted_at IS NULL")
 public class Category extends BaseEntity {
 
     @Column(name = "name", length = 50, nullable = false, unique = true)

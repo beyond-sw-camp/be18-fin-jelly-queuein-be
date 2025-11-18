@@ -30,7 +30,7 @@ import org.hibernate.annotations.SQLRestriction;
         name = "asset",
         indexes = {@Index(name = "idx_asset_category_id", columnList = "category_id")})
 @AttributeOverride(name = "id", column = @Column(name = "asset_id"))
-@SQLRestriction("deleted_at = null")
+@SQLRestriction("deleted_at IS NULL")
 public class Asset extends BaseEntity {
 
     @Column(name = "category_id", nullable = false)
