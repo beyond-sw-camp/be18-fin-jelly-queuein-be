@@ -10,11 +10,10 @@ import com.beyond.qiin.domain.inventory.exception.AssetException;
 import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -50,18 +49,15 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         Long assetId = asset.getId();
 
         // 클로저 관련 자신 → 자신 (depth=0) 저장 추가
-        assetClosureJpaRepository.save(
-                AssetClosure.of(assetId, assetId, 0)
-        );
+        assetClosureJpaRepository.save(AssetClosure.of(assetId, assetId, 0));
 
-        Asset parentAsset = assetJpaRepository.findByName(requestDto.getParentName())
-                                              .orElseThrow(AssetException::notFound);
-
+        Asset parentAsset =
+                assetJpaRepository.findByName(requestDto.getParentName()).orElseThrow(AssetException::notFound);
 
         Long parentId = parentAsset.getId();
 
         // parentId가 없으면(루트 노드이면) 바로 리턴
-        if(parentId == null) {
+        if (parentId == null) {
             return CreateAssetResponseDto.fromEntity(asset, null);
         }
 
@@ -73,9 +69,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             Long ancestorId = ancestor.getAssetClosureId().getAncestorId();
             int depth = ancestor.getDepth() + 1;
 
-            assetClosureJpaRepository.save(
-                    AssetClosure.of(ancestorId, assetId, depth)
-            );
+            assetClosureJpaRepository.save(AssetClosure.of(ancestorId, assetId, depth));
         }
 
         return CreateAssetResponseDto.fromEntity(asset, parentId);
@@ -117,13 +111,10 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     @Transactional
     public void moveAsset(final Long assetId, final Long newParentId) {}
 
-
-    ////일반 메소드들 모음
+    //// 일반 메소드들 모음
 
     // 나중에 AssetQueryService로 옮기기
-    public Asset getAssetByName (final String assetName) {
-        return assetJpaRepository.findByName(assetName)
-                                 .orElseThrow(AssetException::notFound);
+    public Asset getAssetByName(final String assetName) {
+        return assetJpaRepository.findByName(assetName).orElseThrow(AssetException::notFound);
     }
 }
-
