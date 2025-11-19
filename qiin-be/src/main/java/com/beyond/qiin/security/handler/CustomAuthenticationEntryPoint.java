@@ -22,14 +22,16 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         log.warn("[AuthEntryPoint] 인증 실패: {}", authException.getMessage());
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-        response.setContentType("application/json;charset=UTF-8");
+        if (!response.isCommitted()) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 에러
+            response.setContentType("application/json;charset=UTF-8");
 
-        Map<String, Object> body = Map.of(
-                "status", 401,
-                "code", "UNAUTHORIZED",
-                "message", "인증이 필요합니다.");
+            Map<String, Object> body = Map.of(
+                    "status", 401,
+                    "code", "UNAUTHORIZED",
+                    "message", "인증이 필요합니다.");
 
-        new ObjectMapper().writeValue(response.getWriter(), body);
+            new ObjectMapper().writeValue(response.getWriter(), body);
+        }
     }
 }

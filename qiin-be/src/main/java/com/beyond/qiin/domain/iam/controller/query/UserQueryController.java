@@ -28,7 +28,7 @@ public class UserQueryController {
 
     // 사용자 상세 조회
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER','GENERAL')")
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
     public DetailUserResponseDto getUser(@PathVariable final Long userId) {
         return userQueryService.getUser(userId);
     }

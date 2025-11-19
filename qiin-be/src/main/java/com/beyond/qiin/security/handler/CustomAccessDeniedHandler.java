@@ -16,19 +16,23 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(
-            HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)
+            final HttpServletRequest request,
+            final HttpServletResponse response,
+            final AccessDeniedException accessDeniedException)
             throws IOException {
 
         log.warn("[AccessDenied] 권한 부족: {}", accessDeniedException.getMessage());
 
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
-        response.setContentType("application/json;charset=UTF-8");
+        if (!response.isCommitted()) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 에러
+            response.setContentType("application/json;charset=UTF-8");
 
-        Map<String, Object> body = Map.of(
-                "status", 403,
-                "code", "FORBIDDEN",
-                "message", "접근 권한이 없습니다.");
+            Map<String, Object> body = Map.of(
+                    "status", 403,
+                    "code", "FORBIDDEN",
+                    "message", "접근 권한이 없습니다.");
 
-        new ObjectMapper().writeValue(response.getWriter(), body);
+            new ObjectMapper().writeValue(response.getWriter(), body);
+        }
     }
 }
