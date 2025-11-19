@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.inventory.dto.asset.response;
 
 import java.util.List;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

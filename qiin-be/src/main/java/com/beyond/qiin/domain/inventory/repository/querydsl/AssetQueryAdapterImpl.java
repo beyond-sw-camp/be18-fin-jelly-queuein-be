@@ -10,7 +10,6 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,7 +24,6 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
 
     private static final QAssetClosure assetClosure = QAssetClosure.assetClosure;
     private static final QAsset asset = QAsset.asset;
-
 
     @Override
     public Optional<Asset> findById(Long assetId) {
@@ -56,7 +54,8 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
         return jpaQueryFactory
                 .select(assetClosure.assetClosureId.descendantId)
                 .from(assetClosure)
-                .join(asset).on(asset.id.eq(assetClosure.assetClosureId.descendantId))
+                .join(asset)
+                .on(asset.id.eq(assetClosure.assetClosureId.descendantId))
                 .where(assetClosure.assetClosureId.ancestorId.eq(assetId), assetClosure.depth.eq(1))
                 .orderBy(asset.name.asc())
                 .fetch();

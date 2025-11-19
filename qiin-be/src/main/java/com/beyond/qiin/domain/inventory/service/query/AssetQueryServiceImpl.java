@@ -10,14 +10,11 @@ import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
-
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -88,20 +85,17 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
         List<Asset> assets = assetQueryAdapter.findByIds(descendantIds);
 
-        Map<Long, Asset> assetMap = assets.stream()
-                .collect(Collectors.toMap(Asset::getId, a -> a));
+        Map<Long, Asset> assetMap = assets.stream().collect(Collectors.toMap(Asset::getId, a -> a));
 
         Map<Long, List<Long>> childrenMap = new HashMap<>();
 
         for (AssetClosure c : closures) {
-            if(c.getDepth() == 1){
+            if (c.getDepth() == 1) {
                 Long parentId = c.getAssetClosureId().getAncestorId();
                 Long childId = c.getAssetClosureId().getDescendantId();
 
-                childrenMap.computeIfAbsent(parentId, k-> new ArrayList<>())
-                           .add(childId);
+                childrenMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(childId);
             }
-
         }
 
         return buildTreeFromMap(assetId, assetMap, childrenMap);
@@ -113,12 +107,11 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
         List<Long> rootIds = assetQueryAdapter.findRootAssetIds();
 
-        return rootIds.stream()
-                .map(this::getAssetTree)
-                .toList();
+        return rootIds.stream().map(this::getAssetTree).toList();
     }
 
-    private TreeAssetResponseDto buildTreeFromMap(Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
+    private TreeAssetResponseDto buildTreeFromMap(
+            Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
 
         Asset asset = assetMap.get(assetId);
 

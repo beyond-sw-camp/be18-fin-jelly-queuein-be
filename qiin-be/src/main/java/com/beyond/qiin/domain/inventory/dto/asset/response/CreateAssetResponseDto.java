@@ -3,7 +3,6 @@ package com.beyond.qiin.domain.inventory.dto.asset.response;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import java.math.BigDecimal;
 import java.time.Instant;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
