@@ -21,7 +21,7 @@ public class GetAppliedReservationResponseDto {
     // 신청자
     private final String applicantName;
 
-    // TODO: 정확히 무슨 의미지 이게 예약 가능 유무 - 자원으로 둘지 아니면 예약 자체로 둘지(까다로울지도)
+    // 예약 가능 여부
     private final String isReservable;
 
     // 응답 시 필수 x
@@ -34,13 +34,13 @@ public class GetAppliedReservationResponseDto {
     // 사유
     private final String reason;
 
-    public static GetAppliedReservationResponseDto fromEntity(final Reservation reservation) {
+    public static GetAppliedReservationResponseDto fromEntity(final Reservation reservation, boolean isReservable) {
 
         return GetAppliedReservationResponseDto.builder()
                 .assetName(reservation.getAsset().getName())
                 .reservationId(reservation.getId())
                 .applicantName(reservation.getApplicant().getUsername())
-                .isReservable(reservation.isReservable()) // TODO: ??
+                .isReservable(isReservable)
                 .respondentName(
                         reservation.getRespondent() != null
                                 ? reservation.getRespondent().getUsername()
