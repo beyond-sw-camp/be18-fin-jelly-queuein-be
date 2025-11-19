@@ -20,11 +20,7 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
       AND r.startAt <= :endOfDay
       AND r.endAt >= :startOfDay
 """)
-    Page<Reservation> findAllWithStatusPendingAndDate(
-        Instant startOfDay,
-        Instant endOfDay,
-        Pageable pageable
-    );
+    Page<Reservation> findAllWithStatusPendingAndDate(Instant startOfDay, Instant endOfDay, Pageable pageable);
 
     @Query(
             """
