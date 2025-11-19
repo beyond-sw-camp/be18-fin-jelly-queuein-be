@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class MasterApiKeyValidationAspect {
+public class MasterApiKeyValidationFilter {
 
     private final MasterApiKeyValidator masterApiKeyValidator;
     private final HttpServletRequest request; // Spring이 자동 주입함
