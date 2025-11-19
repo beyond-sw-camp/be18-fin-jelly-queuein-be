@@ -1,0 +1,51 @@
+name: CD Deploy Production (Fargate)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1. Checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Step 2. AWS 인증
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # Step 3. ECR 로그인
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Step 4. 환경 변수 설정
+      - name: Set ENV
+        run: |
+          echo "ECR_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com/qiin-backend" >> $GITHUB_ENV
+          echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+
+      # Step 5. Docker 이미지 빌드
+      - name: Build Docker Image
+        run: |
+          docker build -t $ECR_URI:$IMAGE_TAG ./qiin-be
+
+      # Step 6. Docker 이미지 Push
+      - name: Push Docker Image
+        run: |
+          docker push $ECR_URI:$IMAGE_TAG
+
+      # Step 7. ECS 서비스 강제 업데이트
+      - name: Deploy New Task Definition to ECS
+        run: |
+          aws ecs update-service \
+            --cluster qiin-fargate-cluster \
+            --service qiin-service \
+            --force-new-deployment
