@@ -58,11 +58,7 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
 
     @Override
     public List<Asset> findByIds(List<Long> ids) {
-        return jpaQueryFactory
-                .select(asset)
-                .from(asset)
-                .where(asset.id.in(ids))
-                .fetch();
+        return jpaQueryFactory.select(asset).from(asset).where(asset.id.in(ids)).fetch();
     }
 
     public Page<DescendantAssetResponseDto> findAllForDescendant(Pageable pageable) {
@@ -77,17 +73,13 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
                         asset.type,
                         asset.approvalStatus,
                         asset.status.eq(0),
-                        asset.version
-                ))
+                        asset.version))
                 .from(asset)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long totalCount = jpaQueryFactory
-                .select(asset.count())
-                .from(asset)
-                .fetchOne();
+        long totalCount = jpaQueryFactory.select(asset.count()).from(asset).fetchOne();
 
         return new PageImpl<>(contnet, pageable, totalCount);
     }
