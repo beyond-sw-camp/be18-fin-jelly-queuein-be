@@ -1,17 +1,22 @@
-package com.beyond.qiin.domain.iam.controller.command;
+package com.beyond.qiin.domain.iam.controller;
 
 import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.ChangeTempPwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
+import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
+import com.beyond.qiin.domain.iam.dto.user.response.ListUserResponseDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
+import com.beyond.qiin.domain.iam.service.query.UserQueryService;
 import com.beyond.qiin.security.SecurityUtils;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,15 +27,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-public class UserCommandController {
+public class UserController {
 
     private final UserCommandService userCommandService;
+    private final UserQueryService userQueryService;
 
     // 사용자 생성
     @PostMapping
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
     public ResponseEntity<CreateUserResponseDto> createUser(@Valid @RequestBody final CreateUserRequestDto request) {
         return ResponseEntity.ok(userCommandService.createUser(request));
+    }
+
+    // 사용자 목록 조회 (MASTER, ADMIN, MANAGER)
+    @GetMapping
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
+    public List<ListUserResponseDto> getUsers() {
+        return userQueryService.getUsers();
+    }
+
+    // 사용자 상세 조회
+    @GetMapping("/{userId}")
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
+    public DetailUserResponseDto getUser(@PathVariable final Long userId) {
+        return userQueryService.getUser(userId);
+    }
+
+    // 내 정보 조회
+    @GetMapping("/me")
+    public DetailUserResponseDto getMe() {
+        final Long userId = SecurityUtils.getCurrentUserId();
+        return userQueryService.getUser(userId);
     }
 
     // 사용자 수정

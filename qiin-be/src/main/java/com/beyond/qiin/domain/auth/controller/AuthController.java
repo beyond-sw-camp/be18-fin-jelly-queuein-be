@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.auth.controller.command;
+package com.beyond.qiin.domain.auth.controller;
 
 import com.beyond.qiin.domain.auth.dto.request.LoginRequestDto;
 import com.beyond.qiin.domain.auth.dto.response.LoginResult;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
-public class AuthCommandController {
+public class AuthController {
 
     private final AuthCommandService authCommandService;
 
