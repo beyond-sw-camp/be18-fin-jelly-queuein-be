@@ -12,9 +12,9 @@ import lombok.Getter;
 // 자원 계층 전체 트리 조회 dto
 public class TreeAssetResponseDto {
 
-    private Long assetId;
+    private final Long assetId;
 
-    private String name;
+    private final String name;
 
     private List<TreeAssetResponseDto> children;
 

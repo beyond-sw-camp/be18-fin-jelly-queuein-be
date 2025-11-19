@@ -19,27 +19,27 @@ public class CreateAssetResponseDto {
 
     private Long categoryId;
 
-    private String name;
+    private final String name;
 
-    private String description;
+    private final String description;
 
-    private String image;
+    private final String image;
 
-    private Integer status;
+    private final Integer status;
 
-    private Integer type;
+    private final Integer type;
 
-    private Integer accessLevel;
+    private final Integer accessLevel;
 
-    private Boolean approvalStatus;
+    private final Boolean approvalStatus;
 
-    private BigDecimal costPerHour;
+    private final BigDecimal costPerHour;
 
-    private BigDecimal periodCost;
+    private final BigDecimal periodCost;
 
-    private Instant createdAt;
+    private final Instant createdAt;
 
-    private Long createdBy;
+    private final Long createdBy;
 
     public static CreateAssetResponseDto fromEntity(Asset asset, Long parentId) {
         return CreateAssetResponseDto.builder()

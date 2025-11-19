@@ -10,7 +10,7 @@ import java.util.List;
 public interface AssetQueryService {
 
     // 0계층 드롭다운
-    List<RootAssetResponseDto> getRootAssetList();
+    List<RootAssetResponseDto> getRootAssetIds();
 
     // 1계층 드롭다운
     List<OneDepthAssetResponseDto> getOneDepthAssetList(final Long rootAssetId);

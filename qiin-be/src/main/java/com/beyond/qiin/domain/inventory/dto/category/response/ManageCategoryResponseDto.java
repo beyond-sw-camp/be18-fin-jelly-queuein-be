@@ -11,15 +11,15 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ManageCategoryResponseDto {
 
-    private Long categoryId;
+    private final Long categoryId;
 
-    private String name;
+    private final String name;
 
-    private String description;
+    private final String description;
 
-    private Long assetCount;
+    private final Long assetCount;
 
-    private Instant createdAt;
+    private final Instant createdAt;
 
-    private Long createdBy;
+    private final Long createdBy;
 }

@@ -1,11 +1,18 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
+import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
+import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
+import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -15,6 +22,7 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
     private final JPAQueryFactory jpaQueryFactory;
 
     private static final QAssetClosure assetClosure = QAssetClosure.assetClosure;
+    private static final QAsset asset = QAsset.asset;
 
     @Override
     public List<Long> findRootAssetIds() {
@@ -46,5 +54,41 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
                 .where(assetClosure.assetClosureId.ancestorId.eq(assetId))
                 .orderBy(assetClosure.depth.asc())
                 .fetch();
+    }
+
+    @Override
+    public List<Asset> findByIds(List<Long> ids) {
+        return jpaQueryFactory
+                .select(asset)
+                .from(asset)
+                .where(asset.id.in(ids))
+                .fetch();
+    }
+
+    public Page<DescendantAssetResponseDto> findAllForDescendant(Pageable pageable) {
+
+        List<DescendantAssetResponseDto> contnet = jpaQueryFactory
+                .select(Projections.constructor(
+                        DescendantAssetResponseDto.class,
+                        asset.id,
+                        asset.name,
+                        asset.categoryId,
+                        asset.status,
+                        asset.type,
+                        asset.approvalStatus,
+                        asset.status.eq(0),
+                        asset.version
+                ))
+                .from(asset)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long totalCount = jpaQueryFactory
+                .select(asset.count())
+                .from(asset)
+                .fetchOne();
+
+        return new PageImpl<>(contnet, pageable, totalCount);
     }
 }

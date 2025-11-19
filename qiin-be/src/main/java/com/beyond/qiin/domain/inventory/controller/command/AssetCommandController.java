@@ -6,6 +6,7 @@ import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.CreateAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDto;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
+import com.beyond.qiin.domain.inventory.service.command.AssetCommandServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -12,9 +12,9 @@ import lombok.Getter;
 // 1계층 드롭다운 dto
 public class OneDepthAssetResponseDto {
 
-    private Long assetId;
+    private final Long assetId;
 
-    private String name;
+    private final String name;
 
     public static OneDepthAssetResponseDto fromEntity(Asset asset) {
         return OneDepthAssetResponseDto.builder()

@@ -12,21 +12,21 @@ import lombok.Getter;
 // 자원 조회할 때 예약 가능한 자원들이 리스트로 보이는 dto
 public class DescendantAssetResponseDto {
 
-    private Long assetId;
+    private final Long assetId;
 
-    private String name;
+    private final String name;
 
-    private Long categoryId;
+    private final Long categoryId;
 
-    private int status;
+    private final int status;
 
-    private int type;
+    private final int type;
 
-    private Boolean needApproval;
+    private final Boolean needApproval;
 
-    private boolean reservable;
+    private final boolean reservable;
 
-    private Long version;
+    private final Long version;
 
     public static DescendantAssetResponseDto fromEntity(Asset asset) {
         return DescendantAssetResponseDto.builder()

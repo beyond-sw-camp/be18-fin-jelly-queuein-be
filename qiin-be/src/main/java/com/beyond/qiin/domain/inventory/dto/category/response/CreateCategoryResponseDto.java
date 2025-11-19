@@ -11,11 +11,11 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateCategoryResponseDto {
 
-    private Long categoryId;
+    private final Long categoryId;
 
-    private String name;
+    private final String name;
 
-    private String description;
+    private final String description;
 
     public static CreateCategoryResponseDto fromEntity(Category category) {
         return CreateCategoryResponseDto.builder()

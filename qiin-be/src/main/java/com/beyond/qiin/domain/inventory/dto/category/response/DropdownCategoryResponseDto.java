@@ -10,7 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DropdownCategoryResponseDto {
 
-    private Long categoryId;
+    private final Long categoryId;
 
-    private String name;
+    private final String name;
 }

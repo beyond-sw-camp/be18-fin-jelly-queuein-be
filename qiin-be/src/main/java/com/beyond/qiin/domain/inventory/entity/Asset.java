@@ -65,10 +65,10 @@ public class Asset extends BaseEntity {
     @Column(name = "approval_status", nullable = false)
     private boolean approvalStatus;
 
-    @Column(name = "cost_per_hour", nullable = false)
+    @Column(name = "cost_per_hour", nullable = false, precision = 12, scale = 3)
     private BigDecimal costPerHour;
 
-    @Column(name = "period_cost", nullable = false)
+    @Column(name = "period_cost", nullable = false, precision = 12, scale = 3)
     private BigDecimal periodCost;
 
     @Version

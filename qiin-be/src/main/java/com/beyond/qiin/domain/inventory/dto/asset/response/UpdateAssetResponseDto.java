@@ -13,31 +13,31 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UpdateAssetResponseDto {
 
-    private Long assetId;
+    private final Long assetId;
 
-    private Long categoryId;
+    private final Long categoryId;
 
-    private String name;
+    private final String name;
 
-    private String description;
+    private final String description;
 
-    private String image;
+    private final String image;
 
-    private Integer status;
+    private final Integer status;
 
-    private Integer type;
+    private final Integer type;
 
-    private Integer accessLevel;
+    private final Integer accessLevel;
 
-    private Boolean approvalStatus;
+    private final Boolean approvalStatus;
 
-    private BigDecimal costPerHour;
+    private final BigDecimal costPerHour;
 
-    private BigDecimal periodCost;
+    private final BigDecimal periodCost;
 
-    private Instant updatedAt;
+    private final Instant updatedAt;
 
-    private Long updatedBy;
+    private final Long updatedBy;
 
     public static UpdateAssetResponseDto fromEntity(Asset asset) {
         return UpdateAssetResponseDto.builder()
