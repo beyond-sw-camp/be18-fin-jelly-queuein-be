@@ -19,7 +19,6 @@ services:
       retries: 3
       start_period: 10s
 
-
   redis:
     image: redis:7.2
     container_name: redis
@@ -35,6 +34,10 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
     ports:
       - "2181:2181"
+    tmpfs: #임시 볼륨, 개발용 -> zookeeper과 kafka 사용환경 맞춰주는 용도
+      #운영 시 볼륨은 도커 컴포즈가 아니라 aws ebs 활용
+      - /var/lib/zookeeper/data:rw,uid=1000,gid=1000
+      - /var/lib/zookeeper/log:rw,uid=1000,gid=1000
 
   kafka:
     image: confluentinc/cp-kafka:7.6.0
@@ -45,10 +48,20 @@ services:
     ports:
       - "9092:9092"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092 # Docker 네트워크 내부 통신용
+      KAFKA_BROKER_ID: 1 #카프카 컨테이너 1개 사용하므로 고정(브로커)
+      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT:-zookeeper:2181}
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS:-PLAINTEXT://kafka:9092}
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    tmpfs: #임시 볼륨, 개발용
+        - /var/lib/kafka/data:rw,uid=1000,gid=1000
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8082:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local #ui용 이름
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
 
   app:
     build: .
@@ -68,10 +81,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION}
       JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION}
+      INTERNAL_MASTER_KEY: ${INTERNAL_MASTER_KEY}
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY}
     restart: on-failure
 
 volumes:
