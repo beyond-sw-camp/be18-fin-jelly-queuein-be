@@ -110,10 +110,10 @@ public class ReservationCommandController {
     // 예약 정보 변경
     @PatchMapping("/{reservationId}")
     public ResponseEntity<ReservationResponseDto> updateReservation(
-        @PathVariable("reservationId") Long reservationId,
-        @Valid @RequestBody UpdateReservationRequestDto updateReservationRequestDto) {
+            @PathVariable("reservationId") Long reservationId,
+            @Valid @RequestBody UpdateReservationRequestDto updateReservationRequestDto) {
         ReservationResponseDto reservationResponseDto =
-            reservationCommandService.updateReservation(reservationId, updateReservationRequestDto);
+                reservationCommandService.updateReservation(reservationId, updateReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 

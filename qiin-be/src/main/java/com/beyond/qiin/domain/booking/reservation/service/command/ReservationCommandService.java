@@ -29,7 +29,7 @@ public interface ReservationCommandService {
     ReservationResponseDto cancelReservation(final Long reservationId);
 
     ReservationResponseDto updateReservation(
-        final Long reservationId, final UpdateReservationRequestDto createReservationRequestDto);
+            final Long reservationId, final UpdateReservationRequestDto createReservationRequestDto);
 
     Reservation getReservationById(final Long id);
 
