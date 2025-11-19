@@ -15,7 +15,7 @@ public class TreeAssetResponseDto {
 
     private final String name;
 
-    private List<TreeAssetResponseDto> children;
+    private final List<TreeAssetResponseDto> children;
 
     public static TreeAssetResponseDto of(Long assetId, String name, List<TreeAssetResponseDto> children) {
         return TreeAssetResponseDto.builder()

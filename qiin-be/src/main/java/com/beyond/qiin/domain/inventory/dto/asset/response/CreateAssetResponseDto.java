@@ -12,11 +12,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CreateAssetResponseDto {
 
-    private Long assetId;
+    private final Long assetId;
 
-    private Long parentId;
+    private final Long parentId;
 
-    private Long categoryId;
+    private final Long categoryId;
 
     private final String name;
 

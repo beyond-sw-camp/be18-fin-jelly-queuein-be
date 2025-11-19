@@ -33,7 +33,7 @@ public class AssetQueryController {
     }
 
     // 1계층
-    @GetMapping("/{rootId}/One-depth")
+    @GetMapping("/{rootId}/one-depth")
     public ResponseEntity<List<OneDepthAssetResponseDto>> getOneDepthAssets(@PathVariable Long rootId) {
 
         List<OneDepthAssetResponseDto> oneDepthAssetList = assetQueryService.getOneDepthAssetList(rootId);

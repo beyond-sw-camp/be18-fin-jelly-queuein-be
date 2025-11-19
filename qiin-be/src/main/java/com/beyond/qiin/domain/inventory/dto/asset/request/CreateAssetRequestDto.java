@@ -11,7 +11,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class CreateAssetRequestDto {
 
     private String parentName;

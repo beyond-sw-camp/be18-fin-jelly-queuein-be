@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class MoveAssetRequestDto {
 
     private String parentName;
