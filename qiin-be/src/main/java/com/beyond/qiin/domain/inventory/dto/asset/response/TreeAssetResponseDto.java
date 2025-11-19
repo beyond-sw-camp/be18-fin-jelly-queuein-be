@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 // 자원 계층 전체 트리 조회 dto
 public class TreeAssetResponseDto {
 

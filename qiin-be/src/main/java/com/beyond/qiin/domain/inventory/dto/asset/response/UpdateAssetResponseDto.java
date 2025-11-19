@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class UpdateAssetResponseDto {
 
     private final Long assetId;

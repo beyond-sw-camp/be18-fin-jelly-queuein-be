@@ -9,6 +9,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,6 +25,18 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
 
     private static final QAssetClosure assetClosure = QAssetClosure.assetClosure;
     private static final QAsset asset = QAsset.asset;
+
+
+    @Override
+    public Optional<Asset> findById(Long assetId) {
+        Asset result = jpaQueryFactory
+                .select(asset)
+                .from(asset)
+                .where(asset.id.eq(assetId))
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
 
     @Override
     public List<Long> findRootAssetIds() {
@@ -42,7 +56,9 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
         return jpaQueryFactory
                 .select(assetClosure.assetClosureId.descendantId)
                 .from(assetClosure)
+                .join(asset).on(asset.id.eq(assetClosure.assetClosureId.descendantId))
                 .where(assetClosure.assetClosureId.ancestorId.eq(assetId), assetClosure.depth.eq(1))
+                .orderBy(asset.name.asc())
                 .fetch();
     }
 
@@ -58,7 +74,12 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
 
     @Override
     public List<Asset> findByIds(List<Long> ids) {
-        return jpaQueryFactory.select(asset).from(asset).where(asset.id.in(ids)).fetch();
+        return jpaQueryFactory
+                .select(asset)
+                .from(asset)
+                .where(asset.id.in(ids))
+                .orderBy(asset.name.asc())
+                .fetch();
     }
 
     public Page<DescendantAssetResponseDto> findAllForDescendant(Pageable pageable) {
@@ -77,6 +98,7 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
                 .from(asset)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(asset.name.asc())
                 .fetch();
 
         long totalCount = jpaQueryFactory.select(asset.count()).from(asset).fetchOne();

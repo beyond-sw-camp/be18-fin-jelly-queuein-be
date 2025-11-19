@@ -20,4 +20,6 @@ public interface AssetQueryService {
 
     // 전체 트리 구조 조회
     TreeAssetResponseDto getAssetTree(final Long assetId);
+
+    List<TreeAssetResponseDto> getFullAssetTree();
 }

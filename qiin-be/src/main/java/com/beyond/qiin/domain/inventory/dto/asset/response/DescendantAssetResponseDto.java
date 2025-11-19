@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 // 자원 조회할 때 예약 가능한 자원들이 리스트로 보이는 dto
 public class DescendantAssetResponseDto {
 
