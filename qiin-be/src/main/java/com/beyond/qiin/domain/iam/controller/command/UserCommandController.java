@@ -65,6 +65,6 @@ public class UserCommandController {
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable final Long userId) {
         userCommandService.deleteUser(userId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

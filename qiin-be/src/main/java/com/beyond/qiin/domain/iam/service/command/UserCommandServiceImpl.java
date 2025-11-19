@@ -110,6 +110,9 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     public void deleteUser(final Long userId) {
         User user = userReader.findById(userId);
+        // user_role 소프트 딜리트
+        userRoleWriter.deleteAllByUser(user);
+
         userWriter.delete(user);
     }
 }
