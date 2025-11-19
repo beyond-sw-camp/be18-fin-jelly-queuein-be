@@ -1,10 +1,10 @@
 package com.beyond.qiin.domain.booking.reservation.service.query;
 
+import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetListResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;

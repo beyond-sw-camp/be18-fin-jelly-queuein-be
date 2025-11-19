@@ -1,11 +1,11 @@
 package com.beyond.qiin.domain.booking.controller.query;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.reservation.service.query.ReservationQueryService;
@@ -39,12 +39,10 @@ public class ReservationQueryController {
     // 사용자의 예약한 자원에 대한 목록 조회
     @GetMapping("/me")
     public ResponseEntity<PageResponseDto<GetUserReservationResponseDto>> getUserReservations(
-        @PathVariable Long userId,
-        @RequestParam LocalDate date,
-        Pageable pageable) {
+            @PathVariable Long userId, @RequestParam LocalDate date, Pageable pageable) {
 
         Page<GetUserReservationResponseDto> page =
-            reservationQueryService.getReservationsByUserId(userId, date, pageable);
+                reservationQueryService.getReservationsByUserId(userId, date, pageable);
 
         return ResponseEntity.ok(PageResponseDto.from(page));
     }
@@ -52,20 +50,16 @@ public class ReservationQueryController {
     // 예약 가능 자원 목록 조회
     @GetMapping("/{assetId}")
     public ResponseEntity<PageResponseDto<ReservableAssetResponseDto>> getReservableAssets(
-        @RequestParam LocalDate date,
-        Pageable pageable) {
-        Page<GetUserReservationResponseDto> page =
-                reservationQueryService.getReservableAssets(date, pageable);
+            @RequestParam LocalDate date, Pageable pageable) {
+        Page<GetUserReservationResponseDto> page = reservationQueryService.getReservableAssets(date, pageable);
         return ResponseEntity.ok(PageResponseDto.from(page));
     }
 
     // 예약 신청 목록 조회(관리자용)
     @GetMapping("/pending")
     public ResponseEntity<PageResponseDto<GetAppliedReservationResponseDto>> getAppliedReservations(
-        @RequestParam LocalDate date,
-        Pageable pageable) {
-        Page<GetAppliedReservationResponseDto> page =
-                reservationQueryService.getReservationApplies(date, pageable);
+            @RequestParam LocalDate date, Pageable pageable) {
+        Page<GetAppliedReservationResponseDto> page = reservationQueryService.getReservationApplies(date, pageable);
         return ResponseEntity.ok(PageResponseDto.from(page));
     }
 
@@ -88,12 +82,11 @@ public class ReservationQueryController {
     }
 
     // 예약 가능 시간대 조회
-    //TODO : 가능 시간대랑 불가능 시간대 같이 묶어보내줘야 하나 아니면 각자
+    // TODO : 가능 시간대랑 불가능 시간대 같이 묶어보내줘야 하나 아니면 각자
     @GetMapping("/{assetId}/times")
     public ResponseEntity<AssetTimeResponseDto> getAssetTimes(
-        @RequestParam Long assetId, @RequestParam LocalDate date) {
-        AssetTimeResponseDto assetTimeResponseDto =
-            reservationQueryService.getAssetTimes(assetId, date);
+            @RequestParam Long assetId, @RequestParam LocalDate date) {
+        AssetTimeResponseDto assetTimeResponseDto = reservationQueryService.getAssetTimes(assetId, date);
         return ResponseEntity.ok(assetTimeResponseDto);
     }
 }
