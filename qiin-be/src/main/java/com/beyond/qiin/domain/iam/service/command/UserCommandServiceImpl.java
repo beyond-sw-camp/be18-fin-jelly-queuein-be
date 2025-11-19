@@ -13,6 +13,7 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
 import com.beyond.qiin.security.PasswordGenerator;
+import com.beyond.qiin.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -74,7 +75,6 @@ public class UserCommandServiceImpl implements UserCommandService {
     public void changeTempPassword(final Long userId, final String newPassword) {
 
         final User user = userReader.findById(userId);
-        System.out.println("passwordExpired = " + user.getPasswordExpired());
 
         // 임시 비밀번호 사용자만 허용
         if (!Boolean.TRUE.equals(user.getPasswordExpired())) {
@@ -110,9 +110,10 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     public void deleteUser(final Long userId) {
         User user = userReader.findById(userId);
-        // user_role 소프트 딜리트
-        userRoleWriter.deleteAllByUser(user);
 
-        userWriter.delete(user);
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        user.softDelete(currentUserId);
+        userWriter.save(user);
     }
 }

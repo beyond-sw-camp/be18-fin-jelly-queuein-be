@@ -40,4 +40,8 @@ public class UserRole extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Role role;
+
+    public void softDelete(final Long deleterId) {
+        this.delete(deleterId);
+    }
 }

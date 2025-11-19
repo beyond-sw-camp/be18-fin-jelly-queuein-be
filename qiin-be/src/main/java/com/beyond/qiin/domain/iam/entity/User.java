@@ -2,6 +2,7 @@ package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.exception.UserException;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -67,6 +68,7 @@ public class User extends BaseEntity {
     @Column(name = "retire_date", columnDefinition = "TIMESTAMP(6)")
     private Instant retireDate;
 
+    // 비밀번호 수정
     public void updatePassword(final String encrypted) {
         this.password = encrypted;
         this.passwordExpired = false;
@@ -83,5 +85,39 @@ public class User extends BaseEntity {
         if (dto.getUserName() != null) this.userName = dto.getUserName();
         if (dto.getEmail() != null) this.email = dto.getEmail();
         if (dto.getRetireDate() != null) this.retireDate = dto.getRetireDate();
+    }
+
+    // 사용자 삭제하면 자식 데이터도 삭제
+    public void softDelete(final Long deleterId) {
+        // 사용자 삭제
+        this.delete(deleterId);
+
+        // 연관된 UserRole 전체 삭제
+        this.userRoles.forEach(ur -> ur.delete(deleterId));
+    }
+
+    // 임시 비밀번호 인지
+    public boolean isTempPassword() {
+        return Boolean.TRUE.equals(this.passwordExpired);
+    }
+
+    // 처음 로그인 인지
+    public boolean isFirstLogin() {
+        return this.lastLoginAt == null;
+    }
+
+    // 임시 비밀번호 쓰는지 검증
+    public void validateTempPasswordUsage() {
+        if (!isTempPassword()) {
+            return; // 일반 비밀번호라면 제약 없음
+        }
+
+        // 임시 비밀번호 && 최초 로그인 == 허용
+        if (isTempPassword() && isFirstLogin()) {
+            return;
+        }
+
+        // 최초 로그인이 아닌데도 passwordExpired=true → 차단
+        throw UserException.passwordExpired();
     }
 }
