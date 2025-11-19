@@ -12,12 +12,6 @@ spring:
       hibernate:
         format_sql: true
 
-  # Redis 설정
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-
 # JWT 설정
 jwt:
   secret-key: ${JWT_SECRET_KEY}
@@ -27,7 +21,3 @@ jwt:
 logging:
   level:
     org.springframework: INFO
-    com.adjh.springbootkafka: DEBUG
-    org:
-      apache.kafka: INFO
-      springframework.kafka: INFO
