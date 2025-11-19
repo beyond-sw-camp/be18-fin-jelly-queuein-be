@@ -15,11 +15,11 @@ import java.util.List;
 public interface ReservationQueryService {
     Reservation getReservationById(Long id);
 
+    ReservationDetailResponseDto getReservation(final Long id);
+
     GetUserReservationListResponseDto getReservationsByUserId(final Long userId, final LocalDate date);
 
     ReservableAssetListResponseDto getReservableAssets(final LocalDate date);
-
-    ReservationDetailResponseDto getReservation(final Long id);
 
     ReservableAssetTimeResponseDto getReservableAssetTimes(final Long assetId, final LocalDate date);
 
@@ -36,4 +36,6 @@ public interface ReservationQueryService {
     List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final YearMonth yearMonth);
 
     List<Reservation> getReservationsPendingAndDate(final LocalDate date);
+
+    List<Reservation> getReservationsByAssetId(final Long assetId);
 }

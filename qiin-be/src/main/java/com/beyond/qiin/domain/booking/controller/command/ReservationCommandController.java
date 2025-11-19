@@ -97,23 +97,23 @@ public class ReservationCommandController {
         return ResponseEntity.status(200).location(redirectUri).body(reservationResponseDto);
     }
 
-    // 예약 정보 변경
-    @PatchMapping("/{reservationId}")
-    public ResponseEntity<ReservationResponseDto> updateReservation(
-            @PathVariable("reservationId") Long reservationId,
-            @Valid @RequestBody UpdateReservationRequestDto updateReservationRequestDto) {
-        ReservationResponseDto reservationResponseDto =
-                reservationCommandService.updateReservation(reservationId, updateReservationRequestDto);
+    // 자원 예약 취소
+    @PatchMapping("/{reservationId}/cancel")
+    public ResponseEntity<ReservationResponseDto> cancelReservation(@PathVariable("reservationId") Long reservationId) {
+        ReservationResponseDto reservationResponseDto = reservationCommandService.cancelReservation(reservationId);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
         return ResponseEntity.status(200).location(redirectUri).body(reservationResponseDto);
     }
 
-    // 자원 예약 취소
-    @PatchMapping("/{reservationId}/cancel")
-    public ResponseEntity<ReservationResponseDto> cancelReservation(@PathVariable("reservationId") Long reservationId) {
-        ReservationResponseDto reservationResponseDto = reservationCommandService.cancelReservation(reservationId);
+    // 예약 정보 변경
+    @PatchMapping("/{reservationId}")
+    public ResponseEntity<ReservationResponseDto> updateReservation(
+        @PathVariable("reservationId") Long reservationId,
+        @Valid @RequestBody UpdateReservationRequestDto updateReservationRequestDto) {
+        ReservationResponseDto reservationResponseDto =
+            reservationCommandService.updateReservation(reservationId, updateReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 

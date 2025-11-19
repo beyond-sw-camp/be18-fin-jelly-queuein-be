@@ -24,7 +24,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,16 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final ReservationJpaRepository reservationJpaRepository;
+
+    // 자원 자체 (예외처리 포함) -> command service용
+    @Override
+    @Transactional(readOnly = true)
+    public Reservation getReservationById(final Long id) {
+        Reservation reservation = reservationJpaRepository
+            .findById(id)
+            .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+        return reservation;
+    }
 
     // 예약 상세 조회 (api용)
     @Override
@@ -179,7 +191,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         for (Reservation reservation : reservations) {
             GetAppliedReservationResponseDto reservationResponseDto =
-                    GetAppliedReservationResponseDto.fromEntity(reservation);
+                    GetAppliedReservationResponseDto.fromEntity(reservation, isAssetReservableToday(reservation.getAssetId()));
             reservationList.add(reservationResponseDto);
         }
 
@@ -188,16 +200,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
                 .build();
 
         return reservationListResponseDto;
-    }
-
-    // 자원 자체 (예외처리 포함) -> command service용
-    @Override
-    @Transactional(readOnly = true)
-    public Reservation getReservationById(final Long id) {
-        Reservation reservation = reservationJpaRepository
-                .findById(id)
-                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-        return reservation;
     }
 
     @Override
@@ -248,6 +250,18 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return reservations;
     }
 
+
+    // 자원 목록 (예외처리 포함)
+    @Override
+    @Transactional(readOnly = true)
+    public List<Reservation> getReservationsByAssetId(final Long assetId) {
+        // assetId 유효한지 확인
+
+        List<Reservation> reservations = reservationJpaRepository.findByAssetId(assetId);
+        return reservations;
+    }
+
+
     public static String statusToString(final int status) {
         if (status == 0) {
             return "PENDING";
@@ -282,5 +296,40 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
                 .minusNanos(1)
                 .toInstant();
         return DateRange.create(startDay, endDay);
+    }
+
+    public boolean isAssetReservableToday(Long assetId){
+
+        Instant start = LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+
+        Instant end = LocalDate.now().plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+
+        List<Reservation> reservations = getReservationsByAssetId(assetId);
+
+        if(reservations.isEmpty())
+            return true;
+
+        //시작 시간 순으로 정렬
+        reservations.sort(Comparator.comparing(Reservation::getStartAt).reversed());
+
+        //TODO: 첫 예약이 오늘 시작 시간 이후면 앞쪽에 빈 구간 있음
+        if(reservations.get(0).getStartAt().isAfter(start))
+            return true;
+
+        for(int i = 0; i < reservations.size() ; i++){
+            Instant currentEnd = reservations.get(i).getEndAt();
+            Instant nextStart = reservations.get(i + 1).getStartAt();
+
+            if (currentEnd.isBefore(nextStart)) {
+                return true; // 사이에 빈 구간 존재
+            }
+        }
+
+
+        Instant lastEnd = reservations.get(reservations.size() - 1).getEndAt();
+        if (lastEnd.isBefore(end)) {
+            return true;
+        }
+        return false;
     }
 }

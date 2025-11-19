@@ -22,14 +22,14 @@ public interface ReservationCommandService {
     ReservationResponseDto rejectReservation(
             final Long reservationId, final ConfirmReservationRequestDto confirmReservationRequestDto);
 
-    ReservationResponseDto updateReservation(
-            final Long reservationId, final UpdateReservationRequestDto createReservationRequestDto);
-
     ReservationResponseDto startUsingReservation(final Long reservationId, final Instant startAt);
 
     ReservationResponseDto endUsingReservation(final Long reservationId, final Instant endAt);
 
     ReservationResponseDto cancelReservation(final Long reservationId);
+
+    ReservationResponseDto updateReservation(
+        final Long reservationId, final UpdateReservationRequestDto createReservationRequestDto);
 
     Reservation getReservationById(final Long id);
 
