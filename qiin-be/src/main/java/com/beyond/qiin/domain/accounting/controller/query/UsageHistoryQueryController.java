@@ -18,11 +18,8 @@ public class UsageHistoryQueryController {
     private final UsageHistoryQueryService usageHistoryQueryService;
 
     @GetMapping
-    public ResponseEntity<PageResponseDto<UsageHistoryResponse>> getUsageHistoryList(
-            UsageHistorySearchRequest req
-    ) {
-        PageResponseDto<UsageHistoryResponse> response =
-                usageHistoryQueryService.getUsageHistoryList(req);
+    public ResponseEntity<PageResponseDto<UsageHistoryResponse>> getUsageHistoryList(UsageHistorySearchRequest req) {
+        PageResponseDto<UsageHistoryResponse> response = usageHistoryQueryService.getUsageHistoryList(req);
 
         return ResponseEntity.ok(response);
     }

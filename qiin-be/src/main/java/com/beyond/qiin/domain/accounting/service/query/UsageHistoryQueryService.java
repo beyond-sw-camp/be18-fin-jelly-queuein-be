@@ -7,6 +7,4 @@ import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistory
 public interface UsageHistoryQueryService {
 
     PageResponseDto<UsageHistoryResponse> getUsageHistoryList(UsageHistorySearchRequest req);
-
 }
-

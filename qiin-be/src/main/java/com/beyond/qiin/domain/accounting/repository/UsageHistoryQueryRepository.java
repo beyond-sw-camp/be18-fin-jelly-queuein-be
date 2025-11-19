@@ -7,5 +7,4 @@ import org.springframework.data.domain.Page;
 public interface UsageHistoryQueryRepository {
 
     Page<UsageHistoryResponse> searchUsageHistory(UsageHistorySearchRequest req);
-
 }

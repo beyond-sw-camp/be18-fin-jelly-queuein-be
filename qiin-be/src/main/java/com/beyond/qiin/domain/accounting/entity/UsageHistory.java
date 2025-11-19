@@ -1,12 +1,9 @@
 package com.beyond.qiin.domain.accounting.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.lang.management.LockInfo;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.time.Instant;
+import lombok.*;
 
 @Entity
 @Getter
@@ -21,16 +18,15 @@ public class UsageHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "asset_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-//    private Asset asset;   // 자원 FK
+    //    @ManyToOne(fetch = FetchType.LAZY)
+    //    @JoinColumn(name = "asset_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    //    private Asset asset;   // 자원 FK
     @Column(name = "asset_id", nullable = false)
     private Long assetId;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "reservation_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-//    private Reservation reservation;  // 예약 FK
+    //
+    //    @ManyToOne(fetch = FetchType.LAZY)
+    //    @JoinColumn(name = "reservation_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    //    private Reservation reservation;  // 예약 FK
     @Column(name = "reservation_id", nullable = false)
     private Long reservationId;
 
@@ -57,5 +53,4 @@ public class UsageHistory {
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP(6)")
     private Instant createdAt;
-
 }

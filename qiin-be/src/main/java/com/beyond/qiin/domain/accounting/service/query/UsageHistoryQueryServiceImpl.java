@@ -17,8 +17,7 @@ public class UsageHistoryQueryServiceImpl implements UsageHistoryQueryService {
     @Override
     public PageResponseDto<UsageHistoryResponse> getUsageHistoryList(UsageHistorySearchRequest req) {
 
-        Page<UsageHistoryResponse> page =
-                usageHistoryQueryRepository.searchUsageHistory(req);
+        Page<UsageHistoryResponse> page = usageHistoryQueryRepository.searchUsageHistory(req);
 
         return PageResponseDto.from(page);
     }

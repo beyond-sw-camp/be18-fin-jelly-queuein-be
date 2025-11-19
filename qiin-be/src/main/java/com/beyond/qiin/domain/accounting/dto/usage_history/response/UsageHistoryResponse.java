@@ -1,13 +1,12 @@
 package com.beyond.qiin.domain.accounting.dto.usage_history.response;
 
 import com.beyond.qiin.domain.accounting.entity.UsageHistory;
+import java.math.BigDecimal;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.math.BigDecimal;
-import java.time.Instant;
 
 @Getter
 @Builder
@@ -30,11 +29,7 @@ public class UsageHistoryResponse {
 
     // 엔티티 + 조인된 assetName을 함께 받는 방식
     public static UsageHistoryResponse from(
-            UsageHistory u,
-            String assetName,
-            String reservationDurationText,
-            String actualDurationText
-    ) {
+            UsageHistory u, String assetName, String reservationDurationText, String actualDurationText) {
         return UsageHistoryResponse.builder()
                 .usageHistoryId(u.getId())
                 .assetName(assetName)
