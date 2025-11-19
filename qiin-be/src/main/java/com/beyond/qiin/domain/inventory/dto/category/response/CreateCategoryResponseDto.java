@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.inventory.dto.category.response;
 
 import com.beyond.qiin.domain.inventory.entity.Category;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
