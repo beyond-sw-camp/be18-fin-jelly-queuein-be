@@ -15,6 +15,7 @@ import lombok.Getter;
 public class TimeSlotDto {
     private final String start; // "9:00"과 같은 형태로
     private final String end;
+    private final boolean available;
 
     public static TimeSlotDto create(final TimeSlot timeSlot, final String zone) {
         ZoneId zoneId = ZoneId.of(zone);
@@ -22,6 +23,7 @@ public class TimeSlotDto {
         return TimeSlotDto.builder()
                 .start(timeSlot.getStart().atZone(zoneId).format(DateTimeFormatter.ofPattern("HH:mm")))
                 .end(timeSlot.getEnd().atZone(zoneId).format(DateTimeFormatter.ofPattern("HH:mm")))
+                .available(timeSlot.isAvailable())
                 .build();
     }
 }

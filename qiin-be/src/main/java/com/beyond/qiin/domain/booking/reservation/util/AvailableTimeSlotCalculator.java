@@ -45,7 +45,12 @@ public class AvailableTimeSlotCalculator {
 
             // 현재 시각 < 예약 시각이라면 빈 공간 존재
             if (current.isBefore(resStart)) {
-                result.add(TimeSlot.create(current, resStart));
+                result.add(TimeSlot.create(current, resStart, true));
+            }
+
+            Instant blockedStart = resStart.isBefore(current) ? current : resStart;
+            if (blockedStart.isBefore(resEnd)) {
+                result.add(TimeSlot.create(blockedStart, resEnd, false));
             }
 
             // 다음 비교 기준을 예약 끝으로 업데이트
@@ -56,11 +61,11 @@ public class AvailableTimeSlotCalculator {
 
         // 마지막 구간 처리
         if (current.isBefore(endOfDay)) {
-            result.add(TimeSlot.create(current, endOfDay));
+            result.add(TimeSlot.create(current, endOfDay, true));
         }
 
         if (reservations.isEmpty()) {
-            return Collections.emptyList();
+            return List.of(TimeSlot.create(startOfDay, endOfDay, true));
         }
         return result;
     }

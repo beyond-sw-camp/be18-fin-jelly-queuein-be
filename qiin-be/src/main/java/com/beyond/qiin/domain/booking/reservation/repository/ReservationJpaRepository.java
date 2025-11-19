@@ -3,6 +3,8 @@ package com.beyond.qiin.domain.booking.reservation.repository;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,11 +16,15 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
             """
     SELECT r
     FROM Reservation r
-    WHERE r.status == 0
+    WHERE r.status = 0
       AND r.startAt <= :endOfDay
       AND r.endAt >= :startOfDay
 """)
-    List<Reservation> findAllWithStatusPendingAndDate(Instant startOfDay, Instant endOfDay);
+    Page<Reservation> findAllWithStatusPendingAndDate(
+        Instant startOfDay,
+        Instant endOfDay,
+        Pageable pageable
+    );
 
     @Query(
             """

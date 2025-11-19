@@ -12,8 +12,9 @@ import lombok.Getter;
 public class TimeSlot {
     private final Instant start;
     private final Instant end;
+    private final boolean available;
 
-    public static TimeSlot create(Instant start, Instant end) {
-        return TimeSlot.builder().start(start).end(end).build();
+    public static TimeSlot create(Instant start, Instant end, boolean available) {
+        return TimeSlot.builder().start(start).end(end).available(available).build();
     }
 }
