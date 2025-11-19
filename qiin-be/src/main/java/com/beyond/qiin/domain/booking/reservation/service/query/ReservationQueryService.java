@@ -4,7 +4,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReserva
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetListResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetTimeResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
@@ -21,7 +21,7 @@ public interface ReservationQueryService {
 
     ReservableAssetListResponseDto getReservableAssets(final LocalDate date);
 
-    ReservableAssetTimeResponseDto getReservableAssetTimes(final Long assetId, final LocalDate date);
+    AssetTimeResponseDto getAssetTimes(final Long assetId, final LocalDate date);
 
     WeekReservationListResponseDto getWeeklyReservations(final Long userId, final LocalDate date);
 
