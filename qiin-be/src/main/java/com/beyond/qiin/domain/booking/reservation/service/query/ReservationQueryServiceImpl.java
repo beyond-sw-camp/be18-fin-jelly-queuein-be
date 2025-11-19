@@ -24,7 +24,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -42,8 +41,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Transactional(readOnly = true)
     public Reservation getReservationById(final Long id) {
         Reservation reservation = reservationJpaRepository
-            .findById(id)
-            .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+                .findById(id)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
         return reservation;
     }
 
@@ -190,8 +189,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         List<GetAppliedReservationResponseDto> reservationList = new ArrayList<>();
 
         for (Reservation reservation : reservations) {
-            GetAppliedReservationResponseDto reservationResponseDto =
-                    GetAppliedReservationResponseDto.fromEntity(reservation, isAssetReservableToday(reservation.getAssetId()));
+            GetAppliedReservationResponseDto reservationResponseDto = GetAppliedReservationResponseDto.fromEntity(
+                    reservation, isAssetReservableToday(reservation.getAssetId()));
             reservationList.add(reservationResponseDto);
         }
 
@@ -250,7 +249,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return reservations;
     }
 
-
     // 자원 목록 (예외처리 포함)
     @Override
     @Transactional(readOnly = true)
@@ -260,7 +258,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         List<Reservation> reservations = reservationJpaRepository.findByAssetId(assetId);
         return reservations;
     }
-
 
     public static String statusToString(final int status) {
         if (status == 0) {
@@ -298,25 +295,28 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return DateRange.create(startDay, endDay);
     }
 
-    public boolean isAssetReservableToday(Long assetId){
+    public boolean isAssetReservableToday(Long assetId) {
 
-        Instant start = LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+        Instant start =
+                LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
 
-        Instant end = LocalDate.now().plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+        Instant end = LocalDate.now()
+                .plusDays(1)
+                .atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant();
 
         List<Reservation> reservations = getReservationsByAssetId(assetId);
 
-        if(reservations.isEmpty())
-            return true;
+        if (reservations.isEmpty()) return true;
 
-        //시작 시간 순으로 정렬
+        // 시작 시간 순으로 정렬
         reservations.sort(Comparator.comparing(Reservation::getStartAt).reversed());
 
-        //TODO: 첫 예약이 오늘 시작 시간 이후면 앞쪽에 빈 구간 있음
-        if(reservations.get(0).getStartAt().isAfter(start))
-            return true;
+        // TODO: 첫 예약이 오늘 시작 시간 이후면 앞쪽에 빈 구간 있음
+        if (reservations.get(0).getStartAt().isAfter(start)) return true;
 
-        for(int i = 0; i < reservations.size() ; i++){
+        for (int i = 0; i < reservations.size(); i++) {
             Instant currentEnd = reservations.get(i).getEndAt();
             Instant nextStart = reservations.get(i + 1).getStartAt();
 
@@ -324,7 +324,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
                 return true; // 사이에 빈 구간 존재
             }
         }
-
 
         Instant lastEnd = reservations.get(reservations.size() - 1).getEndAt();
         if (lastEnd.isBefore(end)) {
