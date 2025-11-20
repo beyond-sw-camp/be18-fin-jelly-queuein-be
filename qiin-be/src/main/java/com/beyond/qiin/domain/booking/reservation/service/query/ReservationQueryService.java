@@ -13,25 +13,26 @@ import java.time.YearMonth;
 import java.util.List;
 
 public interface ReservationQueryService {
-    Reservation getReservationById(Long id);
+    Reservation getReservationById(final Long id);
 
-    ReservationDetailResponseDto getReservation(final Long id);
+    ReservationDetailResponseDto getReservation(final Long userId, final Long reservationId);
 
     GetUserReservationListResponseDto getReservationsByUserId(final Long userId, final LocalDate date);
 
-    ReservableAssetListResponseDto getReservableAssets(final LocalDate date);
+    ReservableAssetListResponseDto getReservableAssets(final Long userId, final LocalDate date);
 
-    AssetTimeResponseDto getAssetTimes(final Long assetId, final LocalDate date);
+    AssetTimeResponseDto getAssetTimes(
+        final Long userId, final Long assetId, final LocalDate date);
 
     WeekReservationListResponseDto getWeeklyReservations(final Long userId, final LocalDate date);
 
     MonthReservationListResponseDto getMonthlyReservations(final Long userId, final YearMonth yearMonth);
 
-    GetAppliedReservationListResponseDto getReservationApplies(final LocalDate date);
+    GetAppliedReservationListResponseDto getReservationApplies(final Long userId, final LocalDate date);
 
     List<Reservation> getReservationsByUserAndDate(final Long userId, final LocalDate date);
 
-    List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date);
+    List<Reservation> getReservationsByAssetAndDate(final Long userId, final Long assetId, final LocalDate date);
 
     List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final YearMonth yearMonth);
 
