@@ -2,6 +2,7 @@ package com.beyond.qiin.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.api.FlywayException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,5 +32,34 @@ public class GlobalExceptionHandler {
         log.error("[UnhandledException]", ex);
         return ResponseEntity.status(CommonErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(ErrorResponseDto.of(CommonErrorCode.INTERNAL_SERVER_ERROR, ex.getMessage()));
+    }
+
+    // 403 에러
+    @ExceptionHandler(org.springframework.security.authorization.AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponseDto> handleAuthorizationDeniedException(
+            org.springframework.security.authorization.AuthorizationDeniedException ex) {
+
+        log.warn("[AuthorizationDeniedException] {}", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponseDto.builder()
+                        .status(403)
+                        .error("FORBIDDEN")
+                        .message("접근 권한이 없습니다.")
+                        .build());
+    }
+
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDto> handleAccessDeniedException(
+            org.springframework.security.access.AccessDeniedException ex) {
+
+        log.warn("[AccessDeniedException] {}", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponseDto.builder()
+                        .status(403)
+                        .error("FORBIDDEN")
+                        .message("접근 권한이 없습니다.")
+                        .build());
     }
 }
