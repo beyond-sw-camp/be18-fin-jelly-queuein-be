@@ -30,7 +30,7 @@ public class Category extends BaseEntity {
     private String description;
 
     public void apply(UpdateCategoryRequestDto requestDto) {
-        this.name = requestDto.getName();
-        this.description = requestDto.getDescription();
+        if(requestDto.getName() != null) this.name = requestDto.getName();
+        if(requestDto.getDescription() != null) this.description = requestDto.getDescription();
     }
 }

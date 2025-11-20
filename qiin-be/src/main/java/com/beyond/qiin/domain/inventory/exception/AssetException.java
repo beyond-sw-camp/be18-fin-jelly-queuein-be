@@ -17,7 +17,7 @@ public class AssetException extends BaseException {
         super(errorCode, message);
     }
 
-    // 카테고리 에러 정의
+    // 자원 에러 정의
 
     public static AssetException notFound() {
         return new AssetException(AssetErrorCode.ASSET_NOT_FOUND);

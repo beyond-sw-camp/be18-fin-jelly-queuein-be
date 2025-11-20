@@ -62,8 +62,8 @@ public class Asset extends BaseEntity {
     @Column(name = "access_level", nullable = false)
     private int accessLevel;
 
-    @Column(name = "approval_status", nullable = false)
-    private boolean approvalStatus;
+    @Column(name = "needs_approval", nullable = false)
+    private boolean needsApproval;
 
     @Column(name = "cost_per_hour", nullable = false, precision = 12, scale = 3)
     private BigDecimal costPerHour;
@@ -83,7 +83,7 @@ public class Asset extends BaseEntity {
         if (requestDto.getStatus() != null) this.status = requestDto.getStatus();
         if (requestDto.getType() != null) this.type = requestDto.getType();
         if (requestDto.getAccessLevel() != null) this.accessLevel = requestDto.getAccessLevel();
-        if (requestDto.getApprovalStatus() != null) this.approvalStatus = requestDto.getApprovalStatus();
+        if (requestDto.getApprovalStatus() != null) this.needsApproval = requestDto.getApprovalStatus();
         if (requestDto.getCostPerHour() != null) this.costPerHour = requestDto.getCostPerHour();
         if (requestDto.getPeriodCost() != null) this.periodCost = requestDto.getPeriodCost();
     }

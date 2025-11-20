@@ -34,7 +34,7 @@ public class DescendantAssetResponseDto {
                 .categoryId(asset.getCategoryId())
                 .status(asset.getStatus())
                 .type(asset.getType())
-                .needApproval(asset.isApprovalStatus())
+                .needApproval(asset.isNeedsApproval())
                 .reservable(asset.getStatus() == 0)
                 .version(asset.getVersion())
                 .build();

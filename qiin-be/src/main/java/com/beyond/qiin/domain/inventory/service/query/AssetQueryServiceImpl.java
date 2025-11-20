@@ -46,7 +46,7 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<OneDepthAssetResponseDto> getOneDepthAssetList(Long rootAssetId) {
+    public List<OneDepthAssetResponseDto> getOneDepthAssetList(final Long rootAssetId) {
 
         List<Long> childIds = assetQueryAdapter.findChildrenIds(rootAssetId);
         if (childIds.isEmpty()) {
@@ -60,7 +60,7 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(int page, int size) {
+    public PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(final int page, final int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -72,7 +72,7 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public TreeAssetResponseDto getAssetTree(Long assetId) {
+    public TreeAssetResponseDto getAssetTree(final Long assetId) {
 
         Asset rootAsset = assetQueryAdapter.findById(assetId).orElseThrow(AssetException::notFound);
 

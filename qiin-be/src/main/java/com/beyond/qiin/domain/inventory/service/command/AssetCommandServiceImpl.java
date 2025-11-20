@@ -11,6 +11,8 @@ import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
 import java.util.List;
+
+import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,9 +53,13 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         // 클로저 관련 자신 → 자신 (depth=0) 저장 추가
         assetClosureJpaRepository.save(AssetClosure.of(assetId, assetId, 0));
 
-        Asset parentAsset = getAssetByName(requestDto.getParentName());
+        Long parentId = null;
 
-        Long parentId = parentAsset.getId();
+        if(!requestDto.getParentName().isEmpty()) {
+            Asset parentAsset = getAssetByName(requestDto.getParentName());
+
+            parentId = parentAsset.getId();
+        }
 
         // parentId가 없으면(루트 노드이면) 바로 리턴
         if (parentId == null) {
@@ -86,8 +92,9 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         }
 
         // categoryId 존재 여부 검증
-        categoryCommandService.validateCategoryId(requestDto.getCategoryId());
-
+        if(requestDto.getCategoryId() != null) {
+            categoryCommandService.validateCategoryId(requestDto.getCategoryId());
+        }
         Asset asset = getAssetById(assetId);
 
         asset.apply(requestDto);
@@ -124,22 +131,22 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         Long newParentId = newParentAsset.getId();
 
-        List<AssetClosure> descendants = assetClosureQueryAdapter.findDescendants(assetId);
+        List<AssetClosure> subtree = assetClosureQueryAdapter.findDescendants(assetId);
 
-        boolean isCycle = descendants.stream()
+        boolean isCycle = subtree.stream()
                 .anyMatch(c -> c.getAssetClosureId().getDescendantId().equals(newParentId));
 
         if (isCycle) {
             throw AssetException.cannotMoveToChild();
         }
 
-        List<AssetClosure> subtree = assetClosureQueryAdapter.findDescendants(assetId);
 
         List<Long> subtreeIds = subtree.stream()
                 .map(c -> c.getAssetClosureId().getDescendantId())
                 .toList();
 
         for (Long id : subtreeIds) {
+            System.out.println("subtree id 삭제: " + id);
             assetClosureQueryAdapter.deleteAllByAncestorId(id);
             assetClosureQueryAdapter.deleteAllByDescendantId(id);
         }
@@ -162,6 +169,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         }
 
         for (Long id : subtreeIds) {
+            System.out.println("subtree id 생성: " + id);
             assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
         }
     }

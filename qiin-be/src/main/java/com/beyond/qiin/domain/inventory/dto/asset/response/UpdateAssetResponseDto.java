@@ -48,7 +48,7 @@ public class UpdateAssetResponseDto {
                 .status(asset.getStatus())
                 .type(asset.getType())
                 .accessLevel(asset.getAccessLevel())
-                .approvalStatus(asset.isApprovalStatus())
+                .approvalStatus(asset.isNeedsApproval())
                 .costPerHour(asset.getCostPerHour())
                 .periodCost(asset.getPeriodCost())
                 .updatedAt(asset.getUpdatedAt())

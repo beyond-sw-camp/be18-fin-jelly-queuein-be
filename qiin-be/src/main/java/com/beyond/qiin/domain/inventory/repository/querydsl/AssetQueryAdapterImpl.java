@@ -91,7 +91,7 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
                         asset.categoryId,
                         asset.status,
                         asset.type,
-                        asset.approvalStatus,
+                        asset.needsApproval,
                         asset.status.eq(0),
                         asset.version))
                 .from(asset)

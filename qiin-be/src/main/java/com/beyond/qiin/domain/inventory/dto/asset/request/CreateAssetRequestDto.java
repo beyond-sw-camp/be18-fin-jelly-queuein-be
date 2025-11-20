@@ -52,7 +52,7 @@ public class CreateAssetRequestDto {
                 .status(status)
                 .type(type)
                 .accessLevel(accessLevel)
-                .approvalStatus(approvalStatus)
+                .needsApproval(approvalStatus)
                 .costPerHour(costPerHour)
                 .periodCost(periodCost)
                 .build();

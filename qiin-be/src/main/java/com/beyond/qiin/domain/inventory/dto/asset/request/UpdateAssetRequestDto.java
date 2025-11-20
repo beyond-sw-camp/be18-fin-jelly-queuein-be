@@ -12,31 +12,23 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UpdateAssetRequestDto {
 
-    @NotNull
     private Long categoryId;
 
-    @NotBlank
     private String name;
 
     private String description;
 
     private String image;
 
-    @NotNull
     private Integer status;
 
-    @NotNull
     private Integer type;
 
-    @NotNull
     private Integer accessLevel;
 
-    @NotNull
     private Boolean approvalStatus;
 
-    @NotNull
     private BigDecimal costPerHour;
 
-    @NotNull
     private BigDecimal periodCost;
 }
