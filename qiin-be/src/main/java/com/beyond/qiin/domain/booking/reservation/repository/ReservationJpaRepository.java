@@ -31,17 +31,14 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
 """)
     List<Reservation> findByUserIdAndYearMonth(Long userId, Instant startOfMonth, Instant endOfMonth);
 
-    @Query("""
+    @Query(
+            """
     select r from Reservation r
     where r.user.id = :userId
       and r.startAt between :start and :end
     order by r.startAt asc
 """)
-    List<Reservation> findByUserIdAndWeek(
-        Long userId,
-        Instant start,
-        Instant end
-    );
+    List<Reservation> findByUserIdAndWeek(Long userId, Instant start, Instant end);
 
     @Query(
             """
