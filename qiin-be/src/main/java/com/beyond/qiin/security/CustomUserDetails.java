@@ -19,6 +19,8 @@ public class CustomUserDetails implements UserDetails {
         this.authorities = authorities;
     }
 
+    public Long getUserId(){ return userId; }
+
     @Override
     public String getPassword() {
         return null;
