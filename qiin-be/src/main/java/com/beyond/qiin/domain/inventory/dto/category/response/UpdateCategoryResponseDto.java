@@ -18,9 +18,9 @@ public class UpdateCategoryResponseDto {
 
     public static UpdateCategoryResponseDto fromEntity(Category category) {
         return UpdateCategoryResponseDto.builder()
-                                        .categoryId(category.getId())
-                                        .name(category.getName())
-                                        .description(category.getDescription())
-                                        .build();
+                .categoryId(category.getId())
+                .name(category.getName())
+                .description(category.getDescription())
+                .build();
     }
 }

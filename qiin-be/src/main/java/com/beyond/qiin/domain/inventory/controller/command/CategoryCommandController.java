@@ -39,7 +39,8 @@ public class CategoryCommandController {
     public ResponseEntity<UpdateCategoryResponseDto> updateCategory(
             @PathVariable Long categoryId, @Valid @RequestBody UpdateCategoryRequestDto requestDto) {
 
-        UpdateCategoryResponseDto updateCategoryResponseDto = categoryCommandService.updateCategory(requestDto, categoryId);
+        UpdateCategoryResponseDto updateCategoryResponseDto =
+                categoryCommandService.updateCategory(requestDto, categoryId);
 
         return ResponseEntity.status(HttpStatus.OK).body(updateCategoryResponseDto);
     }
