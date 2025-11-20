@@ -34,7 +34,7 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
     @Query(
             """
     select r from Reservation r
-    where r.user.id = :userId
+    where r.applicant.id = :userId
       and r.startAt between :start and :end
     order by r.startAt asc
 """)

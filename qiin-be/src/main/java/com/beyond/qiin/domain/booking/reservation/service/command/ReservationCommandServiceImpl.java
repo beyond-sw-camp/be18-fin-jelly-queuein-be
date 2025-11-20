@@ -30,21 +30,21 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto applyReservation(
-            final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
+        final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
         Asset asset = assetJpaRepository
                 .findByName(assetId)
                 .orElseThrow(() -> new EntityNotFoundException("asset not found by id"));
 
-        User applicant = userReader.findById(createReservationRequestDto.getApplicantId());
+        User applicant = userReader.findById(userId);
 
         // 참여자 전원 있는지에 대한 확인
         userReader.validateAllExist(createReservationRequestDto.getAttendantIds());
 
-        List<User> attendantsUsers = userReader.findAllByIds(attendantIds);
+        List<User> attendantUsers = userReader.findAllByIds(attendantIds);
 
         List<Attendant> attendants =
-                attendantsUsers.stream().map(Attendant::create).toList();
+                attendantUsers.stream().map(Attendant::create).toList();
 
         // 자원 자체가 지금 사용 가능한가에 대한 확인
         if ((asset.getStatus() == 1) || (asset.getStatus() == 2))
@@ -62,18 +62,21 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto instantConfirmReservation(
-            final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
+        final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
         Asset asset = assetRepository
                 .findByName(assetId)
                 .orElseThrow(() -> new EntityNotFoundException("asset not found by id"));
 
-        User applicant = userReader.findById(createReservationRequestDto.getApplicantId());
+        User applicant = userReader.findById(userId);
 
         // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
         userReader.validateAllExist(createReservationRequestDto.getAttendantIds());
 
-        List<User> attendantsUsers = userReader.findAllByIds(attendantIds);
+        List<User> attendantUsers = userReader.findAllByIds(attendantIds);
+
+        List<Attendant> attendants =
+            attendantUsers.stream().map(Attendant::create).toList();
 
         // 해당 시간에 사용 가능한 자원인지 확인
         validateReservationAvailability(
@@ -99,13 +102,13 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto approveReservation(
-            final Long reservationId, final ConfirmReservationRequestDto confirmReservationRequestDto) {
-        // 담당자 권한에 대한 확인
+        final Long userId, final Long reservationId, final ConfirmReservationRequestDto confirmReservationRequestDto) {
+
+        User respondent = userReader.findById(userId);
 
         Reservation reservation = getReservationById(reservationId);
 
-        // TODO: respondent : userDetails.getUserId()
-        reservation.approve(confirmReservationRequestDto.getReason()); // status approved
+        reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
 
         reservationJpaRepository.save(reservation);
         return ReservationResponseDto.fromEntity(reservation, statusToString(reservation.getStatus()));
@@ -114,13 +117,13 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto rejectReservation(
-            final Long reservationId, final ConfirmReservationRequestDto confirmReservationRequestDto) {
-        // 담당자 권한에 대한 확인
+        final Long userId, final Long reservationId, final ConfirmReservationRequestDto confirmReservationRequestDto) {
+
+        User respondent = userReader.findById(userId);
 
         Reservation reservation = getReservationById(reservationId);
 
-        // TODO: respondent : userDetails.getUserId()
-        reservation.reject(confirmReservationRequestDto.getReason()); // status rejected
+        reservation.reject(respondent, confirmReservationRequestDto.getReason()); // status rejected
 
         reservationJpaRepository.save(reservation);
 
@@ -129,9 +132,11 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
     @Override
     @Transactional
-    public ReservationResponseDto startUsingReservation(final Long reservationId, final Instant actualStartAt) {
+    public ReservationResponseDto startUsingReservation(
+        final Long userId, final Long reservationId, final Instant actualStartAt) {
 
         // 예약자 본인에 대한 확인
+        userReader.findById(userId);
 
         // 실제 시작 시간 추가
         Reservation reservation = getReservationById(reservationId);
@@ -145,9 +150,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     // 실제 종료 시간 추가
     @Override
     @Transactional
-    public ReservationResponseDto endUsingReservation(final Long reservationId, final Instant actualEndAt) {
+    public ReservationResponseDto endUsingReservation(final Long userId, final Long reservationId, final Instant actualEndAt) {
 
         // 예약자 본인에 대한 확인
+        userReader.findById(userId);
 
         Reservation reservation = getReservationById(reservationId);
 
@@ -161,9 +167,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     // 사용 시간 30분 전인 경우 허용
     @Override
     @Transactional
-    public ReservationResponseDto cancelReservation(final Long reservationId) {
+    public ReservationResponseDto cancelReservation(final Long userId, final Long reservationId) {
 
         // 예약자 본인에 대한 확인
+        userReader.findById(userId);
 
         Reservation reservation = getReservationById(reservationId);
 
@@ -180,16 +187,26 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto updateReservation(
-            final Long reservationId, final UpdateReservationRequestDto updateReservationRequestDto) {
+        final Long userId,
+        final Long reservationId,
+        final UpdateReservationRequestDto updateReservationRequestDto
+    ) {
 
         // 예약자 본인에 대한 확인
-
+        userReader.findById(userId);
         Reservation reservation = getReservationById(reservationId);
 
         List<Long> userIds = updateReservationRequestDto.getAttendantIds();
-        // 예약자들 있는지 확인 -> user service에서
 
-        reservation.update(updateReservationRequestDto.getDescription(), users);
+        // 예약자들 있는지 확인
+        userReader.validateAllExist(userIds);
+
+        List<User> attendantUsers = userReader.findAllByIds(userIds);
+
+        List<Attendant> attendants =
+            attendantUsers.stream().map(Attendant::create).toList();
+
+        reservation.update(updateReservationRequestDto.getDescription(), attendantUsers);
 
         reservationJpaRepository.save(reservation);
 

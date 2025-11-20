@@ -2,7 +2,7 @@ package com.beyond.qiin.domain.booking.reservation.entity;
 
 import com.beyond.qiin.common.BaseEntity;
 import com.beyond.qiin.domain.booking.dto.user_rev.entity.Attendant;
-import com.beyond.qiin.domain.entity.User;
+import com.beyond.qiin.domain.iam.entity.User;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
