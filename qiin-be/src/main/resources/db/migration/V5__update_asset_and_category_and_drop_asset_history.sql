@@ -1,5 +1,5 @@
 ALTER TABLE `asset`
-    DROP COLUMN `parent_id`,
+    DROP COLUMN `parent_asset_id`,
     CHANGE COLUMN `approval_status` `needs_approval` BOOLEAN NOT NULL DEFAULT FALSE,
     ADD CONSTRAINT `uk_asset_name` UNIQUE (`name`);
 
