@@ -20,7 +20,7 @@ public class CategoryQueryController {
 
     private final CategoryQueryService categoryQueryService;
 
-    @GetMapping("/dropdown")
+    @GetMapping("/dropdown-menu")
     public ResponseEntity<List<DropdownCategoryResponseDto>> getDropdownCategory() {
 
         List<DropdownCategoryResponseDto> categories = categoryQueryService.getDropdownList();
@@ -28,7 +28,7 @@ public class CategoryQueryController {
         return ResponseEntity.status(HttpStatus.OK).body(categories);
     }
 
-    @GetMapping("/manage")
+    @GetMapping("/management")
     public ResponseEntity<PageResponseDto<ManageCategoryResponseDto>> getManageCategory(
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "010") int size) {
 

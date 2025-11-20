@@ -3,6 +3,7 @@ package com.beyond.qiin.domain.inventory.controller.command;
 import com.beyond.qiin.domain.inventory.dto.category.request.CreateCategoryRequestDto;
 import com.beyond.qiin.domain.inventory.dto.category.request.UpdateCategoryRequestDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.CreateCategoryResponseDto;
+import com.beyond.qiin.domain.inventory.dto.category.response.UpdateCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.service.command.CategoryCommandService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,12 +36,12 @@ public class CategoryCommandController {
 
     // 카테고리 수정
     @PatchMapping("/{categoryId}")
-    public ResponseEntity<Void> updateCategory(
+    public ResponseEntity<UpdateCategoryResponseDto> updateCategory(
             @PathVariable Long categoryId, @Valid @RequestBody UpdateCategoryRequestDto requestDto) {
 
-        categoryCommandService.updateCategory(requestDto, categoryId);
+        UpdateCategoryResponseDto updateCategoryResponseDto = categoryCommandService.updateCategory(requestDto, categoryId);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.OK).body(updateCategoryResponseDto);
     }
 
     // 카테고리 삭제

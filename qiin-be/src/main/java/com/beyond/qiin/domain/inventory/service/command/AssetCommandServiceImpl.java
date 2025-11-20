@@ -51,8 +51,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         // 클로저 관련 자신 → 자신 (depth=0) 저장 추가
         assetClosureJpaRepository.save(AssetClosure.of(assetId, assetId, 0));
 
-        Asset parentAsset =
-                assetJpaRepository.findByName(requestDto.getParentName()).orElseThrow(AssetException::notFound);
+        Asset parentAsset = getAssetByName(requestDto.getParentName());
 
         Long parentId = parentAsset.getId();
 
@@ -89,7 +88,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         // categoryId 존재 여부 검증
         categoryCommandService.validateCategoryId(requestDto.getCategoryId());
 
-        Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
+        Asset asset = getAssetById(assetId);
 
         asset.apply(requestDto);
 
@@ -102,7 +101,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         // 나중에 권한 검증 추가
 
-        Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
+        Asset asset = getAssetById(assetId);
 
         asset.delete(userId);
 
@@ -114,14 +113,14 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     @Transactional
     public void moveAsset(final Long assetId, final String newParentName) {
 
-        Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
+        Asset asset = getAssetById(assetId);
 
         if (newParentName == null) {
             moveToRoot(asset.getId());
             return;
         }
 
-        Asset newParentAsset = assetJpaRepository.findByName(newParentName).orElseThrow(AssetException::notFound);
+        Asset newParentAsset = getAssetByName(newParentName);
 
         Long newParentId = newParentAsset.getId();
 
@@ -168,7 +167,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     }
 
     @Transactional
-    public void moveToRoot(Long assetId) {
+    public void moveToRoot(final Long assetId) {
 
         List<AssetClosure> subtree = assetClosureQueryAdapter.findDescendants(assetId);
 
@@ -188,11 +187,12 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
     //// 일반 메소드들 모음
 
+    // 이름으로 자원 가져오기
     public Asset getAssetByName(final String assetName) {
         return assetJpaRepository.findByName(assetName).orElseThrow(AssetException::notFound);
     }
 
-    // id
+    // id로 자원 가져오기
     public Asset getAssetById(final Long assetId) {
         return assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
     }
@@ -207,13 +207,21 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     }
 
     // 자원 상태 변환 // 읽기용으로 옮길 예정
-    public String assetStatusToString(Integer status) {
+    public String assetStatusToString(final Integer status) {
         if (status == 0) {
             return "AVAILABLE";
         } else if (status == 1) {
             return "UNAVAILABLE";
         } else {
             return "MAINTENANCE";
+        }
+    }
+
+    public String assetTypeToString(final Integer type) {
+        if (type == 1) {
+            return "STATIC";
+        } else {
+            return "DYNAMIC";
         }
     }
 }

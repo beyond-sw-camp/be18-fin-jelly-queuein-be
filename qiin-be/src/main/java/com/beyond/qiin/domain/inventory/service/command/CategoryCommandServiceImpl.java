@@ -3,6 +3,7 @@ package com.beyond.qiin.domain.inventory.service.command;
 import com.beyond.qiin.domain.inventory.dto.category.request.CreateCategoryRequestDto;
 import com.beyond.qiin.domain.inventory.dto.category.request.UpdateCategoryRequestDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.CreateCategoryResponseDto;
+import com.beyond.qiin.domain.inventory.dto.category.response.UpdateCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Category;
 import com.beyond.qiin.domain.inventory.exception.CategoryException;
 import com.beyond.qiin.domain.inventory.repository.CategoryJpaRepository;
@@ -38,7 +39,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
     // 수정
     @Override
     @Transactional
-    public void updateCategory(final UpdateCategoryRequestDto requestDto, final Long categoryId) {
+    public UpdateCategoryResponseDto updateCategory(final UpdateCategoryRequestDto requestDto, final Long categoryId) {
 
         // 나중에 권한 검증 추가
 
@@ -50,6 +51,8 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
         Category category = categoryJpaRepository.findById(categoryId).orElseThrow(CategoryException::notFound);
 
         category.apply(requestDto);
+
+        return UpdateCategoryResponseDto.fromEntity(category);
     }
 
     // 삭제
