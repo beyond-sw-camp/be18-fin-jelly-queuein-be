@@ -157,16 +157,15 @@ public class ReservationController {
         return ResponseEntity.status(200).location(redirectUri).body(reservationResponseDto);
     }
 
-
-    //조회
+    // 조회
 
     // 예약 상세 조회
     @PreAuthorize("hasAnyRole('GENERAL', 'MANAGER')")
     @GetMapping("/{reservationId}")
     public ResponseEntity<ReservationDetailResponseDto> getReservation(
-        @PathVariable Long reservationId, @AuthenticationPrincipal CustomUserDetails user) {
+            @PathVariable Long reservationId, @AuthenticationPrincipal CustomUserDetails user) {
         ReservationDetailResponseDto reservationDetailResponseDto =
-            reservationQueryService.getReservation(reservationId, user.getUserId());
+                reservationQueryService.getReservation(reservationId, user.getUserId());
         return ResponseEntity.ok(reservationDetailResponseDto);
     }
 
@@ -174,13 +173,13 @@ public class ReservationController {
     @PreAuthorize("hasAnyRole('GENERAL', 'MANAGER')")
     @GetMapping("/me")
     public ResponseEntity<PageResponseDto<GetUserReservationResponseDto>> getUserReservations(
-        @PathVariable Long userId,
-        @AuthenticationPrincipal CustomUserDetails user,
-        @RequestParam LocalDate date,
-        Pageable pageable) {
+            @PathVariable Long userId,
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam LocalDate date,
+            Pageable pageable) {
 
         Page<GetUserReservationResponseDto> page =
-            reservationQueryService.getReservationsByUserId(user.getUserId(), date, pageable);
+                reservationQueryService.getReservationsByUserId(user.getUserId(), date, pageable);
 
         return ResponseEntity.ok(PageResponseDto.from(page));
     }
@@ -189,9 +188,9 @@ public class ReservationController {
     @PreAuthorize("hasAnyRole('GENERAL', 'MANAGER')")
     @GetMapping("/{assetId}")
     public ResponseEntity<PageResponseDto<ReservableAssetResponseDto>> getReservableAssets(
-        @RequestParam LocalDate date, @AuthenticationPrincipal CustomUserDetails user, Pageable pageable) {
+            @RequestParam LocalDate date, @AuthenticationPrincipal CustomUserDetails user, Pageable pageable) {
         Page<GetUserReservationResponseDto> page =
-            reservationQueryService.getReservableAssets(user.getUserId(), date, pageable);
+                reservationQueryService.getReservableAssets(user.getUserId(), date, pageable);
         return ResponseEntity.ok(PageResponseDto.from(page));
     }
 
@@ -199,10 +198,10 @@ public class ReservationController {
     @PreAuthorize("hasAnyRole('MANAGER')")
     @GetMapping("/pending")
     public ResponseEntity<PageResponseDto<GetAppliedReservationResponseDto>> getAppliedReservations(
-        @AuthenticationPrincipal CustomUserDetails user, @RequestParam LocalDate date, Pageable pageable) {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam LocalDate date, Pageable pageable) {
 
         Page<GetAppliedReservationResponseDto> page =
-            reservationQueryService.getReservationApplies(user.getUserId(), date, pageable);
+                reservationQueryService.getReservationApplies(user.getUserId(), date, pageable);
         return ResponseEntity.ok(PageResponseDto.from(page));
     }
 
@@ -210,11 +209,11 @@ public class ReservationController {
     @PreAuthorize("hasAnyRole('GENERAL', 'MANAGER')")
     @GetMapping("/monthly")
     public ResponseEntity<MonthReservationListResponseDto> getMonthlyReservations(
-        @AuthenticationPrincipal CustomUserDetails user,
-        @PathVariable Long userId,
-        @RequestParam YearMonth yearMonth) {
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long userId,
+            @RequestParam YearMonth yearMonth) {
         MonthReservationListResponseDto monthReservationListResponseDto =
-            reservationQueryService.getMonthlyReservations(user.getUserId(), yearMonth);
+                reservationQueryService.getMonthlyReservations(user.getUserId(), yearMonth);
         return ResponseEntity.ok(monthReservationListResponseDto);
     }
 
@@ -222,9 +221,9 @@ public class ReservationController {
     @PreAuthorize("hasAnyRole('GENERAL', 'MANAGER')")
     @GetMapping("/weekly")
     public ResponseEntity<WeekReservationListResponseDto> getWeeklyReservations(
-        @AuthenticationPrincipal CustomUserDetails user, @PathVariable Long userId, @RequestParam LocalDate date) {
+            @AuthenticationPrincipal CustomUserDetails user, @PathVariable Long userId, @RequestParam LocalDate date) {
         WeekReservationListResponseDto weekReservationListResponseDto =
-            reservationQueryService.getWeeklyReservations(user.getUserId(), date);
+                reservationQueryService.getWeeklyReservations(user.getUserId(), date);
         return ResponseEntity.ok(weekReservationListResponseDto);
     }
 
@@ -232,10 +231,9 @@ public class ReservationController {
     @PreAuthorize("hasAnyRole('GENERAL', 'MANAGER')")
     @GetMapping("/{assetId}/times")
     public ResponseEntity<AssetTimeResponseDto> getAssetTimes(
-        @AuthenticationPrincipal CustomUserDetails user, @RequestParam Long assetId, @RequestParam LocalDate date) {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Long assetId, @RequestParam LocalDate date) {
         AssetTimeResponseDto assetTimeResponseDto =
-            reservationQueryService.getAssetTimes(user.getUserId(), assetId, date);
+                reservationQueryService.getAssetTimes(user.getUserId(), assetId, date);
         return ResponseEntity.ok(assetTimeResponseDto);
     }
-
 }
