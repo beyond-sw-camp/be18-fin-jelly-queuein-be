@@ -9,7 +9,8 @@ import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
 import com.beyond.qiin.domain.booking.reservation.repository.ReservationJpaRepository;
-import com.beyond.qiin.domain.entity.User;
+import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.iam.support.user.UserReader;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationCommandServiceImpl implements ReservationCommandService {
 
     private final ReservationJpaRepository reservationJpaRepository;
+    private final UserReader userReader;
 
     // 선착순 예약
     @Override
@@ -35,17 +37,20 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 .findByName(assetId)
                 .orElseThrow(() -> new EntityNotFoundException("asset not found by id"));
 
-        User applicant = userJpaRepository
-                .findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("user not found by id"));
+        User applicant = userReader.findById(createReservationRequestDto.getApplicantId());
 
         // 참여자 전원 있는지에 대한 확인
+        userReader.validateAllExist(createReservationRequestDto.getAttendantIds());
 
-        List<Attendant> attendants =
-                users.stream().map(user -> Attendant.create(user)).collect(Collectors.toList());
+        List<User> attendantsUsers = userReader.findAllByIds(attendantIds);
+
+        List<Attendant> attendants = attendantsUsers.stream()
+            .map(Attendant::create)
+            .toList();
 
         // 자원 자체가 지금 사용 가능한가에 대한 확인
         if ((asset.getStatus() == 1) || (asset.getStatus() == 2))
+            //TODO: 예약 쪽에서 예외 추가
             throw new IllegalArgumentException("asset not available");
 
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, attendants, 0);
@@ -65,10 +70,12 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 .findByName(assetId)
                 .orElseThrow(() -> new EntityNotFoundException("asset not found by id"));
 
-        User applicant =
-                userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user not found by id"));
+        User applicant = userReader.findById(createReservationRequestDto.getApplicantId());
 
         // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
+        userReader.validateAllExist(createReservationRequestDto.getAttendantIds());
+
+        List<User> attendantsUsers = userReader.findAllByIds(attendantIds);
 
         // 해당 시간에 사용 가능한 자원인지 확인
         validateReservationAvailability(
@@ -79,8 +86,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             throw new IllegalArgumentException("asset not available");
 
         // 선착순 자원은 자동 승인
-        List<Attendant> attendants =
-                users.stream().map(user -> Attendant.create(user)).collect(Collectors.toList());
+        List<Attendant> attendants = attendantsUsers.stream()
+            .map(Attendant::create)
+            .toList();
 
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, attendants, 1);
 
