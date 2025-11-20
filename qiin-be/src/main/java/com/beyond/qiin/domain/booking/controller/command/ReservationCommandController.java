@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.booking.controller.command;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
@@ -12,6 +11,8 @@ import java.net.URI;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,11 +34,9 @@ public class ReservationCommandController {
     public ResponseEntity<ReservationResponseDto> createReservationApply(
             @PathVariable("assetId") Long assetId,
             @AuthenticationPrincipal CustomUserDetails user,
-
             @Valid @RequestBody CreateReservationRequestDto createReservationRequestDto) {
         ReservationResponseDto createReservationResponseDto =
-                reservationCommandService.applyReservation(
-                    assetId, user.getUserId(), createReservationRequestDto);
+                reservationCommandService.applyReservation(assetId, user.getUserId(), createReservationRequestDto);
         return ResponseEntity.status(201).body(createReservationResponseDto);
     }
 
@@ -48,9 +47,8 @@ public class ReservationCommandController {
             @PathVariable("assetId") Long assetId,
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody CreateReservationRequestDto createReservationRequestDto) {
-        ReservationResponseDto createReservationResponseDto =
-                reservationCommandService.instantConfirmReservation(
-                    assetId, user.getUserId(), createReservationRequestDto);
+        ReservationResponseDto createReservationResponseDto = reservationCommandService.instantConfirmReservation(
+                assetId, user.getUserId(), createReservationRequestDto);
         return ResponseEntity.status(201).body(createReservationResponseDto);
     }
 
@@ -62,9 +60,8 @@ public class ReservationCommandController {
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody ConfirmReservationRequestDto confirmReservationRequestDto) {
         // 담당자 권한인 경우
-        ReservationResponseDto reservationResponseDto =
-                reservationCommandService.approveReservation(
-                    reservationId, user.getUserId(), confirmReservationRequestDto);
+        ReservationResponseDto reservationResponseDto = reservationCommandService.approveReservation(
+                reservationId, user.getUserId(), confirmReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -79,9 +76,8 @@ public class ReservationCommandController {
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody ConfirmReservationRequestDto confirmReservationRequestDto) {
         // 담당자 권한인 경우
-        ReservationResponseDto reservationResponseDto =
-                reservationCommandService.rejectReservation(
-                    reservationId, user.getUserId(), confirmReservationRequestDto);
+        ReservationResponseDto reservationResponseDto = reservationCommandService.rejectReservation(
+                reservationId, user.getUserId(), confirmReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -96,8 +92,7 @@ public class ReservationCommandController {
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam Instant startAt) {
         ReservationResponseDto reservationResponseDto =
-                reservationCommandService.startUsingReservation(
-                    reservationId, user.getUserId(), startAt);
+                reservationCommandService.startUsingReservation(reservationId, user.getUserId(), startAt);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -112,8 +107,7 @@ public class ReservationCommandController {
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam Instant endAt) {
         ReservationResponseDto reservationResponseDto =
-                reservationCommandService.endUsingReservation(
-                    reservationId, user.getUserId(), endAt);
+                reservationCommandService.endUsingReservation(reservationId, user.getUserId(), endAt);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -124,10 +118,9 @@ public class ReservationCommandController {
     @PreAuthorize("hasAnyRole('GENERAL', 'MANAGER')")
     @PatchMapping("/{reservationId}/cancel")
     public ResponseEntity<ReservationResponseDto> cancelReservation(
-        @PathVariable("reservationId") Long reservationId,
-        @AuthenticationPrincipal CustomUserDetails user) {
-        ReservationResponseDto reservationResponseDto = reservationCommandService.cancelReservation(
-            reservationId, user.getUserId());
+            @PathVariable("reservationId") Long reservationId, @AuthenticationPrincipal CustomUserDetails user) {
+        ReservationResponseDto reservationResponseDto =
+                reservationCommandService.cancelReservation(reservationId, user.getUserId());
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -141,9 +134,8 @@ public class ReservationCommandController {
             @PathVariable("reservationId") Long reservationId,
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody UpdateReservationRequestDto updateReservationRequestDto) {
-        ReservationResponseDto reservationResponseDto =
-                reservationCommandService.updateReservation(
-                    reservationId, updateReservationRequestDto, user.getUserId());
+        ReservationResponseDto reservationResponseDto = reservationCommandService.updateReservation(
+                reservationId, updateReservationRequestDto, user.getUserId());
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 

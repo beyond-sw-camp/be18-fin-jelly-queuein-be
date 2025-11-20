@@ -30,7 +30,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto applyReservation(
-        final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
+            final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
         Asset asset = assetJpaRepository
                 .findByName(assetId)
@@ -62,7 +62,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto instantConfirmReservation(
-        final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
+            final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
         Asset asset = assetRepository
                 .findByName(assetId)
@@ -76,7 +76,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         List<User> attendantUsers = userReader.findAllByIds(attendantIds);
 
         List<Attendant> attendants =
-            attendantUsers.stream().map(Attendant::create).toList();
+                attendantUsers.stream().map(Attendant::create).toList();
 
         // 해당 시간에 사용 가능한 자원인지 확인
         validateReservationAvailability(
@@ -102,7 +102,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto approveReservation(
-        final Long userId, final Long reservationId, final ConfirmReservationRequestDto confirmReservationRequestDto) {
+            final Long userId,
+            final Long reservationId,
+            final ConfirmReservationRequestDto confirmReservationRequestDto) {
 
         User respondent = userReader.findById(userId);
 
@@ -117,7 +119,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto rejectReservation(
-        final Long userId, final Long reservationId, final ConfirmReservationRequestDto confirmReservationRequestDto) {
+            final Long userId,
+            final Long reservationId,
+            final ConfirmReservationRequestDto confirmReservationRequestDto) {
 
         User respondent = userReader.findById(userId);
 
@@ -133,7 +137,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto startUsingReservation(
-        final Long userId, final Long reservationId, final Instant actualStartAt) {
+            final Long userId, final Long reservationId, final Instant actualStartAt) {
 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
@@ -150,7 +154,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     // 실제 종료 시간 추가
     @Override
     @Transactional
-    public ReservationResponseDto endUsingReservation(final Long userId, final Long reservationId, final Instant actualEndAt) {
+    public ReservationResponseDto endUsingReservation(
+            final Long userId, final Long reservationId, final Instant actualEndAt) {
 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
@@ -187,10 +192,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto updateReservation(
-        final Long userId,
-        final Long reservationId,
-        final UpdateReservationRequestDto updateReservationRequestDto
-    ) {
+            final Long userId,
+            final Long reservationId,
+            final UpdateReservationRequestDto updateReservationRequestDto) {
 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
@@ -204,7 +208,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         List<User> attendantUsers = userReader.findAllByIds(userIds);
 
         List<Attendant> attendants =
-            attendantUsers.stream().map(Attendant::create).toList();
+                attendantUsers.stream().map(Attendant::create).toList();
 
         reservation.update(updateReservationRequestDto.getDescription(), attendantUsers);
 
