@@ -21,8 +21,7 @@ public interface ReservationQueryService {
 
     ReservableAssetListResponseDto getReservableAssets(final Long userId, final LocalDate date);
 
-    AssetTimeResponseDto getAssetTimes(
-        final Long userId, final Long assetId, final LocalDate date);
+    AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId, final LocalDate date);
 
     WeekReservationListResponseDto getWeeklyReservations(final Long userId, final LocalDate date);
 
