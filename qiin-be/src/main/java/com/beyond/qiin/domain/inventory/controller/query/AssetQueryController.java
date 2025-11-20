@@ -59,7 +59,7 @@ public class AssetQueryController {
 
         return ResponseEntity.status(HttpStatus.OK).body(tree);
     }
-//
-//    @GetMapping("/{assetId}")
-//    public ResponseEntity<>
+    //
+    //    @GetMapping("/{assetId}")
+    //    public ResponseEntity<>
 }

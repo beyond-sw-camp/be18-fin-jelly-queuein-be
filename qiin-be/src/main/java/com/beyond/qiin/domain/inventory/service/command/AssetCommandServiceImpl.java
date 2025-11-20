@@ -11,8 +11,6 @@ import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
 import java.util.List;
-
-import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +53,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         Long parentId = null;
 
-        if(!requestDto.getParentName().isEmpty()) {
+        if (!requestDto.getParentName().isEmpty()) {
             Asset parentAsset = getAssetByName(requestDto.getParentName());
 
             parentId = parentAsset.getId();
@@ -92,7 +90,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         }
 
         // categoryId 존재 여부 검증
-        if(requestDto.getCategoryId() != null) {
+        if (requestDto.getCategoryId() != null) {
             categoryCommandService.validateCategoryId(requestDto.getCategoryId());
         }
         Asset asset = getAssetById(assetId);
@@ -139,7 +137,6 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         if (isCycle) {
             throw AssetException.cannotMoveToChild();
         }
-
 
         List<Long> subtreeIds = subtree.stream()
                 .map(c -> c.getAssetClosureId().getDescendantId())
