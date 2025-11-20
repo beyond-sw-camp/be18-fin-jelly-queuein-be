@@ -26,7 +26,7 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponseDto<ManageCategoryResponseDto> getManageList(int page, int size) {
+    public PageResponseDto<ManageCategoryResponseDto> getManageList(final int page, final int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<ManageCategoryResponseDto> categoryManageResponseDtoPage = categoryQueryAdapter.findAllForManage(pageable);
