@@ -32,7 +32,7 @@ import org.hibernate.annotations.SQLRestriction;
             @Index(name = "idx_attendant_reservation_id", columnList = "reservation_id"),
             @Index(name = "idx_attendant_user_id", columnList = "user_id")
         })
-@AttributeOverride(name = "id", column = @Column(name = "reservation_id"))
+@AttributeOverride(name = "id", column = @Column(name = "attendant_id"))
 @SQLRestriction("deleted_at is null")
 public class Attendant extends BaseEntity {
 
