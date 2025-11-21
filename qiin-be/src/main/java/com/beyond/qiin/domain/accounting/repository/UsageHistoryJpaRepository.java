@@ -4,7 +4,7 @@ import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistoryS
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryResponse;
 import org.springframework.data.domain.Page;
 
-public interface UsageHistoryQueryRepository {
+public interface UsageHistoryJpaRepository {
 
     Page<UsageHistoryResponse> searchUsageHistory(UsageHistorySearchRequest req);
 }

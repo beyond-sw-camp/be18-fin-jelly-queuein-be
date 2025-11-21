@@ -2,7 +2,7 @@ package com.beyond.qiin.domain.accounting.repository.querydsl;
 
 import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistorySearchRequest;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryResponse;
-import com.beyond.qiin.domain.accounting.repository.UsageHistoryQueryRepository;
+import com.beyond.qiin.domain.accounting.repository.UsageHistoryJpaRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class UsageHistoryQueryAdapter implements UsageHistoryQueryRepository {
+public class UsageHistoryQueryAdapter implements UsageHistoryJpaRepository {
 
     private final JPAQueryFactory queryFactory;
 

@@ -21,6 +21,7 @@ public class UsageHistory {
     //    @ManyToOne(fetch = FetchType.LAZY)
     //    @JoinColumn(name = "asset_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     //    private Asset asset;   // 자원 FK
+
     @Column(name = "asset_id", nullable = false)
     private Long assetId;
     //
@@ -40,7 +41,7 @@ public class UsageHistory {
     private Instant actualUsageTime;
 
     @Column(name = "start_at", columnDefinition = "TIMESTAMP(6)")
-    private Instant StartAt;
+    private Instant startAt;
 
     @Column(name = "end_at", columnDefinition = "TIMESTAMP(6)")
     private Instant endAt;
