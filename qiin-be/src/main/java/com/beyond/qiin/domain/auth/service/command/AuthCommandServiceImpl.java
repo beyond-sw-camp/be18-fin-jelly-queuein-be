@@ -15,10 +15,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthCommandServiceImpl implements AuthCommandService {
@@ -76,9 +78,9 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
         // Access Token 추출
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
-        //        if (accessToken == null) {
-        //            throw AuthException.unauthorized();
-        //        }
+        if (accessToken == null) {
+            throw AuthException.unauthorized();
+        }
 
         // 사용자 ID 추출
         final Long userId = jwtTokenProvider.getUserId(accessToken);
