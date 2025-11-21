@@ -31,12 +31,11 @@ public class ArgumentResolver implements HandlerMethodArgumentResolver {
             final NativeWebRequest webRequest,
             final WebDataBinderFactory binderFactory) {
 
+        // 인가 헤더에서 토큰 추출
         String header = webRequest.getHeader("Authorization");
-
         if (header == null || !header.startsWith("Bearer ")) {
             throw AuthException.unauthorized();
         }
-
         String token = header.substring(7);
 
         // 블랙리스트 체크

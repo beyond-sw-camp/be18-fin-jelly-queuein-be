@@ -11,6 +11,7 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleReader;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.jwt.RedisTokenRepository;
+import com.beyond.qiin.security.util.SecurityUtils;
 import java.time.Duration;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +77,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     public void logout(final String accessToken) {
 
         // 사용자 ID 추출
-        final Long userId = jwtTokenProvider.getUserId(accessToken);
+        final Long userId = SecurityUtils.getCurrentUserId();
 
         // Refresh Token 삭제
         redisTokenRepository.deleteRefreshToken(userId);
