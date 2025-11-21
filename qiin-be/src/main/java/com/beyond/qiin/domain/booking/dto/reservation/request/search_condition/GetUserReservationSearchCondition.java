@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.booking.dto.reservation.request;
+package com.beyond.qiin.domain.booking.dto.reservation.request.search_condition;
 
 import java.time.Instant;
 import lombok.Getter;
