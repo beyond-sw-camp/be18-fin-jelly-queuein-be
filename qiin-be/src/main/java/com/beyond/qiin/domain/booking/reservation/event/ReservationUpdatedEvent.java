@@ -1,4 +1,4 @@
-//package com.beyond.qiin.domain.booking.reservation.event;
+// package com.beyond.qiin.domain.booking.reservation.event;
 
 //
 // @Getter
