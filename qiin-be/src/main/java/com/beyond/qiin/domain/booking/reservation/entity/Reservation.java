@@ -3,9 +3,9 @@ package com.beyond.qiin.domain.booking.reservation.entity;
 import com.beyond.qiin.common.BaseEntity;
 import com.beyond.qiin.domain.booking.reservation.attendant.entity.Attendant;
 import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
-import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -108,10 +108,7 @@ public class Reservation extends BaseEntity {
         this.description = description;
 
         List<Attendant> attendants = users.stream()
-                .map(user -> Attendant.builder()
-                    .reservation(this)
-                    .user(user)
-                    .build())
+                .map(user -> Attendant.builder().reservation(this).user(user).build())
                 .toList();
 
         this.attendants.clear(); // empty list

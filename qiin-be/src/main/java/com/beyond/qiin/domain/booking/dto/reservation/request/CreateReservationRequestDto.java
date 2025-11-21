@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.booking.dto.reservation.request;
 
-
 import com.beyond.qiin.domain.booking.reservation.attendant.entity.Attendant;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import com.beyond.qiin.domain.iam.entity.User;
