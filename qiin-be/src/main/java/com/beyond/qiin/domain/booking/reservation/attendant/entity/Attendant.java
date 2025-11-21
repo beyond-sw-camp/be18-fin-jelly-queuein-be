@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 // @RedisHash("user") //redis hash 용
+
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Entity
