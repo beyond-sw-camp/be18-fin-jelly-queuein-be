@@ -1,28 +1,28 @@
-package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
+ package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
 
-import static com.beyond.qiin.domain.booking.reservation.entity.QReservation.reservation;
+ import static com.beyond.qiin.domain.booking.reservation.entity.QReservation.reservation;
 
-import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
-import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
-import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
-import com.beyond.qiin.domain.inventory.entity.QAsset;
-import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
-import com.beyond.qiin.domain.inventory.entity.QCategory;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
+ import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
+ import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
+ import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
+ import com.beyond.qiin.domain.inventory.entity.QAsset;
+ import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
+ import com.beyond.qiin.domain.inventory.entity.QCategory;
+ import com.querydsl.core.BooleanBuilder;
+ import com.querydsl.core.types.Projections;
+ import com.querydsl.jpa.impl.JPAQueryFactory;
+ import java.time.Instant;
+ import java.time.temporal.ChronoUnit;
+ import java.util.List;
+ import lombok.RequiredArgsConstructor;
+ import org.springframework.data.domain.Page;
+ import org.springframework.data.domain.PageImpl;
+ import org.springframework.data.domain.Pageable;
+ import org.springframework.stereotype.Repository;
 
-@Repository
-@RequiredArgsConstructor
-public class UserReservationsQueryAdapterImpl implements UserReservationsQueryAdapter {
+ @Repository
+ @RequiredArgsConstructor
+ public class UserReservationsQueryAdapterImpl implements UserReservationsQueryAdapter {
     private final JPAQueryFactory query;
 
     private static final QReservation reservation = QReservation.reservation;
@@ -46,8 +46,7 @@ public class UserReservationsQueryAdapterImpl implements UserReservationsQueryAd
             builder.and(reservation.startAt.between(start, end));
         }
 
-        // TODO : 이거 지금 int 이다
-        // 예약 상태 (PENDING, APPROVED, REJECTED...)
+        // 예약 상태 (int)
         if (condition.getReservationStatus() != null) {
             builder.and(reservation.status.eq(reservationStatus));
         }
@@ -137,4 +136,4 @@ public class UserReservationsQueryAdapterImpl implements UserReservationsQueryAd
 
         return new PageImpl<>(content, pageable, total);
     }
-}
+ }
