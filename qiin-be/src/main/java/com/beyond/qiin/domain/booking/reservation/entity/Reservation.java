@@ -2,6 +2,8 @@ package com.beyond.qiin.domain.booking.reservation.entity;
 
 import com.beyond.qiin.common.BaseEntity;
 import com.beyond.qiin.domain.booking.reservation.attendant.entity.Attendant;
+import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
+import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.persistence.AttributeOverride;
@@ -108,7 +110,11 @@ public class Reservation extends BaseEntity {
         this.description = description;
 
         List<Attendant> attendants = users.stream()
-                .map(user -> Attendant.builder().reservation(this).user(user).build())
+                .map(user -> {
+                    Attendant attendant = Attendant.create(user);
+                    attendant.setReservation(this);
+                    return attendant;
+                })
                 .toList();
 
         this.attendants.clear(); // empty list
@@ -157,7 +163,7 @@ public class Reservation extends BaseEntity {
 
     // 예약 승인
     public void approve(User respondent, String reason) {
-        if (this.status != 0) throw new IllegalArgumentException("only pending to approved");
+        if (this.status != 0) throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
         this.status = 1;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
@@ -165,7 +171,7 @@ public class Reservation extends BaseEntity {
 
     // 예약 거절
     public void reject(User respondent, String reason) {
-        if (this.status != 0) throw new IllegalArgumentException("only pending to rejected");
+        if (this.status != 0) throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
         this.status = 3;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
@@ -173,14 +179,14 @@ public class Reservation extends BaseEntity {
 
     // 사용 시작
     public void start() {
-        if (this.status != 1) throw new IllegalArgumentException("only approved to start");
+        if (this.status != 1) throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
         this.status = 2;
         this.actualStartAt = Instant.now();
     }
 
     // 사용 종료
     public void end() {
-        if (this.status != 2) throw new IllegalArgumentException("only started to end");
+        if (this.status != 2) throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
         this.status = 5;
         this.actualEndAt = Instant.now();
     }
