@@ -5,6 +5,7 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetRespon
 import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.RootAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.TreeAssetResponseDto;
+import com.beyond.qiin.domain.inventory.entity.Asset;
 import java.util.List;
 
 public interface AssetQueryService {
@@ -22,6 +23,8 @@ public interface AssetQueryService {
     TreeAssetResponseDto getAssetTree(final Long assetId);
 
     List<TreeAssetResponseDto> getFullAssetTree();
+
+    Asset getAssetById(final Long assetId);
 
     String assetStatusToString(final Integer status);
 
