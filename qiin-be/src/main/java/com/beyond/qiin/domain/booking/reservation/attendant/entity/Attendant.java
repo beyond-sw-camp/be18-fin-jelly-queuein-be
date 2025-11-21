@@ -26,11 +26,10 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(
-        name = "reservation",
+        name = "attendant",
         indexes = {
-            @Index(name = "idx_reservation_applicant_id", columnList = "applicant_id"),
-            @Index(name = "idx_reservation_respondent_id", columnList = "respondent_id"),
-            @Index(name = "idx_reservation_asset_id", columnList = "asset_id")
+            @Index(name = "idx_attendant_reservation_id", columnList = "reservation_id"),
+            @Index(name = "idx_attendant_user_id", columnList = "user_id")
         })
 @AttributeOverride(name = "id", column = @Column(name = "reservation_id"))
 @SQLRestriction("deleted_at is null")
