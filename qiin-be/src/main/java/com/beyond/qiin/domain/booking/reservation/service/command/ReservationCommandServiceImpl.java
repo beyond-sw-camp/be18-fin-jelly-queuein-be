@@ -15,12 +15,13 @@ import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
+
 @Service
 @RequiredArgsConstructor
 public class ReservationCommandServiceImpl implements ReservationCommandService {
@@ -44,9 +45,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
 
-        List<Attendant> attendants = attendantUsers.stream()
-            .map(Attendant::create)
-            .collect(Collectors.toCollection(ArrayList::new));
+        List<Attendant> attendants =
+                attendantUsers.stream().map(Attendant::create).collect(Collectors.toCollection(ArrayList::new));
 
         // 자원 자체가 지금 사용 가능한가에 대한 확인
         assetCommandService.isAvailable(assetId);
@@ -81,9 +81,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         assetCommandService.isAvailable(assetId);
 
         // 선착순 자원은 자동 승인
-        List<Attendant> attendants = attendantUsers.stream()
-            .map(Attendant::create)
-            .collect(Collectors.toCollection(ArrayList::new));
+        List<Attendant> attendants =
+                attendantUsers.stream().map(Attendant::create).collect(Collectors.toCollection(ArrayList::new));
 
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, attendants, 1);
 
@@ -167,9 +166,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     // 사용 시간 30분 전인 경우 허용
     @Override
     @Transactional
-    public ReservationResponseDto cancelReservation(
-        final Long userId,
-        final Long reservationId) {
+    public ReservationResponseDto cancelReservation(final Long userId, final Long reservationId) {
 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
