@@ -11,7 +11,6 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleReader;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.jwt.RedisTokenRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
@@ -74,16 +73,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
     @Override
     @Transactional
-    public void logout(HttpServletRequest request) {
-
-        // Access Token 추출
-        String accessToken = jwtTokenProvider.resolveAccessToken(request);
-        log.info("[로그아웃] resolveAccessToken() result = {}", accessToken);
-
-        if (accessToken == null) {
-            log.warn("[로그아웃] 액세스 토큰이 NULL → 401 던짐");
-            throw AuthException.unauthorized();
-        }
+    public void logout(final String accessToken) {
 
         // 사용자 ID 추출
         final Long userId = jwtTokenProvider.getUserId(accessToken);
