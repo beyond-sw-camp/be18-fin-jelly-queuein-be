@@ -146,10 +146,38 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
     @Override
     public String assetTypeToString(final Integer type) {
-        if (type == 1) {
+        if (type == 0) {
             return "STATIC";
         } else {
             return "DYNAMIC";
+        }
+    }
+
+    @Override
+    public int assetStatusToInt(final String status) {
+
+        switch (status.toUpperCase()) {
+            case "AVAILABLE":
+                return 0;
+            case "UNAVAILABLE":
+                return 1;
+            case "MAINTENANCE":
+                return 2;
+            default:
+                return -1;
+        }
+    }
+
+    @Override
+    public int assetTypeToInt(final String type) {
+
+        switch (type.toUpperCase()) {
+            case "STATIC":
+                return 0;
+            case "DYNAMIC":
+                return 1;
+            default:
+                return -1;
         }
     }
 }
