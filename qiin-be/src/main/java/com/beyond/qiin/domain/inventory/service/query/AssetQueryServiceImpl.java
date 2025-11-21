@@ -180,5 +180,4 @@ public class AssetQueryServiceImpl implements AssetQueryService {
                 return -1;
         }
     }
-
 }
