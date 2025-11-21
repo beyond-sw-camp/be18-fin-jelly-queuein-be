@@ -1,9 +1,9 @@
 package com.beyond.qiin.domain.booking.reservation.service.query;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.request.GetAppliedReservationSearchCondition;
-import com.beyond.qiin.domain.booking.dto.reservation.request.GetUserReservationSearchCondition;
-import com.beyond.qiin.domain.booking.dto.reservation.request.ReservableAssetSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;

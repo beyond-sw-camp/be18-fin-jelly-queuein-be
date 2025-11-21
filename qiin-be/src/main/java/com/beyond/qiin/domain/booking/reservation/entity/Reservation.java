@@ -72,7 +72,6 @@ public class Reservation extends BaseEntity {
 
     // 참여자들
     @OneToMany(mappedBy = "reservation")
-    @Builder.Default
     private List<Attendant> attendants = new ArrayList<>();
 
     @Column(name = "start_at", nullable = false)
