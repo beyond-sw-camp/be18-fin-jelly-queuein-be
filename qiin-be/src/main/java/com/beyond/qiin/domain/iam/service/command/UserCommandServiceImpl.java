@@ -92,7 +92,6 @@ public class UserCommandServiceImpl implements UserCommandService {
     public void changePassword(final Long userId, final ChangePwRequestDto request) {
 
         final User user = userReader.findById(userId);
-        System.out.println("passwordExpired = " + user.getPasswordExpired());
 
         // 기존 비밀번호 검증
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
