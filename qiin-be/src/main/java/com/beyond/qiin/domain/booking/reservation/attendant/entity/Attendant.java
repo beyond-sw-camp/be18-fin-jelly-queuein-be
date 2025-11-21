@@ -68,10 +68,6 @@ public class Attendant extends BaseEntity {
     }
 
     public static Attendant create(User user) {
-        return Attendant.builder()
-            .user(user)
-            .userId(user.getId())
-            .build();
+        return Attendant.builder().user(user).userId(user.getId()).build();
     }
-
 }

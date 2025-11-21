@@ -212,10 +212,11 @@ public class ReservationController {
     @GetMapping("/monthly")
     public ResponseEntity<MonthReservationListResponseDto> getMonthlyReservations(
             @AuthenticationPrincipal CustomUserDetails user,
-            @RequestParam LocalDate month) {
+            @RequestParam Instant from,
+            @RequestParam Instant to) {
         MonthReservationListResponseDto monthReservationListResponseDto =
                 reservationQueryService.getMonthlyReservations(
-                    user.getUserId(), month);
+                    user.getUserId(), from, to);
         return ResponseEntity.ok(monthReservationListResponseDto);
     }
 
@@ -224,9 +225,10 @@ public class ReservationController {
     @GetMapping("/weekly")
     public ResponseEntity<WeekReservationListResponseDto> getWeeklyReservations(
             @AuthenticationPrincipal CustomUserDetails user,
-            @RequestParam LocalDate date) {
+            @RequestParam Instant start,
+            @RequestParam Instant end) {
         WeekReservationListResponseDto weekReservationListResponseDto =
-                reservationQueryService.getWeeklyReservations(user.getUserId(), date);
+                reservationQueryService.getWeeklyReservations(user.getUserId(), start, end);
         return ResponseEntity.ok(weekReservationListResponseDto);
     }
 

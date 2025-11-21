@@ -30,10 +30,10 @@ public interface ReservationQueryService {
     AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId, final LocalDate date);
 
     WeekReservationListResponseDto getWeeklyReservations(
-        final Long userId, final LocalDate date);
+        final Long userId, Instant start, Instant end);
 
     MonthReservationListResponseDto getMonthlyReservations(
-        final Long userId, final LocalDate month);
+        final Long userId, final Instant from, final Instant to);
 
     PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
             final Long userId, final LocalDate date, Pageable pageable);
@@ -42,11 +42,9 @@ public interface ReservationQueryService {
 
     List<Reservation> getReservationsByAssetAndDate(final Long userId, final Long assetId, final LocalDate date);
 
-    List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final LocalDate month);
+    List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final Instant start, final Instant end);
 
-    List<Reservation> getReservationsByUserAndWeek(final Long userId, final LocalDate date);
-
-    List<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageabl);
+    List<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageable);
 
     List<Reservation> getReservationsByAssetId(final Long assetId);
 }

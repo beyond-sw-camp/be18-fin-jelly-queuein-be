@@ -14,10 +14,10 @@ public class AttendantResponseDto {
     private final Long attendantId;
     private final String attendantName;
 
-    public static AttendantResponseDto fromEntity(Attendant attendant){
+    public static AttendantResponseDto fromEntity(Attendant attendant) {
         return AttendantResponseDto.builder()
-            .attendantId(attendant.getId())
-            .attendantName(attendant.getUser().getUserName())
-            .build();
+                .attendantId(attendant.getId())
+                .attendantName(attendant.getUser().getUserName())
+                .build();
     }
 }
