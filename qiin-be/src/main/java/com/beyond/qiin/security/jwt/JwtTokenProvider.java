@@ -35,10 +35,6 @@ public class JwtTokenProvider {
         log.info("JWT SecretKey 초기화 완료");
     }
 
-    // -------------------------------------------------------------
-    // Token 생성
-    // -------------------------------------------------------------
-
     /** Access Token 생성 */
     public String generateAccessToken(final Long userId, final String role) {
         return generateToken(userId, role, accessTokenExpiration, "ACCESS");
@@ -64,10 +60,6 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
-
-    // -------------------------------------------------------------
-    //  Token 검증
-    // -------------------------------------------------------------
 
     // Access Token 검증
     public boolean validateAccessToken(final String token) {
@@ -102,10 +94,6 @@ public class JwtTokenProvider {
         }
         return false;
     }
-
-    // -------------------------------------------------------------
-    // Token Claims 조회
-    // -------------------------------------------------------------
 
     // 토큰에서 사용자 ID 추출
     public Long getUserId(final String token) {

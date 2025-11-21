@@ -78,7 +78,10 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
         // Access Token 추출
         String accessToken = jwtTokenProvider.resolveAccessToken(request);
+        log.info("[로그아웃] resolveAccessToken() result = {}", accessToken);
+
         if (accessToken == null) {
+            log.warn("[로그아웃] 액세스 토큰이 NULL → 401 던짐");
             throw AuthException.unauthorized();
         }
 
