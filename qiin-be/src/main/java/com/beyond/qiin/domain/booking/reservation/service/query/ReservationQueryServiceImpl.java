@@ -70,7 +70,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
                 reservation,
                 statusToString(reservation.getStatus()),
                 assetQueryService.assetStatusToString(reservation.getAsset().getStatus()),
-                assetQueryService.assetTypeToString(reservation.getAsset().getType())));
+                assetQueryService.assetTypeToString(reservation.getAsset().getType()))
+        );
 
         return PageResponseDto.from(dtoPage);
 
@@ -91,8 +92,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         //        return reservationListResponseDto;
     }
 
-    // 예약 가능 자원 목록 조회, 날짜 기준의 조회
-    // TODO : querydsl 적용할지 -> 사용 함수도 조정해야할지도
+    //TODO : 목록 조회 - querydsl 대상
+    // 예약 가능 자원 목록 조회
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
@@ -192,7 +193,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         List<WeekReservationResponseDto> reservationList = new ArrayList<>();
 
         // TODO: 메서드화
-        List<Reservation> reservations = reservationJpaRepository.findByUserIdAndWeek(userId, start, end);
+        List<Reservation> reservations = getReservationsByUserAndWeek(userId, start, end);
 
         for (Reservation reservation : reservations) {
             WeekReservationResponseDto reservationResponseDto = WeekReservationResponseDto.fromEntity(reservation);
@@ -237,6 +238,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         userReader.findById(userId);
 
         // TODO : assetId 유효검증
+        Asset asset = assetCommandService.getAssetById(assetId);
 
         List<Reservation> reservations = getReservationsByAssetAndDate(assetId, date);
 

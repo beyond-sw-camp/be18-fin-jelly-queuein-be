@@ -40,6 +40,8 @@ public interface ReservationQueryService {
 
     List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final Instant start, final Instant end);
 
+    List<Reservation> getReservationsByUserAndWeek(final Long userId, final Instant start, final Instant end);
+
     List<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageable);
 
     List<Reservation> getReservationsByAssetId(final Long assetId);

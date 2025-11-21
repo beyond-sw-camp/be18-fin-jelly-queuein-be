@@ -41,7 +41,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         // 참여자 전원 있는지에 대한 확인
         userReader.validateAllExist(createReservationRequestDto.getAttendantIds());
 
-        List<User> attendantUsers = userReader.findAllByIds(attendantIds);
+        List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
 
         List<Attendant> attendants =
                 attendantUsers.stream().map(Attendant::create).toList();
@@ -69,15 +69,14 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
         userReader.validateAllExist(createReservationRequestDto.getAttendantIds());
 
-        List<User> attendantUsers = userReader.findAllByIds(attendantIds);
+        List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
 
         // 해당 시간에 사용 가능한 자원인지 확인
         validateReservationAvailability(
                 asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
 
         // 자원 자체가 지금 사용 가능한가에 대한 확인
-        if ((asset.getStatus() == 1) || (asset.getStatus() == 2))
-            throw new IllegalArgumentException("asset not available");
+        assetCommandService.isAvailable(assetId);
 
         // 선착순 자원은 자동 승인
         List<Attendant> attendants =
@@ -200,9 +199,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         List<User> attendantUsers = userReader.findAllByIds(userIds);
 
-        List<Attendant> attendants =
-                attendantUsers.stream().map(Attendant::create).toList();
-
+        //attendants는 reservation 안에서 생성
         reservation.update(updateReservationRequestDto.getDescription(), attendantUsers);
 
         reservationJpaRepository.save(reservation);
