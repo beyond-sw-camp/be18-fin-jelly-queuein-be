@@ -64,15 +64,13 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         Page<Reservation> page = getReservationsByUserAndDate(userId, date, pageable);
 
-        //TODO : status 둘다 query service에 추가
+        // TODO : status 둘다 query service에 추가
 
-        Page<GetUserReservationResponseDto> dtoPage = page.map(reservation ->
-                GetUserReservationResponseDto.fromEntity(
-                    reservation,
-                    statusToString(reservation.getStatus()),
-                    assetQueryService.assetStatusToString(reservation.getAsset().getStatus()),
-                    assetQueryService.assetTypeToString(reservation.getAsset().getType())
-                    ));
+        Page<GetUserReservationResponseDto> dtoPage = page.map(reservation -> GetUserReservationResponseDto.fromEntity(
+                reservation,
+                statusToString(reservation.getStatus()),
+                assetQueryService.assetStatusToString(reservation.getAsset().getStatus()),
+                assetQueryService.assetTypeToString(reservation.getAsset().getType())));
 
         return PageResponseDto.from(dtoPage);
 
@@ -193,7 +191,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         // 비어있을 수 있음
         List<WeekReservationResponseDto> reservationList = new ArrayList<>();
 
-        //TODO: 메서드화
+        // TODO: 메서드화
         List<Reservation> reservations = reservationJpaRepository.findByUserIdAndWeek(userId, start, end);
 
         for (Reservation reservation : reservations) {
@@ -238,7 +236,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         userReader.findById(userId);
 
-        //TODO : assetId 유효검증
+        // TODO : assetId 유효검증
 
         List<Reservation> reservations = getReservationsByAssetAndDate(assetId, date);
 
