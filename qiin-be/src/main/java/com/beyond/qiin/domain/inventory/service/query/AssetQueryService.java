@@ -29,4 +29,8 @@ public interface AssetQueryService {
     String assetStatusToString(final Integer status);
 
     String assetTypeToString(final Integer type);
+
+    int assetStatusToInt(final String status);
+
+    int assetTypeToInt(final String type);
 }
