@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED) //실행해보고 없도 되면 생략
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 실행해보고 없도 되면 생략
 public class UsageHistorySearchRequest {
 
     private Instant startDate; // 조회 시작 날짜
