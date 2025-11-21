@@ -1,6 +1,9 @@
 package com.beyond.qiin.domain.booking.reservation.service.query;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.GetAppliedReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.GetUserReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.ReservableAssetSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
@@ -20,10 +23,10 @@ public interface ReservationQueryService {
     ReservationDetailResponseDto getReservation(final Long userId, final Long reservationId);
 
     PageResponseDto<GetUserReservationResponseDto> getReservationsByUserId(
-            final Long userId, final LocalDate date, final Pageable pageable);
+        final Long userId, final GetUserReservationSearchCondition condition, final Pageable pageable);
 
     PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
-            final Long userId, final LocalDate date, Pageable pageable);
+        final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable);
 
     AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId, final LocalDate date);
 
@@ -32,17 +35,19 @@ public interface ReservationQueryService {
     MonthReservationListResponseDto getMonthlyReservations(final Long userId, final Instant from, final Instant to);
 
     PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
-            final Long userId, final LocalDate date, Pageable pageable);
-
-    List<Reservation> getReservationsByUserAndDate(final Long userId, final LocalDate date, final Pageable pageable);
-
-    List<Reservation> getReservationsByAssetAndDate(final Long userId, final Long assetId, final LocalDate date);
+        final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable);
 
     List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final Instant start, final Instant end);
 
     List<Reservation> getReservationsByUserAndWeek(final Long userId, final Instant start, final Instant end);
 
-    List<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageable);
-
     List<Reservation> getReservationsByAssetId(final Long assetId);
+
+    List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date);
+
+//    List<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageable);
+//
+//    List<Reservation> getReservationsByUserAndDate(final Long userId, final LocalDate date, final Pageable pageable);
+
+
 }
