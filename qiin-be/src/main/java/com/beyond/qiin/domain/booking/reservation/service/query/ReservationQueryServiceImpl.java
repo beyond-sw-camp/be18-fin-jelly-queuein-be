@@ -1,51 +1,48 @@
- package com.beyond.qiin.domain.booking.reservation.service.query;
+package com.beyond.qiin.domain.booking.reservation.service.query;
 
- import com.beyond.qiin.common.dto.PageResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.TimeSlotDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationResponseDto;
- import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
- import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
- import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
- import com.beyond.qiin.domain.booking.reservation.repository.ReservationJpaRepository;
- import com.beyond.qiin.domain.booking.reservation.repository.querydsl.AppliedReservationsQueryAdapter;
- import com.beyond.qiin.domain.booking.reservation.repository.querydsl.ReservableAssetsQueryAdapter;
- import com.beyond.qiin.domain.booking.reservation.repository.querydsl.UserReservationsQueryAdapter;
- import com.beyond.qiin.domain.booking.reservation.repository.querydsl.UserReservationsQueryAdapterImpl;
- import com.beyond.qiin.domain.booking.reservation.util.AvailableTimeSlotCalculator;
- import com.beyond.qiin.domain.booking.reservation.vo.DateRange;
- import com.beyond.qiin.domain.booking.reservation.vo.TimeSlot;
- import com.beyond.qiin.domain.iam.support.user.UserReader;
- import com.beyond.qiin.domain.inventory.entity.Asset;
- import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
- import com.beyond.qiin.domain.inventory.service.query.AssetQueryServiceImpl;
- import java.time.Instant;
- import java.time.LocalDate;
- import java.time.YearMonth;
- import java.time.ZoneId;
- import java.util.ArrayList;
- import java.util.Comparator;
- import java.util.List;
- import lombok.RequiredArgsConstructor;
- import org.springframework.data.domain.Page;
- import org.springframework.data.domain.Pageable;
- import org.springframework.stereotype.Service;
- import org.springframework.transaction.annotation.Transactional;
+import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.TimeSlotDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationResponseDto;
+import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
+import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
+import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
+import com.beyond.qiin.domain.booking.reservation.repository.ReservationJpaRepository;
+import com.beyond.qiin.domain.booking.reservation.repository.querydsl.AppliedReservationsQueryAdapter;
+import com.beyond.qiin.domain.booking.reservation.repository.querydsl.ReservableAssetsQueryAdapter;
+import com.beyond.qiin.domain.booking.reservation.repository.querydsl.UserReservationsQueryAdapter;
+import com.beyond.qiin.domain.booking.reservation.util.AvailableTimeSlotCalculator;
+import com.beyond.qiin.domain.booking.reservation.vo.DateRange;
+import com.beyond.qiin.domain.booking.reservation.vo.TimeSlot;
+import com.beyond.qiin.domain.iam.support.user.UserReader;
+import com.beyond.qiin.domain.inventory.entity.Asset;
+import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
- @Service
- @RequiredArgsConstructor
- public class ReservationQueryServiceImpl implements ReservationQueryService {
+@Service
+@RequiredArgsConstructor
+public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final ReservationJpaRepository reservationJpaRepository;
     private final UserReader userReader;
     private final AssetQueryService assetQueryService;
@@ -78,7 +75,7 @@
         int reservationStatus = statusToInt(condition.getReservationStatus());
 
         Page<GetUserReservationResponseDto> page =
-            userReservationsQueryAdapter.search(userId, condition, reservationStatus, pageable);
+                userReservationsQueryAdapter.search(userId, condition, reservationStatus, pageable);
 
         return PageResponseDto.from(page);
 
@@ -109,13 +106,12 @@
         userReader.findById(userId);
 
         Page<ReservableAssetResponseDto> page = reservableAssetsQueryAdapter.search(
-            condition,
-            assetQueryService.assetTypeToInt(condition.getAssetType()),
-            assetQueryService.assetStatusToInt(condition.getAssetStatus()),
-            pageable);
+                condition,
+                assetQueryService.assetTypeToInt(condition.getAssetType()),
+                assetQueryService.assetStatusToInt(condition.getAssetStatus()),
+                pageable);
 
         return PageResponseDto.from(page);
-
 
         //        // 사용 가능 상태의 자원들을 가져옴 - 빌 수 있음
         //        List<Asset> assets = assetRepository.findAvailableAssets();
@@ -154,12 +150,11 @@
             final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
         userReader.findById(userId);
 
-
         Page<GetAppliedReservationResponseDto> page = appliedReservationsQueryAdapter.search(
-            condition,
-            assetQueryService.assetTypeToInt(condition.getAssetType()),
-            assetQueryService.assetStatusToInt(condition.getAssetStatus()),
-            pageable);
+                condition,
+                assetQueryService.assetTypeToInt(condition.getAssetType()),
+                assetQueryService.assetStatusToInt(condition.getAssetStatus()),
+                pageable);
 
         return PageResponseDto.from(page);
 
@@ -256,8 +251,8 @@
     @Transactional(readOnly = true)
     public Reservation getReservationById(Long id) {
         Reservation reservation = reservationJpaRepository
-            .findById(id)
-            .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+                .findById(id)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
         return reservation;
     }
 
@@ -295,8 +290,7 @@
 
     @Override
     @Transactional(readOnly = true)
-    public List<Reservation> getReservationsByAssetAndDate(
-            final Long assetId, final LocalDate date) {
+    public List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date) {
 
         // assetId 유효한지 확인
         Asset asset = assetQueryService.getAssetById(assetId);
@@ -324,24 +318,21 @@
         }
     }
 
-   public static Integer statusToInt(final String status) {
-     if (status == null) return null;
+    public static Integer statusToInt(final String status) {
+        if (status == null) return null;
 
-     return switch (status.toUpperCase()) {
-       case "PENDING"   -> 0;
-       case "APPROVED"  -> 1;
-       case "USING"     -> 2;
-       case "REJECTED"  -> 3;
-       case "CANCELED"  -> 4;
-       case "COMPLETED" -> 5;
-       default -> null;
-     };
-   }
+        return switch (status.toUpperCase()) {
+            case "PENDING" -> 0;
+            case "APPROVED" -> 1;
+            case "USING" -> 2;
+            case "REJECTED" -> 3;
+            case "CANCELED" -> 4;
+            case "COMPLETED" -> 5;
+            default -> null;
+        };
+    }
 
-
-
-
-   public DateRange dayToInstant(final String timezone, final LocalDate date) {
+    public DateRange dayToInstant(final String timezone, final LocalDate date) {
         ZoneId zone = ZoneId.of(timezone); // Asia/Seoul
         Instant startOfDay = date.atStartOfDay().atZone(zone).toInstant();
         Instant endOfDay = date.plusDays(1).atStartOfDay(zone).toInstant();
@@ -398,35 +389,34 @@
         return false;
     }
 
-
-//    // TODO : querydsl 시 x
-//    @Override
-//    @Transactional(readOnly = true)
-//    public Page<Reservation> getReservationsByUserAndDate(
-//            final Long userId, final LocalDate date, final Pageable pageable) {
-//
-//        userReader.findById(userId);
-//
-//        DateRange dateRange = dayToInstant("Asia/Seoul", date);
-//
-//        //        List<Reservation> reservations =
-//        //                reservationJpaRepository.findByUserIdAndDate(userId, dateRange.getStartDay(), getEndDay());
-//        //        return reservations;
-//
-//        return reservationJpaRepository.findByUserIdAndDate(
-//                userId, dateRange.getStartDay(), dateRange.getEndDay(), pageable);
-//    }
-
-
+    //    // TODO : querydsl 시 x
+    //    @Override
+    //    @Transactional(readOnly = true)
+    //    public Page<Reservation> getReservationsByUserAndDate(
+    //            final Long userId, final LocalDate date, final Pageable pageable) {
+    //
+    //        userReader.findById(userId);
+    //
+    //        DateRange dateRange = dayToInstant("Asia/Seoul", date);
+    //
+    //        //        List<Reservation> reservations =
+    //        //                reservationJpaRepository.findByUserIdAndDate(userId, dateRange.getStartDay(),
+    // getEndDay());
+    //        //        return reservations;
+    //
+    //        return reservationJpaRepository.findByUserIdAndDate(
+    //                userId, dateRange.getStartDay(), dateRange.getEndDay(), pageable);
+    //    }
 
     //    // TODO : querydsl 시 x
-//    @Override
-//    @Transactional(readOnly = true)
-//    public Page<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageable) {
-//        userReader.findById(userId);
-//        DateRange dateRange = dayToInstant("Asia/Seoul", date);
-//
-//        return reservationJpaRepository.findAllWithStatusPendingAndDate(
-//                dateRange.getStartDay(), dateRange.getEndDay(), pageable);
-//    }
- }
+    //    @Override
+    //    @Transactional(readOnly = true)
+    //    public Page<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable
+    // pageable) {
+    //        userReader.findById(userId);
+    //        DateRange dateRange = dayToInstant("Asia/Seoul", date);
+    //
+    //        return reservationJpaRepository.findAllWithStatusPendingAndDate(
+    //                dateRange.getStartDay(), dateRange.getEndDay(), pageable);
+    //    }
+}

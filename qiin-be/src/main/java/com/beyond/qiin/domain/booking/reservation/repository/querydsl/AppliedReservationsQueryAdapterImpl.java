@@ -1,30 +1,30 @@
- package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
+package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
 
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
- import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
- import com.beyond.qiin.domain.iam.entity.QUser;
- import com.beyond.qiin.domain.inventory.entity.QAsset;
- import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
- import com.beyond.qiin.domain.inventory.entity.QCategory;
- import com.querydsl.core.BooleanBuilder;
- import com.querydsl.core.types.Projections;
- import com.querydsl.core.types.dsl.BooleanExpression;
- import com.querydsl.jpa.impl.JPAQueryFactory;
- import java.time.Instant;
- import java.time.LocalDate;
- import java.time.ZoneId;
- import java.time.temporal.ChronoUnit;
- import java.util.List;
- import lombok.RequiredArgsConstructor;
- import org.springframework.data.domain.Page;
- import org.springframework.data.domain.PageImpl;
- import org.springframework.data.domain.Pageable;
- import org.springframework.stereotype.Repository;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
+import com.beyond.qiin.domain.iam.entity.QUser;
+import com.beyond.qiin.domain.inventory.entity.QAsset;
+import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
+import com.beyond.qiin.domain.inventory.entity.QCategory;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
- @Repository
- @RequiredArgsConstructor
- public class AppliedReservationsQueryAdapterImpl implements AppliedReservationsQueryAdapter {
+@Repository
+@RequiredArgsConstructor
+public class AppliedReservationsQueryAdapterImpl implements AppliedReservationsQueryAdapter {
 
     private final JPAQueryFactory query;
 
@@ -38,10 +38,7 @@
     // TODO : dto 에 대해 string status 따로 service에서 추가해줘야함
     @Override
     public Page<GetAppliedReservationResponseDto> search(
-            GetAppliedReservationSearchCondition condition,
-        int assetType,
-        int assetStatus,
-        Pageable pageable) {
+            GetAppliedReservationSearchCondition condition, int assetType, int assetStatus, Pageable pageable) {
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(reservation.status.eq(0)); // pending인 경우 == 신청된 reservations
@@ -101,7 +98,7 @@
             builder.and(category.name.eq(condition.getCategoryName()));
         }
 
-        //자원 상태(int)
+        // 자원 상태(int)
         if (condition.getAssetStatus() != null) {
             try {
                 builder.and(asset.status.eq(assetStatus));
@@ -124,7 +121,7 @@
                     .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
         }
 
-        //조회
+        // 조회
         List<GetAppliedReservationResponseDto> content = query.select(Projections.constructor(
                         GetAppliedReservationResponseDto.class,
                         reservation.id,
@@ -176,4 +173,4 @@
 
         return new PageImpl<>(content, pageable, total);
     }
- }
+}
