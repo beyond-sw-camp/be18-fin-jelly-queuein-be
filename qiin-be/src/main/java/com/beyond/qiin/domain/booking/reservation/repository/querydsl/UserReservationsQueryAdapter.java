@@ -8,8 +8,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface UserReservationsQueryAdapter {
     Page<GetUserReservationResponseDto> search(
-            Long userId, ReservableAssetSearchCondition condition, Pageable pageable);
-
-    Page<GetUserReservationResponseDto> search(
             Long userId, GetUserReservationSearchCondition condition, Pageable pageable);
+
 }
