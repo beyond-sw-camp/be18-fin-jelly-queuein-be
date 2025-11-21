@@ -2,7 +2,7 @@ package com.beyond.qiin.security.jwt;
 
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.repository.UserJpaRepository;
-import com.beyond.qiin.security.CustomUserDetails;
+import com.beyond.qiin.security.model.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

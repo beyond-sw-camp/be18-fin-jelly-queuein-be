@@ -10,7 +10,7 @@ import com.beyond.qiin.domain.iam.support.userrole.UserRoleReader;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
 import com.beyond.qiin.internal.master.dto.request.RegisterMasterRequestDto;
 import com.beyond.qiin.internal.master.dto.response.RegisterMasterResponseDto;
-import com.beyond.qiin.security.PasswordGenerator;
+import com.beyond.qiin.security.util.PasswordGenerator;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;

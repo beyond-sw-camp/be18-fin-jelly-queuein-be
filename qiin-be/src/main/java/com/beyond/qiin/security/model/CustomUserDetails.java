@@ -1,4 +1,4 @@
-package com.beyond.qiin.security;
+package com.beyond.qiin.security.model;
 
 import java.util.Collection;
 import lombok.Getter;

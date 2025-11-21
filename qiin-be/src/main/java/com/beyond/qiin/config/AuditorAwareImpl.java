@@ -1,6 +1,6 @@
 package com.beyond.qiin.config;
 
-import com.beyond.qiin.security.SecurityUtils;
+import com.beyond.qiin.security.util.SecurityUtils;
 import java.util.Optional;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.lang.NonNull;

@@ -9,7 +9,7 @@ import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.ListUserResponseDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
-import com.beyond.qiin.security.SecurityUtils;
+import com.beyond.qiin.security.util.SecurityUtils;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

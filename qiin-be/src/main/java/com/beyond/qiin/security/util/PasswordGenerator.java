@@ -1,4 +1,4 @@
-package com.beyond.qiin.security;
+package com.beyond.qiin.security.util;
 
 import java.security.SecureRandom;
 
