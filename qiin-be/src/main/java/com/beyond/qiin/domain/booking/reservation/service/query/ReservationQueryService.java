@@ -23,10 +23,10 @@ public interface ReservationQueryService {
     ReservationDetailResponseDto getReservation(final Long userId, final Long reservationId);
 
     PageResponseDto<GetUserReservationResponseDto> getReservationsByUserId(
-        final Long userId, final GetUserReservationSearchCondition condition, final Pageable pageable);
+            final Long userId, final GetUserReservationSearchCondition condition, final Pageable pageable);
 
     PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
-        final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable);
+            final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable);
 
     AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId, final LocalDate date);
 
@@ -35,7 +35,7 @@ public interface ReservationQueryService {
     MonthReservationListResponseDto getMonthlyReservations(final Long userId, final Instant from, final Instant to);
 
     PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
-        final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable);
+            final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable);
 
     List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final Instant start, final Instant end);
 
@@ -45,9 +45,9 @@ public interface ReservationQueryService {
 
     List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date);
 
-//    List<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageable);
-//
-//    List<Reservation> getReservationsByUserAndDate(final Long userId, final LocalDate date, final Pageable pageable);
-
+    //    List<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageable);
+    //
+    //    List<Reservation> getReservationsByUserAndDate(final Long userId, final LocalDate date, final Pageable
+    // pageable);
 
 }
