@@ -52,6 +52,8 @@ public class ReservationDetailResponseDto {
 
     private final Long version;
 
+    private final boolean isApproved;
+
     // 참여자들 - 해당 리스트에는 추가적인 역할이 없기 때문에 AttendantListResponseDto로 분리 x
     // 큰 차이 없으나 attendant(entity)가 종속되지 않도록 dto로 추가
     @Builder.Default
@@ -61,10 +63,8 @@ public class ReservationDetailResponseDto {
             final Reservation reservation, final String reservationStatus) {
         ReservationDetailResponseDto reservationDetailResponseDto = ReservationDetailResponseDto.builder()
                 .reservationId(reservation.getId())
-                .applicantName(reservation.getApplicant().getUsername())
-                .assetType(reservation.getAsset().getType())
+                .applicantName(reservation.getApplicant().getUserName())
                 .assetName(reservation.getAsset().getName())
-                .categoryName(reservation.getAsset().getCategory())
                 .startAt(reservation.getStartAt())
                 .endAt(reservation.getEndAt())
                 .actualStartAt(reservation.getActualStartAt())
@@ -74,11 +74,8 @@ public class ReservationDetailResponseDto {
                 .version(reservation.getVersion())
                 .isApproved(reservation.isApproved())
                 .attendants( // new ArrayList<>() 이므로 null 처리 생략
-                        // TODO: 참여자들
                         reservation.getAttendants().stream()
-                                .map(attendant -> new AttendantResponseDto(
-                                        attendant.getUser().getId(),
-                                        attendant.getUser().getUsername()))
+                                .map(attendant -> AttendantResponseDto.fromEntity(attendant))
                                 .toList())
                 .date(reservation.getStartAt().atZone(ZoneId.of("Asia/Seoul")).toLocalDate())
                 .status(reservationStatus)
