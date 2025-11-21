@@ -123,4 +123,24 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
         return TreeAssetResponseDto.of(asset.getId(), asset.getName(), children);
     }
+
+    @Override
+    public String assetStatusToString(final Integer status) {
+        if (status == 0) {
+            return "AVAILABLE";
+        } else if (status == 1) {
+            return "UNAVAILABLE";
+        } else {
+            return "MAINTENANCE";
+        }
+    }
+
+    @Override
+    public String assetTypeToString(final Integer type) {
+        if (type == 1) {
+            return "STATIC";
+        } else {
+            return "DYNAMIC";
+        }
+    }
 }
