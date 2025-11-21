@@ -8,15 +8,15 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ListUserResponseDto {
+public class UserResponseDto {
 
     private final Long userId;
     private final String userName;
     private final String email;
     private final Boolean passwordExpired;
 
-    public static ListUserResponseDto fromEntity(final User user) {
-        return ListUserResponseDto.builder()
+    public static UserResponseDto fromEntity(final User user) {
+        return UserResponseDto.builder()
                 .userId(user.getId())
                 .userName(user.getUserName())
                 .email(user.getEmail())

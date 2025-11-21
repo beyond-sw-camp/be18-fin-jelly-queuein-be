@@ -6,7 +6,7 @@ import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
-import com.beyond.qiin.domain.iam.dto.user.response.ListUserResponseDto;
+import com.beyond.qiin.domain.iam.dto.user.response.UserResponseDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
 import com.beyond.qiin.security.util.SecurityUtils;
@@ -42,7 +42,7 @@ public class UserController {
     // 사용자 목록 조회 (MASTER, ADMIN, MANAGER)
     @GetMapping
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
-    public List<ListUserResponseDto> getUsers() {
+    public List<UserResponseDto> getUsers() {
         return userQueryService.getUsers();
     }
 

@@ -1,7 +1,7 @@
 package com.beyond.qiin.domain.iam.service.query;
 
 import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
-import com.beyond.qiin.domain.iam.dto.user.response.ListUserResponseDto;
+import com.beyond.qiin.domain.iam.dto.user.response.UserResponseDto;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.repository.UserJpaRepository;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
@@ -19,9 +19,9 @@ public class UserQueryServiceImpl implements UserQueryService {
     // 사용자 전체 조회
     @Override
     @Transactional(readOnly = true)
-    public List<ListUserResponseDto> getUsers() {
+    public List<UserResponseDto> getUsers() {
         return userJpaRepository.findAll().stream()
-                .map(ListUserResponseDto::fromEntity)
+                .map(UserResponseDto::fromEntity)
                 .toList();
     }
 
