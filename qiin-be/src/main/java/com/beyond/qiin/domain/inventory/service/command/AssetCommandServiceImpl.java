@@ -194,18 +194,21 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     //// 일반 메소드들 모음
 
     // 이름으로 자원 가져오기
+    @Transactional(readOnly = true)
     public Asset getAssetByName(final String assetName) {
         return assetJpaRepository.findByName(assetName).orElseThrow(AssetException::notFound);
     }
 
     // id로 자원 가져오기
     @Override
+    @Transactional(readOnly = true)
     public Asset getAssetById(final Long assetId) {
         return assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
     }
 
     // 자원 사용 가능 여부
     @Override
+    @Transactional(readOnly = true)
     public boolean isAvailable(final Long assetId) {
         Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
         if (asset.getStatus() == 1 || asset.getStatus() == 2) {
