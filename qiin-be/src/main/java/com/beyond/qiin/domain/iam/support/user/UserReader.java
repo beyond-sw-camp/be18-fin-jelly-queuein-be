@@ -3,6 +3,9 @@ package com.beyond.qiin.domain.iam.support.user;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.repository.UserJpaRepository;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -36,9 +39,24 @@ public class UserReader {
     // 사용자 여러건 조회
     // ------------------------------------------------
 
-    /**
-     * 모든 사용자 ID가 존재하면 true, 하나라도 없으면 false 반환
-     **/
+    // 여러 유저 조회
+    public List<User> findAllByIds(final List<Long> userIds) {
+
+        // 전체 조회
+        List<User> users = userJpaRepository.findAllById(userIds);
+
+        // 존재하지 않는 ID가 있는지 검증
+        if (users.size() != userIds.size()) {
+            throw UserException.userNotFound();
+        }
+
+        // 입력한 ID 순서 보존해서 반환
+        Map<Long, User> map = users.stream().collect(Collectors.toMap(User::getId, u -> u));
+
+        return userIds.stream().map(map::get).toList();
+    }
+
+    // 모든 사용자 ID가 존재하면 true, 하나라도 없으면 false 반환
     public boolean existsAll(final Iterable<Long> userIds) {
         for (Long id : userIds) {
             if (!userJpaRepository.existsById(id)) {
