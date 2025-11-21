@@ -70,6 +70,7 @@ public class JwtTokenProvider {
         return validateTokenInternal(token, "REFRESH");
     }
 
+    // FIXME: Access Token을 던질 때 null, 123456, 잘못된 토큰 값을 던지던 같은 예외 처리 발생
     // 공통 검증 로직
     private boolean validateTokenInternal(final String token, final String expectedType) {
         try {
