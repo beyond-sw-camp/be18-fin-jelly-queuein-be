@@ -22,7 +22,7 @@ public class GetAppliedReservationResponseDto {
     private final String applicantName;
 
     // 예약 가능 여부
-    private final String isReservable;
+    private final boolean isReservable;
 
     // 응답 시 필수 x
     // 승인자
@@ -39,11 +39,11 @@ public class GetAppliedReservationResponseDto {
         return GetAppliedReservationResponseDto.builder()
                 .assetName(reservation.getAsset().getName())
                 .reservationId(reservation.getId())
-                .applicantName(reservation.getApplicant().getUsername())
+                .applicantName(reservation.getApplicant().getUserName())
                 .isReservable(isReservable)
                 .respondentName(
                         reservation.getRespondent() != null
-                                ? reservation.getRespondent().getUsername()
+                                ? reservation.getRespondent().getUserName()
                                 : null)
                 .isApproved(reservation.isApproved())
                 .reason(reservation.getReason())

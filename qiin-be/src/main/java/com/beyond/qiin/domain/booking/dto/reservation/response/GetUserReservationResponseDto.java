@@ -44,10 +44,10 @@ public class GetUserReservationResponseDto {
 
         return GetUserReservationResponseDto.builder()
                 .reservationId(reservation.getId().toString())
-                .assetType(assetType) // TODO: Enum -> String
+                .assetType(assetType)
                 .assetName(reservation.getAsset().getName())
                 .categoryName(reservation.getAsset().getCategory().getName())
-                .assetStatus(assetStatus) // TODO: Enum -> String
+                .assetStatus(assetStatus)
                 .isApproved(reservation.isApproved()) // Boolean (null 가능)
                 .startAt(reservation.getStartAt())
                 .endAt(reservation.getEndAt())

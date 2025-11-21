@@ -4,14 +4,16 @@ import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservation
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
-import com.beyond.qiin.domain.booking.dto.user_rev.entity.Attendant;
+
+import com.beyond.qiin.domain.booking.reservation.attendant.entity.Attendant;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
 import com.beyond.qiin.domain.booking.reservation.repository.ReservationJpaRepository;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
-import jakarta.persistence.EntityNotFoundException;
+import com.beyond.qiin.domain.inventory.entity.Asset;
+import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -25,6 +27,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
     private final ReservationJpaRepository reservationJpaRepository;
     private final UserReader userReader;
+    private final AssetCommandService assetCommandService;
 
     // 선착순 예약
     @Override
@@ -32,9 +35,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     public ReservationResponseDto applyReservation(
             final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
-        Asset asset = assetJpaRepository
-                .findByName(assetId)
-                .orElseThrow(() -> new EntityNotFoundException("asset not found by id"));
+        Asset asset = assetCommandService.getAssetById(assetId);
 
         User applicant = userReader.findById(userId);
 
@@ -47,9 +48,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 attendantUsers.stream().map(Attendant::create).toList();
 
         // 자원 자체가 지금 사용 가능한가에 대한 확인
-        if ((asset.getStatus() == 1) || (asset.getStatus() == 2))
-            // TODO: 예약 쪽에서 예외 추가
-            throw new IllegalArgumentException("asset not available");
+        assetCommandService.isAvailable(assetId);
 
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, attendants, 0);
 
@@ -64,9 +63,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     public ReservationResponseDto instantConfirmReservation(
             final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
-        Asset asset = assetRepository
-                .findByName(assetId)
-                .orElseThrow(() -> new EntityNotFoundException("asset not found by id"));
+        Asset asset = assetCommandService.getAssetById(assetId);
 
         User applicant = userReader.findById(userId);
 
@@ -74,9 +71,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         userReader.validateAllExist(createReservationRequestDto.getAttendantIds());
 
         List<User> attendantUsers = userReader.findAllByIds(attendantIds);
-
-        List<Attendant> attendants =
-                attendantUsers.stream().map(Attendant::create).toList();
 
         // 해당 시간에 사용 가능한 자원인지 확인
         validateReservationAvailability(
@@ -88,7 +82,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         // 선착순 자원은 자동 승인
         List<Attendant> attendants =
-                attendantsUsers.stream().map(Attendant::create).toList();
+                attendantUsers.stream().map(Attendant::create).toList();
 
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, attendants, 1);
 

@@ -1,8 +1,10 @@
 package com.beyond.qiin.domain.booking.dto.reservation.request;
 
-import com.beyond.qiin.domain.booking.dto.user_rev.entity.Attendant;
+
+import com.beyond.qiin.domain.booking.reservation.attendant.entity.Attendant;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -52,7 +54,6 @@ public class CreateReservationRequestDto {
                 .startAt(startAt)
                 .endAt(endAt)
                 .description(description)
-                .version(version)
                 .status(status)
                 .attendants(attendants)
                 .build();

@@ -80,8 +80,7 @@ public class ReservationResponseDto {
                 .isApproved(reservation.isApproved())
                 .status(status)
                 .attendants(reservation.getAttendants().stream()
-                        .map(attendant -> new AttendantResponseDto(
-                                attendant.getUser().getId(), attendant.getUser().getUsername()))
+                        .map(attendant -> AttendantResponseDto.fromEntity(attendant))
                         .toList())
                 .createdAt(reservation.getCreatedAt())
                 .createdBy(reservation.getCreatedBy())

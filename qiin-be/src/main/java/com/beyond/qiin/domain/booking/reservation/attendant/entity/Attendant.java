@@ -66,4 +66,12 @@ public class Attendant extends BaseEntity {
         this.user = user;
         this.userId = user.getId();
     }
+
+    public static Attendant create(User user) {
+        return Attendant.builder()
+            .user(user)
+            .userId(user.getId())
+            .build();
+    }
+
 }
