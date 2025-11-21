@@ -45,25 +45,25 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at is null")
 public class Reservation extends BaseEntity {
 
-    //one to one에 적용 시 오류 남
-//    @Column(name = "applicant_id")
-//    private Long applicantId;
+    // one to one에 적용 시 오류 남
+    //    @Column(name = "applicant_id")
+    //    private Long applicantId;
 
     // 신청자 - user 쪽에서 조회할 일 없으므로 reservation 쪽에서 매핑
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User applicant;
 
-//    @Column(name = "respondent_id")
-//    private Long respondentId;
+    //    @Column(name = "respondent_id")
+    //    private Long respondentId;
 
     // 승인자
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "respondent_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User respondent;
 
-//    @Column(name = "asset_id")
-//    private Long assetId;
+    //    @Column(name = "asset_id")
+    //    private Long assetId;
 
     // 자원
     @OneToOne(fetch = FetchType.LAZY)
