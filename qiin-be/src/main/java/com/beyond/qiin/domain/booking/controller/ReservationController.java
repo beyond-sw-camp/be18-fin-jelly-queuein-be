@@ -45,39 +45,39 @@ public class ReservationController {
     private final ReservationQueryService reservationQueryService;
 
     // 예약 신청
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PostMapping("/{assetId}/apply")
     public ResponseEntity<ReservationResponseDto> createReservationApply(
-            @PathVariable("assetId") Long assetId,
-            @AuthenticationPrincipal CustomUserDetails user,
+        @AuthenticationPrincipal CustomUserDetails user,
+        @PathVariable("assetId") Long assetId,
             @Valid @RequestBody CreateReservationRequestDto createReservationRequestDto) {
         ReservationResponseDto createReservationResponseDto =
-                reservationCommandService.applyReservation(assetId, user.getUserId(), createReservationRequestDto);
+                reservationCommandService.applyReservation(user.getUserId(), assetId, createReservationRequestDto);
         return ResponseEntity.status(201).body(createReservationResponseDto);
     }
 
     // 선착순 예약
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PostMapping("/{assetId}/instant-confirm")
     public ResponseEntity<ReservationResponseDto> createReservationInstantConfirm(
-            @PathVariable("assetId") Long assetId,
-            @AuthenticationPrincipal CustomUserDetails user,
+        @AuthenticationPrincipal CustomUserDetails user,
+        @PathVariable("assetId") Long assetId,
             @Valid @RequestBody CreateReservationRequestDto createReservationRequestDto) {
         ReservationResponseDto createReservationResponseDto = reservationCommandService.instantConfirmReservation(
-                assetId, user.getUserId(), createReservationRequestDto);
+                user.getUserId(), assetId, createReservationRequestDto);
         return ResponseEntity.status(201).body(createReservationResponseDto);
     }
 
     // 예약 승인
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @PatchMapping("/{reservationId}/approve")
     public ResponseEntity<ReservationResponseDto> approveReservation(
+        @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable("reservationId") Long reservationId,
-            @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody ConfirmReservationRequestDto confirmReservationRequestDto) {
         // 담당자 권한인 경우
         ReservationResponseDto reservationResponseDto = reservationCommandService.approveReservation(
-                reservationId, user.getUserId(), confirmReservationRequestDto);
+                user.getUserId(), reservationId, confirmReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -85,15 +85,15 @@ public class ReservationController {
     }
 
     // 예약 거절
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @PatchMapping("/{reservationId}/reject")
     public ResponseEntity<ReservationResponseDto> rejectReservation(
+        @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable("reservationId") Long reservationId,
-            @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody ConfirmReservationRequestDto confirmReservationRequestDto) {
         // 담당자 권한인 경우
         ReservationResponseDto reservationResponseDto = reservationCommandService.rejectReservation(
-                reservationId, user.getUserId(), confirmReservationRequestDto);
+                user.getUserId(), reservationId, confirmReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -101,14 +101,15 @@ public class ReservationController {
     }
 
     // 예약 자원 사용 시작
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PatchMapping("/{reservationId}/check-in")
     public ResponseEntity<ReservationResponseDto> startUsingReservation(
+        @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable("reservationId") Long reservationId,
-            @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam Instant startAt) {
         ReservationResponseDto reservationResponseDto =
-                reservationCommandService.startUsingReservation(reservationId, user.getUserId(), startAt);
+                reservationCommandService.startUsingReservation(
+                    user.getUserId(), reservationId, startAt);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -116,14 +117,15 @@ public class ReservationController {
     }
 
     // 예약 자원 사용 종료
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PatchMapping("/{reservationId}/check-out")
     public ResponseEntity<ReservationResponseDto> endUsingReservation(
+        @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable("reservationId") Long reservationId,
-            @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam Instant endAt) {
         ReservationResponseDto reservationResponseDto =
-                reservationCommandService.endUsingReservation(reservationId, user.getUserId(), endAt);
+                reservationCommandService.endUsingReservation(
+                    user.getUserId(), reservationId, endAt);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -131,12 +133,15 @@ public class ReservationController {
     }
 
     // 자원 예약 취소
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PatchMapping("/{reservationId}/cancel")
     public ResponseEntity<ReservationResponseDto> cancelReservation(
-            @PathVariable("reservationId") Long reservationId, @AuthenticationPrincipal CustomUserDetails user) {
+        @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable("reservationId") Long reservationId
+        ) {
         ReservationResponseDto reservationResponseDto =
-                reservationCommandService.cancelReservation(reservationId, user.getUserId());
+                reservationCommandService.cancelReservation(
+                    user.getUserId(), reservationId);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -145,10 +150,10 @@ public class ReservationController {
 
     // 예약 정보 변경
     @PatchMapping("/{reservationId}")
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     public ResponseEntity<ReservationResponseDto> updateReservation(
+        @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable("reservationId") Long reservationId,
-            @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody UpdateReservationRequestDto updateReservationRequestDto) {
         ReservationResponseDto reservationResponseDto = reservationCommandService.updateReservation(
                 user.getUserId(), reservationId, updateReservationRequestDto);
@@ -161,18 +166,20 @@ public class ReservationController {
     // 조회
 
     // 예약 상세 조회
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/{reservationId}")
     public ResponseEntity<ReservationDetailResponseDto> getReservation(
-            @PathVariable Long reservationId, @AuthenticationPrincipal CustomUserDetails user) {
+        @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long reservationId
+        ) {
         ReservationDetailResponseDto reservationDetailResponseDto =
-                reservationQueryService.getReservation(reservationId, user.getUserId());
+                reservationQueryService.getReservation(user.getUserId(), reservationId);
         return ResponseEntity.ok(reservationDetailResponseDto);
     }
 
     // 페이징 대상의 조회
     // 사용자의 예약한 자원에 대한 목록 조회
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/me")
     public ResponseEntity<PageResponseDto<GetUserReservationResponseDto>> getUserReservations(
             @AuthenticationPrincipal CustomUserDetails user,
@@ -180,26 +187,28 @@ public class ReservationController {
             Pageable pageable) {
 
         PageResponseDto<GetUserReservationResponseDto> page =
-                reservationQueryService.getReservationsByUserId(user.getUserId(), condition, pageable);
+                reservationQueryService.getReservationsByUserId(
+                    user.getUserId(), condition, pageable);
 
         return ResponseEntity.ok(page);
     }
 
     // 예약 가능 자원 목록 조회
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/{assetId}")
     public ResponseEntity<PageResponseDto<ReservableAssetResponseDto>> getReservableAssets(
+        @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam LocalDate date,
-            @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody ReservableAssetSearchCondition condition,
             Pageable pageable) {
         PageResponseDto<ReservableAssetResponseDto> page =
-                reservationQueryService.getReservableAssets(user.getUserId(), condition, pageable);
+                reservationQueryService.getReservableAssets(
+                    user.getUserId(), condition, pageable);
         return ResponseEntity.ok(page);
     }
 
     // 예약 신청 목록 조회(관리자용)
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @GetMapping("/pending")
     public ResponseEntity<PageResponseDto<GetAppliedReservationResponseDto>> getAppliedReservations(
             @AuthenticationPrincipal CustomUserDetails user,
@@ -207,37 +216,47 @@ public class ReservationController {
             Pageable pageable) {
 
         PageResponseDto<GetAppliedReservationResponseDto> page =
-                reservationQueryService.getReservationApplies(user.getUserId(), condition, pageable);
+                reservationQueryService.getReservationApplies(
+                    user.getUserId(), condition, pageable);
         return ResponseEntity.ok(page);
     }
 
     // page x 조회
 
     // 월별 일정 조회
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/monthly")
     public ResponseEntity<MonthReservationListResponseDto> getMonthlyReservations(
-            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant from, @RequestParam Instant to) {
+            @AuthenticationPrincipal CustomUserDetails user,
+        @RequestParam Instant from,
+        @RequestParam Instant to) {
         MonthReservationListResponseDto monthReservationListResponseDto =
-                reservationQueryService.getMonthlyReservations(user.getUserId(), from, to);
+                reservationQueryService.getMonthlyReservations(
+                    user.getUserId(), from, to);
         return ResponseEntity.ok(monthReservationListResponseDto);
     }
 
     // 주별 일정 조회
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/weekly")
     public ResponseEntity<WeekReservationListResponseDto> getWeeklyReservations(
-            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant start, @RequestParam Instant end) {
+            @AuthenticationPrincipal CustomUserDetails user,
+        @RequestParam Instant start,
+        @RequestParam Instant end) {
         WeekReservationListResponseDto weekReservationListResponseDto =
-                reservationQueryService.getWeeklyReservations(user.getUserId(), start, end);
+                reservationQueryService.getWeeklyReservations(
+                    user.getUserId(), start, end);
         return ResponseEntity.ok(weekReservationListResponseDto);
     }
 
+
     // 예약 가능 시간대 조회
-    @PreAuthorize("hasAnyRole('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/{assetId}/times")
     public ResponseEntity<AssetTimeResponseDto> getAssetTimes(
-            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Long assetId, @RequestParam LocalDate date) {
+            @AuthenticationPrincipal CustomUserDetails user,
+        @RequestParam Long assetId,
+        @RequestParam LocalDate date) {
         AssetTimeResponseDto assetTimeResponseDto =
                 reservationQueryService.getAssetTimes(user.getUserId(), assetId, date);
         return ResponseEntity.ok(assetTimeResponseDto);

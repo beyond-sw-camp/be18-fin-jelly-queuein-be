@@ -53,7 +53,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // 예약 상세 조회 (api용)
     @Override
     @Transactional(readOnly = true)
-    public ReservationDetailResponseDto getReservation(final Long userId, final Long reservationId) {
+    public ReservationDetailResponseDto getReservation(
+        final Long userId, final Long reservationId) {
 
         userReader.findById(userId);
         Reservation reservation = getReservationById(reservationId);
@@ -229,7 +230,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId, final LocalDate date) {
+    public AssetTimeResponseDto getAssetTimes(
+        final Long userId, final Long assetId, final LocalDate date) {
 
         userReader.findById(userId);
 
@@ -270,7 +272,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Reservation> getReservationsByUserAndWeek(final Long userId, final Instant start, final Instant end) {
+    public List<Reservation> getReservationsByUserAndWeek(
+        final Long userId, final Instant start, final Instant end) {
         userReader.findById(userId);
         List<Reservation> reservations = reservationJpaRepository.findByUserIdAndWeek(userId, start, end);
 
@@ -290,7 +293,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date) {
+    public List<Reservation> getReservationsByAssetAndDate(
+        final Long assetId, final LocalDate date) {
 
         // assetId 유효한지 확인
         Asset asset = assetQueryService.getAssetById(assetId);

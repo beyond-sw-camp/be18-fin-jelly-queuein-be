@@ -72,7 +72,7 @@ public class Reservation extends BaseEntity {
 
     // 참여자들
     @OneToMany(mappedBy = "reservation")
-    private List<Attendant> attendants = new ArrayList<>();
+    private List<Attendant> attendants;
 
     @Column(name = "start_at", nullable = false)
     private Instant startAt;
@@ -135,12 +135,15 @@ public class Reservation extends BaseEntity {
     }
 
     public void addAttendant(Attendant attendant) {
+        if (this.attendants == null) {
+            this.attendants = new ArrayList<>();
+        }
         attendants.add(attendant); // 양방향 관계 유지
         attendant.setReservation(this);
     }
 
     public void addAttendants(List<Attendant> list) {
-
+        if (attendants == null) return;
         list.forEach(this::addAttendant);
     }
 
