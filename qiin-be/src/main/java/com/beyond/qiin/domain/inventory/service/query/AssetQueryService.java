@@ -22,4 +22,8 @@ public interface AssetQueryService {
     TreeAssetResponseDto getAssetTree(final Long assetId);
 
     List<TreeAssetResponseDto> getFullAssetTree();
+
+    String assetStatusToString(final Integer status);
+
+    String assetTypeToString(final Integer type);
 }
