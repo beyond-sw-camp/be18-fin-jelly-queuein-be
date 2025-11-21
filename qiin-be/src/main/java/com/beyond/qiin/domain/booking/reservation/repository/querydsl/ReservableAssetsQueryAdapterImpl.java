@@ -1,26 +1,26 @@
-//package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
+// package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
 //
-//import com.beyond.qiin.domain.booking.dto.reservation.request.ReservableAssetSearchCondition;
-//import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
-//import com.beyond.qiin.domain.inventory.entity.QAsset;
-//import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
-//import com.beyond.qiin.domain.inventory.entity.QCategory;
-//import com.querydsl.core.BooleanBuilder;
-//import com.querydsl.core.types.Projections;
-//import com.querydsl.jpa.impl.JPAQueryFactory;
-//import java.time.Instant;
-//import java.util.List;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageImpl;
-//import org.springframework.data.domain.Pageable;
-//import org.springframework.stereotype.Repository;
+// import com.beyond.qiin.domain.booking.dto.reservation.request.ReservableAssetSearchCondition;
+// import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
+// import com.beyond.qiin.domain.inventory.entity.QAsset;
+// import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
+// import com.beyond.qiin.domain.inventory.entity.QCategory;
+// import com.querydsl.core.BooleanBuilder;
+// import com.querydsl.core.types.Projections;
+// import com.querydsl.jpa.impl.JPAQueryFactory;
+// import java.time.Instant;
+// import java.util.List;
+// import lombok.RequiredArgsConstructor;
+// import org.springframework.data.domain.Page;
+// import org.springframework.data.domain.PageImpl;
+// import org.springframework.data.domain.Pageable;
+// import org.springframework.stereotype.Repository;
 //
 //// TODO : is reservable을 어떻게 포함해줄지에 대해 고려
 //
-//@Repository
-//@RequiredArgsConstructor
-//public class ReservableAssetsQueryAdapterImpl implements ReservableAssetsQueryAdapter {
+// @Repository
+// @RequiredArgsConstructor
+// public class ReservableAssetsQueryAdapterImpl implements ReservableAssetsQueryAdapter {
 //
 //    private final JPAQueryFactory query;
 //
@@ -104,4 +104,4 @@
 //
 //        return new PageImpl<>(content, pageable, total);
 //    }
-//}
+// }
