@@ -19,9 +19,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -150,7 +148,7 @@ public class ReservationController {
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody UpdateReservationRequestDto updateReservationRequestDto) {
         ReservationResponseDto reservationResponseDto = reservationCommandService.updateReservation(
-            user.getUserId(), reservationId, updateReservationRequestDto);
+                user.getUserId(), reservationId, updateReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -169,14 +167,12 @@ public class ReservationController {
         return ResponseEntity.ok(reservationDetailResponseDto);
     }
 
-    //페이징 대상의 조회
+    // 페이징 대상의 조회
     // 사용자의 예약한 자원에 대한 목록 조회
     @PreAuthorize("hasAnyRole('GENERAL', 'MANAGER')")
     @GetMapping("/me")
     public ResponseEntity<PageResponseDto<GetUserReservationResponseDto>> getUserReservations(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @RequestParam LocalDate date,
-            Pageable pageable) {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam LocalDate date, Pageable pageable) {
 
         PageResponseDto<GetUserReservationResponseDto> page =
                 reservationQueryService.getReservationsByUserId(user.getUserId(), date, pageable);
@@ -205,18 +201,15 @@ public class ReservationController {
         return ResponseEntity.ok(page);
     }
 
-    //page x 조회
+    // page x 조회
 
     // 월별 일정 조회
     @PreAuthorize("hasAnyRole('GENERAL', 'MANAGER')")
     @GetMapping("/monthly")
     public ResponseEntity<MonthReservationListResponseDto> getMonthlyReservations(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @RequestParam Instant from,
-            @RequestParam Instant to) {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant from, @RequestParam Instant to) {
         MonthReservationListResponseDto monthReservationListResponseDto =
-                reservationQueryService.getMonthlyReservations(
-                    user.getUserId(), from, to);
+                reservationQueryService.getMonthlyReservations(user.getUserId(), from, to);
         return ResponseEntity.ok(monthReservationListResponseDto);
     }
 
@@ -224,9 +217,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyRole('GENERAL', 'MANAGER')")
     @GetMapping("/weekly")
     public ResponseEntity<WeekReservationListResponseDto> getWeeklyReservations(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @RequestParam Instant start,
-            @RequestParam Instant end) {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant start, @RequestParam Instant end) {
         WeekReservationListResponseDto weekReservationListResponseDto =
                 reservationQueryService.getWeeklyReservations(user.getUserId(), start, end);
         return ResponseEntity.ok(weekReservationListResponseDto);
@@ -236,9 +227,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyRole('GENERAL', 'MANAGER')")
     @GetMapping("/{assetId}/times")
     public ResponseEntity<AssetTimeResponseDto> getAssetTimes(
-        @AuthenticationPrincipal CustomUserDetails user,
-        @RequestParam Long assetId,
-        @RequestParam LocalDate date) {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Long assetId, @RequestParam LocalDate date) {
         AssetTimeResponseDto assetTimeResponseDto =
                 reservationQueryService.getAssetTimes(user.getUserId(), assetId, date);
         return ResponseEntity.ok(assetTimeResponseDto);
