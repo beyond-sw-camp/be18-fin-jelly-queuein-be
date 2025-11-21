@@ -7,7 +7,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
@@ -122,15 +121,6 @@ public class JwtTokenProvider {
     // Refresh Token TTL 조회
     public long getRefreshTokenValidityMillis() {
         return refreshTokenExpiration;
-    }
-
-    // Authorization 헤더에서 Access Token 추출
-    public String resolveAccessToken(final HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
-        }
-        return null;
     }
 
     // Access Token 남은 유효 시간 계산
