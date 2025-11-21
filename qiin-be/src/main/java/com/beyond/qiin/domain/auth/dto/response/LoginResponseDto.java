@@ -8,13 +8,13 @@ import lombok.Getter;
 @Builder
 public class LoginResponseDto implements LoginResult {
 
-    private Long userId;
-    private String userName;
-    private String email;
-    private String role;
-    private Boolean passwordExpired;
-    private String accessToken;
-    private String refreshToken;
+    private final Long userId;
+    private final String userName;
+    private final String email;
+    private final String role;
+    private final Boolean passwordExpired;
+    private final String accessToken;
+    private final String refreshToken;
 
     public static LoginResponseDto of(
             final User user, final String role, final String accessToken, final String refreshToken) {
