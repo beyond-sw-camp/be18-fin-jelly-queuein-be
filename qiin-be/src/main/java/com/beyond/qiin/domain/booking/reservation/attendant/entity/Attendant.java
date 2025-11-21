@@ -26,43 +26,45 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(
-    name = "reservation",
-    indexes = {
-        @Index(name = "idx_reservation_applicant_id", columnList = "applicant_id"),
-        @Index(name = "idx_reservation_respondent_id", columnList = "respondent_id"),
-        @Index(name = "idx_reservation_asset_id", columnList = "asset_id")
-    })
+        name = "reservation",
+        indexes = {
+            @Index(name = "idx_reservation_applicant_id", columnList = "applicant_id"),
+            @Index(name = "idx_reservation_respondent_id", columnList = "respondent_id"),
+            @Index(name = "idx_reservation_asset_id", columnList = "asset_id")
+        })
 @AttributeOverride(name = "id", column = @Column(name = "reservation_id"))
 @SQLRestriction("deleted_at is null")
 public class Attendant extends BaseEntity {
 
-  @Column(name = "reservation_id", nullable = false)
-  private Long reservationId;
+    @Column(name = "reservation_id", nullable = false)
+    private Long reservationId;
 
-  @ManyToOne
-  @JoinColumn(name = "reservation_id",
-      insertable = false, updatable = false,
-      foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-  private Reservation reservation;
+    @ManyToOne
+    @JoinColumn(
+            name = "reservation_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Reservation reservation;
 
-  @Column(name = "user_id", nullable = false)
-  private Long userId;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id",
-      insertable = false, updatable = false,
-      foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-  private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "user_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User user;
 
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
+        this.reservationId = reservation.getId();
+    }
 
-  public void setReservation(Reservation reservation) {
-    this.reservation = reservation;
-    this.reservationId = reservation.getId();
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-    this.userId = user.getId();
-  }
-
+    public void setUser(User user) {
+        this.user = user;
+        this.userId = user.getId();
+    }
 }
