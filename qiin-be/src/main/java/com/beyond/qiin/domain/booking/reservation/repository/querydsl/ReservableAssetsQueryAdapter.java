@@ -6,6 +6,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ReservableAssetsQueryAdapter {
-  Page<ReservableAssetResponseDto> search(
-      ReservableAssetSearchCondition condition, Pageable pageable);
+    Page<ReservableAssetResponseDto> search(ReservableAssetSearchCondition condition, Pageable pageable);
 }

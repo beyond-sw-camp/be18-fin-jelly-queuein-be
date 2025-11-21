@@ -199,7 +199,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         List<User> attendantUsers = userReader.findAllByIds(userIds);
 
-        //attendants는 reservation 안에서 생성
+        // attendants는 reservation 안에서 생성
         reservation.update(updateReservationRequestDto.getDescription(), attendantUsers);
 
         reservationJpaRepository.save(reservation);

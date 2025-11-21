@@ -70,8 +70,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
                 reservation,
                 statusToString(reservation.getStatus()),
                 assetQueryService.assetStatusToString(reservation.getAsset().getStatus()),
-                assetQueryService.assetTypeToString(reservation.getAsset().getType()))
-        );
+                assetQueryService.assetTypeToString(reservation.getAsset().getType())));
 
         return PageResponseDto.from(dtoPage);
 
@@ -92,7 +91,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         //        return reservationListResponseDto;
     }
 
-    //TODO : 목록 조회 - querydsl 대상
+    // TODO : 목록 조회 - querydsl 대상
     // 예약 가능 자원 목록 조회
     @Override
     @Transactional(readOnly = true)

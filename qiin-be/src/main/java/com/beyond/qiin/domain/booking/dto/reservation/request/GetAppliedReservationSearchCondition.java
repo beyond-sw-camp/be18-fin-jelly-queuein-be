@@ -5,17 +5,17 @@ import lombok.Getter;
 
 @Getter
 public class GetAppliedReservationSearchCondition {
-  private Instant date;
+    private Instant date;
 
-  private String applicantName;
-  private String respondentName;
-  private String isApproved;
-  private String isReservable;
+    private String applicantName;
+    private String respondentName;
+    private String isApproved;
+    private String isReservable;
 
-  private String assetName;
-  private String assetType;
-  private String categoryName;
-  private String assetStatus;
-  private String layerZero;
-  private String layerOne;
+    private String assetName;
+    private String assetType;
+    private String categoryName;
+    private String assetStatus;
+    private String layerZero;
+    private String layerOne;
 }
