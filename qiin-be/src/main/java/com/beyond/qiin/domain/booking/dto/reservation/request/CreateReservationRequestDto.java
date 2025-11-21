@@ -54,7 +54,6 @@ public class CreateReservationRequestDto {
                 .endAt(endAt)
                 .description(description)
                 .status(status)
-                .attendants(attendants)
                 .build();
 
         reservation.addAttendants(attendants);
