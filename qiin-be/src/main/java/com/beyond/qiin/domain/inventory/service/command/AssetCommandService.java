@@ -1,12 +1,12 @@
-//package com.beyond.qiin.domain.inventory.service.command;
+// package com.beyond.qiin.domain.inventory.service.command;
 //
-//import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
-//import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
-//import com.beyond.qiin.domain.inventory.dto.asset.response.CreateAssetResponseDto;
-//import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDto;
-//import com.beyond.qiin.domain.inventory.entity.Asset;
+// import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
+// import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
+// import com.beyond.qiin.domain.inventory.dto.asset.response.CreateAssetResponseDto;
+// import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDto;
+// import com.beyond.qiin.domain.inventory.entity.Asset;
 //
-//public interface AssetCommandService {
+// public interface AssetCommandService {
 //
 //    // create
 //    CreateAssetResponseDto createAsset(final CreateAssetRequestDto requestDto);
@@ -27,4 +27,4 @@
 //    String assetStatusToString(final Integer status);
 //
 //    String assetTypeToString(final Integer type);
-//}
+// }
