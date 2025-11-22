@@ -86,8 +86,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, attendants, 1);
 
-        // TODO: toEntity 에 넣을지 이 내용을
-        // reservation.addAttendants(attendants);
         reservationJpaRepository.save(reservation);
 
         return ReservationResponseDto.fromEntity(reservation, statusToString(1));

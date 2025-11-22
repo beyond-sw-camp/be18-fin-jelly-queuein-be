@@ -5,7 +5,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservatio
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface UserReservationsQueryAdapter {
+public interface UserReservationsQueryRepository {
     Page<GetUserReservationResponseDto> search(
-            Long userId, GetUserReservationSearchCondition condition, int reservationStatus, Pageable pageable);
+            Long userId, GetUserReservationSearchCondition condition, Integer reservationStatus, Pageable pageable);
 }

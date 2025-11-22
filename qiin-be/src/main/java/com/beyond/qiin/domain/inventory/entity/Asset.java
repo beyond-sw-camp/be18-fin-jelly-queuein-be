@@ -5,7 +5,6 @@ import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -28,8 +27,8 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(
-        name = "asset",
-        indexes = {@Index(name = "idx_asset_category_id", columnList = "category_id")})
+    name = "asset",
+    indexes = {@Index(name = "idx_asset_category_id", columnList = "category_id")})
 @AttributeOverride(name = "id", column = @Column(name = "asset_id"))
 @SQLRestriction("deleted_at IS NULL")
 public class Asset extends BaseEntity {
@@ -39,10 +38,10 @@ public class Asset extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-            name = "category_id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+        name = "category_id",
+        insertable = false,
+        updatable = false,
+        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Category category;
 
     @Column(name = "name", length = 100, nullable = false, unique = true)
@@ -54,12 +53,8 @@ public class Asset extends BaseEntity {
     @Column(name = "image")
     private String image;
 
-    //    @Column(name = "status", nullable = false)
-    //    private int status;
-
     @Column(name = "status", nullable = false)
-    @Convert(converter = AssetStatusConverter.class)
-    private AssetStatus status;
+    private int status;
 
     @Column(name = "type", nullable = false)
     private int type;
@@ -85,7 +80,7 @@ public class Asset extends BaseEntity {
         if (requestDto.getName() != null) this.name = requestDto.getName();
         if (requestDto.getDescription() != null) this.description = requestDto.getDescription();
         if (requestDto.getImage() != null) this.image = requestDto.getImage();
-        //        if (requestDto.getStatus() != null) this.status = requestDto.getStatus();
+        if (requestDto.getStatus() != null) this.status = requestDto.getStatus();
         if (requestDto.getType() != null) this.type = requestDto.getType();
         if (requestDto.getAccessLevel() != null) this.accessLevel = requestDto.getAccessLevel();
         if (requestDto.getApprovalStatus() != null) this.needsApproval = requestDto.getApprovalStatus();

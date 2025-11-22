@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class ReservableAssetsQueryAdapterImpl implements ReservableAssetsQueryAdapter {
+public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQueryRepository {
 
     private final JPAQueryFactory query;
 

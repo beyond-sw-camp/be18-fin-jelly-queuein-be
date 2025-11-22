@@ -26,10 +26,11 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
             """
     SELECT r
     FROM Reservation r
-    WHERE r.startAt <= :startOfMonth
-      AND r.endAt >= :endOfMonth
+    WHERE r.applicant.id = :userId
+      AND r.startAt <= :to
+      AND r.endAt >= :from
 """)
-    List<Reservation> findByUserIdAndYearMonth(Long userId, Instant startOfMonth, Instant endOfMonth);
+    List<Reservation> findByUserIdAndYearMonth(Long userId, Instant from, Instant to);
 
     @Query(
             """
