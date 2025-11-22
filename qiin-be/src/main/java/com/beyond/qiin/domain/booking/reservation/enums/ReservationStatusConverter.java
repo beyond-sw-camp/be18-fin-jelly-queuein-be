@@ -5,7 +5,7 @@ import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class ReservationStatusConverter extends EnumCodeConverter<AssetStatus> {
-  public AssetStatusConverter() {
-    super(AssetStatus.class);
-  }
+    public AssetStatusConverter() {
+        super(AssetStatus.class);
+    }
 }

@@ -27,8 +27,8 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(
-    name = "asset",
-    indexes = {@Index(name = "idx_asset_category_id", columnList = "category_id")})
+        name = "asset",
+        indexes = {@Index(name = "idx_asset_category_id", columnList = "category_id")})
 @AttributeOverride(name = "id", column = @Column(name = "asset_id"))
 @SQLRestriction("deleted_at IS NULL")
 public class Asset extends BaseEntity {
@@ -38,10 +38,10 @@ public class Asset extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-        name = "category_id",
-        insertable = false,
-        updatable = false,
-        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+            name = "category_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Category category;
 
     @Column(name = "name", length = 100, nullable = false, unique = true)

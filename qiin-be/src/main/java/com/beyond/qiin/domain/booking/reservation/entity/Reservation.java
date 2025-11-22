@@ -87,9 +87,9 @@ public class Reservation extends BaseEntity {
     @Column(name = "actual_end_at", nullable = true)
     private Instant actualEndAt;
 
-//    @Column(name = "status", nullable = false)
-//    @Builder.Default
-//    private int status = 0;
+    //    @Column(name = "status", nullable = false)
+    //    @Builder.Default
+    //    private int status = 0;
 
     @Column(name = "status", nullable = false)
     @Convert(converter = ReservationStatusConverter.class)
