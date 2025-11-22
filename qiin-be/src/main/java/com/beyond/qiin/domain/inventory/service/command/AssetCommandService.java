@@ -8,23 +8,23 @@ import com.beyond.qiin.domain.inventory.entity.Asset;
 
 public interface AssetCommandService {
 
-  // create
-  CreateAssetResponseDto createAsset(final CreateAssetRequestDto requestDto);
+    // create
+    CreateAssetResponseDto createAsset(final CreateAssetRequestDto requestDto);
 
-  // update
-  UpdateAssetResponseDto updateAsset(final UpdateAssetRequestDto requestDto, final Long assetId);
+    // update
+    UpdateAssetResponseDto updateAsset(final UpdateAssetRequestDto requestDto, final Long assetId);
 
-  // delete
-  void deleteAsset(final Long assetId, final Long userId);
+    // delete
+    void deleteAsset(final Long assetId, final Long userId);
 
-  // move
-  void moveAsset(final Long assetId, final String newParentName);
+    // move
+    void moveAsset(final Long assetId, final String newParentName);
 
-  Asset getAssetById(final Long assetId);
+    Asset getAssetById(final Long assetId);
 
-  boolean isAvailable(final Long assetId);
+    boolean isAvailable(final Long assetId);
 
-  String assetStatusToString(final Integer status);
+    String assetStatusToString(final Integer status);
 
-  String assetTypeToString(final Integer type);
+    String assetTypeToString(final Integer type);
 }
