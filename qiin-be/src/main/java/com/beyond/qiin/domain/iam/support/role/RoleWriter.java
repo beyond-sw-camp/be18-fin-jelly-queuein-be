@@ -11,6 +11,7 @@ public class RoleWriter {
 
     private final RoleJpaRepository roleJpaRepository;
 
+    // 역할 저장
     public Role save(final Role role) {
         return roleJpaRepository.save(role);
     }

@@ -13,21 +13,25 @@ public class RoleReader {
 
     private final RoleJpaRepository roleJpaRepository;
 
-    public Role findById(Long roleId) {
+    // 역할 단건 조회
+    public Role findById(final Long roleId) {
         return roleJpaRepository.findById(roleId).orElseThrow(RoleException::roleNotFound);
     }
 
+    // 역할명 단건 조회
     public Role findByRoleName(final String roleName) {
         return roleJpaRepository.findByRoleName(roleName).orElseThrow(RoleException::roleNotFound);
     }
 
-    public List<Role> findAll() {
-        return roleJpaRepository.findAll();
-    }
-
-    public void validateNameDuplication(String roleName) {
+    // 역할명 중복 체크
+    public void validateNameDuplication(final String roleName) {
         if (roleJpaRepository.findByRoleName(roleName).isPresent()) {
             throw RoleException.roleAlreadyExists();
         }
+    }
+
+    // 역할 전체 조회
+    public List<Role> findAll() {
+        return roleJpaRepository.findAll();
     }
 }

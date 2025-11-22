@@ -45,4 +45,13 @@ public class RolePermission {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "permission_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Permission permission;
+
+    // TODO: BaseEntity 상속 예정, flyway 반영
+    /*
+        // 소프트딜리트
+    public void softDelete(final Long deleterId) {
+        this.delete(deleterId);
+    }
+     */
+
 }
