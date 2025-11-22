@@ -16,7 +16,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -105,17 +104,18 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
 
         // 0계층 / 1계층 (AssetClosure 기반)
         if (condition.getLayerZero() != null) {
-            closureOn.and(closure.depth.eq(0))
-                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
+            closureOn
+                    .and(closure.depth.eq(0))
+                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
         }
 
         if (condition.getLayerOne() != null) {
-            closureOn.and(closure.depth.eq(1))
-                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
+            closureOn
+                    .and(closure.depth.eq(1))
+                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
         }
 
-        List<RawUserReservationResponseDto> content = query.select(
-            Projections.constructor(
+        List<RawUserReservationResponseDto> content = query.select(Projections.constructor(
                         RawUserReservationResponseDto.class,
                         reservation.id,
                         reservation.startAt,
@@ -127,21 +127,25 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                         category.name.as("categoryName"),
                         asset.type,
                         asset.status))
-            .from(reservation)
-            .join(asset).on(asset.id.eq(reservation.asset.id))
-            .leftJoin(category).on(category.id.eq(asset.categoryId))
-            .leftJoin(closure).on(closureOn)
-            .where(builder)
-            .orderBy(getOrderSpecifiers(pageable))
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
-
-        long total =
-            query.select(reservation.count())
                 .from(reservation)
-                .join(asset).on(asset.id.eq(reservation.asset.id))
-                .leftJoin(closure).on(closureOn)
+                .join(asset)
+                .on(asset.id.eq(reservation.asset.id))
+                .leftJoin(category)
+                .on(category.id.eq(asset.categoryId))
+                .leftJoin(closure)
+                .on(closureOn)
+                .where(builder)
+                .orderBy(getOrderSpecifiers(pageable))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        long total = query.select(reservation.count())
+                .from(reservation)
+                .join(asset)
+                .on(asset.id.eq(reservation.asset.id))
+                .leftJoin(closure)
+                .on(closureOn)
                 .where(builder)
                 .fetchOne();
 

@@ -41,6 +41,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -79,14 +80,14 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         // Page<GetUserReservationResponseDto> page =
         //        userReservationsQueryRepository.search(userId, condition, reservationStatus, pageable);
-        log.info("date={}, status={}, approved={}, assetName={}, assetType={}, layerZero={}",
-            condition.getDate(),
-            condition.getReservationStatus(),
-            condition.getIsApproved(),
-            condition.getAssetName(),
-            condition.getAssetType(),
-            condition.getLayerZero()
-        );
+        log.info(
+                "date={}, status={}, approved={}, assetName={}, assetType={}, layerZero={}",
+                condition.getDate(),
+                condition.getReservationStatus(),
+                condition.getIsApproved(),
+                condition.getAssetName(),
+                condition.getAssetType(),
+                condition.getLayerZero());
 
         Page<RawUserReservationResponseDto> rawPage =
                 userReservationsQueryRepository.search(userId, condition, pageable);

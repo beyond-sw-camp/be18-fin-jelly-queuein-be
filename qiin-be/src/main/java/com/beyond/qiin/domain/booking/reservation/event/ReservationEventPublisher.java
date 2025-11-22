@@ -1,9 +1,9 @@
-//package com.beyond.qiin.domain.booking.reservation.event;
+// package com.beyond.qiin.domain.booking.reservation.event;
 //
-//import org.springframework.stereotype.Component;
+// import org.springframework.stereotype.Component;
 //
-//@Component
-//public class ReservationEventPublisher {
+// @Component
+// public class ReservationEventPublisher {
 //    private final ReservationProducerService reservationProducer;
 //
 //    public void publish(Object event) {
@@ -21,4 +21,4 @@
 //        //TODO: custom exception 대상
 //        throw new IllegalArgumentException("Unknown event type: " + event.getClass());
 //    }
-//}
+// }

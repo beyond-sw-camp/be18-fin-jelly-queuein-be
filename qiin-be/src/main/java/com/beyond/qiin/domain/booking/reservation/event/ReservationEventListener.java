@@ -1,12 +1,12 @@
-//package com.beyond.qiin.domain.booking.reservation.event;
+// package com.beyond.qiin.domain.booking.reservation.event;
 //
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.kafka.annotation.KafkaListener;
-//import org.springframework.stereotype.Component;
+// import lombok.RequiredArgsConstructor;
+// import org.springframework.kafka.annotation.KafkaListener;
+// import org.springframework.stereotype.Component;
 //
-//@Component
-//@RequiredArgsConstructor
-//public class ReservationEventListener {
+// @Component
+// @RequiredArgsConstructor
+// public class ReservationEventListener {
 //
 //  private final ReservationConsumerService consumerService;
 //
@@ -19,4 +19,4 @@
 //  public void onUpdated(ReservationUpdatedEvent event) {
 //      consumerService.handleUpdated(event);
 //  }
-//}
+// }
