@@ -31,9 +31,7 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
 
     @Override
     public Page<GetUserReservationResponseDto> search(
-            Long userId,
-        GetUserReservationSearchCondition condition,
-        Pageable pageable) {
+            Long userId, GetUserReservationSearchCondition condition, Pageable pageable) {
 
         BooleanBuilder builder = new BooleanBuilder();
 

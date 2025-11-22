@@ -59,8 +59,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         Reservation reservation = getReservationById(reservationId);
 
         ReservationDetailResponseDto reservationDetailResponseDto =
-            ReservationDetailResponseDto.fromEntity(reservation);
-//                ReservationDetailResponseDto.fromEntity(reservation, statusToString(reservation.getStatus()));
+                ReservationDetailResponseDto.fromEntity(reservation);
+        //                ReservationDetailResponseDto.fromEntity(reservation, statusToString(reservation.getStatus()));
 
         return reservationDetailResponseDto;
     }
@@ -75,13 +75,12 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         // condition 자체의 필드들은 모두 null 가능
         // status는 int가 아닌 Integer이 됨
-        //Integer reservationStatus = statusToInt(condition.getReservationStatus());
+        // Integer reservationStatus = statusToInt(condition.getReservationStatus());
 
-        //Page<GetUserReservationResponseDto> page =
+        // Page<GetUserReservationResponseDto> page =
         //        userReservationsQueryRepository.search(userId, condition, reservationStatus, pageable);
 
-        Page<GetUserReservationResponseDto> page =
-            userReservationsQueryRepository.search(userId, condition, pageable);
+        Page<GetUserReservationResponseDto> page = userReservationsQueryRepository.search(userId, condition, pageable);
 
         return PageResponseDto.from(page);
 
@@ -111,9 +110,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         userReader.findById(userId);
 
-        Page<ReservableAssetResponseDto> page = reservableAssetsQueryRepository.search(
-                condition,
-                pageable);
+        Page<ReservableAssetResponseDto> page = reservableAssetsQueryRepository.search(condition, pageable);
 
         return PageResponseDto.from(page);
 
@@ -154,9 +151,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
         userReader.findById(userId);
 
-        Page<GetAppliedReservationResponseDto> page = appliedReservationsQueryRepository.search(
-                condition,
-                pageable);
+        Page<GetAppliedReservationResponseDto> page = appliedReservationsQueryRepository.search(condition, pageable);
 
         return PageResponseDto.from(page);
 

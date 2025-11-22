@@ -6,7 +6,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface AppliedReservationsQueryRepository {
-    Page<GetAppliedReservationResponseDto> search(
-            GetAppliedReservationSearchCondition condition,
-            Pageable pageable);
+    Page<GetAppliedReservationResponseDto> search(GetAppliedReservationSearchCondition condition, Pageable pageable);
 }

@@ -105,7 +105,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
 
         reservationJpaRepository.save(reservation);
-        return ReservationResponseDto.fromEntity(reservation, statusToString(reservation.getStatus()));
+        return ReservationResponseDto.fromEntity(reservation);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservationJpaRepository.save(reservation);
 
-        return ReservationResponseDto.fromEntity(reservation, statusToString(reservation.getStatus()));
+        return ReservationResponseDto.fromEntity(reservation);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.start(); // status using
 
         reservationJpaRepository.save(reservation);
-        return ReservationResponseDto.fromEntity(reservation, statusToString(reservation.getStatus()));
+        return ReservationResponseDto.fromEntity(reservation);
     }
 
     // 실제 종료 시간 추가
@@ -158,7 +158,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservationJpaRepository.save(reservation);
 
-        return ReservationResponseDto.fromEntity(reservation, statusToString(reservation.getStatus()));
+        return ReservationResponseDto.fromEntity(reservation);
     }
 
     // 사용 시간 30분 전인 경우 허용
@@ -177,7 +177,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservationJpaRepository.save(reservation);
 
-        return ReservationResponseDto.fromEntity(reservation, statusToString(reservation.getStatus()));
+        return ReservationResponseDto.fromEntity(reservation);
     }
 
     // 예약 정보 수정
@@ -204,7 +204,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservationJpaRepository.save(reservation);
 
-        return ReservationResponseDto.fromEntity(reservation, statusToString(reservation.getStatus()));
+        return ReservationResponseDto.fromEntity(reservation);
     }
 
     // 자원 자체 (예외처리 포함)

@@ -179,41 +179,41 @@ public class Reservation extends BaseEntity {
 
     // 예약 승인
     public void approve(User respondent, String reason) {
-        if (this.status!= ReservationStatus.PENDING) //(this.status != 0)
-            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
-        this.status = ReservationStatus.APPROVED; //this.status = 1;
+        if (this.status != ReservationStatus.PENDING) // (this.status != 0)
+        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        this.status = ReservationStatus.APPROVED; // this.status = 1;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
     }
 
     // 예약 거절
     public void reject(User respondent, String reason) {
-        if (this.status!= ReservationStatus.PENDING)//(this.status != 0)
-            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
-        this.status = ReservationStatus.REJECTED; //this.status = 3;
+        if (this.status != ReservationStatus.PENDING) // (this.status != 0)
+        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        this.status = ReservationStatus.REJECTED; // this.status = 3;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
     }
 
     // 사용 시작
     public void start() {
-        if (this.status!= ReservationStatus.APPROVED) //(this.status != 1)
-            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
-        this.status = ReservationStatus.USING; //this.status = 2;
+        if (this.status != ReservationStatus.APPROVED) // (this.status != 1)
+        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        this.status = ReservationStatus.USING; // this.status = 2;
         this.actualStartAt = Instant.now();
     }
 
     // 사용 종료
     public void end() {
-        if (this.status != ReservationStatus.USING)//(this.status != 2)
-            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
-        this.status = ReservationStatus.COMPLETED; //this.status = 5;
+        if (this.status != ReservationStatus.USING) // (this.status != 2)
+        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        this.status = ReservationStatus.COMPLETED; // this.status = 5;
         this.actualEndAt = Instant.now();
     }
 
     // 예약 취소
     public void cancel() {
         this.status = ReservationStatus.CANCELED;
-        //this.status = 4;
+        // this.status = 4;
     }
 }

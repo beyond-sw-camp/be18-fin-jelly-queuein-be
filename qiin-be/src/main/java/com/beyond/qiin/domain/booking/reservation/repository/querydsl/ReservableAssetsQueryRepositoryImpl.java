@@ -31,9 +31,7 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
     private static final QCategory category = QCategory.category;
 
     @Override
-    public Page<ReservableAssetResponseDto> search(
-            ReservableAssetSearchCondition condition,
-            Pageable pageable) {
+    public Page<ReservableAssetResponseDto> search(ReservableAssetSearchCondition condition, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
         // 자원 관련
@@ -43,12 +41,12 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
         }
 
         // 자원 유형
-//        if (condition.getAssetType() != null) {
-//            try {
-//                builder.and(asset.type.eq(assetType));
-//            } catch (NumberFormatException ignored) {
-//            }
-//        }
+        //        if (condition.getAssetType() != null) {
+        //            try {
+        //                builder.and(asset.type.eq(assetType));
+        //            } catch (NumberFormatException ignored) {
+        //            }
+        //        }
 
         // 카테고리
         if (condition.getCategoryName() != null) {
@@ -56,12 +54,12 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
         }
 
         // 상태(사용가능 / 점검중 / 예약불가 등)
-//        if (condition.getAssetStatus() != null) {
-//            try {
-//                builder.and(asset.status.eq(assetStatus));
-//            } catch (NumberFormatException ignored) {
-//            }
-//        }
+        //        if (condition.getAssetStatus() != null) {
+        //            try {
+        //                builder.and(asset.status.eq(assetStatus));
+        //            } catch (NumberFormatException ignored) {
+        //            }
+        //        }
 
         // 0계층 / 1계층
         if (condition.getLayerZero() != null) {

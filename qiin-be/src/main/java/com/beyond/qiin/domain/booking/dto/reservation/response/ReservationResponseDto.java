@@ -64,7 +64,7 @@ public class ReservationResponseDto {
     @Builder.Default
     private final List<AttendantResponseDto> attendants = new ArrayList<>();
 
-    public static ReservationResponseDto fromEntity(final Reservation reservation, final String status) {
+    public static ReservationResponseDto fromEntity(final Reservation reservation) {
 
         return ReservationResponseDto.builder()
                 .reservationId(reservation.getId())
@@ -78,7 +78,7 @@ public class ReservationResponseDto {
                 .reason(reservation.getReason())
                 .version(reservation.getVersion())
                 .isApproved(reservation.isApproved())
-                .status(status)
+                .status(reservation.getStatus().name())
                 .attendants(reservation.getAttendants().stream()
                         .map(attendant -> AttendantResponseDto.fromEntity(attendant))
                         .toList())
