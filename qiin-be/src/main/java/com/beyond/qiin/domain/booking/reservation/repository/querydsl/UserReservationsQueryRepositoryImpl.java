@@ -34,9 +34,7 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
 
     @Override
     public Page<RawUserReservationResponseDto> search(
-            Long userId,
-            GetUserReservationSearchCondition condition,
-            Pageable pageable) {
+            Long userId, GetUserReservationSearchCondition condition, Pageable pageable) {
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -50,7 +48,7 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
             builder.and(reservation.startAt.between(start, end));
         }
 
-        //TODO 예약 상태 (int)
+        // TODO 예약 상태 (int)
         if (condition.getReservationStatus() != null) {
             String raw = condition.getReservationStatus().trim();
 
@@ -113,8 +111,7 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                     .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
         }
 
-        List<RawUserReservationResponseDto> content = query
-            .select(Projections.constructor(
+        List<RawUserReservationResponseDto> content = query.select(Projections.constructor(
                         RawUserReservationResponseDto.class,
                         reservation.id,
                         reservation.startAt,
@@ -154,18 +151,16 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
     }
 
     private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
-        return pageable.getSort()
-            .stream()
-            .map(order -> {
-                String property = order.getProperty();  // "startAt", "status" ...
+        return pageable.getSort().stream()
+                .map(order -> {
+                    String property = order.getProperty(); // "startAt", "status" ...
 
-                Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+                    Order direction = order.isAscending() ? Order.ASC : Order.DESC;
 
-                PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
+                    PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
 
-                return new OrderSpecifier(direction, path.get(property));
-            })
-            .toArray(OrderSpecifier[]::new);
+                    return new OrderSpecifier(direction, path.get(property));
+                })
+                .toArray(OrderSpecifier[]::new);
     }
-
 }
