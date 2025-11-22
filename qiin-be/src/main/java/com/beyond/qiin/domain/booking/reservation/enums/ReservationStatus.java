@@ -20,8 +20,7 @@ public enum ReservationStatus implements EnumCode {
     private final int code;
 
     private static final Map<Integer, ReservationStatus> CODE_MAP =
-        Arrays.stream(values())
-            .collect(Collectors.toMap(ReservationStatus::getCode, s -> s));
+            Arrays.stream(values()).collect(Collectors.toMap(ReservationStatus::getCode, s -> s));
 
     public static ReservationStatus from(int code) {
         ReservationStatus status = CODE_MAP.get(code);
