@@ -94,7 +94,7 @@ public class Reservation extends BaseEntity {
     //    @Builder.Default
     //    private int status = 0;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, columnDefinition = "int")
     @Convert(converter = ReservationStatusConverter.class)
     private ReservationStatus status;
 

@@ -2,6 +2,7 @@ package com.beyond.qiin.domain.booking.dto.reservation.request;
 
 import com.beyond.qiin.domain.booking.reservation.attendant.entity.Attendant;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
+import com.beyond.qiin.domain.booking.reservation.enums.ReservationStatus;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.validation.constraints.NotNull;
@@ -45,7 +46,7 @@ public class CreateReservationRequestDto {
     private List<Long> attendantIds = new ArrayList<>();
 
     public Reservation toEntity(
-            final Asset asset, final User applicant, final List<Attendant> attendants, final Integer status) {
+            final Asset asset, final User applicant, final List<Attendant> attendants, final ReservationStatus reservationStatus) {
 
         Reservation reservation = Reservation.builder()
                 .asset(asset)
@@ -53,7 +54,7 @@ public class CreateReservationRequestDto {
                 .startAt(startAt)
                 .endAt(endAt)
                 .description(description)
-                .status(status)
+                .status(reservationStatus)
                 .build();
 
         reservation.addAttendants(attendants);
