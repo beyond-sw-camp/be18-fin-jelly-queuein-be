@@ -12,5 +12,6 @@ public class CreateRoleRequestDto {
     private String roleName;
 
     // 역할 설명
+    @NotBlank(message = "역할 설명은 필수입니다.")
     private String roleDescription;
 }
