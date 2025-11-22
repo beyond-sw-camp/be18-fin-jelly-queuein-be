@@ -46,7 +46,10 @@ public class CreateReservationRequestDto {
     private List<Long> attendantIds = new ArrayList<>();
 
     public Reservation toEntity(
-            final Asset asset, final User applicant, final List<Attendant> attendants, final ReservationStatus reservationStatus) {
+            final Asset asset,
+            final User applicant,
+            final List<Attendant> attendants,
+            final ReservationStatus reservationStatus) {
 
         Reservation reservation = Reservation.builder()
                 .asset(asset)
@@ -54,7 +57,8 @@ public class CreateReservationRequestDto {
                 .startAt(startAt)
                 .endAt(endAt)
                 .description(description)
-                .status(reservationStatus)
+                .status(reservationStatus.getCode())
+                .reservationStatus(reservationStatus)
                 .build();
 
         reservation.addAttendants(attendants);

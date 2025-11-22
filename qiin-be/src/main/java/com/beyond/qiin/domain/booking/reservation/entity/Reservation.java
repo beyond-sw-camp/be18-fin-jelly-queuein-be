@@ -21,6 +21,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.Version;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -75,8 +76,9 @@ public class Reservation extends BaseEntity {
     private Asset asset;
 
     // 참여자들
+    @Builder.Default
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
-    private List<Attendant> attendants;
+    private List<Attendant> attendants = new ArrayList<>();
 
     @Column(name = "start_at", nullable = false)
     private Instant startAt;
@@ -90,13 +92,17 @@ public class Reservation extends BaseEntity {
     @Column(name = "actual_end_at", nullable = true)
     private Instant actualEndAt;
 
-    //    @Column(name = "status", nullable = false)
-    //    @Builder.Default
-    //    private int status = 0;
+    @Column(name = "status", nullable = false)
+    @Builder.Default
+    private int status = 0;
 
-    @Column(name = "status", nullable = false, columnDefinition = "int")
-    @Convert(converter = ReservationStatusConverter.class)
-    private ReservationStatus status;
+
+    @Transient
+    private ReservationStatus reservationStatus;
+
+//    @Column(name = "status", nullable = false, columnDefinition = "int")
+//    @Convert(converter = ReservationStatusConverter.class)
+//    private ReservationStatus status;
 
     @Column(name = "description", length = 500, nullable = true)
     private String description;
@@ -179,41 +185,50 @@ public class Reservation extends BaseEntity {
 
     // 예약 승인
     public void approve(User respondent, String reason) {
-        if (this.status != ReservationStatus.PENDING) // (this.status != 0)
-        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
-        this.status = ReservationStatus.APPROVED; // this.status = 1;
+        if (this.getStatus() != ReservationStatus.PENDING) // (this.status != 0)
+            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        this.setStatus(ReservationStatus.APPROVED); // this.status = 1;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
     }
 
     // 예약 거절
     public void reject(User respondent, String reason) {
-        if (this.status != ReservationStatus.PENDING) // (this.status != 0)
-        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
-        this.status = ReservationStatus.REJECTED; // this.status = 3;
+        if (this.getStatus() != ReservationStatus.PENDING) // (this.status != 0)
+            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        this.setStatus(ReservationStatus.REJECTED); // this.status = 3;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
     }
 
     // 사용 시작
     public void start() {
-        if (this.status != ReservationStatus.APPROVED) // (this.status != 1)
-        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
-        this.status = ReservationStatus.USING; // this.status = 2;
+        if (this.getStatus() != ReservationStatus.APPROVED) // (this.status != 1)
+            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        this.setStatus(ReservationStatus.USING); // this.status = 2;
         this.actualStartAt = Instant.now();
     }
 
     // 사용 종료
     public void end() {
-        if (this.status != ReservationStatus.USING) // (this.status != 2)
-        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
-        this.status = ReservationStatus.COMPLETED; // this.status = 5;
+        if (this.getStatus() != ReservationStatus.USING) // (this.status != 2)
+            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        this.setStatus(ReservationStatus.COMPLETED); // this.status = 5;
         this.actualEndAt = Instant.now();
     }
 
     // 예약 취소
     public void cancel() {
-        this.status = ReservationStatus.CANCELED;
+        this.setStatus(ReservationStatus.CANCELED);
         // this.status = 4;
+    }
+
+    public ReservationStatus getStatus() {
+        return ReservationStatus.from(this.status);
+    }
+
+    public void setStatus(ReservationStatus reservationStatus) {
+        this.reservationStatus = reservationStatus;
+        this.status = reservationStatus.getCode();
     }
 }
