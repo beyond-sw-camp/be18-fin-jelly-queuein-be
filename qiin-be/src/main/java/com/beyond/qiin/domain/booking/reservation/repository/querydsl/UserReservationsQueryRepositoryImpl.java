@@ -3,6 +3,7 @@ package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
+import com.beyond.qiin.domain.booking.reservation.enums.ReservationStatus;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
@@ -30,7 +31,9 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
 
     @Override
     public Page<GetUserReservationResponseDto> search(
-            Long userId, GetUserReservationSearchCondition condition, Integer reservationStatus, Pageable pageable) {
+            Long userId,
+        GetUserReservationSearchCondition condition,
+        Pageable pageable) {
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -46,7 +49,18 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
 
         // 예약 상태 (int)
         if (condition.getReservationStatus() != null) {
-            builder.and(reservation.status.eq(reservationStatus));
+            String raw = condition.getReservationStatus().trim();
+
+            try {
+                // "pending" → "PENDING" → ReservationStatus.PENDING
+                ReservationStatus statusEnum = ReservationStatus.valueOf(raw.toUpperCase());
+
+                // QueryDSL은 int 비교
+                builder.and(reservation.status.eq(statusEnum.getCode()));
+
+            } catch (IllegalArgumentException ignored) {
+                // 잘못된 enum 문자열이 들어오면 필터 적용 안 함
+            }
         }
 
         // 승인 여부 (true/false)

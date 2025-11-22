@@ -60,7 +60,7 @@ public class ReservationDetailResponseDto {
     private final List<AttendantResponseDto> attendants = new ArrayList<>();
 
     public static ReservationDetailResponseDto fromEntity(
-            final Reservation reservation, final String reservationStatus) {
+            final Reservation reservation) {
         ReservationDetailResponseDto reservationDetailResponseDto = ReservationDetailResponseDto.builder()
                 .reservationId(reservation.getId())
                 .applicantName(reservation.getApplicant().getUserName())
@@ -78,7 +78,7 @@ public class ReservationDetailResponseDto {
                                 .map(attendant -> AttendantResponseDto.fromEntity(attendant))
                                 .toList())
                 .date(reservation.getStartAt().atZone(ZoneId.of("Asia/Seoul")).toLocalDate())
-                .status(reservationStatus)
+                .status(reservation.getStatus().name())
                 .build();
 
         return reservationDetailResponseDto;

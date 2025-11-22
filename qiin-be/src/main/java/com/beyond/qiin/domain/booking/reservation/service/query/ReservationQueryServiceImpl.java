@@ -59,7 +59,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         Reservation reservation = getReservationById(reservationId);
 
         ReservationDetailResponseDto reservationDetailResponseDto =
-                ReservationDetailResponseDto.fromEntity(reservation, statusToString(reservation.getStatus()));
+            ReservationDetailResponseDto.fromEntity(reservation);
+//                ReservationDetailResponseDto.fromEntity(reservation, statusToString(reservation.getStatus()));
 
         return reservationDetailResponseDto;
     }
@@ -74,16 +75,13 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         // condition 자체의 필드들은 모두 null 가능
         // status는 int가 아닌 Integer이 됨
-        Integer reservationStatus = statusToInt(condition.getReservationStatus());
+        //Integer reservationStatus = statusToInt(condition.getReservationStatus());
+
+        //Page<GetUserReservationResponseDto> page =
+        //        userReservationsQueryRepository.search(userId, condition, reservationStatus, pageable);
 
         Page<GetUserReservationResponseDto> page =
-                userReservationsQueryRepository.search(userId, condition, reservationStatus, pageable);
-
-        // TODO : final 이라 set status가 안돼
-        //        page.map(dto -> {
-        //            dto.setStatus(statusToString(reservationStatus));
-        //            return dto;
-        //        });
+            userReservationsQueryRepository.search(userId, condition, pageable);
 
         return PageResponseDto.from(page);
 
@@ -115,8 +113,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         Page<ReservableAssetResponseDto> page = reservableAssetsQueryRepository.search(
                 condition,
-                assetQueryService.assetTypeToInt(condition.getAssetType()),
-                assetQueryService.assetStatusToInt(condition.getAssetStatus()),
                 pageable);
 
         return PageResponseDto.from(page);
@@ -160,8 +156,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         Page<GetAppliedReservationResponseDto> page = appliedReservationsQueryRepository.search(
                 condition,
-                assetQueryService.assetTypeToInt(condition.getAssetType()),
-                assetQueryService.assetStatusToInt(condition.getAssetStatus()),
                 pageable);
 
         return PageResponseDto.from(page);

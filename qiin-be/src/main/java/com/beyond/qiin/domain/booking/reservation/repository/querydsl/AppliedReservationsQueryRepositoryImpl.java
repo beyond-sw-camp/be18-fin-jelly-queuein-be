@@ -37,7 +37,7 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
 
     @Override
     public Page<GetAppliedReservationResponseDto> search(
-            GetAppliedReservationSearchCondition condition, int assetType, int assetStatus, Pageable pageable) {
+            GetAppliedReservationSearchCondition condition, Pageable pageable) {
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(reservation.status.eq(0)); // pending인 경우 == 신청된 reservations
@@ -85,12 +85,12 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         }
 
         // 자원 유형(int)
-        if (condition.getAssetType() != null) {
-            try {
-                builder.and(asset.type.eq(assetType));
-            } catch (NumberFormatException ignored) {
-            }
-        }
+//        if (condition.getAssetType() != null) {
+//            try {
+//                builder.and(asset.type.eq(assetType));
+//            } catch (NumberFormatException ignored) {
+//            }
+//        }
 
         // 카테고리 이름
         if (condition.getCategoryName() != null) {
@@ -98,12 +98,12 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         }
 
         // 자원 상태(int)
-        if (condition.getAssetStatus() != null) {
-            try {
-                builder.and(asset.status.eq(assetStatus));
-            } catch (NumberFormatException ignored) {
-            }
-        }
+//        if (condition.getAssetStatus() != null) {
+//            try {
+//                builder.and(asset.status.eq(assetStatus));
+//            } catch (NumberFormatException ignored) {
+//            }
+//        }
 
         // 계층 필터
         if (condition.getLayerZero() != null) {
