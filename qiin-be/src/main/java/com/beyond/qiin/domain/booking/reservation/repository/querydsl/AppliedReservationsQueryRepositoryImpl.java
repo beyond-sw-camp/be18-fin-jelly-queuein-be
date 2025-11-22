@@ -1,30 +1,30 @@
- package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
+package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
 
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
- import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
- import com.beyond.qiin.domain.iam.entity.QUser;
- import com.beyond.qiin.domain.inventory.entity.QAsset;
- import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
- import com.beyond.qiin.domain.inventory.entity.QCategory;
- import com.querydsl.core.BooleanBuilder;
- import com.querydsl.core.types.Projections;
- import com.querydsl.core.types.dsl.BooleanExpression;
- import com.querydsl.jpa.impl.JPAQueryFactory;
- import java.time.Instant;
- import java.time.LocalDate;
- import java.time.ZoneId;
- import java.time.temporal.ChronoUnit;
- import java.util.List;
- import lombok.RequiredArgsConstructor;
- import org.springframework.data.domain.Page;
- import org.springframework.data.domain.PageImpl;
- import org.springframework.data.domain.Pageable;
- import org.springframework.stereotype.Repository;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
+import com.beyond.qiin.domain.iam.entity.QUser;
+import com.beyond.qiin.domain.inventory.entity.QAsset;
+import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
+import com.beyond.qiin.domain.inventory.entity.QCategory;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
- @Repository
- @RequiredArgsConstructor
- public class AppliedReservationsQueryRepositoryImpl implements AppliedReservationsQueryRepository {
+@Repository
+@RequiredArgsConstructor
+public class AppliedReservationsQueryRepositoryImpl implements AppliedReservationsQueryRepository {
 
     private final JPAQueryFactory query;
 
@@ -46,7 +46,7 @@
         // 날짜 조건
         if (condition.getDate() != null) {
             LocalDate targetDate =
-                condition.getDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDate();
+                    condition.getDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDate();
 
             Instant start = targetDate.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
 
@@ -172,4 +172,4 @@
 
         return new PageImpl<>(content, pageable, total);
     }
- }
+}

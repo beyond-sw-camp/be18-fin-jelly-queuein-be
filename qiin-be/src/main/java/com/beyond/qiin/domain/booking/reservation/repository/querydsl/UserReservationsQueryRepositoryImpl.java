@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
-import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
 import com.beyond.qiin.domain.booking.reservation.enums.ReservationStatus;
@@ -9,6 +8,7 @@ import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
@@ -147,4 +147,21 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
 
         return new PageImpl<>(content, pageable, total);
     }
+
+    private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
+        return pageable.getSort()
+            .stream()
+            .map(order -> {
+                PathBuilder<?> entityPath = new PathBuilder<>(RawUserReservationResponseDto.class, "reservation");
+
+                // 실제 정렬 대상 지정
+                String property = order.getProperty();  // "startAt", "assetName", etc.
+
+                Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+
+                return new OrderSpecifier(direction, new PathBuilder(Object.class, "reservation").get(property));
+            })
+            .toArray(OrderSpecifier[]::new);
+    }
+
 }
