@@ -8,6 +8,7 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.TreeAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
+import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     private final AssetQueryAdapter assetQueryAdapter;
 
     private final AssetClosureQueryAdapter assetClosureQueryAdapter;
+
+    private final AssetJpaRepository assetJpaRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -122,5 +125,59 @@ public class AssetQueryServiceImpl implements AssetQueryService {
                 .toList();
 
         return TreeAssetResponseDto.of(asset.getId(), asset.getName(), children);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Asset getAssetById(final Long assetId) {
+        return assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
+    }
+
+    @Override
+    public String assetStatusToString(final Integer status) {
+        if (status == 0) {
+            return "AVAILABLE";
+        } else if (status == 1) {
+            return "UNAVAILABLE";
+        } else {
+            return "MAINTENANCE";
+        }
+    }
+
+    @Override
+    public String assetTypeToString(final Integer type) {
+        if (type == 0) {
+            return "STATIC";
+        } else {
+            return "DYNAMIC";
+        }
+    }
+
+    @Override
+    public int assetStatusToInt(final String status) {
+
+        switch (status.toUpperCase()) {
+            case "AVAILABLE":
+                return 0;
+            case "UNAVAILABLE":
+                return 1;
+            case "MAINTENANCE":
+                return 2;
+            default:
+                return -1;
+        }
+    }
+
+    @Override
+    public int assetTypeToInt(final String type) {
+
+        switch (type.toUpperCase()) {
+            case "STATIC":
+                return 0;
+            case "DYNAMIC":
+                return 1;
+            default:
+                return -1;
+        }
     }
 }
