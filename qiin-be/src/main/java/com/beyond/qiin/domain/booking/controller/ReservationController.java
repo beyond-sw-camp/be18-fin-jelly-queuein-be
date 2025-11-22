@@ -216,9 +216,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/monthly")
     public ResponseEntity<MonthReservationListResponseDto> getMonthlyReservations(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @RequestParam Instant from,
-            @RequestParam Instant to) {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant from, @RequestParam Instant to) {
         MonthReservationListResponseDto monthReservationListResponseDto =
                 reservationQueryService.getMonthlyReservations(user.getUserId(), from, to);
         return ResponseEntity.ok(monthReservationListResponseDto);
@@ -228,9 +226,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/weekly")
     public ResponseEntity<WeekReservationListResponseDto> getWeeklyReservations(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @RequestParam Instant start,
-            @RequestParam Instant end) {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant start, @RequestParam Instant end) {
         WeekReservationListResponseDto weekReservationListResponseDto =
                 reservationQueryService.getWeeklyReservations(user.getUserId(), start, end);
         return ResponseEntity.ok(weekReservationListResponseDto);
@@ -240,9 +236,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/{assetId}/times")
     public ResponseEntity<AssetTimeResponseDto> getAssetTimes(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @RequestParam Long assetId,
-            @RequestParam LocalDate date) {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Long assetId, @RequestParam LocalDate date) {
         AssetTimeResponseDto assetTimeResponseDto =
                 reservationQueryService.getAssetTimes(user.getUserId(), assetId, date);
         return ResponseEntity.ok(assetTimeResponseDto);

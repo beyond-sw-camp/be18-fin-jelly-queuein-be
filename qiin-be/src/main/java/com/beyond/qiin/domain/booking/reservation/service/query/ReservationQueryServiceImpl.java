@@ -72,18 +72,18 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         // 사용자 있는지 확인
         userReader.findById(userId);
 
-        //condition 자체의 필드들은 모두 null 가능
-        //status는 int가 아닌 Integer이 됨
+        // condition 자체의 필드들은 모두 null 가능
+        // status는 int가 아닌 Integer이 됨
         Integer reservationStatus = statusToInt(condition.getReservationStatus());
 
         Page<GetUserReservationResponseDto> page =
                 userReservationsQueryRepository.search(userId, condition, reservationStatus, pageable);
 
-        //TODO : final 이라 set status가 안돼
-//        page.map(dto -> {
-//            dto.setStatus(statusToString(reservationStatus));
-//            return dto;
-//        });
+        // TODO : final 이라 set status가 안돼
+        //        page.map(dto -> {
+        //            dto.setStatus(statusToString(reservationStatus));
+        //            return dto;
+        //        });
 
         return PageResponseDto.from(page);
 
@@ -310,7 +310,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return reservations;
     }
 
-    //status 자체는 null x이므로 int
+    // status 자체는 null x이므로 int
     public static String statusToString(final int status) {
         if (status == 0) {
             return "PENDING";

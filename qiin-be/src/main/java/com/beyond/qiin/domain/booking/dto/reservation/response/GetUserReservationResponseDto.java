@@ -56,8 +56,8 @@ public class GetUserReservationResponseDto {
                 .actualEndAt(reservation.getActualEndAt())
                 .build();
     }
-    //TODO: final 이라 set이 안되네
-//    public void setStatus(String status){
-//        this.reservationStatus = status;
-//    }
+    // TODO: final 이라 set이 안되네
+    //    public void setStatus(String status){
+    //        this.reservationStatus = status;
+    //    }
 }
