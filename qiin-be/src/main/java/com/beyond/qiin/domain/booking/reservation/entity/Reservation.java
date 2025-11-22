@@ -3,7 +3,6 @@ package com.beyond.qiin.domain.booking.reservation.entity;
 import com.beyond.qiin.common.BaseEntity;
 import com.beyond.qiin.domain.booking.reservation.attendant.entity.Attendant;
 import com.beyond.qiin.domain.booking.reservation.enums.ReservationStatus;
-import com.beyond.qiin.domain.booking.reservation.enums.ReservationStatusConverter;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -12,7 +11,6 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -96,13 +94,12 @@ public class Reservation extends BaseEntity {
     @Builder.Default
     private int status = 0;
 
-
     @Transient
     private ReservationStatus reservationStatus;
 
-//    @Column(name = "status", nullable = false, columnDefinition = "int")
-//    @Convert(converter = ReservationStatusConverter.class)
-//    private ReservationStatus status;
+    //    @Column(name = "status", nullable = false, columnDefinition = "int")
+    //    @Convert(converter = ReservationStatusConverter.class)
+    //    private ReservationStatus status;
 
     @Column(name = "description", length = 500, nullable = true)
     private String description;
@@ -186,7 +183,7 @@ public class Reservation extends BaseEntity {
     // 예약 승인
     public void approve(User respondent, String reason) {
         if (this.getStatus() != ReservationStatus.PENDING) // (this.status != 0)
-            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.APPROVED); // this.status = 1;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
@@ -195,7 +192,7 @@ public class Reservation extends BaseEntity {
     // 예약 거절
     public void reject(User respondent, String reason) {
         if (this.getStatus() != ReservationStatus.PENDING) // (this.status != 0)
-            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.REJECTED); // this.status = 3;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
@@ -204,7 +201,7 @@ public class Reservation extends BaseEntity {
     // 사용 시작
     public void start() {
         if (this.getStatus() != ReservationStatus.APPROVED) // (this.status != 1)
-            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.USING); // this.status = 2;
         this.actualStartAt = Instant.now();
     }
@@ -212,7 +209,7 @@ public class Reservation extends BaseEntity {
     // 사용 종료
     public void end() {
         if (this.getStatus() != ReservationStatus.USING) // (this.status != 2)
-            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.COMPLETED); // this.status = 5;
         this.actualEndAt = Instant.now();
     }
