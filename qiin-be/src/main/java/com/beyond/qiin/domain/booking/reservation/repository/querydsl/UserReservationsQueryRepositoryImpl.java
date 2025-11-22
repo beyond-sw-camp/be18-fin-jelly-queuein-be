@@ -14,6 +14,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +45,11 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
 
         // 날짜(Instant)
         if (condition.getDate() != null) {
-            Instant start = condition.getDate();
-            Instant end = start.plus(1, ChronoUnit.DAYS);
+            LocalDate date = condition.getDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDate();
+
+            Instant start = date.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+            Instant end = date.plusDays(1).atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+
             builder.and(reservation.startAt.between(start, end));
         }
 
@@ -95,23 +100,22 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
             } catch (NumberFormatException ignored) {
             }
         }
+        BooleanBuilder closureOn = new BooleanBuilder();
+        closureOn.and(closure.assetClosureId.descendantId.eq(asset.id));
 
         // 0계층 / 1계층 (AssetClosure 기반)
         if (condition.getLayerZero() != null) {
-            builder.and(closure.depth
-                    .eq(0)
-                    .and(closure.assetClosureId.descendantId.eq(asset.id))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero()))));
+            closureOn.and(closure.depth.eq(0))
+                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
         }
 
         if (condition.getLayerOne() != null) {
-            builder.and(closure.depth
-                    .eq(1)
-                    .and(closure.assetClosureId.descendantId.eq(asset.id))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
+            closureOn.and(closure.depth.eq(1))
+                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
         }
 
-        List<RawUserReservationResponseDto> content = query.select(Projections.constructor(
+        List<RawUserReservationResponseDto> content = query.select(
+            Projections.constructor(
                         RawUserReservationResponseDto.class,
                         reservation.id,
                         reservation.startAt,
@@ -123,27 +127,21 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                         category.name.as("categoryName"),
                         asset.type,
                         asset.status))
-                .from(reservation)
-                .join(asset)
-                .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
-                .leftJoin(closure)
-                .on(closure.assetClosureId.descendantId.eq(asset.id))
-                .where(builder)
-                .orderBy(reservation.startAt.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+            .from(reservation)
+            .join(asset).on(asset.id.eq(reservation.asset.id))
+            .leftJoin(category).on(category.id.eq(asset.categoryId))
+            .leftJoin(closure).on(closureOn)
+            .where(builder)
+            .orderBy(getOrderSpecifiers(pageable))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
 
-        long total = query.select(reservation.count())
+        long total =
+            query.select(reservation.count())
                 .from(reservation)
-                .join(asset)
-                .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
-                .leftJoin(closure)
-                .on(closure.assetClosureId.descendantId.eq(asset.id))
+                .join(asset).on(asset.id.eq(reservation.asset.id))
+                .leftJoin(closure).on(closureOn)
                 .where(builder)
                 .fetchOne();
 

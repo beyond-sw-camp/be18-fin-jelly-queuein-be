@@ -2,8 +2,10 @@ package com.beyond.qiin.domain.booking.dto.reservation.request.search_condition;
 
 import java.time.Instant;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class GetUserReservationSearchCondition {
     private Instant date;
 

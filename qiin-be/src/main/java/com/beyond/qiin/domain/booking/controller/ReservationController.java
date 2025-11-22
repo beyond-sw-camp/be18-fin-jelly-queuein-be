@@ -28,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -176,7 +177,7 @@ public class ReservationController {
     @GetMapping("/me")
     public ResponseEntity<PageResponseDto<GetUserReservationResponseDto>> getUserReservations(
             @AuthenticationPrincipal CustomUserDetails user,
-            @Valid GetUserReservationSearchCondition condition,
+            @Valid @ModelAttribute GetUserReservationSearchCondition condition,
             Pageable pageable) {
 
         PageResponseDto<GetUserReservationResponseDto> page =
@@ -190,7 +191,7 @@ public class ReservationController {
     @GetMapping("/reservable-assets")
     public ResponseEntity<PageResponseDto<ReservableAssetResponseDto>> getReservableAssets(
             @AuthenticationPrincipal CustomUserDetails user,
-            @Valid ReservableAssetSearchCondition condition,
+            @Valid @ModelAttribute ReservableAssetSearchCondition condition,
             Pageable pageable) {
         PageResponseDto<ReservableAssetResponseDto> page =
                 reservationQueryService.getReservableAssets(user.getUserId(), condition, pageable);
@@ -202,7 +203,7 @@ public class ReservationController {
     @GetMapping("/pending")
     public ResponseEntity<PageResponseDto<GetAppliedReservationResponseDto>> getAppliedReservations(
             @AuthenticationPrincipal CustomUserDetails user,
-            @Valid GetAppliedReservationSearchCondition condition,
+            @Valid @ModelAttribute GetAppliedReservationSearchCondition condition,
             Pageable pageable) {
 
         PageResponseDto<GetAppliedReservationResponseDto> page =

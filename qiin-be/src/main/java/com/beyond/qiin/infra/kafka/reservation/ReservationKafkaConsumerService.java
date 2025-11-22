@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class KafkaReservationConsumerComponent {
+public class ReservationKafkaConsumerService {
     private final KafkaReservationConsumerService kafkaReservationConsumerService;
 
     @KafkaListener(topics = "${spring.kafka.topic.reservation}", groupId = "reservation-group")
