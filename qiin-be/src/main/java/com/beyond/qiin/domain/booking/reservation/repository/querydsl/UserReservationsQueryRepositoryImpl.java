@@ -8,8 +8,10 @@ import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -32,11 +34,13 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
 
     @Override
     public Page<RawUserReservationResponseDto> search(
-            Long userId, GetUserReservationSearchCondition condition, Pageable pageable) {
+            Long userId,
+            GetUserReservationSearchCondition condition,
+            Pageable pageable) {
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        // 사용자 예약 필터 : 입력받은 userId 기준으로
+        // 사용자
         builder.and(reservation.applicant.id.eq(userId));
 
         // 날짜(Instant)
@@ -46,7 +50,7 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
             builder.and(reservation.startAt.between(start, end));
         }
 
-        // 예약 상태 (int)
+        //TODO 예약 상태 (int)
         if (condition.getReservationStatus() != null) {
             String raw = condition.getReservationStatus().trim();
 
@@ -109,7 +113,8 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                     .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
         }
 
-        List<RawUserReservationResponseDto> content = query.select(Projections.constructor(
+        List<RawUserReservationResponseDto> content = query
+            .select(Projections.constructor(
                         RawUserReservationResponseDto.class,
                         reservation.id,
                         reservation.startAt,
@@ -152,14 +157,13 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
         return pageable.getSort()
             .stream()
             .map(order -> {
-                PathBuilder<?> entityPath = new PathBuilder<>(RawUserReservationResponseDto.class, "reservation");
-
-                // 실제 정렬 대상 지정
-                String property = order.getProperty();  // "startAt", "assetName", etc.
+                String property = order.getProperty();  // "startAt", "status" ...
 
                 Order direction = order.isAscending() ? Order.ASC : Order.DESC;
 
-                return new OrderSpecifier(direction, new PathBuilder(Object.class, "reservation").get(property));
+                PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
+
+                return new OrderSpecifier(direction, path.get(property));
             })
             .toArray(OrderSpecifier[]::new);
     }
