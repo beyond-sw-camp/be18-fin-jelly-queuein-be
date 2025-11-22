@@ -47,6 +47,6 @@ public class RoleController {
     @PreAuthorize("hasAuthority('MASTER')")
     public ResponseEntity<Void> deleteRole(@PathVariable final Long roleId) {
         roleCommandService.deleteRole(roleId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
