@@ -143,7 +143,12 @@ public class Reservation extends BaseEntity {
     }
 
     public void addAttendants(List<Attendant> list) {
-        if (attendants == null) return;
+        if (list == null || list.isEmpty()) return;
+
+        if (this.attendants == null) {
+            this.attendants = new ArrayList<>();
+        }
+
         list.forEach(this::addAttendant);
     }
 
