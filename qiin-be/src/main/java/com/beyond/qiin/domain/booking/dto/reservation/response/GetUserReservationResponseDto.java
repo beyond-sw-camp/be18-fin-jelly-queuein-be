@@ -9,7 +9,7 @@ import lombok.Getter;
 
 // 사용자의 예약에 대한 현황 목록 조회용
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Getter
 public class GetUserReservationResponseDto {
 
@@ -36,28 +36,39 @@ public class GetUserReservationResponseDto {
 
     private final Instant actualEndAt;
 
-    public static GetUserReservationResponseDto fromEntity(
-            final Reservation reservation,
-            final String reservationStatus,
-            final String assetType,
-            final String assetStatus) {
-
+//    public static GetUserReservationResponseDto fromEntity(
+//            final Reservation reservation,
+//            final String reservationStatus,
+//            final String assetType,
+//            final String assetStatus) {
+//
+//        return GetUserReservationResponseDto.builder()
+//                .reservationId(reservation.getId().toString())
+//                .assetType(assetType)
+//                .assetName(reservation.getAsset().getName())
+//                .categoryName(reservation.getAsset().getCategory().getName())
+//                .assetStatus(assetStatus)
+//                .isApproved(reservation.isApproved()) // Boolean (null 가능)
+//                .startAt(reservation.getStartAt())
+//                .endAt(reservation.getEndAt())
+//                .reservationStatus(reservationStatus)
+//                .actualStartAt(reservation.getActualStartAt())
+//                .actualEndAt(reservation.getActualEndAt())
+//                .build();
+//    }
+    public static GetUserReservationResponseDto fromRaw(RawUserReservationResponseDto raw) {
         return GetUserReservationResponseDto.builder()
-                .reservationId(reservation.getId().toString())
-                .assetType(assetType)
-                .assetName(reservation.getAsset().getName())
-                .categoryName(reservation.getAsset().getCategory().getName())
-                .assetStatus(assetStatus)
-                .isApproved(reservation.isApproved()) // Boolean (null 가능)
-                .startAt(reservation.getStartAt())
-                .endAt(reservation.getEndAt())
-                .reservationStatus(reservationStatus)
-                .actualStartAt(reservation.getActualStartAt())
-                .actualEndAt(reservation.getActualEndAt())
-                .build();
+            .reservationId(raw.getReservationId())
+            .assetType(raw.getAssetType())
+            .assetName(raw.getAssetName())
+            .categoryName(raw.getCategoryName())
+            .assetStatus(raw.getAssetStatus())
+            .isApproved(raw.getIsApproved())
+            .startAt(raw.getStartAt())
+            .endAt(raw.getEndAt())
+            .reservationStatus(raw.getReservationStatus())
+            .actualStartAt(raw.getActualStartAt())
+            .actualEndAt(raw.getActualEndAt())
+            .build();
     }
-    // TODO: final 이라 set이 안되네
-    //    public void setStatus(String status){
-    //        this.reservationStatus = status;
-    //    }
 }

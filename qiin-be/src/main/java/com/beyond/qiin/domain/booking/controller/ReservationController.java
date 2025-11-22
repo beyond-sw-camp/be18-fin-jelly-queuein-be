@@ -1,45 +1,45 @@
- package com.beyond.qiin.domain.booking.controller;
+package com.beyond.qiin.domain.booking.controller;
 
- import com.beyond.qiin.common.dto.PageResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
- import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
- import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
- import com.beyond.qiin.domain.booking.reservation.service.command.ReservationCommandService;
- import com.beyond.qiin.domain.booking.reservation.service.query.ReservationQueryService;
- import com.beyond.qiin.security.CustomUserDetails;
- import jakarta.validation.Valid;
- import java.net.URI;
- import java.time.Instant;
- import java.time.LocalDate;
- import lombok.RequiredArgsConstructor;
- import org.springframework.data.domain.Pageable;
- import org.springframework.http.ResponseEntity;
- import org.springframework.security.access.prepost.PreAuthorize;
- import org.springframework.security.core.annotation.AuthenticationPrincipal;
- import org.springframework.web.bind.annotation.GetMapping;
- import org.springframework.web.bind.annotation.PatchMapping;
- import org.springframework.web.bind.annotation.PathVariable;
- import org.springframework.web.bind.annotation.PostMapping;
- import org.springframework.web.bind.annotation.RequestBody;
- import org.springframework.web.bind.annotation.RequestMapping;
- import org.springframework.web.bind.annotation.RequestParam;
- import org.springframework.web.bind.annotation.RestController;
+import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
+import com.beyond.qiin.domain.booking.reservation.service.command.ReservationCommandService;
+import com.beyond.qiin.domain.booking.reservation.service.query.ReservationQueryService;
+import com.beyond.qiin.security.CustomUserDetails;
+import jakarta.validation.Valid;
+import java.net.URI;
+import java.time.Instant;
+import java.time.LocalDate;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
- @RequestMapping("/api/v1/reservations")
- @RestController
- @RequiredArgsConstructor
- public class ReservationController {
+@RequestMapping("/api/v1/reservations")
+@RestController
+@RequiredArgsConstructor
+public class ReservationController {
 
     private final ReservationCommandService reservationCommandService;
     private final ReservationQueryService reservationQueryService;
@@ -236,10 +236,9 @@
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/{assetId}/times")
     public ResponseEntity<AssetTimeResponseDto> getAssetTimes(
-            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Long assetId, @RequestParam LocalDate date)
- {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Long assetId, @RequestParam LocalDate date) {
         AssetTimeResponseDto assetTimeResponseDto =
                 reservationQueryService.getAssetTimes(user.getUserId(), assetId, date);
         return ResponseEntity.ok(assetTimeResponseDto);
     }
- }
+}
