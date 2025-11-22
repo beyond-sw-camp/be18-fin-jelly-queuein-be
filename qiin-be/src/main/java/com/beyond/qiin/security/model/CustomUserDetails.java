@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Getter
 public class CustomUserDetails implements UserDetails {
 
+    //
+
     private final Long userId;
     private final String email;
     private final Collection<? extends GrantedAuthority> authorities;
