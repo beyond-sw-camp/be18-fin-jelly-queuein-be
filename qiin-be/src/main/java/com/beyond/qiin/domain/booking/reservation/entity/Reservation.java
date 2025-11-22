@@ -7,6 +7,7 @@ import com.beyond.qiin.domain.booking.reservation.exception.ReservationException
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -71,7 +72,7 @@ public class Reservation extends BaseEntity {
     private Asset asset;
 
     // 참여자들
-    @OneToMany(mappedBy = "reservation")
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
     private List<Attendant> attendants;
 
     @Column(name = "start_at", nullable = false)
@@ -171,7 +172,7 @@ public class Reservation extends BaseEntity {
 
     // 예약 승인
     public void approve(User respondent, String reason) {
-        if (this.status != 0) throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
+        if (this.status != 0) throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.status = 1;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
@@ -179,7 +180,7 @@ public class Reservation extends BaseEntity {
 
     // 예약 거절
     public void reject(User respondent, String reason) {
-        if (this.status != 0) throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
+        if (this.status != 0) throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.status = 3;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
@@ -187,14 +188,14 @@ public class Reservation extends BaseEntity {
 
     // 사용 시작
     public void start() {
-        if (this.status != 1) throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
+        if (this.status != 1) throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.status = 2;
         this.actualStartAt = Instant.now();
     }
 
     // 사용 종료
     public void end() {
-        if (this.status != 2) throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
+        if (this.status != 2) throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.status = 5;
         this.actualEndAt = Instant.now();
     }

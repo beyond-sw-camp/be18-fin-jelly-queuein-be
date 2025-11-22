@@ -18,9 +18,9 @@ import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
 import com.beyond.qiin.domain.booking.reservation.repository.ReservationJpaRepository;
-import com.beyond.qiin.domain.booking.reservation.repository.querydsl.AppliedReservationsQueryAdapter;
-import com.beyond.qiin.domain.booking.reservation.repository.querydsl.ReservableAssetsQueryAdapter;
-import com.beyond.qiin.domain.booking.reservation.repository.querydsl.UserReservationsQueryAdapter;
+import com.beyond.qiin.domain.booking.reservation.repository.querydsl.AppliedReservationsQueryRepository;
+import com.beyond.qiin.domain.booking.reservation.repository.querydsl.ReservableAssetsQueryRepository;
+import com.beyond.qiin.domain.booking.reservation.repository.querydsl.UserReservationsQueryRepository;
 import com.beyond.qiin.domain.booking.reservation.util.AvailableTimeSlotCalculator;
 import com.beyond.qiin.domain.booking.reservation.vo.DateRange;
 import com.beyond.qiin.domain.booking.reservation.vo.TimeSlot;
@@ -46,9 +46,9 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final ReservationJpaRepository reservationJpaRepository;
     private final UserReader userReader;
     private final AssetQueryService assetQueryService;
-    private final UserReservationsQueryAdapter userReservationsQueryAdapter;
-    private final ReservableAssetsQueryAdapter reservableAssetsQueryAdapter;
-    private final AppliedReservationsQueryAdapter appliedReservationsQueryAdapter;
+    private final UserReservationsQueryRepository userReservationsQueryRepository;
+    private final ReservableAssetsQueryRepository reservableAssetsQueryRepository;
+    private final AppliedReservationsQueryRepository appliedReservationsQueryRepository;
 
     // 예약 상세 조회 (api용)
     @Override
@@ -72,10 +72,18 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         // 사용자 있는지 확인
         userReader.findById(userId);
 
-        int reservationStatus = statusToInt(condition.getReservationStatus());
+        //condition 자체의 필드들은 모두 null 가능
+        //status는 int가 아닌 Integer이 됨
+        Integer reservationStatus = statusToInt(condition.getReservationStatus());
 
         Page<GetUserReservationResponseDto> page =
-                userReservationsQueryAdapter.search(userId, condition, reservationStatus, pageable);
+                userReservationsQueryRepository.search(userId, condition, reservationStatus, pageable);
+
+        //TODO : final 이라 set status가 안돼
+//        page.map(dto -> {
+//            dto.setStatus(statusToString(reservationStatus));
+//            return dto;
+//        });
 
         return PageResponseDto.from(page);
 
@@ -105,7 +113,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         userReader.findById(userId);
 
-        Page<ReservableAssetResponseDto> page = reservableAssetsQueryAdapter.search(
+        Page<ReservableAssetResponseDto> page = reservableAssetsQueryRepository.search(
                 condition,
                 assetQueryService.assetTypeToInt(condition.getAssetType()),
                 assetQueryService.assetStatusToInt(condition.getAssetStatus()),
@@ -150,7 +158,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
         userReader.findById(userId);
 
-        Page<GetAppliedReservationResponseDto> page = appliedReservationsQueryAdapter.search(
+        Page<GetAppliedReservationResponseDto> page = appliedReservationsQueryRepository.search(
                 condition,
                 assetQueryService.assetTypeToInt(condition.getAssetType()),
                 assetQueryService.assetStatusToInt(condition.getAssetStatus()),
@@ -302,6 +310,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return reservations;
     }
 
+    //status 자체는 null x이므로 int
     public static String statusToString(final int status) {
         if (status == 0) {
             return "PENDING";
@@ -319,7 +328,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     }
 
     public static Integer statusToInt(final String status) {
-        if (status == null) return null;
+        if (status == null || status.isBlank()) return null;
 
         return switch (status.toUpperCase()) {
             case "PENDING" -> 0;

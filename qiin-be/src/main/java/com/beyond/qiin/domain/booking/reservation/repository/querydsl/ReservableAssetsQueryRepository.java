@@ -5,7 +5,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetRe
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface ReservableAssetsQueryAdapter {
+public interface ReservableAssetsQueryRepository {
     Page<ReservableAssetResponseDto> search(
             ReservableAssetSearchCondition condition, int assetType, int assetStatus, Pageable pageable);
 }
