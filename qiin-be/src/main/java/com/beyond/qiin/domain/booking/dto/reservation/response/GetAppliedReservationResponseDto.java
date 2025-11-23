@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.dto.reservation.response;
 
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.reservation.enums.ReservationStatus;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,6 +32,8 @@ public class GetAppliedReservationResponseDto {
     // 승인 여부
     private final Boolean isApproved; // null o : 승인 전일 수 있음
 
+    private final String reservationStatus;
+
     // 사유
     private final String reason;
 
@@ -41,6 +44,7 @@ public class GetAppliedReservationResponseDto {
                 .applicantName(raw.getApplicantName())
                 // TODO:.isReservable(false)
                 .respondentName(raw.getRespondentName())
+                .reservationStatus(ReservationStatus.from(raw.getReservationStatus()).name())
                 .isApproved(raw.isApproved())
                 .reason(raw.getReason())
                 .build();

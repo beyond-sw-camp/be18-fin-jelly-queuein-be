@@ -1,8 +1,10 @@
 package com.beyond.qiin.domain.booking.reservation.service.query;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationResponseDto;
@@ -10,6 +12,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetail
 import com.beyond.qiin.domain.booking.dto.reservation.response.TimeSlotDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
@@ -111,6 +114,41 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         //        return reservationListResponseDto;
     }
 
+    // 신청 예약 목록 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
+        final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
+        userReader.findById(userId);
+
+        Page<RawAppliedReservationResponseDto> rawPage = appliedReservationsQueryRepository.search(condition,
+            pageable);
+
+        Page<GetAppliedReservationResponseDto> page = rawPage.map(GetAppliedReservationResponseDto::fromRaw);
+
+        return PageResponseDto.from(page);
+
+        //
+        //        // status == pending인 경우
+        //        List<Reservation> reservations = getReservationsPendingAndDate(date);
+        //
+        //        List<GetAppliedReservationResponseDto> reservationList = new ArrayList<>();
+        //
+        //        for (Reservation reservation : reservations) {
+        //            GetAppliedReservationResponseDto reservationResponseDto =
+        //                GetAppliedReservationResponseDto.fromEntity(reservation,
+        // isAssetReservableToday(reservation.getAssetId()));
+        //            reservationList.add(reservationResponseDto);
+        //        }
+        //
+        //        GetAppliedReservationResponseDto reservationListResponseDto =
+        // GetAppliedReservationResponseDto.builder()
+        //            .reservations(reservationList)
+        //            .build();
+        //
+        //        return reservationListResponseDto;
+    }
+
     //    // TODO : 목록 조회 - querydsl 대상
     //    // 예약 가능 자원 목록 조회
     //    @Override
@@ -158,40 +196,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     //        //        return reservableAssetListResponseDto;
     //    }
     //
-    //    // 신청 예약 목록 조회
-    //    @Override
-    //    @Transactional(readOnly = true)
-    //    public PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
-    //            final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
-    //        userReader.findById(userId);
-    //
-    //        Page<RawAppliedReservationResponseDto> rawPage = appliedReservationsQueryRepository.search(condition,
-    // pageable);
-    //
-    //        Page<GetAppliedReservationResponseDto> page = rawPage.map(GetAppliedReservationResponseDto::fromRaw);
-    //
-    //        return PageResponseDto.from(page);
-    //
-    //        //
-    //        //        // status == pending인 경우
-    //        //        List<Reservation> reservations = getReservationsPendingAndDate(date);
-    //        //
-    //        //        List<GetAppliedReservationResponseDto> reservationList = new ArrayList<>();
-    //        //
-    //        //        for (Reservation reservation : reservations) {
-    //        //            GetAppliedReservationResponseDto reservationResponseDto =
-    //        //                GetAppliedReservationResponseDto.fromEntity(reservation,
-    //        // isAssetReservableToday(reservation.getAssetId()));
-    //        //            reservationList.add(reservationResponseDto);
-    //        //        }
-    //        //
-    //        //        GetAppliedReservationResponseDto reservationListResponseDto =
-    //        // GetAppliedReservationResponseDto.builder()
-    //        //            .reservations(reservationList)
-    //        //            .build();
-    //        //
-    //        //        return reservationListResponseDto;
-    //    }
+
 
     // 주별 일정 조회
     @Override

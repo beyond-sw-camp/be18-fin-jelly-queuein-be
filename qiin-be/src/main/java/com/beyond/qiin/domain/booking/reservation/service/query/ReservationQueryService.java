@@ -1,8 +1,10 @@
 package com.beyond.qiin.domain.booking.reservation.service.query;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
@@ -24,9 +26,9 @@ public interface ReservationQueryService {
     //    PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
     //            final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable);
     //
-    //   PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
-    //       final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable);
-    //
+   PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
+       final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable);
+
 
     AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId, final LocalDate date);
 

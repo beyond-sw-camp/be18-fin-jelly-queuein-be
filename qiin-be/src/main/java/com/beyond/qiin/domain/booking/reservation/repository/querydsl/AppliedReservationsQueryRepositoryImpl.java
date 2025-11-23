@@ -45,7 +45,7 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         builder.and(reservation.status.eq(0)); // pending인 경우 == 신청된 reservations
 
         if (condition.getDate() != null) {
-            LocalDate date = condition.getDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDate();
+            LocalDate date = condition.getDate();
 
             Instant start = date.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
             Instant end = date.plusDays(1).atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
@@ -64,12 +64,14 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         }
 
         // TODO: isReservable = true → 해당 시간대 다른 예약 없음
-        BooleanExpression reservableCondition = null;
         if (condition.getIsReservable() != null) {
             boolean isReservable = Boolean.parseBoolean(condition.getIsReservable());
-            reservableCondition = isReservable
-                    ? reservation.status.eq(0) // 단순화: 승인대기 or 예약가능
+
+            BooleanExpression reservableCondition =
+                isReservable ? reservation.status.eq(0)
                     : reservation.status.ne(0);
+
+            builder.and(reservableCondition);
         }
 
         // 승인 여부
@@ -104,6 +106,9 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         //            }
         //        }
 
+
+        BooleanBuilder closureOn = new BooleanBuilder();
+        closureOn.and(closure.assetClosureId.descendantId.eq(asset.id));
         // 계층 필터
         if (condition.getLayerZero() != null) {
             builder.and(closure.depth
@@ -131,40 +136,27 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                         reservation.isApproved,
                         reservation.reason))
                 .from(reservation)
-                .join(asset)
-                .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
-                .leftJoin(applicant)
-                .on(applicant.id.eq(reservation.applicant.id))
-                .leftJoin(respondent)
-                .on(respondent.id.eq(reservation.respondent.id))
-                .leftJoin(closure)
-                .on(closure.assetClosureId.descendantId.eq(asset.id))
+                .join(asset).on(asset.id.eq(reservation.asset.id))
+                .leftJoin(category).on(category.id.eq(asset.categoryId))
+                .leftJoin(applicant).on(applicant.id.eq(reservation.applicant.id))
+                .leftJoin(respondent).on(respondent.id.eq(reservation.respondent.id))
+                .leftJoin(closure).on(closureOn)
                 .where(builder)
-                .where(reservableCondition)
                 .orderBy(reservation.startAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = query.select(reservation.count())
-                .from(reservation)
-                .join(asset)
-                .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
-                .leftJoin(applicant)
-                .on(applicant.id.eq(reservation.applicant.id))
-                .leftJoin(respondent)
-                .on(respondent.id.eq(reservation.respondent.id))
-                .leftJoin(closure)
-                .on(closure.assetClosureId.descendantId.eq(asset.id))
-                .where(builder)
-                .where(reservableCondition)
-                .fetchOne();
-
-        return new PageImpl<>(content, pageable, total);
+        Long total = query.select(reservation.count())
+            .from(reservation)
+            .join(asset).on(asset.id.eq(reservation.asset.id))
+            .leftJoin(category).on(category.id.eq(asset.categoryId))
+            .leftJoin(applicant).on(applicant.id.eq(reservation.applicant.id))
+            .leftJoin(respondent).on(respondent.id.eq(reservation.respondent.id))
+            .leftJoin(closure).on(closureOn)
+            .where(builder)
+            .fetchOne();
+        return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
 
     private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
