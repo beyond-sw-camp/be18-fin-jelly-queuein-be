@@ -60,8 +60,7 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(usageHistory.createdAt.desc(),
-                        usageHistory.id.desc())
+                .orderBy(usageHistory.createdAt.desc(), usageHistory.id.desc())
                 .fetch();
 
         Long total = queryFactory

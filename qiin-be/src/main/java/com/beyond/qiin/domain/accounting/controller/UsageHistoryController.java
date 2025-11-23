@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/accounting/usage-history")
 @RequiredArgsConstructor
-public class UsageHistoryQueryController {
+public class UsageHistoryController {
 
     private final UsageHistoryQueryService service;
 
