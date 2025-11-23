@@ -304,11 +304,16 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         // assetId 유효한지 확인
         Asset asset = assetQueryService.getAssetById(assetId);
 
-        DateRange dateRange = dayToInstant("Asia/Seoul", date);
+        ZoneId zone = ZoneId.of("Asia/Seoul");
 
-        List<Reservation> reservations = reservationJpaRepository.findAllByAssetIdAndDate(
-                asset.getId(), dateRange.getStartDay(), dateRange.getEndDay());
-        return reservations;
+        Instant startOfDay = date.atStartOfDay(zone).toInstant();
+        Instant endOfDay = date.plusDays(1).atStartOfDay(zone).toInstant();
+
+        return reservationJpaRepository.findAllByAssetIdAndDate(
+            assetId,
+            startOfDay,
+            endOfDay
+        );
     }
 
     // status 자체는 null x이므로 int
