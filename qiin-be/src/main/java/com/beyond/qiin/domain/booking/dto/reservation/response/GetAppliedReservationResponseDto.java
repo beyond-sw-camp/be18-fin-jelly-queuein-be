@@ -1,16 +1,16 @@
- package com.beyond.qiin.domain.booking.dto.reservation.response;
+package com.beyond.qiin.domain.booking.dto.reservation.response;
 
- import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
- import lombok.AccessLevel;
- import lombok.AllArgsConstructor;
- import lombok.Builder;
- import lombok.Getter;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 // 관리자 승인 / 거절
- @Builder
- @AllArgsConstructor(access = AccessLevel.PRIVATE)
- @Getter
- public class GetAppliedReservationResponseDto {
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+public class GetAppliedReservationResponseDto {
 
     // 자원명
     private final String assetName;
@@ -62,4 +62,4 @@
     //                .reason(reservation.getReason())
     //                .build();
     //    }
- }
+}

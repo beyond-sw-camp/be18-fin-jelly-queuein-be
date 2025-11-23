@@ -168,7 +168,7 @@ public class ReservationController {
     }
 
     // 페이징 대상의 조회
-    //사용자의 예약한 자원에 대한 목록 조회
+    // 사용자의 예약한 자원에 대한 목록 조회
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/me")
     public ResponseEntity<PageResponseDto<GetUserReservationResponseDto>> getUserReservations(
