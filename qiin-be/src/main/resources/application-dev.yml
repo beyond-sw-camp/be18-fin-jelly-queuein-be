@@ -17,16 +17,20 @@ spring:
     producer:
       #직렬화
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     topic:
-      reservation: reservation-topic-dev
-      notification: notification-topic-dev
+      topics:
+        reservation-created: reservation-created-topic
+        reservation-updated: reservation-updated-topic
 
     consumer:
       auto-offset-reset: earliest
+      group-id: reservation-group
       #역직렬화
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 
   # DB 설정: Spring 표준 키 사용 (Doppler에 있는 키와 매칭)
   datasource:
