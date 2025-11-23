@@ -29,4 +29,3 @@ public class UsageHistoryQueryController {
         return ResponseEntity.ok(service.getUsageHistoryDetail(id));
     }
 }
-

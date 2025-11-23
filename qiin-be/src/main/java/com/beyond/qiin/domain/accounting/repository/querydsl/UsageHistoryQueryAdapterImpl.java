@@ -6,17 +6,14 @@ import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
 import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistorySearchRequestDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
-
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,8 +25,7 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
     public Page<UsageHistoryListResponseDto> searchUsageHistory(UsageHistorySearchRequestDto req) {
 
         Pageable pageable =
-                PageRequest.of(req.getPage() == null ? 0 : req.getPage(),
-                        req.getSize() == null ? 20 : req.getSize());
+                PageRequest.of(req.getPage() == null ? 0 : req.getPage(), req.getSize() == null ? 20 : req.getSize());
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -57,10 +53,10 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                         usageHistory.actualUsageTime,
                         Expressions.nullExpression(String.class),
                         usageHistory.usageRatio,
-                        Expressions.nullExpression(String.class)
-                ))
+                        Expressions.nullExpression(String.class)))
                 .from(usageHistory)
-                .join(asset).on(asset.id.eq(usageHistory.assetId))
+                .join(asset)
+                .on(asset.id.eq(usageHistory.assetId))
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -70,14 +66,13 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
         Long total = queryFactory
                 .select(usageHistory.count())
                 .from(usageHistory)
-                .join(asset).on(asset.id.eq(usageHistory.assetId))
+                .join(asset)
+                .on(asset.id.eq(usageHistory.assetId))
                 .where(builder)
                 .fetchOne();
 
         return new PageImpl<>(items, pageable, total == null ? 0 : total);
     }
-
-
 
     @Override
     public UsageHistoryDetailResponseDto getUsageHistoryDetail(final Long usageHistoryId) {
@@ -88,13 +83,14 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                         usageHistory.id,
                         asset.name,
                         Expressions.nullExpression(String.class), // image (S3)
-                        Expressions.nullExpression(List.class),  // reserverNames
-                        usageHistory.usageRatio,                 // billAmount raw (임시)
-                        usageHistory.usageRatio,                 // actualBillAmount raw (임시)
-                        usageHistory.usageRatio                  // fixedCost raw (임시)
-                ))
+                        Expressions.nullExpression(List.class), // reserverNames
+                        usageHistory.usageRatio, // billAmount raw (임시)
+                        usageHistory.usageRatio, // actualBillAmount raw (임시)
+                        usageHistory.usageRatio // fixedCost raw (임시)
+                        ))
                 .from(usageHistory)
-                .join(asset).on(asset.id.eq(usageHistory.assetId))
+                .join(asset)
+                .on(asset.id.eq(usageHistory.assetId))
                 .where(usageHistory.id.eq(usageHistoryId))
                 .fetchOne();
     }
