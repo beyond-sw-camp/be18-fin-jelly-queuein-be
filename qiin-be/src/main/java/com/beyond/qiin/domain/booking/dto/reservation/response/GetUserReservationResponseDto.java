@@ -1,17 +1,17 @@
-//package com.beyond.qiin.domain.booking.dto.reservation.response;
+// package com.beyond.qiin.domain.booking.dto.reservation.response;
 //
-//import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
-//import java.time.Instant;
-//import lombok.AccessLevel;
-//import lombok.AllArgsConstructor;
-//import lombok.Builder;
-//import lombok.Getter;
+// import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
+// import java.time.Instant;
+// import lombok.AccessLevel;
+// import lombok.AllArgsConstructor;
+// import lombok.Builder;
+// import lombok.Getter;
 //
 //// 사용자의 예약에 대한 현황 목록 조회용
-//@Builder
-//@AllArgsConstructor(access = AccessLevel.PRIVATE)
-//@Getter
-//public class GetUserReservationResponseDto {
+// @Builder
+// @AllArgsConstructor(access = AccessLevel.PRIVATE)
+// @Getter
+// public class GetUserReservationResponseDto {
 //
 //    private final Long reservationId;
 //
@@ -72,4 +72,4 @@
 //    //                .actualEndAt(reservation.getActualEndAt())
 //    //                .build();
 //    //    }
-//}
+// }

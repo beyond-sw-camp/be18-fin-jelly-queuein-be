@@ -16,7 +16,6 @@ import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -43,11 +42,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
         assetCommandService.isAvailable(assetId); //        // 자원 자체가 지금 사용 가능한가에 대한 확인
 
-        Reservation reservation =
-            createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
+        Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
 
-        List<Attendant> attendants =
-            attendantUsers.stream()
+        List<Attendant> attendants = attendantUsers.stream()
                 .map(user -> Attendant.create(user, reservation))
                 .collect(Collectors.toList());
 
@@ -81,11 +78,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         assetCommandService.isAvailable(assetId);
 
         // 선착순 자원은 자동 승인
-        Reservation reservation =
-                createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
+        Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
 
-        List<Attendant> attendants =
-            attendantUsers.stream()
+        List<Attendant> attendants = attendantUsers.stream()
                 .map(user -> Attendant.create(user, reservation))
                 .collect(Collectors.toList());
 

@@ -1,17 +1,17 @@
-//package com.beyond.qiin.domain.booking.dto.reservation.response;
+// package com.beyond.qiin.domain.booking.dto.reservation.response;
 //
-//import java.util.ArrayList;
-//import java.util.List;
-//import lombok.AccessLevel;
-//import lombok.AllArgsConstructor;
-//import lombok.Builder;
-//import lombok.Getter;
+// import java.util.ArrayList;
+// import java.util.List;
+// import lombok.AccessLevel;
+// import lombok.AllArgsConstructor;
+// import lombok.Builder;
+// import lombok.Getter;
 //
-//@Builder
-//@AllArgsConstructor(access = AccessLevel.PRIVATE)
-//@Getter
-//public class GetAppliedReservationListResponseDto {
+// @Builder
+// @AllArgsConstructor(access = AccessLevel.PRIVATE)
+// @Getter
+// public class GetAppliedReservationListResponseDto {
 //
 //    @Builder.Default
 //    private final List<GetAppliedReservationResponseDto> reservations = new ArrayList<>();
-//}
+// }

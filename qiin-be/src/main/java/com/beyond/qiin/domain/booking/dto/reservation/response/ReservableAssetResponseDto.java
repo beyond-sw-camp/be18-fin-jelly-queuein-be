@@ -1,15 +1,15 @@
-//package com.beyond.qiin.domain.booking.dto.reservation.response;
+// package com.beyond.qiin.domain.booking.dto.reservation.response;
 //
-//import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
-//import lombok.AccessLevel;
-//import lombok.AllArgsConstructor;
-//import lombok.Builder;
-//import lombok.Getter;
+// import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
+// import lombok.AccessLevel;
+// import lombok.AllArgsConstructor;
+// import lombok.Builder;
+// import lombok.Getter;
 //
-//@Getter
-//@Builder
-//@AllArgsConstructor(access = AccessLevel.PRIVATE)
-//public class ReservableAssetResponseDto {
+// @Getter
+// @Builder
+// @AllArgsConstructor(access = AccessLevel.PRIVATE)
+// public class ReservableAssetResponseDto {
 //
 //    private final Long assetId;
 //
@@ -47,4 +47,4 @@
 //    //                .build();
 //    //    }
 //
-//}
+// }

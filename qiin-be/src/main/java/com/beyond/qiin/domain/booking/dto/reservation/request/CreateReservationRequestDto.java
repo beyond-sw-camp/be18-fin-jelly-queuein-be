@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.booking.dto.reservation.request;
 
-import com.beyond.qiin.domain.booking.reservation.attendant.entity.Attendant;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import com.beyond.qiin.domain.booking.reservation.enums.ReservationStatus;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -48,7 +47,7 @@ public class CreateReservationRequestDto {
     public Reservation toEntity(
             final Asset asset,
             final User applicant,
-            //final List<Attendant> attendants,
+            // final List<Attendant> attendants,
             final ReservationStatus reservationStatus) {
 
         Reservation reservation = Reservation.builder()
@@ -61,7 +60,7 @@ public class CreateReservationRequestDto {
                 .reservationStatus(reservationStatus)
                 .build();
 
-        //reservation.addAttendants(attendants);
+        // reservation.addAttendants(attendants);
 
         return reservation;
     }
