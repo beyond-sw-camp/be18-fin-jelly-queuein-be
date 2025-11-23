@@ -49,7 +49,6 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
             builder.and(reservation.startAt.between(start, end));
         }
 
-
         // 자원 관련
         // 이름 검색
         if (condition.getAssetName() != null) {
