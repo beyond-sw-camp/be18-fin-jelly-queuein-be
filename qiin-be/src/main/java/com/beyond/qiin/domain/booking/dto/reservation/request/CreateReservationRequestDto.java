@@ -48,7 +48,7 @@ public class CreateReservationRequestDto {
     public Reservation toEntity(
             final Asset asset,
             final User applicant,
-            final List<Attendant> attendants,
+            //final List<Attendant> attendants,
             final ReservationStatus reservationStatus) {
 
         Reservation reservation = Reservation.builder()
@@ -61,7 +61,7 @@ public class CreateReservationRequestDto {
                 .reservationStatus(reservationStatus)
                 .build();
 
-        reservation.addAttendants(attendants);
+        //reservation.addAttendants(attendants);
 
         return reservation;
     }

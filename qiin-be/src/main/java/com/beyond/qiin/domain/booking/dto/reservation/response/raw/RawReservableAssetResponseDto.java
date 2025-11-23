@@ -7,13 +7,15 @@ import lombok.Getter;
 @AllArgsConstructor
 // TODO : asset type, asset status enum화
 public class RawReservableAssetResponseDto {
+    //TODO : 순서대로 넣어줘야함 QUERYDSL PROJECTION 용이라
+    //  private final AssetType assetType;
+
+    //  private final AssetStatus assetStatus;
+
     private final Long reservationId;
     private final Long assetId;
     private final String assetName;
-    //  private final AssetType assetType;
     private final String categoryName;
-    //  private final AssetStatus assetStatus;
-
-    private final boolean needsApproval;
+    private final Boolean needsApproval;
     private final String reservationStatus;
 }

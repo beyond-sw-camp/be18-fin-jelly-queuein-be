@@ -112,8 +112,8 @@ public class Reservation extends BaseEntity {
 
         List<Attendant> attendants = users.stream()
                 .map(user -> {
-                    Attendant attendant = Attendant.create(user);
-                    attendant.setReservation(this);
+                    Attendant attendant = Attendant.create(user, this);
+
                     return attendant;
                 })
                 .toList();

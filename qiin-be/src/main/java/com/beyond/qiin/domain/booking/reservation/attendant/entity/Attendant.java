@@ -60,7 +60,7 @@ public class Attendant extends BaseEntity {
         this.user = user;
     }
 
-    public static Attendant create(User user) {
-        return Attendant.builder().user(user).build();
+    public static Attendant create(User user, Reservation reservation) {
+        return Attendant.builder().user(user).reservation(reservation).build();
     }
 }

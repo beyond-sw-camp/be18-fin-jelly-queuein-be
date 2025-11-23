@@ -38,22 +38,20 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
         Asset asset = assetCommandService.getAssetById(assetId);
-
         User applicant = userReader.findById(userId);
-
-        // 참여자 전원 있는지에 대한 확인
         userReader.validateAllExist(createReservationRequestDto.getAttendantIds());
-
         List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
-
-        List<Attendant> attendants =
-                attendantUsers.stream().map(Attendant::create).collect(Collectors.toCollection(ArrayList::new));
-
-        // 자원 자체가 지금 사용 가능한가에 대한 확인
-        assetCommandService.isAvailable(assetId);
+        assetCommandService.isAvailable(assetId); //        // 자원 자체가 지금 사용 가능한가에 대한 확인
 
         Reservation reservation =
-                createReservationRequestDto.toEntity(asset, applicant, attendants, ReservationStatus.PENDING);
+            createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
+
+        List<Attendant> attendants =
+            attendantUsers.stream()
+                .map(user -> Attendant.create(user, reservation))
+                .collect(Collectors.toList());
+
+        reservation.addAttendants(attendants);
 
         reservationJpaRepository.save(reservation);
 
@@ -83,11 +81,15 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         assetCommandService.isAvailable(assetId);
 
         // 선착순 자원은 자동 승인
-        List<Attendant> attendants =
-                attendantUsers.stream().map(Attendant::create).collect(Collectors.toCollection(ArrayList::new));
-
         Reservation reservation =
-                createReservationRequestDto.toEntity(asset, applicant, attendants, ReservationStatus.APPROVED);
+                createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
+
+        List<Attendant> attendants =
+            attendantUsers.stream()
+                .map(user -> Attendant.create(user, reservation))
+                .collect(Collectors.toList());
+
+        reservation.addAttendants(attendants);
 
         reservationJpaRepository.save(reservation);
 

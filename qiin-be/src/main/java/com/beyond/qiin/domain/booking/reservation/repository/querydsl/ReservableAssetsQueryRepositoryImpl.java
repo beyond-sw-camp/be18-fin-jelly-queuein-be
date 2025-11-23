@@ -99,6 +99,7 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
 
         List<RawReservableAssetResponseDto> content = query.select(Projections.constructor(
                         RawReservableAssetResponseDto.class,
+                        reservation.id,
                         asset.id,
                         asset.name,
                         //                        asset.type,
