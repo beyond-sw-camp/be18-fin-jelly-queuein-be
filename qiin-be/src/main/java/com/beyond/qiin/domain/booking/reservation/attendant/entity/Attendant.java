@@ -36,9 +36,6 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at is null")
 public class Attendant extends BaseEntity {
 
-    @Column(name = "reservation_id", nullable = false)
-    private Long reservationId;
-
     @ManyToOne
     @JoinColumn(
             name = "reservation_id",
@@ -46,9 +43,6 @@ public class Attendant extends BaseEntity {
             updatable = false,
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Reservation reservation;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
@@ -60,15 +54,13 @@ public class Attendant extends BaseEntity {
 
     public void setReservation(Reservation reservation) {
         this.reservation = reservation;
-        this.reservationId = reservation.getId();
     }
 
     public void setUser(User user) {
         this.user = user;
-        this.userId = user.getId();
     }
 
     public static Attendant create(User user) {
-        return Attendant.builder().user(user).userId(user.getId()).build();
+        return Attendant.builder().user(user).build();
     }
 }
