@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
-import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.RawAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
 import com.beyond.qiin.domain.iam.entity.QUser;
@@ -18,7 +17,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -176,15 +174,15 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
 
     private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
         return pageable.getSort().stream()
-            .map(order -> {
-                String property = order.getProperty(); // "startAt", "status" ...
+                .map(order -> {
+                    String property = order.getProperty(); // "startAt", "status" ...
 
-                Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+                    Order direction = order.isAscending() ? Order.ASC : Order.DESC;
 
-                PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
+                    PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
 
-                return new OrderSpecifier(direction, path.get(property));
-            })
-            .toArray(OrderSpecifier[]::new);
+                    return new OrderSpecifier(direction, path.get(property));
+                })
+                .toArray(OrderSpecifier[]::new);
     }
 }

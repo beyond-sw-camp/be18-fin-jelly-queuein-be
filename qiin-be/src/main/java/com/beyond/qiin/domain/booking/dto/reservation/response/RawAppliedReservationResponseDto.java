@@ -5,7 +5,4 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class RawAppliedReservationResponseDto {
-
-
-}
+public class RawAppliedReservationResponseDto {}

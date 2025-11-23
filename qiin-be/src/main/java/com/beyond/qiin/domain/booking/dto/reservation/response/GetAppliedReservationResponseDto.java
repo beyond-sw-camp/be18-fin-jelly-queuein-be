@@ -49,6 +49,4 @@ public class GetAppliedReservationResponseDto {
                 .reason(reservation.getReason())
                 .build();
     }
-
-
 }

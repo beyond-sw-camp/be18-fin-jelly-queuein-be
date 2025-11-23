@@ -14,7 +14,6 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.RawReservableAsse
 import com.beyond.qiin.domain.booking.dto.reservation.response.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.TimeSlotDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationResponseDto;
@@ -171,7 +170,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         Page<RawAppliedReservationResponseDto> rawPage = appliedReservationsQueryRepository.search(condition, pageable);
 
         Page<GetAppliedReservationResponseDto> page = rawPage.map(GetAppliedReservationResponseDto::fromRaw);
-
 
         return PageResponseDto.from(page);
 

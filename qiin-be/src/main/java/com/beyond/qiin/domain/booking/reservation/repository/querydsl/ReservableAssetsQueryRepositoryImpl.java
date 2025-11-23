@@ -2,7 +2,6 @@ package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.RawReservableAssetResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
@@ -16,7 +15,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,8 +36,7 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
     private static final QCategory category = QCategory.category;
 
     @Override
-    public Page<RawReservableAssetResponseDto> search
-        (ReservableAssetSearchCondition condition, Pageable pageable) {
+    public Page<RawReservableAssetResponseDto> search(ReservableAssetSearchCondition condition, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
         // 날짜 조건
@@ -100,23 +97,25 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
         Instant start = date;
         Instant end = date.plusSeconds(24 * 3600);
 
-        List<RawReservableAssetResponseDto> content = query.select(
-            Projections.constructor(
+        List<RawReservableAssetResponseDto> content = query.select(Projections.constructor(
                         RawReservableAssetResponseDto.class,
                         asset.id,
                         asset.name,
-//                        asset.type,
+                        //                        asset.type,
                         category.name,
-//                        asset.status,
-                        asset.needsApproval
-                        ))
+                        //                        asset.status,
+                        asset.needsApproval))
                 .from(asset)
                 .leftJoin(reservation)
-                .on(reservation.asset.id.eq(asset.id)
-                    .and(start != null ? reservation.startAt.between(start, end) : null)
-                )
-                .leftJoin(category).on(category.id.eq(asset.categoryId))
-                .leftJoin(closure).on(closure.assetClosureId.descendantId.eq(asset.id))
+                .on(reservation
+                        .asset
+                        .id
+                        .eq(asset.id)
+                        .and(start != null ? reservation.startAt.between(start, end) : null))
+                .leftJoin(category)
+                .on(category.id.eq(asset.categoryId))
+                .leftJoin(closure)
+                .on(closure.assetClosureId.descendantId.eq(asset.id))
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -124,26 +123,28 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
                 .fetch();
 
         long total = query.select(asset.count())
-            .from(asset)
-            .leftJoin(category).on(category.id.eq(asset.categoryId))
-            .leftJoin(closure).on(closure.assetClosureId.descendantId.eq(asset.id))
-            .where(builder)
-            .fetchOne();
+                .from(asset)
+                .leftJoin(category)
+                .on(category.id.eq(asset.categoryId))
+                .leftJoin(closure)
+                .on(closure.assetClosureId.descendantId.eq(asset.id))
+                .where(builder)
+                .fetchOne();
 
         return new PageImpl<>(content, pageable, total);
     }
 
     private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
         return pageable.getSort().stream()
-            .map(order -> {
-                String property = order.getProperty(); // "startAt", "status" ...
+                .map(order -> {
+                    String property = order.getProperty(); // "startAt", "status" ...
 
-                Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+                    Order direction = order.isAscending() ? Order.ASC : Order.DESC;
 
-                PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
+                    PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
 
-                return new OrderSpecifier(direction, path.get(property));
-            })
-            .toArray(OrderSpecifier[]::new);
+                    return new OrderSpecifier(direction, path.get(property));
+                })
+                .toArray(OrderSpecifier[]::new);
     }
 }
