@@ -17,26 +17,38 @@ public class UsageHistoryListResponseDto {
     private final Instant reservationEndAt;
 
     private final Integer reservationMinutes;
-    private String reservationDurationText;
+    private final String reservationDurationText;
 
     private final Instant actualStartAt;
     private final Instant actualEndAt;
 
     private final Integer actualMinutes;
-    private String actualDurationText;
+    private final String actualDurationText;
 
     private final BigDecimal usageRatioRaw;
-    private String usageRatio;
+    private final String usageRatio;
 
-    public void changeReservationDurationText(String text) {
-        this.reservationDurationText = text;
-    }
-
-    public void changeActualDurationText(String text) {
-        this.actualDurationText = text;
-    }
-
-    public void changeUsageRatioText(String text) {
-        this.usageRatio = text;
+    /**
+     * 기존 DTO(raw) 값에서 텍스트 변환 값을 적용한 새로운 DTO 생성
+     */
+    public UsageHistoryListResponseDto withConvertedValues(
+            String reservationDurationText,
+            String actualDurationText,
+            String usageRatioText
+    ) {
+        return new UsageHistoryListResponseDto(
+                this.usageHistoryId,
+                this.assetName,
+                this.reservationStartAt,
+                this.reservationEndAt,
+                this.reservationMinutes,
+                reservationDurationText,
+                this.actualStartAt,
+                this.actualEndAt,
+                this.actualMinutes,
+                actualDurationText,
+                this.usageRatioRaw,
+                usageRatioText
+        );
     }
 }

@@ -8,6 +8,7 @@ import com.beyond.qiin.domain.accounting.repository.querydsl.UsageHistoryQueryAd
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,15 +22,23 @@ public class UsageHistoryQueryServiceImpl implements UsageHistoryQueryService {
     @Transactional(readOnly = true)
     public PageResponseDto<UsageHistoryListResponseDto> getUsageHistoryList(UsageHistorySearchRequestDto req) {
 
-        Page<UsageHistoryListResponseDto> page = usageHistoryQueryAdapter.searchUsageHistory(req);
+        Page<UsageHistoryListResponseDto> rawPage = usageHistoryQueryAdapter.searchUsageHistory(req);
 
-        page.forEach(item -> {
-            item.changeReservationDurationText(convertMinutes(item.getReservationMinutes()));
-            item.changeActualDurationText(convertMinutes(item.getActualMinutes()));
-            item.changeUsageRatioText(formatRatio(item.getUsageRatioRaw()));
-        });
+        // 변환된 DTO 리스트 생성
+        var convertedItems = rawPage.getContent()
+                .stream()
+                .map(item -> item.withConvertedValues(
+                        convertMinutes(item.getReservationMinutes()),
+                        convertMinutes(item.getActualMinutes()),
+                        formatRatio(item.getUsageRatioRaw())
+                ))
+                .toList();
 
-        return PageResponseDto.from(page);
+        // 기존 pageable과 totalCount 그대로 유지하며 Page 재생성
+        Page<UsageHistoryListResponseDto> convertedPage =
+                new PageImpl<>(convertedItems, rawPage.getPageable(), rawPage.getTotalElements());
+
+        return PageResponseDto.from(convertedPage);
     }
 
     @Override

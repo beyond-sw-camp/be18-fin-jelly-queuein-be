@@ -68,6 +68,11 @@ public class UsageHistory {
     @Column(name = "created_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
     private Instant createdAt;
 
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = Instant.now();
+    }
+
     public static UsageHistory create(Long assetId, Long reservationId, Instant startAt, Instant endAt) {
         return UsageHistory.builder()
                 .assetId(assetId)
