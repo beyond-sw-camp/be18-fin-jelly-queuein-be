@@ -9,9 +9,7 @@ import org.springframework.data.domain.Pageable;
 public interface UsageHistoryQueryService {
 
     PageResponseDto<UsageHistoryListResponseDto> getUsageHistoryList(
-            UsageHistorySearchRequestDto req,
-            Pageable pageable
-    );
+            UsageHistorySearchRequestDto req, Pageable pageable);
 
     UsageHistoryDetailResponseDto getUsageHistoryDetail(final Long usageHistoryId);
 }

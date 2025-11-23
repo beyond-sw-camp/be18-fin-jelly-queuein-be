@@ -20,9 +20,7 @@ public class UsageHistoryController {
 
     @GetMapping
     public ResponseEntity<PageResponseDto<UsageHistoryListResponseDto>> list(
-            @ModelAttribute UsageHistorySearchRequestDto req,
-            @PageableDefault(size = 20) Pageable pageable
-    ) {
+            @ModelAttribute UsageHistorySearchRequestDto req, @PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(service.getUsageHistoryList(req, pageable));
     }
 

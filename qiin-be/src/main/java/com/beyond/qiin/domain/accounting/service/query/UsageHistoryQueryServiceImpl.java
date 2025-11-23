@@ -22,26 +22,19 @@ public class UsageHistoryQueryServiceImpl implements UsageHistoryQueryService {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<UsageHistoryListResponseDto> getUsageHistoryList(
-            final UsageHistorySearchRequestDto req,
-            final Pageable pageable
-    ) {
+            final UsageHistorySearchRequestDto req, final Pageable pageable) {
 
-        Page<UsageHistoryListResponseDto> rawPage =
-                usageHistoryQueryAdapter.searchUsageHistory(req, pageable);
+        Page<UsageHistoryListResponseDto> rawPage = usageHistoryQueryAdapter.searchUsageHistory(req, pageable);
 
         var convertedItems = rawPage.getContent().stream()
                 .map(item -> item.withConvertedValues(
                         convertMinutes(item.getReservationMinutes()),
                         convertMinutes(item.getActualMinutes()),
-                        formatRatio(item.getUsageRatioRaw())
-                ))
+                        formatRatio(item.getUsageRatioRaw())))
                 .toList();
 
-        return PageResponseDto.from(
-                new PageImpl<>(convertedItems, pageable, rawPage.getTotalElements())
-        );
+        return PageResponseDto.from(new PageImpl<>(convertedItems, pageable, rawPage.getTotalElements()));
     }
-
 
     @Override
     @Transactional(readOnly = true)
