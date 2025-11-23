@@ -107,19 +107,16 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
 
         BooleanBuilder closureOn = new BooleanBuilder();
         closureOn.and(closure.assetClosureId.descendantId.eq(asset.id));
-        // 계층 필터
         if (condition.getLayerZero() != null) {
-            builder.and(closure.depth
-                    .eq(0)
-                    .and(closure.assetClosureId.descendantId.eq(asset.id))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero()))));
+            closureOn
+                .and(closure.depth.eq(0))
+                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
         }
 
         if (condition.getLayerOne() != null) {
-            builder.and(closure.depth
-                    .eq(1)
-                    .and(closure.assetClosureId.descendantId.eq(asset.id))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
+            closureOn
+                .and(closure.depth.eq(1))
+                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
         }
 
         // 조회
@@ -138,32 +135,29 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                 .on(asset.id.eq(reservation.asset.id))
                 .leftJoin(category)
                 .on(category.id.eq(asset.categoryId))
-                .leftJoin(applicant)
-                .on(applicant.id.eq(reservation.applicant.id))
-                .leftJoin(respondent)
-                .on(respondent.id.eq(reservation.respondent.id))
-                .leftJoin(closure)
-                .on(closureOn)
+                .leftJoin(closure).on(closureOn)
+
+                // applicant/respondent: 매핑 기반
+                .leftJoin(reservation.applicant, applicant)
+                .leftJoin(reservation.respondent, respondent)
+
                 .where(builder)
                 .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long total = query.select(reservation.count())
-                .from(reservation)
-                .join(asset)
-                .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
-                .leftJoin(applicant)
-                .on(applicant.id.eq(reservation.applicant.id))
-                .leftJoin(respondent)
-                .on(respondent.id.eq(reservation.respondent.id))
-                .leftJoin(closure)
-                .on(closureOn)
-                .where(builder)
-                .fetchOne();
+        Long total = query
+            .select(reservation.count())
+            .from(reservation)
+            .join(asset).on(asset.id.eq(reservation.asset.id))
+            .leftJoin(category).on(category.id.eq(asset.categoryId))
+            .leftJoin(closure).on(closureOn)
+            .leftJoin(reservation.applicant, applicant)
+            .leftJoin(reservation.respondent, respondent)
+            .where(builder)
+            .fetchOne();
+
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
 

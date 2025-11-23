@@ -12,6 +12,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationLi
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 
@@ -33,9 +34,9 @@ public interface ReservationQueryService {
 
     WeekReservationListResponseDto getWeeklyReservations(final Long userId, Instant start, Instant end);
 
-    MonthReservationListResponseDto getMonthlyReservations(final Long userId, final Instant from, final Instant to);
+    MonthReservationListResponseDto getMonthlyReservations(final Long userId, final YearMonth yearMonth);
 
-    List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final Instant start, final Instant end);
+    List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final Instant from, Instant to);
 
     List<Reservation> getReservationsByUserAndWeek(final Long userId, final Instant start, final Instant end);
 
@@ -43,8 +44,8 @@ public interface ReservationQueryService {
 
     List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date);
 
-    //    List<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageable);
-    //
+//    List<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageable);
+
     //    List<Reservation> getReservationsByUserAndDate(final Long userId, final LocalDate date, final Pageable
     // pageable);
 

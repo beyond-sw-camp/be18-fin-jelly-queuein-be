@@ -142,7 +142,7 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = query.select(reservation.count())
+        Long total = query.select(reservation.count())
                 .from(reservation)
                 .join(asset)
                 .on(asset.id.eq(reservation.asset.id))

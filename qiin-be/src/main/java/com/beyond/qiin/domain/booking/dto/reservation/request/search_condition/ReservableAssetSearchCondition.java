@@ -1,12 +1,13 @@
 package com.beyond.qiin.domain.booking.dto.reservation.request.search_condition;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import lombok.Getter;
 
 // 예약 가능 자원 조회 시
 @Getter
 public class ReservableAssetSearchCondition {
-    private Instant date;
+    private LocalDate date;
 
     private String assetName;
     private String assetType;

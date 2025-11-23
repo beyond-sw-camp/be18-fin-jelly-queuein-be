@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -215,9 +216,9 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/monthly")
     public ResponseEntity<MonthReservationListResponseDto> getMonthlyReservations(
-            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant from, @RequestParam Instant to) {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam YearMonth yearMonth) {
         MonthReservationListResponseDto monthReservationListResponseDto =
-                reservationQueryService.getMonthlyReservations(user.getUserId(), from, to);
+                reservationQueryService.getMonthlyReservations(user.getUserId(), yearMonth);
         return ResponseEntity.ok(monthReservationListResponseDto);
     }
 
