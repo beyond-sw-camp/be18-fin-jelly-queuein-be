@@ -1,42 +1,42 @@
- package com.beyond.qiin.domain.booking.reservation.service.query;
+package com.beyond.qiin.domain.booking.reservation.service.query;
 
- import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.TimeSlotDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationResponseDto;
- import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
- import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
- import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
- import com.beyond.qiin.domain.booking.reservation.repository.ReservationJpaRepository;
- import com.beyond.qiin.domain.booking.reservation.repository.querydsl.AppliedReservationsQueryRepository;
- import com.beyond.qiin.domain.booking.reservation.repository.querydsl.ReservableAssetsQueryRepository;
- import com.beyond.qiin.domain.booking.reservation.repository.querydsl.UserReservationsQueryRepository;
- import com.beyond.qiin.domain.booking.reservation.util.AvailableTimeSlotCalculator;
- import com.beyond.qiin.domain.booking.reservation.vo.DateRange;
- import com.beyond.qiin.domain.booking.reservation.vo.TimeSlot;
- import com.beyond.qiin.domain.iam.support.user.UserReader;
- import com.beyond.qiin.domain.inventory.entity.Asset;
- import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
- import com.beyond.qiin.infra.redis.reservation.ReservationRedisRepository;
- import java.time.Instant;
- import java.time.LocalDate;
- import java.time.YearMonth;
- import java.time.ZoneId;
- import java.util.ArrayList;
- import java.util.Comparator;
- import java.util.List;
- import lombok.RequiredArgsConstructor;
- import lombok.extern.slf4j.Slf4j;
- import org.springframework.stereotype.Service;
- import org.springframework.transaction.annotation.Transactional;
+import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.TimeSlotDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationResponseDto;
+import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
+import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
+import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
+import com.beyond.qiin.domain.booking.reservation.repository.ReservationJpaRepository;
+import com.beyond.qiin.domain.booking.reservation.repository.querydsl.AppliedReservationsQueryRepository;
+import com.beyond.qiin.domain.booking.reservation.repository.querydsl.ReservableAssetsQueryRepository;
+import com.beyond.qiin.domain.booking.reservation.repository.querydsl.UserReservationsQueryRepository;
+import com.beyond.qiin.domain.booking.reservation.util.AvailableTimeSlotCalculator;
+import com.beyond.qiin.domain.booking.reservation.vo.DateRange;
+import com.beyond.qiin.domain.booking.reservation.vo.TimeSlot;
+import com.beyond.qiin.domain.iam.support.user.UserReader;
+import com.beyond.qiin.domain.inventory.entity.Asset;
+import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
+import com.beyond.qiin.infra.redis.reservation.ReservationRedisRepository;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
- @Slf4j
- @Service
- @RequiredArgsConstructor
- public class ReservationQueryServiceImpl implements ReservationQueryService {
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final ReservationJpaRepository reservationJpaRepository;
     private final UserReader userReader;
     private final AssetQueryService assetQueryService;
@@ -57,133 +57,135 @@
                 ReservationDetailResponseDto.fromEntity(reservation);
         return reservationDetailResponseDto;
     }
-//
-//    // 사용자 이름으로 예약 목록 조회
-//    @Override
-//    @Transactional(readOnly = true)
-//    public PageResponseDto<GetUserReservationResponseDto> getReservationsByUserId(
-//            final Long userId, final GetUserReservationSearchCondition condition, final Pageable pageable) {
-//        // 사용자 있는지 확인
-//        userReader.findById(userId);
-//
-//        // condition 자체의 필드들은 모두 null 가능
-//        // status는 int가 아닌 Integer이 됨
-//        // Integer reservationStatus = statusToInt(condition.getReservationStatus());
-//
-//        // Page<GetUserReservationResponseDto> page =
-//        //        userReservationsQueryRepository.search(userId, condition, reservationStatus, pageable);
-//        log.info(
-//                "date={}, status={}, approved={}, assetName={}, assetType={}, layerZero={}",
-//                condition.getDate(),
-//                condition.getReservationStatus(),
-//                condition.getIsApproved(),
-//                condition.getAssetName(),
-//                condition.getAssetType(),
-//                condition.getLayerZero());
-//
-//        Page<RawUserReservationResponseDto> rawPage =
-//                userReservationsQueryRepository.search(userId, condition, pageable);
-//
-//        Page<GetUserReservationResponseDto> page = rawPage.map(GetUserReservationResponseDto::fromRaw);
-//
-//        return PageResponseDto.from(page);
-//
-//        //        List<Reservation> reservations = getReservationsByUserAndDate(userId, date);
-//        //        List<GetUserReservationResponseDto> reservationList = new ArrayList<>();
-//        //        for (Reservation reservation : reservations) {
-//        //            GetUserReservationResponseDto getUserReservationResponseDto =
-//        //                    GetUserReservationResponseDto.fromEntity(reservation,
-//        // statusToString(reservation.getStatus()));
-//        //            reservationList.add(getUserReservationResponseDto);
-//        //        }
-//        //
-//        //        GetUserReservationListResponseDto reservationListResponseDto =
-//        // GetUserReservationListResponseDto.builder()
-//        //                .reservations(reservationList)
-//        //                .build();
-//        //
-//        //        return reservationListResponseDto;
-//    }
-//
-//    // TODO : 목록 조회 - querydsl 대상
-//    // 예약 가능 자원 목록 조회
-//    @Override
-//    @Transactional(readOnly = true)
-//    public PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
-//            final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable) {
-//
-//        userReader.findById(userId);
-//
-//        Page<RawReservableAssetResponseDto> rawPage = reservableAssetsQueryRepository.search(condition, pageable);
-//
-//        Page<ReservableAssetResponseDto> page = rawPage.map(ReservableAssetResponseDto::fromRaw);
-//
-//        return PageResponseDto.from(page);
-//
-//        //        // 사용 가능 상태의 자원들을 가져옴 - 빌 수 있음
-//        //        List<Asset> assets = assetRepository.findAvailableAssets();
-//        //
-//        //        // 예약 가능한 자원들을 담는 용도
-//        //        List<ReservableAssetResponseDto> responseList = new ArrayList<>();
-//        //
-//        //        for (Asset asset : assets) {
-//        //            // 해당 날짜의 해당 자원의 목록 조회
-//        //            List<Reservation> reservations = getReservationsByAssetAndDate(asset.getId(), date);
-//        //
-//        //            // 모든 시간에 대해 예약이 차있지 않은 경우만 추가
-//        //            boolean reservableAsset =
-//        //                    AvailableTimeSlotCalculator.isReservable(reservations, date, ZoneId.of("Asia/Seoul"));
-//        //
-//        //            if (reservableAsset) {
-//        //                // 시간대가 있는 경우 해당 자원에 대해 dto 추가
-//        //
-//        //                ReservableAssetResponseDto reservableAssetResponseDto =
-//        //                        ReservableAssetResponseDto.fromEntity(asset, statusToString(asset.getType()));
-//        //                responseList.add(reservableAssetResponseDto);
-//        //            }
-//        //        }
-//        //
-//        //        ReservableAssetListResponseDto reservationListResponseDto = ReservableAssetListResponseDto.builder()
-//        //                .reservations(responseList)
-//        //                .build();
-//        //
-//        //        return reservableAssetListResponseDto;
-//    }
-//
-//    // 신청 예약 목록 조회
-//    @Override
-//    @Transactional(readOnly = true)
-//    public PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
-//            final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
-//        userReader.findById(userId);
-//
-//        Page<RawAppliedReservationResponseDto> rawPage = appliedReservationsQueryRepository.search(condition,
-// pageable);
-//
-//        Page<GetAppliedReservationResponseDto> page = rawPage.map(GetAppliedReservationResponseDto::fromRaw);
-//
-//        return PageResponseDto.from(page);
-//
-//        //
-//        //        // status == pending인 경우
-//        //        List<Reservation> reservations = getReservationsPendingAndDate(date);
-//        //
-//        //        List<GetAppliedReservationResponseDto> reservationList = new ArrayList<>();
-//        //
-//        //        for (Reservation reservation : reservations) {
-//        //            GetAppliedReservationResponseDto reservationResponseDto =
-//        //                GetAppliedReservationResponseDto.fromEntity(reservation,
-//        // isAssetReservableToday(reservation.getAssetId()));
-//        //            reservationList.add(reservationResponseDto);
-//        //        }
-//        //
-//        //        GetAppliedReservationResponseDto reservationListResponseDto =
-//        // GetAppliedReservationResponseDto.builder()
-//        //            .reservations(reservationList)
-//        //            .build();
-//        //
-//        //        return reservationListResponseDto;
-//    }
+    //
+    //    // 사용자 이름으로 예약 목록 조회
+    //    @Override
+    //    @Transactional(readOnly = true)
+    //    public PageResponseDto<GetUserReservationResponseDto> getReservationsByUserId(
+    //            final Long userId, final GetUserReservationSearchCondition condition, final Pageable pageable) {
+    //        // 사용자 있는지 확인
+    //        userReader.findById(userId);
+    //
+    //        // condition 자체의 필드들은 모두 null 가능
+    //        // status는 int가 아닌 Integer이 됨
+    //        // Integer reservationStatus = statusToInt(condition.getReservationStatus());
+    //
+    //        // Page<GetUserReservationResponseDto> page =
+    //        //        userReservationsQueryRepository.search(userId, condition, reservationStatus, pageable);
+    //        log.info(
+    //                "date={}, status={}, approved={}, assetName={}, assetType={}, layerZero={}",
+    //                condition.getDate(),
+    //                condition.getReservationStatus(),
+    //                condition.getIsApproved(),
+    //                condition.getAssetName(),
+    //                condition.getAssetType(),
+    //                condition.getLayerZero());
+    //
+    //        Page<RawUserReservationResponseDto> rawPage =
+    //                userReservationsQueryRepository.search(userId, condition, pageable);
+    //
+    //        Page<GetUserReservationResponseDto> page = rawPage.map(GetUserReservationResponseDto::fromRaw);
+    //
+    //        return PageResponseDto.from(page);
+    //
+    //        //        List<Reservation> reservations = getReservationsByUserAndDate(userId, date);
+    //        //        List<GetUserReservationResponseDto> reservationList = new ArrayList<>();
+    //        //        for (Reservation reservation : reservations) {
+    //        //            GetUserReservationResponseDto getUserReservationResponseDto =
+    //        //                    GetUserReservationResponseDto.fromEntity(reservation,
+    //        // statusToString(reservation.getStatus()));
+    //        //            reservationList.add(getUserReservationResponseDto);
+    //        //        }
+    //        //
+    //        //        GetUserReservationListResponseDto reservationListResponseDto =
+    //        // GetUserReservationListResponseDto.builder()
+    //        //                .reservations(reservationList)
+    //        //                .build();
+    //        //
+    //        //        return reservationListResponseDto;
+    //    }
+    //
+    //    // TODO : 목록 조회 - querydsl 대상
+    //    // 예약 가능 자원 목록 조회
+    //    @Override
+    //    @Transactional(readOnly = true)
+    //    public PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
+    //            final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable) {
+    //
+    //        userReader.findById(userId);
+    //
+    //        Page<RawReservableAssetResponseDto> rawPage = reservableAssetsQueryRepository.search(condition, pageable);
+    //
+    //        Page<ReservableAssetResponseDto> page = rawPage.map(ReservableAssetResponseDto::fromRaw);
+    //
+    //        return PageResponseDto.from(page);
+    //
+    //        //        // 사용 가능 상태의 자원들을 가져옴 - 빌 수 있음
+    //        //        List<Asset> assets = assetRepository.findAvailableAssets();
+    //        //
+    //        //        // 예약 가능한 자원들을 담는 용도
+    //        //        List<ReservableAssetResponseDto> responseList = new ArrayList<>();
+    //        //
+    //        //        for (Asset asset : assets) {
+    //        //            // 해당 날짜의 해당 자원의 목록 조회
+    //        //            List<Reservation> reservations = getReservationsByAssetAndDate(asset.getId(), date);
+    //        //
+    //        //            // 모든 시간에 대해 예약이 차있지 않은 경우만 추가
+    //        //            boolean reservableAsset =
+    //        //                    AvailableTimeSlotCalculator.isReservable(reservations, date,
+    // ZoneId.of("Asia/Seoul"));
+    //        //
+    //        //            if (reservableAsset) {
+    //        //                // 시간대가 있는 경우 해당 자원에 대해 dto 추가
+    //        //
+    //        //                ReservableAssetResponseDto reservableAssetResponseDto =
+    //        //                        ReservableAssetResponseDto.fromEntity(asset, statusToString(asset.getType()));
+    //        //                responseList.add(reservableAssetResponseDto);
+    //        //            }
+    //        //        }
+    //        //
+    //        //        ReservableAssetListResponseDto reservationListResponseDto =
+    // ReservableAssetListResponseDto.builder()
+    //        //                .reservations(responseList)
+    //        //                .build();
+    //        //
+    //        //        return reservableAssetListResponseDto;
+    //    }
+    //
+    //    // 신청 예약 목록 조회
+    //    @Override
+    //    @Transactional(readOnly = true)
+    //    public PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
+    //            final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
+    //        userReader.findById(userId);
+    //
+    //        Page<RawAppliedReservationResponseDto> rawPage = appliedReservationsQueryRepository.search(condition,
+    // pageable);
+    //
+    //        Page<GetAppliedReservationResponseDto> page = rawPage.map(GetAppliedReservationResponseDto::fromRaw);
+    //
+    //        return PageResponseDto.from(page);
+    //
+    //        //
+    //        //        // status == pending인 경우
+    //        //        List<Reservation> reservations = getReservationsPendingAndDate(date);
+    //        //
+    //        //        List<GetAppliedReservationResponseDto> reservationList = new ArrayList<>();
+    //        //
+    //        //        for (Reservation reservation : reservations) {
+    //        //            GetAppliedReservationResponseDto reservationResponseDto =
+    //        //                GetAppliedReservationResponseDto.fromEntity(reservation,
+    //        // isAssetReservableToday(reservation.getAssetId()));
+    //        //            reservationList.add(reservationResponseDto);
+    //        //        }
+    //        //
+    //        //        GetAppliedReservationResponseDto reservationListResponseDto =
+    //        // GetAppliedReservationResponseDto.builder()
+    //        //            .reservations(reservationList)
+    //        //            .build();
+    //        //
+    //        //        return reservationListResponseDto;
+    //    }
 
     // 주별 일정 조회
     @Override
@@ -426,4 +428,4 @@
     //        return reservationJpaRepository.findAllWithStatusPendingAndDate(
     //                dateRange.getStartDay(), dateRange.getEndDay(), pageable);
     //    }
- }
+}
