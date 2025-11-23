@@ -184,8 +184,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // 주별 일정 조회
     @Override
     @Transactional(readOnly = true)
-    public WeekReservationListResponseDto getWeeklyReservations(
-            final Long userId, final LocalDate date) { // 해당 주의 기준날짜
+    public WeekReservationListResponseDto getWeeklyReservations(final Long userId, final LocalDate date) { // 해당 주의 기준날짜
         userReader.findById(userId);
 
         LocalDate startDate = date.with(DayOfWeek.MONDAY);
@@ -197,9 +196,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         List<Reservation> reservations = getReservationsByUserAndWeek(userId, start, end);
 
         Map<LocalDate, List<Reservation>> byDate = reservations.stream()
-            .collect(Collectors.groupingBy(
-                r -> r.getStartAt().atZone(ZoneId.of("Asia/Seoul")).toLocalDate()
-            ));
+                .collect(Collectors.groupingBy(
+                        r -> r.getStartAt().atZone(ZoneId.of("Asia/Seoul")).toLocalDate()));
 
         // 비어있을 수 있음
         List<WeekReservationResponseDto> reservationList = new ArrayList<>();
@@ -210,13 +208,11 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             List<Reservation> dailyReservations = byDate.getOrDefault(cursor, List.of());
 
             WeekReservationResponseDto dto = WeekReservationResponseDto.builder()
-                .date(cursor)
-                .reservations(
-                    dailyReservations.stream()
-                        .map(WeekReservationDailyResponseDto::fromEntity)
-                        .toList()
-                )
-                .build();
+                    .date(cursor)
+                    .reservations(dailyReservations.stream()
+                            .map(WeekReservationDailyResponseDto::fromEntity)
+                            .toList())
+                    .build();
 
             reservationList.add(dto);
 
