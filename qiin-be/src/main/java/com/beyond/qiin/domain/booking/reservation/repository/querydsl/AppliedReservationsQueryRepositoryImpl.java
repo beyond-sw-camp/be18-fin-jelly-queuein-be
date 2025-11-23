@@ -109,14 +109,14 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         closureOn.and(closure.assetClosureId.descendantId.eq(asset.id));
         if (condition.getLayerZero() != null) {
             closureOn
-                .and(closure.depth.eq(0))
-                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
+                    .and(closure.depth.eq(0))
+                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
         }
 
         if (condition.getLayerOne() != null) {
             closureOn
-                .and(closure.depth.eq(1))
-                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
+                    .and(closure.depth.eq(1))
+                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
         }
 
         // 조회
@@ -135,28 +135,30 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                 .on(asset.id.eq(reservation.asset.id))
                 .leftJoin(category)
                 .on(category.id.eq(asset.categoryId))
-                .leftJoin(closure).on(closureOn)
+                .leftJoin(closure)
+                .on(closureOn)
 
                 // applicant/respondent: 매핑 기반
                 .leftJoin(reservation.applicant, applicant)
                 .leftJoin(reservation.respondent, respondent)
-
                 .where(builder)
                 .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long total = query
-            .select(reservation.count())
-            .from(reservation)
-            .join(asset).on(asset.id.eq(reservation.asset.id))
-            .leftJoin(category).on(category.id.eq(asset.categoryId))
-            .leftJoin(closure).on(closureOn)
-            .leftJoin(reservation.applicant, applicant)
-            .leftJoin(reservation.respondent, respondent)
-            .where(builder)
-            .fetchOne();
+        Long total = query.select(reservation.count())
+                .from(reservation)
+                .join(asset)
+                .on(asset.id.eq(reservation.asset.id))
+                .leftJoin(category)
+                .on(category.id.eq(asset.categoryId))
+                .leftJoin(closure)
+                .on(closureOn)
+                .leftJoin(reservation.applicant, applicant)
+                .leftJoin(reservation.respondent, respondent)
+                .where(builder)
+                .fetchOne();
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }

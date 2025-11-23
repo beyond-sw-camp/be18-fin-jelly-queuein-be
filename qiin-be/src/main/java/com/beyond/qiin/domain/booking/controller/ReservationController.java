@@ -226,9 +226,9 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/weekly")
     public ResponseEntity<WeekReservationListResponseDto> getWeeklyReservations(
-            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant start, @RequestParam Instant end) {
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam LocalDate date) {
         WeekReservationListResponseDto weekReservationListResponseDto =
-                reservationQueryService.getWeeklyReservations(user.getUserId(), start, end);
+                reservationQueryService.getWeeklyReservations(user.getUserId(), date);
         return ResponseEntity.ok(weekReservationListResponseDto);
     }
     //
