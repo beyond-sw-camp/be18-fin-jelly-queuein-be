@@ -1,13 +1,15 @@
 package com.beyond.qiin.domain.booking.dto.reservation.response;
 
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
 import java.time.Instant;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 // 사용자의 예약에 대한 현황 목록 조회용
 @Builder
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class GetUserReservationResponseDto {
 
@@ -34,6 +36,22 @@ public class GetUserReservationResponseDto {
 
     private final Instant actualEndAt;
 
+    public static GetUserReservationResponseDto fromRaw(RawUserReservationResponseDto raw) {
+        return GetUserReservationResponseDto.builder()
+                .reservationId(raw.getReservationId())
+                .assetType(raw.getAssetType())
+                .assetName(raw.getAssetName())
+                .categoryName(raw.getCategoryName())
+                .assetStatus(raw.getAssetStatus())
+                .isApproved(raw.getIsApproved())
+                .startAt(raw.getStartAt())
+                .endAt(raw.getEndAt())
+                .reservationStatus(raw.getReservationStatus())
+                .actualStartAt(raw.getActualStartAt())
+                .actualEndAt(raw.getActualEndAt())
+                .build();
+    }
+
     //    public static GetUserReservationResponseDto fromEntity(
     //            final Reservation reservation,
     //            final String reservationStatus,
@@ -54,19 +72,4 @@ public class GetUserReservationResponseDto {
     //                .actualEndAt(reservation.getActualEndAt())
     //                .build();
     //    }
-    public static GetUserReservationResponseDto fromRaw(RawUserReservationResponseDto raw) {
-        return GetUserReservationResponseDto.builder()
-                .reservationId(raw.getReservationId())
-                .assetType(raw.getAssetType())
-                .assetName(raw.getAssetName())
-                .categoryName(raw.getCategoryName())
-                .assetStatus(raw.getAssetStatus())
-                .isApproved(raw.getIsApproved())
-                .startAt(raw.getStartAt())
-                .endAt(raw.getEndAt())
-                .reservationStatus(raw.getReservationStatus())
-                .actualStartAt(raw.getActualStartAt())
-                .actualEndAt(raw.getActualEndAt())
-                .build();
-    }
 }

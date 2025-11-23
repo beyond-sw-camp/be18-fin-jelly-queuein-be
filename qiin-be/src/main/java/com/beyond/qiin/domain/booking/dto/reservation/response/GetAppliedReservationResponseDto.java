@@ -1,5 +1,6 @@
 package com.beyond.qiin.domain.booking.dto.reservation.response;
 
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,19 +35,31 @@ public class GetAppliedReservationResponseDto {
     // 사유
     private final String reason;
 
-    public static GetAppliedReservationResponseDto fromEntity(final Reservation reservation, boolean isReservable) {
-
+    public static GetAppliedReservationResponseDto fromRaw(RawAppliedReservationResponseDto raw) {
         return GetAppliedReservationResponseDto.builder()
-                .assetName(reservation.getAsset().getName())
-                .reservationId(reservation.getId())
-                .applicantName(reservation.getApplicant().getUserName())
-                .isReservable(isReservable)
-                .respondentName(
-                        reservation.getRespondent() != null
-                                ? reservation.getRespondent().getUserName()
-                                : null)
-                .isApproved(reservation.isApproved())
-                .reason(reservation.getReason())
-                .build();
+            .assetName(raw.getAssetName())
+            .reservationId(raw.getReservationId())
+            .applicantName(raw.getApplicantName())
+            //TODO:.isReservable(false)
+            .respondentName(raw.getRespondentName())
+            .isApproved(raw.isApproved())
+            .reason(raw.getReason())
+            .build();
     }
+
+//    public static GetAppliedReservationResponseDto fromEntity(final Reservation reservation, boolean isReservable) {
+//
+//        return GetAppliedReservationResponseDto.builder()
+//                .assetName(reservation.getAsset().getName())
+//                .reservationId(reservation.getId())
+//                .applicantName(reservation.getApplicant().getUserName())
+//                .isReservable(isReservable)
+//                .respondentName(
+//                        reservation.getRespondent() != null
+//                                ? reservation.getRespondent().getUserName()
+//                                : null)
+//                .isApproved(reservation.isApproved())
+//                .reason(reservation.getReason())
+//                .build();
+//    }
 }

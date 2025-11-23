@@ -9,9 +9,9 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReserva
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.RawAppliedReservationResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.RawReservableAssetResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.RawUserReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.TimeSlotDto;
@@ -30,6 +30,7 @@ import com.beyond.qiin.domain.booking.reservation.vo.TimeSlot;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
+import com.beyond.qiin.infra.redis.reservation.ReservationRedisRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -54,6 +55,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final UserReservationsQueryRepository userReservationsQueryRepository;
     private final ReservableAssetsQueryRepository reservableAssetsQueryRepository;
     private final AppliedReservationsQueryRepository appliedReservationsQueryRepository;
+    private final ReservationRedisRepository reservationRedisRepository;
 
     // 예약 상세 조회 (api용)
     @Override

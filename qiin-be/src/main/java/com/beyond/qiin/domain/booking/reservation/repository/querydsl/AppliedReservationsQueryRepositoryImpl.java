@@ -1,7 +1,7 @@
 package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
-import com.beyond.qiin.domain.booking.dto.reservation.response.RawAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
 import com.beyond.qiin.domain.iam.entity.QUser;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
@@ -122,19 +122,15 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         // 조회
         List<RawAppliedReservationResponseDto> content = query.select(Projections.constructor(
                         RawAppliedReservationResponseDto.class,
-                        reservation.id,
-                        reservation.startAt,
-                        reservation.endAt,
-                        reservation.status,
-                        reservation.isApproved,
-                        reservation.reason,
-                        applicant.userName,
-                        respondent.userName,
                         asset.id,
                         asset.name,
-                        category.name,
-                        asset.status,
-                        asset.type))
+                        reservation.id,
+                        applicant.userName,
+                        respondent.userName,
+                        reservation.status,
+                        reservation.isApproved,
+                        reservation.reason
+                ))
                 .from(reservation)
                 .join(asset)
                 .on(asset.id.eq(reservation.asset.id))

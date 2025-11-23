@@ -1,7 +1,7 @@
 package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
-import com.beyond.qiin.domain.booking.dto.reservation.response.RawReservableAssetResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
@@ -39,12 +39,15 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
     public Page<RawReservableAssetResponseDto> search(ReservableAssetSearchCondition condition, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
+        Instant start = null;
+        Instant end = null;
+
         // 날짜 조건
         if (condition.getDate() != null) {
             LocalDate date = condition.getDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDate();
 
-            Instant start = date.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
-            Instant end = date.plusDays(1).atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+            start = date.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+            end = date.plusDays(1).atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
 
             builder.and(reservation.startAt.between(start, end));
         }
@@ -76,6 +79,9 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
         //            }
         //        }
 
+        BooleanBuilder closureOn = new BooleanBuilder();
+        closureOn.and(closure.assetClosureId.descendantId.eq(asset.id));
+
         // 0계층 / 1계층
         if (condition.getLayerZero() != null) {
             builder.and(closure.depth
@@ -90,12 +96,6 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
                     .and(closure.assetClosureId.descendantId.eq(asset.id))
                     .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
         }
-        // 날짜 기반 예약 여부
-        Instant date = condition.getDate();
-
-        // 하루 범위
-        Instant start = date;
-        Instant end = date.plusSeconds(24 * 3600);
 
         List<RawReservableAssetResponseDto> content = query.select(Projections.constructor(
                         RawReservableAssetResponseDto.class,
@@ -104,30 +104,29 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
                         //                        asset.type,
                         category.name,
                         //                        asset.status,
-                        asset.needsApproval))
-                .from(asset)
-                .leftJoin(reservation)
-                .on(reservation
-                        .asset
-                        .id
-                        .eq(asset.id)
-                        .and(start != null ? reservation.startAt.between(start, end) : null))
+                        asset.needsApproval,
+                        reservation.status
+                ))
+
+                .from(reservation)
+                .join(asset)
+                .on(asset.id.eq(reservation.asset.id))
                 .leftJoin(category)
                 .on(category.id.eq(asset.categoryId))
                 .leftJoin(closure)
-                .on(closure.assetClosureId.descendantId.eq(asset.id))
+                .on(closureOn)
                 .where(builder)
+                .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(asset.name.asc())
                 .fetch();
 
-        long total = query.select(asset.count())
-                .from(asset)
-                .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
+        long total = query.select(reservation.count())
+                .from(reservation)
+                .join(asset)
+                .on(asset.id.eq(reservation.asset.id))
                 .leftJoin(closure)
-                .on(closure.assetClosureId.descendantId.eq(asset.id))
+                .on(closureOn)
                 .where(builder)
                 .fetchOne();
 
