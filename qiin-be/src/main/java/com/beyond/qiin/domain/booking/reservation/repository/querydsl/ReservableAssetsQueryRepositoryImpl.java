@@ -39,18 +39,16 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
     public Page<RawReservableAssetResponseDto> search(ReservableAssetSearchCondition condition, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        Instant start = null;
-        Instant end = null;
-
-        // 날짜 조건
+        // 날짜(Instant)
         if (condition.getDate() != null) {
-            LocalDate date = condition.getDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDate();
+            LocalDate date = condition.getDate();
 
-            start = date.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
-            end = date.plusDays(1).atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+            Instant start = date.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+            Instant end = date.plusDays(1).atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
 
             builder.and(reservation.startAt.between(start, end));
         }
+
 
         // 자원 관련
         // 이름 검색

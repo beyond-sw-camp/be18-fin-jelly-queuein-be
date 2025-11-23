@@ -44,6 +44,7 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(reservation.status.eq(0)); // pending인 경우 == 신청된 reservations
 
+        // 날짜(Instant)
         if (condition.getDate() != null) {
             LocalDate date = condition.getDate();
 
@@ -144,7 +145,7 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                 .leftJoin(closure)
                 .on(closureOn)
                 .where(builder)
-                .orderBy(reservation.startAt.desc())
+                .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
