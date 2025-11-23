@@ -42,7 +42,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
         assetCommandService.isAvailable(assetId); //        // 자원 자체가 지금 사용 가능한가에 대한 확인
 
-        Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
+        Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.PENDING);
 
         List<Attendant> attendants = attendantUsers.stream()
                 .map(user -> Attendant.create(user, reservation))

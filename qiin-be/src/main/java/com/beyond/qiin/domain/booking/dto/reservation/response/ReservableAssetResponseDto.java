@@ -33,7 +33,7 @@
 //                .categoryName(raw.getCategoryName())
 //                //            .assetStatus(raw.getAssetStatus())
 //                .needsApproval(raw.isNeedsApproval())
-//                .reservationStatus(raw.getReservationStatus())
+//                .reservationStatus(raw.getReservationStatus()) //.reservationStatus(reservation.getStatus().name())
 //                .build();
 //    }
 //    //    public static ReservableAssetResponseDto fromEntity(final Asset asset, final String assetType) {
