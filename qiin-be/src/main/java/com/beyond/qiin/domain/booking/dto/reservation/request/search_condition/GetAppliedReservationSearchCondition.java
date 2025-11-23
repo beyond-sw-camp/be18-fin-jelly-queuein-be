@@ -1,12 +1,11 @@
 package com.beyond.qiin.domain.booking.dto.reservation.request.search_condition;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import lombok.Getter;
 
 @Getter
 public class GetAppliedReservationSearchCondition {
-    private LocalDate date; //TODO:
+    private LocalDate date; // TODO:
 
     private String applicantName;
     private String respondentName;

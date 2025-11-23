@@ -188,12 +188,12 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @GetMapping("/pending")
     public ResponseEntity<PageResponseDto<GetAppliedReservationResponseDto>> getAppliedReservations(
-        @AuthenticationPrincipal CustomUserDetails user,
-        @Valid @ModelAttribute GetAppliedReservationSearchCondition condition,
-        Pageable pageable) {
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Valid @ModelAttribute GetAppliedReservationSearchCondition condition,
+            Pageable pageable) {
 
         PageResponseDto<GetAppliedReservationResponseDto> page =
-            reservationQueryService.getReservationApplies(user.getUserId(), condition, pageable);
+                reservationQueryService.getReservationApplies(user.getUserId(), condition, pageable);
         return ResponseEntity.ok(page);
     }
 

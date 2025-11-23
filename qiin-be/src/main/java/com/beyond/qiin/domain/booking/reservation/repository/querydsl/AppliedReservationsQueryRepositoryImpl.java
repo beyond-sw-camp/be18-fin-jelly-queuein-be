@@ -67,9 +67,7 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         if (condition.getIsReservable() != null) {
             boolean isReservable = Boolean.parseBoolean(condition.getIsReservable());
 
-            BooleanExpression reservableCondition =
-                isReservable ? reservation.status.eq(0)
-                    : reservation.status.ne(0);
+            BooleanExpression reservableCondition = isReservable ? reservation.status.eq(0) : reservation.status.ne(0);
 
             builder.and(reservableCondition);
         }
@@ -106,7 +104,6 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         //            }
         //        }
 
-
         BooleanBuilder closureOn = new BooleanBuilder();
         closureOn.and(closure.assetClosureId.descendantId.eq(asset.id));
         // 계층 필터
@@ -136,11 +133,16 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                         reservation.isApproved,
                         reservation.reason))
                 .from(reservation)
-                .join(asset).on(asset.id.eq(reservation.asset.id))
-                .leftJoin(category).on(category.id.eq(asset.categoryId))
-                .leftJoin(applicant).on(applicant.id.eq(reservation.applicant.id))
-                .leftJoin(respondent).on(respondent.id.eq(reservation.respondent.id))
-                .leftJoin(closure).on(closureOn)
+                .join(asset)
+                .on(asset.id.eq(reservation.asset.id))
+                .leftJoin(category)
+                .on(category.id.eq(asset.categoryId))
+                .leftJoin(applicant)
+                .on(applicant.id.eq(reservation.applicant.id))
+                .leftJoin(respondent)
+                .on(respondent.id.eq(reservation.respondent.id))
+                .leftJoin(closure)
+                .on(closureOn)
                 .where(builder)
                 .orderBy(reservation.startAt.desc())
                 .offset(pageable.getOffset())
@@ -148,14 +150,19 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                 .fetch();
 
         Long total = query.select(reservation.count())
-            .from(reservation)
-            .join(asset).on(asset.id.eq(reservation.asset.id))
-            .leftJoin(category).on(category.id.eq(asset.categoryId))
-            .leftJoin(applicant).on(applicant.id.eq(reservation.applicant.id))
-            .leftJoin(respondent).on(respondent.id.eq(reservation.respondent.id))
-            .leftJoin(closure).on(closureOn)
-            .where(builder)
-            .fetchOne();
+                .from(reservation)
+                .join(asset)
+                .on(asset.id.eq(reservation.asset.id))
+                .leftJoin(category)
+                .on(category.id.eq(asset.categoryId))
+                .leftJoin(applicant)
+                .on(applicant.id.eq(reservation.applicant.id))
+                .leftJoin(respondent)
+                .on(respondent.id.eq(reservation.respondent.id))
+                .leftJoin(closure)
+                .on(closureOn)
+                .where(builder)
+                .fetchOne();
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
 

@@ -118,11 +118,10 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
-        final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
+            final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
         userReader.findById(userId);
 
-        Page<RawAppliedReservationResponseDto> rawPage = appliedReservationsQueryRepository.search(condition,
-            pageable);
+        Page<RawAppliedReservationResponseDto> rawPage = appliedReservationsQueryRepository.search(condition, pageable);
 
         Page<GetAppliedReservationResponseDto> page = rawPage.map(GetAppliedReservationResponseDto::fromRaw);
 
@@ -196,7 +195,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     //        //        return reservableAssetListResponseDto;
     //    }
     //
-
 
     // 주별 일정 조회
     @Override

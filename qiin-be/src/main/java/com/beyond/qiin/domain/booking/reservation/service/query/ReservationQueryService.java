@@ -26,9 +26,8 @@ public interface ReservationQueryService {
     //    PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
     //            final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable);
     //
-   PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
-       final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable);
-
+    PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
+            final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable);
 
     AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId, final LocalDate date);
 

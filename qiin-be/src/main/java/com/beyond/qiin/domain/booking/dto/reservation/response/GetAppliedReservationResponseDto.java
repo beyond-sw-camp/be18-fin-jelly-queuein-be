@@ -44,7 +44,8 @@ public class GetAppliedReservationResponseDto {
                 .applicantName(raw.getApplicantName())
                 // TODO:.isReservable(false)
                 .respondentName(raw.getRespondentName())
-                .reservationStatus(ReservationStatus.from(raw.getReservationStatus()).name())
+                .reservationStatus(
+                        ReservationStatus.from(raw.getReservationStatus()).name())
                 .isApproved(raw.isApproved())
                 .reason(raw.getReason())
                 .build();
