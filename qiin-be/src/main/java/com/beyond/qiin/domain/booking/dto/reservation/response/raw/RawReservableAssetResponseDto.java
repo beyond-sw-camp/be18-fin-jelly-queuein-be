@@ -16,6 +16,6 @@ public class RawReservableAssetResponseDto {
     private final Long assetId;
     private final String assetName;
     private final String categoryName;
-    private final Boolean needsApproval;
+    private final boolean needsApproval;
     private final String reservationStatus;
 }

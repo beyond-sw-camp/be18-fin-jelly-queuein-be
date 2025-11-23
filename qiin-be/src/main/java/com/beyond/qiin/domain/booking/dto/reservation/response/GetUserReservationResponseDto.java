@@ -16,15 +16,15 @@ public class GetUserReservationResponseDto {
 
     private final Long reservationId;
 
-    private final Integer assetType;
+    private final int assetType;
 
     private final String assetName;
 
     private final String categoryName;
 
-    private final Integer assetStatus;
+    private final int assetStatus;
 
-    private final Boolean isApproved;
+    private final boolean isApproved;
 
     private final Instant startAt;
 
@@ -44,7 +44,7 @@ public class GetUserReservationResponseDto {
                 .assetName(raw.getAssetName())
                 .categoryName(raw.getCategoryName())
                 .assetStatus(raw.getAssetStatus())
-                .isApproved(raw.getIsApproved())
+                .isApproved(raw.isApproved())
                 .startAt(raw.getStartAt())
                 .endAt(raw.getEndAt())
                 .reservationStatus(

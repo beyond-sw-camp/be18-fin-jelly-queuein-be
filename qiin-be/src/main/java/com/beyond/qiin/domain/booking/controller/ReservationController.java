@@ -1,9 +1,12 @@
 package com.beyond.qiin.domain.booking.controller;
 
+import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
@@ -16,10 +19,12 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -163,19 +168,19 @@ public class ReservationController {
     }
 
     // 페이징 대상의 조회
-    // 사용자의 예약한 자원에 대한 목록 조회
-    //    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
-    //    @GetMapping("/me")
-    //    public ResponseEntity<PageResponseDto<GetUserReservationResponseDto>> getUserReservations(
-    //            @AuthenticationPrincipal CustomUserDetails user,
-    //            @Valid @ModelAttribute GetUserReservationSearchCondition condition,
-    //            Pageable pageable) {
-    //
-    //        PageResponseDto<GetUserReservationResponseDto> page =
-    //                reservationQueryService.getReservationsByUserId(user.getUserId(), condition, pageable);
-    //
-    //        return ResponseEntity.ok(page);
-    //    }
+    //사용자의 예약한 자원에 대한 목록 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @GetMapping("/me")
+    public ResponseEntity<PageResponseDto<GetUserReservationResponseDto>> getUserReservations(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Valid @ModelAttribute GetUserReservationSearchCondition condition,
+            Pageable pageable) {
+
+        PageResponseDto<GetUserReservationResponseDto> page =
+                reservationQueryService.getReservationsByUserId(user.getUserId(), condition, pageable);
+
+        return ResponseEntity.ok(page);
+    }
 
     //    // 예약 가능 자원 목록 조회
     //    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")

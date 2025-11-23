@@ -11,13 +11,13 @@ public class RawUserReservationResponseDto {
     private final Long reservationId;
     private final Instant startAt;
     private final Instant endAt;
-    private final Integer reservationStatus;
-    private final Boolean isApproved;
+    private final int reservationStatus;
+    private final boolean isApproved;
     private final Instant actualStartAt;
     private final Instant actualEndAt;
     private final Long assetId;
     private final String assetName;
     private final String categoryName;
-    private final Integer assetType;
-    private final Integer assetStatus;
+    private final int assetType;
+    private final int assetStatus;
 }
