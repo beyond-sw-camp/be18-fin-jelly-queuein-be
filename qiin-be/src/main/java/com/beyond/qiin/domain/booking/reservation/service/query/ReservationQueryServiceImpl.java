@@ -1,12 +1,16 @@
 package com.beyond.qiin.domain.booking.reservation.service.query;
 
+import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.TimeSlotDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
@@ -30,6 +34,8 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,54 +63,54 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
                 ReservationDetailResponseDto.fromEntity(reservation);
         return reservationDetailResponseDto;
     }
-    //
-    //    // 사용자 이름으로 예약 목록 조회
-    //    @Override
-    //    @Transactional(readOnly = true)
-    //    public PageResponseDto<GetUserReservationResponseDto> getReservationsByUserId(
-    //            final Long userId, final GetUserReservationSearchCondition condition, final Pageable pageable) {
-    //        // 사용자 있는지 확인
-    //        userReader.findById(userId);
-    //
-    //        // condition 자체의 필드들은 모두 null 가능
-    //        // status는 int가 아닌 Integer이 됨
-    //        // Integer reservationStatus = statusToInt(condition.getReservationStatus());
-    //
-    //        // Page<GetUserReservationResponseDto> page =
-    //        //        userReservationsQueryRepository.search(userId, condition, reservationStatus, pageable);
-    //        log.info(
-    //                "date={}, status={}, approved={}, assetName={}, assetType={}, layerZero={}",
-    //                condition.getDate(),
-    //                condition.getReservationStatus(),
-    //                condition.getIsApproved(),
-    //                condition.getAssetName(),
-    //                condition.getAssetType(),
-    //                condition.getLayerZero());
-    //
-    //        Page<RawUserReservationResponseDto> rawPage =
-    //                userReservationsQueryRepository.search(userId, condition, pageable);
-    //
-    //        Page<GetUserReservationResponseDto> page = rawPage.map(GetUserReservationResponseDto::fromRaw);
-    //
-    //        return PageResponseDto.from(page);
-    //
-    //        //        List<Reservation> reservations = getReservationsByUserAndDate(userId, date);
-    //        //        List<GetUserReservationResponseDto> reservationList = new ArrayList<>();
-    //        //        for (Reservation reservation : reservations) {
-    //        //            GetUserReservationResponseDto getUserReservationResponseDto =
-    //        //                    GetUserReservationResponseDto.fromEntity(reservation,
-    //        // statusToString(reservation.getStatus()));
-    //        //            reservationList.add(getUserReservationResponseDto);
-    //        //        }
-    //        //
-    //        //        GetUserReservationListResponseDto reservationListResponseDto =
-    //        // GetUserReservationListResponseDto.builder()
-    //        //                .reservations(reservationList)
-    //        //                .build();
-    //        //
-    //        //        return reservationListResponseDto;
-    //    }
-    //
+
+    // 사용자 이름으로 예약 목록 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDto<GetUserReservationResponseDto> getReservationsByUserId(
+            final Long userId, final GetUserReservationSearchCondition condition, final Pageable pageable) {
+        // 사용자 있는지 확인
+        userReader.findById(userId);
+
+        // condition 자체의 필드들은 모두 null 가능
+        // status는 int가 아닌 Integer이 됨
+        // Integer reservationStatus = statusToInt(condition.getReservationStatus());
+
+        // Page<GetUserReservationResponseDto> page =
+        //        userReservationsQueryRepository.search(userId, condition, reservationStatus, pageable);
+        log.info(
+                "date={}, status={}, approved={}, assetName={}, assetType={}, layerZero={}",
+                condition.getDate(),
+                condition.getReservationStatus(),
+                condition.getIsApproved(),
+                condition.getAssetName(),
+                condition.getAssetType(),
+                condition.getLayerZero());
+
+        Page<RawUserReservationResponseDto> rawPage =
+                userReservationsQueryRepository.search(userId, condition, pageable);
+
+        Page<GetUserReservationResponseDto> page = rawPage.map(GetUserReservationResponseDto::fromRaw);
+
+        return PageResponseDto.from(page);
+
+        //        List<Reservation> reservations = getReservationsByUserAndDate(userId, date);
+        //        List<GetUserReservationResponseDto> reservationList = new ArrayList<>();
+        //        for (Reservation reservation : reservations) {
+        //            GetUserReservationResponseDto getUserReservationResponseDto =
+        //                    GetUserReservationResponseDto.fromEntity(reservation,
+        // statusToString(reservation.getStatus()));
+        //            reservationList.add(getUserReservationResponseDto);
+        //        }
+        //
+        //        GetUserReservationListResponseDto reservationListResponseDto =
+        // GetUserReservationListResponseDto.builder()
+        //                .reservations(reservationList)
+        //                .build();
+        //
+        //        return reservationListResponseDto;
+    }
+
     //    // TODO : 목록 조회 - querydsl 대상
     //    // 예약 가능 자원 목록 조회
     //    @Override
