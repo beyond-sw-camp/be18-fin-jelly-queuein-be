@@ -20,5 +20,4 @@ public class ReservationEventListener {
     public void onUpdated(ReservationUpdatedEvent event) {
         consumerService.handleUpdated(event);
     }
-
 }

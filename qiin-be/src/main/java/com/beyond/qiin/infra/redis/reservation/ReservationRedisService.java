@@ -9,14 +9,14 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ReservationRedisService {
-  private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-  public void save(Reservation reservation) {
-      String key = "reservation:" + reservation.getId();
-      redisTemplate.opsForValue().set(key, ReservationResponseDto.fromEntity(reservation));
-  }
+    public void save(Reservation reservation) {
+        String key = "reservation:" + reservation.getId();
+        redisTemplate.opsForValue().set(key, ReservationResponseDto.fromEntity(reservation));
+    }
 
-  public void delete(Long id) {
-      redisTemplate.delete("reservation:" + id);
-  }
+    public void delete(Long id) {
+        redisTemplate.delete("reservation:" + id);
+    }
 }

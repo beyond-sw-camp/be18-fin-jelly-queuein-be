@@ -7,14 +7,14 @@ import lombok.Getter;
 
 @Getter
 public class ReservationCreatedEvent {
-  private final Long reservationId;
+    private final Long reservationId;
 
-  @JsonCreator
-  public ReservationCreatedEvent(@JsonProperty("reservationId") Long reservationId) {
-      this.reservationId = reservationId;
-  }
+    @JsonCreator
+    public ReservationCreatedEvent(@JsonProperty("reservationId") Long reservationId) {
+        this.reservationId = reservationId;
+    }
 
-  public static ReservationCreatedEvent from(Reservation reservation) {
-      return new ReservationCreatedEvent(reservation.getId());
-  }
+    public static ReservationCreatedEvent from(Reservation reservation) {
+        return new ReservationCreatedEvent(reservation.getId());
+    }
 }
