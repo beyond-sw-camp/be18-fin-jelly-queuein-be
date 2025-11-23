@@ -17,12 +17,11 @@ public class TimeSlotDto {
     private final String end;
     private final boolean available;
 
-    public static TimeSlotDto create(final TimeSlot timeSlot, final String zone) {
-        ZoneId zoneId = ZoneId.of(zone);
+    public static TimeSlotDto create(final TimeSlot timeSlot, final ZoneId zone) {
 
         return TimeSlotDto.builder()
-                .start(timeSlot.getStart().atZone(zoneId).format(DateTimeFormatter.ofPattern("HH:mm")))
-                .end(timeSlot.getEnd().atZone(zoneId).format(DateTimeFormatter.ofPattern("HH:mm")))
+                .start(timeSlot.getStart().atZone(zone).format(DateTimeFormatter.ofPattern("HH:mm")))
+                .end(timeSlot.getEnd().atZone(zone).format(DateTimeFormatter.ofPattern("HH:mm")))
                 .available(timeSlot.isAvailable())
                 .build();
     }

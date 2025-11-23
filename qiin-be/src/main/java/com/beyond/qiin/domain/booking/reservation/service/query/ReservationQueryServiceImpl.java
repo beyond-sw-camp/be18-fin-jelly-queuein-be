@@ -239,21 +239,25 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Transactional(readOnly = true)
     public AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId, final LocalDate date) {
 
-        userReader.findById(userId);
+      userReader.findById(userId);
 
-        Asset asset = assetQueryService.getAssetById(assetId);
+      Asset asset = assetQueryService.getAssetById(assetId);
 
-        List<Reservation> reservations = getReservationsByAssetAndDate(assetId, date);
+      // 해당 자원의 해당 날짜 예약 목록
+      List<Reservation> reservations = getReservationsByAssetAndDate(assetId, date);
 
-        List<TimeSlot> timeSlots =
-                AvailableTimeSlotCalculator.calculateAvailableSlots(reservations, date, ZoneId.of("Asia/Seoul"));
+      ZoneId zone = ZoneId.of("Asia/Seoul");
 
-        List<TimeSlotDto> timeSlotDtos = timeSlots.stream()
-                .map(slot -> TimeSlotDto.create(slot, "Asia/Seoul"))
-                .toList();
+      List<TimeSlot> timeSlots =
+          AvailableTimeSlotCalculator.calculateAvailableSlots(reservations, date, zone);
 
-        return AssetTimeResponseDto.create(assetId, timeSlotDtos);
+      List<TimeSlotDto> timeSlotDtos = timeSlots.stream()
+          .map(slot -> TimeSlotDto.create(slot, zone))
+          .toList();
+
+      return AssetTimeResponseDto.create(assetId, timeSlotDtos);
     }
+
 
     @Override
     @Transactional(readOnly = true)
