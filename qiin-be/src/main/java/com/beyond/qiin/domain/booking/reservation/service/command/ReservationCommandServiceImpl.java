@@ -79,6 +79,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         // 선착순 자원은 자동 승인
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
+        reservation.approve(null, null);
 
         List<Attendant> attendants = attendantUsers.stream()
                 .map(user -> Attendant.create(user, reservation))
