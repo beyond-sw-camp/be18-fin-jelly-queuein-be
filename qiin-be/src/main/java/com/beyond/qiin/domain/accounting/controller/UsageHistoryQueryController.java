@@ -1,12 +1,14 @@
 package com.beyond.qiin.domain.accounting.controller;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
-import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistorySearchRequest;
-import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryResponse;
+import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistorySearchRequestDto;
+import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
+import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
 import com.beyond.qiin.domain.accounting.service.query.UsageHistoryQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,12 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UsageHistoryQueryController {
 
-    private final UsageHistoryQueryService usageHistoryQueryService;
+    private final UsageHistoryQueryService service;
 
     @GetMapping
-    public ResponseEntity<PageResponseDto<UsageHistoryResponse>> getUsageHistoryList(UsageHistorySearchRequest req) {
-        PageResponseDto<UsageHistoryResponse> response = usageHistoryQueryService.getUsageHistoryList(req);
+    public ResponseEntity<PageResponseDto<UsageHistoryListResponseDto>> list(UsageHistorySearchRequestDto req) {
+        return ResponseEntity.ok(service.getUsageHistoryList(req));
+    }
 
-        return ResponseEntity.ok(response);
+    @GetMapping("/{id}")
+    public ResponseEntity<UsageHistoryDetailResponseDto> detail(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getUsageHistoryDetail(id));
     }
 }
+

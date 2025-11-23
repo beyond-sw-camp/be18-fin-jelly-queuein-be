@@ -1,5 +1,8 @@
 package com.beyond.qiin.domain.accounting.entity;
 
+import static jakarta.persistence.FetchType.LAZY;
+
+import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -18,16 +21,26 @@ public class UsageHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //    @ManyToOne(fetch = FetchType.LAZY)
-    //    @JoinColumn(name = "asset_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    //    private Asset asset;   // 자원 FK
-
     @Column(name = "asset_id", nullable = false)
     private Long assetId;
-    //
-    //    @ManyToOne(fetch = FetchType.LAZY)
-    //    @JoinColumn(name = "reservation_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    //    private Reservation reservation;  // 예약 FK
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(
+            name = "asset_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Asset asset;
+
+    //    @ManyToOne(fetch = LAZY)
+    //    @JoinColumn(
+    //            name = "reservation_id",
+    //            insertable = false,
+    //            updatable = false,
+    //            foreignKey = @ForeignKey(NO_CONSTRAINT)
+    //    )
+    //    private Reservation reservation;
+
     @Column(name = "reservation_id", nullable = false)
     private Long reservationId;
 
@@ -37,8 +50,8 @@ public class UsageHistory {
     @Column(name = "actual_end_at", columnDefinition = "TIMESTAMP(6)")
     private Instant actualEndAt;
 
-    @Column(name = "actual_usage_time", columnDefinition = "TIMESTAMP(6)")
-    private Instant actualUsageTime;
+    @Column(name = "actual_usage_time")
+    private Integer actualUsageTime;
 
     @Column(name = "start_at", columnDefinition = "TIMESTAMP(6)")
     private Instant startAt;
@@ -46,12 +59,22 @@ public class UsageHistory {
     @Column(name = "end_at", columnDefinition = "TIMESTAMP(6)")
     private Instant endAt;
 
-    @Column(name = "usage_time", columnDefinition = "TIMESTAMP(6)")
-    private Instant usageTime;
+    @Column(name = "usage_time")
+    private Integer usageTime;
 
     @Column(name = "usage_ratio", precision = 12, scale = 3)
     private BigDecimal usageRatio;
 
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP(6)")
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
     private Instant createdAt;
+
+    public static UsageHistory create(Long assetId, Long reservationId, Instant startAt, Instant endAt) {
+        return UsageHistory.builder()
+                .assetId(assetId)
+                .reservationId(reservationId)
+                .startAt(startAt)
+                .endAt(endAt)
+                .createdAt(Instant.now())
+                .build();
+    }
 }

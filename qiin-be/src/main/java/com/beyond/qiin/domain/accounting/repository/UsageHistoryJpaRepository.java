@@ -1,10 +1,6 @@
 package com.beyond.qiin.domain.accounting.repository;
 
-import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistorySearchRequest;
-import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryResponse;
-import org.springframework.data.domain.Page;
+import com.beyond.qiin.domain.accounting.entity.UsageHistory;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UsageHistoryJpaRepository {
-
-    Page<UsageHistoryResponse> searchUsageHistory(UsageHistorySearchRequest req);
-}
+public interface UsageHistoryJpaRepository extends JpaRepository<UsageHistory, Long> {}
