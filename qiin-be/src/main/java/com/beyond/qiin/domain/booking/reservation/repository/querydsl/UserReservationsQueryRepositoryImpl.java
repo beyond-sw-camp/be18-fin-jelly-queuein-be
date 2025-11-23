@@ -44,7 +44,7 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
 
         // 날짜(Instant)
         if (condition.getDate() != null) {
-            LocalDate date = condition.getDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDate();
+            LocalDate date = condition.getDate();
 
             Instant start = date.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
             Instant end = date.plusDays(1).atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
