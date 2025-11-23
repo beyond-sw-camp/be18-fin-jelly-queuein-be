@@ -9,6 +9,7 @@ import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.exception.RoleException;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.role.RoleWriter;
+import com.beyond.qiin.infra.redis.iam.role.RoleProjectionHandler;
 import com.beyond.qiin.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class RoleCommandServiceImpl implements RoleCommandService {
 
     private final RoleReader roleReader;
     private final RoleWriter roleWriter;
+    private final RoleProjectionHandler projectionHandler;
 
     // 역할 생성
     @Override
@@ -34,6 +36,9 @@ public class RoleCommandServiceImpl implements RoleCommandService {
                 .build();
 
         Role savedRole = roleWriter.save(role);
+
+        // redis projection
+        projectionHandler.onRoleCreated(savedRole);
 
         return RoleResponseDto.fromEntity(savedRole);
     }
@@ -52,6 +57,9 @@ public class RoleCommandServiceImpl implements RoleCommandService {
 
         Role updated = roleWriter.save(role);
 
+        // redis projection
+        projectionHandler.onRoleUpdated(updated);
+
         return RoleResponseDto.fromEntity(updated);
     }
 
@@ -67,6 +75,9 @@ public class RoleCommandServiceImpl implements RoleCommandService {
 
         // TODO: Resolver로 변경
         role.softDelete(SecurityUtils.getCurrentUserId());
+
+        // redis projection
+        projectionHandler.onRoleDeleted(role);
     }
 
     // -------------------------------
