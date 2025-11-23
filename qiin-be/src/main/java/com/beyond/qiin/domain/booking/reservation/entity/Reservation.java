@@ -221,6 +221,7 @@ public class Reservation extends BaseEntity {
     }
 
     public ReservationStatus getStatus() {
+
         return ReservationStatus.from(this.status);
     }
 

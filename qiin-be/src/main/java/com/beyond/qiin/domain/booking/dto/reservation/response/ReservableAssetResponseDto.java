@@ -15,9 +15,11 @@ public class ReservableAssetResponseDto {
 
     private final String assetName;
 
-    private final String assetType;
+//    private final AssetType assetType;
 
     private final String categoryName;
+
+//    private final AssetStatus assetStatus;
 
     private final boolean needsApproval; // 자원의 승인 필요 여부
 
@@ -25,9 +27,21 @@ public class ReservableAssetResponseDto {
         return ReservableAssetResponseDto.builder()
                 .assetId(asset.getId())
                 .assetName(asset.getName())
-                .assetType(assetType)
+//                .assetType(asset.getAssetType())
                 .categoryName(asset.getCategory().getName()) // 필수
+//                .assetStatus(asset.getAssetStatus())
                 .needsApproval(asset.isNeedsApproval())
                 .build();
+    }
+
+    public static ReservableAssetResponseDto fromRaw(RawReservableAssetResponseDto raw) {
+        return new ReservableAssetResponseDto(
+            raw.getAssetId(),
+            raw.getAssetName(),
+            //raw.getAssetType(),
+            raw.getCategoryName(),
+            //raw.getAssetStatus(),
+            raw.getNeedsApproval()
+        );
     }
 }

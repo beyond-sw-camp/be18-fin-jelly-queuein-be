@@ -1,15 +1,22 @@
 package com.beyond.qiin.domain.booking.reservation.repository.querydsl;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.response.RawReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,8 +38,19 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
     private static final QCategory category = QCategory.category;
 
     @Override
-    public Page<ReservableAssetResponseDto> search(ReservableAssetSearchCondition condition, Pageable pageable) {
+    public Page<RawReservableAssetResponseDto> search
+        (ReservableAssetSearchCondition condition, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        // 날짜 조건
+        if (condition.getDate() != null) {
+            LocalDate date = condition.getDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDate();
+
+            Instant start = date.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+            Instant end = date.plusDays(1).atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+
+            builder.and(reservation.startAt.between(start, end));
+        }
 
         // 자원 관련
         // 이름 검색
@@ -82,27 +100,50 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
         Instant start = date;
         Instant end = date.plusSeconds(24 * 3600);
 
-        List<ReservableAssetResponseDto> content = query.select(Projections.constructor(
-                        ReservableAssetResponseDto.class,
+        List<RawReservableAssetResponseDto> content = query.select(
+            Projections.constructor(
+                        RawReservableAssetResponseDto.class,
                         asset.id,
                         asset.name,
-                        asset.type,
+//                        asset.type,
                         category.name,
-                        asset.status,
-                        asset.needsApproval,
-                        reservation.id.isNull() // 해당 시간대 예약이 없으면 true
+//                        asset.status,
+                        asset.needsApproval
                         ))
                 .from(asset)
                 .leftJoin(reservation)
-                .on(reservation.asset.id.eq(asset.id).and(reservation.startAt.between(start, end)))
+                .on(reservation.asset.id.eq(asset.id)
+                    .and(start != null ? reservation.startAt.between(start, end) : null)
+                )
+                .leftJoin(category).on(category.id.eq(asset.categoryId))
+                .leftJoin(closure).on(closure.assetClosureId.descendantId.eq(asset.id))
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(asset.name.asc())
                 .fetch();
 
-        long total = query.select(asset.count()).from(asset).where(builder).fetchOne();
+        long total = query.select(asset.count())
+            .from(asset)
+            .leftJoin(category).on(category.id.eq(asset.categoryId))
+            .leftJoin(closure).on(closure.assetClosureId.descendantId.eq(asset.id))
+            .where(builder)
+            .fetchOne();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
+        return pageable.getSort().stream()
+            .map(order -> {
+                String property = order.getProperty(); // "startAt", "status" ...
+
+                Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+
+                PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
+
+                return new OrderSpecifier(direction, path.get(property));
+            })
+            .toArray(OrderSpecifier[]::new);
     }
 }

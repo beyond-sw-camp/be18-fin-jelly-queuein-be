@@ -9,9 +9,12 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReserva
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.RawAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.RawReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.TimeSlotDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationResponseDto;
@@ -122,7 +125,9 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         userReader.findById(userId);
 
-        Page<ReservableAssetResponseDto> page = reservableAssetsQueryRepository.search(condition, pageable);
+        Page<RawReservableAssetResponseDto> rawPage = reservableAssetsQueryRepository.search(condition, pageable);
+
+        Page<ReservableAssetResponseDto> page = rawPage.map(ReservableAssetResponseDto::fromRaw);
 
         return PageResponseDto.from(page);
 
@@ -163,7 +168,10 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
         userReader.findById(userId);
 
-        Page<GetAppliedReservationResponseDto> page = appliedReservationsQueryRepository.search(condition, pageable);
+        Page<RawAppliedReservationResponseDto> rawPage = appliedReservationsQueryRepository.search(condition, pageable);
+
+        Page<GetAppliedReservationResponseDto> page = rawPage.map(GetAppliedReservationResponseDto::fromRaw);
+
 
         return PageResponseDto.from(page);
 
