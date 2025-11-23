@@ -32,10 +32,7 @@ public class UsageHistoryListResponseDto {
      * 기존 DTO(raw) 값에서 텍스트 변환 값을 적용한 새로운 DTO 생성
      */
     public UsageHistoryListResponseDto withConvertedValues(
-            String reservationDurationText,
-            String actualDurationText,
-            String usageRatioText
-    ) {
+            String reservationDurationText, String actualDurationText, String usageRatioText) {
         return new UsageHistoryListResponseDto(
                 this.usageHistoryId,
                 this.assetName,
@@ -48,7 +45,6 @@ public class UsageHistoryListResponseDto {
                 this.actualMinutes,
                 actualDurationText,
                 this.usageRatioRaw,
-                usageRatioText
-        );
+                usageRatioText);
     }
 }

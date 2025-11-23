@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,13 +21,15 @@ public class UsageHistoryQueryServiceImpl implements UsageHistoryQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponseDto<UsageHistoryListResponseDto> getUsageHistoryList(UsageHistorySearchRequestDto req) {
+    public PageResponseDto<UsageHistoryListResponseDto> getUsageHistoryList(
+            final UsageHistorySearchRequestDto req,
+            final Pageable pageable
+    ) {
 
-        Page<UsageHistoryListResponseDto> rawPage = usageHistoryQueryAdapter.searchUsageHistory(req);
+        Page<UsageHistoryListResponseDto> rawPage =
+                usageHistoryQueryAdapter.searchUsageHistory(req, pageable);
 
-        // 변환된 DTO 리스트 생성
-        var convertedItems = rawPage.getContent()
-                .stream()
+        var convertedItems = rawPage.getContent().stream()
                 .map(item -> item.withConvertedValues(
                         convertMinutes(item.getReservationMinutes()),
                         convertMinutes(item.getActualMinutes()),
@@ -34,16 +37,15 @@ public class UsageHistoryQueryServiceImpl implements UsageHistoryQueryService {
                 ))
                 .toList();
 
-        // 기존 pageable과 totalCount 그대로 유지하며 Page 재생성
-        Page<UsageHistoryListResponseDto> convertedPage =
-                new PageImpl<>(convertedItems, rawPage.getPageable(), rawPage.getTotalElements());
-
-        return PageResponseDto.from(convertedPage);
+        return PageResponseDto.from(
+                new PageImpl<>(convertedItems, pageable, rawPage.getTotalElements())
+        );
     }
+
 
     @Override
     @Transactional(readOnly = true)
-    public UsageHistoryDetailResponseDto getUsageHistoryDetail(Long usageHistoryId) {
+    public UsageHistoryDetailResponseDto getUsageHistoryDetail(final Long usageHistoryId) {
         return usageHistoryQueryAdapter.getUsageHistoryDetail(usageHistoryId);
     }
 
