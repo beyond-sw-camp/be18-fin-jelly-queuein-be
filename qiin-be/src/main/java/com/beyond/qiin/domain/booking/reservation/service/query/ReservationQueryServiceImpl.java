@@ -309,11 +309,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         Instant startOfDay = date.atStartOfDay(zone).toInstant();
         Instant endOfDay = date.plusDays(1).atStartOfDay(zone).toInstant();
 
-        return reservationJpaRepository.findAllByAssetIdAndDate(
-            assetId,
-            startOfDay,
-            endOfDay
-        );
+        return reservationJpaRepository.findAllByAssetIdAndDate(assetId, startOfDay, endOfDay);
     }
 
     // status 자체는 null x이므로 int
