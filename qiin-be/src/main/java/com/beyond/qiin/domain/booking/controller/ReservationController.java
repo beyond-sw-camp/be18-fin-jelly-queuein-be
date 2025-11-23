@@ -3,16 +3,23 @@ package com.beyond.qiin.domain.booking.controller;
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.reservation.service.command.ReservationCommandService;
+import com.beyond.qiin.domain.booking.reservation.service.query.ReservationQueryService;
 import com.beyond.qiin.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.Instant;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservationController {
 
     private final ReservationCommandService reservationCommandService;
-    //    private final ReservationQueryService reservationQueryService;
+    private final ReservationQueryService reservationQueryService;
 
     // 예약 신청
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
@@ -145,15 +152,15 @@ public class ReservationController {
 
     // 조회
 
-    // 예약 상세 조회
-    //    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
-    //    @GetMapping("/{reservationId}")
-    //    public ResponseEntity<ReservationDetailResponseDto> getReservation(
-    //            @AuthenticationPrincipal CustomUserDetails user, @PathVariable Long reservationId) {
-    //        ReservationDetailResponseDto reservationDetailResponseDto =
-    //                reservationQueryService.getReservation(user.getUserId(), reservationId);
-    //        return ResponseEntity.ok(reservationDetailResponseDto);
-    //    }
+     //예약 상세 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<ReservationDetailResponseDto> getReservation(
+            @AuthenticationPrincipal CustomUserDetails user, @PathVariable Long reservationId) {
+        ReservationDetailResponseDto reservationDetailResponseDto =
+                reservationQueryService.getReservation(user.getUserId(), reservationId);
+        return ResponseEntity.ok(reservationDetailResponseDto);
+    }
 
     // 페이징 대상의 조회
     // 사용자의 예약한 자원에 대한 목록 조회
@@ -197,36 +204,36 @@ public class ReservationController {
 
     // page x 조회
 
-    // 월별 일정 조회
-    //    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
-    //    @GetMapping("/monthly")
-    //    public ResponseEntity<MonthReservationListResponseDto> getMonthlyReservations(
-    //            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant from, @RequestParam Instant to)
-    // {
-    //        MonthReservationListResponseDto monthReservationListResponseDto =
-    //                reservationQueryService.getMonthlyReservations(user.getUserId(), from, to);
-    //        return ResponseEntity.ok(monthReservationListResponseDto);
-    //    }
+     //월별 일정 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @GetMapping("/monthly")
+    public ResponseEntity<MonthReservationListResponseDto> getMonthlyReservations(
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant from, @RequestParam Instant to)
+ {
+        MonthReservationListResponseDto monthReservationListResponseDto =
+                reservationQueryService.getMonthlyReservations(user.getUserId(), from, to);
+        return ResponseEntity.ok(monthReservationListResponseDto);
+    }
+
+    // 주별 일정 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @GetMapping("/weekly")
+    public ResponseEntity<WeekReservationListResponseDto> getWeeklyReservations(
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant start, @RequestParam Instant
+ end) {
+        WeekReservationListResponseDto weekReservationListResponseDto =
+                reservationQueryService.getWeeklyReservations(user.getUserId(), start, end);
+        return ResponseEntity.ok(weekReservationListResponseDto);
+    }
     //
-    //    // 주별 일정 조회
-    //    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
-    //    @GetMapping("/weekly")
-    //    public ResponseEntity<WeekReservationListResponseDto> getWeeklyReservations(
-    //            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Instant start, @RequestParam Instant
-    // end) {
-    //        WeekReservationListResponseDto weekReservationListResponseDto =
-    //                reservationQueryService.getWeeklyReservations(user.getUserId(), start, end);
-    //        return ResponseEntity.ok(weekReservationListResponseDto);
-    //    }
-    //
-    //    // 예약 가능 시간대 조회
-    //    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
-    //    @GetMapping("/{assetId}/times")
-    //    public ResponseEntity<AssetTimeResponseDto> getAssetTimes(
-    //            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Long assetId, @RequestParam LocalDate
-    // date) {
-    //        AssetTimeResponseDto assetTimeResponseDto =
-    //                reservationQueryService.getAssetTimes(user.getUserId(), assetId, date);
-    //        return ResponseEntity.ok(assetTimeResponseDto);
-    //    }
+    // 예약 가능 시간대 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @GetMapping("/{assetId}/available-times")
+    public ResponseEntity<AssetTimeResponseDto> getAssetTimes(
+            @AuthenticationPrincipal CustomUserDetails user, @RequestParam Long assetId, @RequestParam LocalDate
+ date) {
+        AssetTimeResponseDto assetTimeResponseDto =
+                reservationQueryService.getAssetTimes(user.getUserId(), assetId, date);
+        return ResponseEntity.ok(assetTimeResponseDto);
+    }
 }

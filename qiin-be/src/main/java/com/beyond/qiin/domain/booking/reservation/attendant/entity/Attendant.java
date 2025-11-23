@@ -39,16 +39,14 @@ public class Attendant extends BaseEntity {
     @ManyToOne
     @JoinColumn(
             name = "reservation_id",
-            insertable = false,
-            updatable = false,
+            nullable = false,
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Reservation reservation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "user_id",
-            insertable = false,
-            updatable = false,
+            nullable = false,
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
