@@ -18,8 +18,9 @@ public class AvailableTimeSlotCalculator {
         }
         return true;
     }
+
     public static List<TimeSlot> calculateAvailableSlots(
-        List<Reservation> reservations, LocalDate date, ZoneId zoneId) {
+            List<Reservation> reservations, LocalDate date, ZoneId zoneId) {
 
         Instant startOfDay = date.atStartOfDay(zoneId).toInstant();
         Instant endOfDay = date.plusDays(1).atStartOfDay(zoneId).toInstant();
@@ -29,9 +30,9 @@ public class AvailableTimeSlotCalculator {
         // APPROVED(1), USING(2), COMPLETED(5)
 
         List<Reservation> filtered = reservations.stream()
-            .filter(r -> blockingStatuses.contains(r.getStatus().getCode()))
-            .sorted(Comparator.comparing(Reservation::getStartAt))
-            .toList();
+                .filter(r -> blockingStatuses.contains(r.getStatus().getCode()))
+                .sorted(Comparator.comparing(Reservation::getStartAt))
+                .toList();
 
         List<TimeSlot> result = new ArrayList<>();
 
@@ -69,6 +70,4 @@ public class AvailableTimeSlotCalculator {
 
         return result;
     }
-
-
 }
