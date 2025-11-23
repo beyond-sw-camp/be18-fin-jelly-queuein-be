@@ -129,8 +129,7 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                         respondent.userName,
                         reservation.status,
                         reservation.isApproved,
-                        reservation.reason
-                ))
+                        reservation.reason))
                 .from(reservation)
                 .join(asset)
                 .on(asset.id.eq(reservation.asset.id))

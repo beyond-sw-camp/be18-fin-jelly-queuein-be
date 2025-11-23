@@ -105,9 +105,7 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
                         category.name,
                         //                        asset.status,
                         asset.needsApproval,
-                        reservation.status
-                ))
-
+                        reservation.status))
                 .from(reservation)
                 .join(asset)
                 .on(asset.id.eq(reservation.asset.id))

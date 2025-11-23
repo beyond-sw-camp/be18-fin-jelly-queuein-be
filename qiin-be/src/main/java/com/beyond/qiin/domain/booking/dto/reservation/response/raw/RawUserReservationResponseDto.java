@@ -3,7 +3,8 @@ package com.beyond.qiin.domain.booking.dto.reservation.response.raw;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-//TODO : ui 테이블에 필요없는 값들 제외
+// TODO : ui 테이블에 필요없는 값들 제외
+
 @Getter
 @AllArgsConstructor
 public class RawUserReservationResponseDto {
@@ -28,5 +29,4 @@ public class RawUserReservationResponseDto {
     private final Instant actualStartAt;
 
     private final Instant actualEndAt;
-
 }

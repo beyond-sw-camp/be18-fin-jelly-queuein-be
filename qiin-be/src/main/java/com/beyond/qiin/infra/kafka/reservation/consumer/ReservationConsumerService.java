@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class ReservationConsumerService {
     private final ReservationJpaRepository reservationJpaRepository;
 
-    //다른 외부 infra 이므로 adpter 통해 사용
+    // 다른 외부 infra 이므로 adpter 통해 사용
     private final ReservationRedisAdapter reservationRedisAdapter;
 
     public void handleCreated(ReservationCreatedEvent event) {

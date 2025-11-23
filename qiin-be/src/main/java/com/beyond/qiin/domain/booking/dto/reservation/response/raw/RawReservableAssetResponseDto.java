@@ -16,5 +16,4 @@ public class RawReservableAssetResponseDto {
 
     private final boolean needsApproval;
     private final String reservationStatus;
-
 }

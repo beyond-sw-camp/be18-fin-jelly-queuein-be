@@ -8,32 +8,31 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ReservationRedisAdapter {
 
-  private final ReservationRedisRepository redisRepository;
+    private final ReservationRedisRepository redisRepository;
 
-  public void save(Reservation reservation) {
+    public void save(Reservation reservation) {
 
-    ReservationReadModel model = ReservationReadModel.builder()
-        .id(reservation.getId())
-        .assetName(reservation.getAsset().getName())
-        .applicantName(reservation.getApplicant().getUserName())
-        .respondentName(
-            reservation.getRespondent() != null
-                ? reservation.getRespondent().getUserName()
-                : null
-        )
-        .isApproved(reservation.isApproved())
-        .statusCode(reservation.getStatus().getCode())
-        .startAt(reservation.getStartAt().getEpochSecond())
-        .endAt(reservation.getEndAt().getEpochSecond())
-        .attendantCount(reservation.getAttendants().size())
-        .reason(reservation.getReason())
-        .description(reservation.getDescription())
-        .build();
+        ReservationReadModel model = ReservationReadModel.builder()
+                .id(reservation.getId())
+                .assetName(reservation.getAsset().getName())
+                .applicantName(reservation.getApplicant().getUserName())
+                .respondentName(
+                        reservation.getRespondent() != null
+                                ? reservation.getRespondent().getUserName()
+                                : null)
+                .isApproved(reservation.isApproved())
+                .statusCode(reservation.getStatus().getCode())
+                .startAt(reservation.getStartAt().getEpochSecond())
+                .endAt(reservation.getEndAt().getEpochSecond())
+                .attendantCount(reservation.getAttendants().size())
+                .reason(reservation.getReason())
+                .description(reservation.getDescription())
+                .build();
 
-    redisRepository.save(model);
-  }
+        redisRepository.save(model);
+    }
 
-  public void delete(Long id) {
-    redisRepository.deleteById(id);
-  }
+    public void delete(Long id) {
+        redisRepository.deleteById(id);
+    }
 }
