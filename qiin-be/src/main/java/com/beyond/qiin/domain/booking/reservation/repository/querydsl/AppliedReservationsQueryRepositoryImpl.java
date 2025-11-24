@@ -8,20 +8,13 @@ import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -38,8 +31,7 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
     private static final QUser respondent = new QUser("respondent");
 
     @Override
-    public List<RawAppliedReservationResponseDto> search(
-            GetAppliedReservationSearchCondition condition) {
+    public List<RawAppliedReservationResponseDto> search(GetAppliedReservationSearchCondition condition) {
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(reservation.status.eq(0)); // pending인 경우 == 신청된 reservations
@@ -130,7 +122,5 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                 .leftJoin(reservation.respondent, respondent)
                 .where(builder)
                 .fetch();
-
     }
-
 }

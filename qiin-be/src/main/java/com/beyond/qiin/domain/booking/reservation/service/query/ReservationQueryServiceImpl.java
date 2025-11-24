@@ -31,7 +31,6 @@ import com.beyond.qiin.domain.booking.reservation.vo.DateRange;
 import com.beyond.qiin.domain.booking.reservation.vo.TimeSlot;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
-import com.beyond.qiin.infra.redis.reservation.ReservationRedisRepository;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -65,14 +64,13 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // 예약 상세 조회 (api용)
     @Override
     @Transactional(readOnly = true)
-    public ReservationDetailResponseDto getReservation(final Long userId,
-        final Long reservationId) {
+    public ReservationDetailResponseDto getReservation(final Long userId, final Long reservationId) {
 
         userReader.findById(userId);
         Reservation reservation = getReservationById(reservationId);
 
         ReservationDetailResponseDto reservationDetailResponseDto =
-            ReservationDetailResponseDto.fromEntity(reservation);
+                ReservationDetailResponseDto.fromEntity(reservation);
         return reservationDetailResponseDto;
     }
 
@@ -80,25 +78,23 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<GetUserReservationResponseDto> getReservationsByUserId(
-        final Long userId, final GetUserReservationSearchCondition condition,
-        final Pageable pageable) {
+            final Long userId, final GetUserReservationSearchCondition condition, final Pageable pageable) {
         // 사용자 있는지 확인
         userReader.findById(userId);
 
         log.info(
-            "date={}, status={}, approved={}, assetName={}, assetType={}, layerZero={}",
-            condition.getDate(),
-            condition.getReservationStatus(),
-            condition.getIsApproved(),
-            condition.getAssetName(),
-            condition.getAssetType(),
-            condition.getLayerZero());
+                "date={}, status={}, approved={}, assetName={}, assetType={}, layerZero={}",
+                condition.getDate(),
+                condition.getReservationStatus(),
+                condition.getIsApproved(),
+                condition.getAssetName(),
+                condition.getAssetType(),
+                condition.getLayerZero());
 
         Page<RawUserReservationResponseDto> rawPage =
-            userReservationsQueryRepository.search(userId, condition, pageable);
+                userReservationsQueryRepository.search(userId, condition, pageable);
 
-        Page<GetUserReservationResponseDto> page = rawPage.map(
-            GetUserReservationResponseDto::fromRaw);
+        Page<GetUserReservationResponseDto> page = rawPage.map(GetUserReservationResponseDto::fromRaw);
 
         return PageResponseDto.from(page);
     }
@@ -107,13 +103,11 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
-        final Long userId, final GetAppliedReservationSearchCondition condition,
-        Pageable pageable) {
+            final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
         userReader.findById(userId);
         LocalDate date = condition.getDate();
 
-        List<RawAppliedReservationResponseDto> rawList = appliedReservationsQueryRepository.search(
-            condition);
+        List<RawAppliedReservationResponseDto> rawList = appliedReservationsQueryRepository.search(condition);
 
         List<GetAppliedReservationResponseDto> appliedReservations = new ArrayList<>();
 
@@ -128,8 +122,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         int endIdx = Math.min(startIdx + pageable.getPageSize(), appliedReservations.size());
 
         Page<GetAppliedReservationResponseDto> page =
-            new PageImpl<>(appliedReservations.subList(startIdx, endIdx), pageable,
-                appliedReservations.size());
+                new PageImpl<>(appliedReservations.subList(startIdx, endIdx), pageable, appliedReservations.size());
 
         return PageResponseDto.from(page);
     }
@@ -138,12 +131,11 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
-        final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable) {
+            final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable) {
 
         userReader.findById(userId);
 
-        List<RawReservableAssetResponseDto> rawList = reservableAssetsQueryRepository.search(
-            condition);
+        List<RawReservableAssetResponseDto> rawList = reservableAssetsQueryRepository.search(condition);
 
         LocalDate date = condition.getDate();
 
@@ -154,8 +146,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             boolean isReservable = isAssetReservableOnDate(raw.getAssetId(), date);
 
             if (isReservable) {
-                reservableAssets.add(
-                    ReservableAssetResponseDto.fromRaw(raw)); // 생성 조건이 true이므로 인자로 받지 않음
+                reservableAssets.add(ReservableAssetResponseDto.fromRaw(raw)); // 생성 조건이 true이므로 인자로 받지 않음
             }
         }
 
@@ -164,8 +155,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         List<ReservableAssetResponseDto> pageContent = reservableAssets.subList(startIdx, endIdx);
 
-        Page<ReservableAssetResponseDto> page = new PageImpl<>(pageContent, pageable,
-            reservableAssets.size());
+        Page<ReservableAssetResponseDto> page = new PageImpl<>(pageContent, pageable, reservableAssets.size());
 
         return PageResponseDto.from(page);
     }
@@ -173,8 +163,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // 주별 일정 조회
     @Override
     @Transactional(readOnly = true)
-    public WeekReservationListResponseDto getWeeklyReservations(final Long userId,
-        final LocalDate date) { // 해당 주의 기준날짜
+    public WeekReservationListResponseDto getWeeklyReservations(final Long userId, final LocalDate date) { // 해당 주의 기준날짜
         userReader.findById(userId);
 
         LocalDate startDate = date.with(DayOfWeek.MONDAY);
@@ -186,8 +175,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         List<Reservation> reservations = getReservationsByUserAndWeek(userId, start, end);
 
         Map<LocalDate, List<Reservation>> byDate = reservations.stream()
-            .collect(Collectors.groupingBy(
-                r -> r.getStartAt().atZone(ZoneId.of("Asia/Seoul")).toLocalDate()));
+                .collect(Collectors.groupingBy(
+                        r -> r.getStartAt().atZone(ZoneId.of("Asia/Seoul")).toLocalDate()));
 
         // 비어있을 수 있음
         List<WeekReservationResponseDto> reservationList = new ArrayList<>();
@@ -198,11 +187,11 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             List<Reservation> dailyReservations = byDate.getOrDefault(cursor, List.of());
 
             WeekReservationResponseDto dto = WeekReservationResponseDto.builder()
-                .date(cursor)
-                .reservations(dailyReservations.stream()
-                    .map(WeekReservationDailyResponseDto::fromEntity)
-                    .toList())
-                .build();
+                    .date(cursor)
+                    .reservations(dailyReservations.stream()
+                            .map(WeekReservationDailyResponseDto::fromEntity)
+                            .toList())
+                    .build();
 
             reservationList.add(dto);
 
@@ -210,8 +199,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         }
 
         WeekReservationListResponseDto weekReservationListResponseDto = WeekReservationListResponseDto.builder()
-            .reservations(reservationList)
-            .build();
+                .reservations(reservationList)
+                .build();
 
         return weekReservationListResponseDto;
     }
@@ -220,7 +209,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Override
     @Transactional(readOnly = true)
     public MonthReservationListResponseDto getMonthlyReservations(
-        final Long userId, final YearMonth yearMonth) { // 일까지 포함 X이므로 달까지 포함하는 자료형 사용
+            final Long userId, final YearMonth yearMonth) { // 일까지 포함 X이므로 달까지 포함하는 자료형 사용
         userReader.findById(userId);
 
         LocalDate start = yearMonth.atDay(1);
@@ -233,8 +222,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         // 예약을 LocalDate 기준으로 그룹핑
         Map<LocalDate, List<Reservation>> byDate = reservations.stream()
-            .collect(Collectors.groupingBy(
-                r -> r.getStartAt().atZone(ZoneId.of("Asia/Seoul")).toLocalDate()));
+                .collect(Collectors.groupingBy(
+                        r -> r.getStartAt().atZone(ZoneId.of("Asia/Seoul")).toLocalDate()));
 
         // 월의 모든 날짜 dto 생성
         List<MonthReservationResponseDto> dailyDtos = new ArrayList<>();
@@ -244,11 +233,11 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             List<Reservation> dailyReservations = byDate.getOrDefault(cursor, List.of());
 
             MonthReservationResponseDto dto = MonthReservationResponseDto.builder()
-                .date(cursor)
-                .reservations(dailyReservations.stream()
-                    .map(MonthReservationDailyResponseDto::fromEntity) // 필요하면 inside DTO
-                    .toList())
-                .build();
+                    .date(cursor)
+                    .reservations(dailyReservations.stream()
+                            .map(MonthReservationDailyResponseDto::fromEntity) // 필요하면 inside DTO
+                            .toList())
+                    .build();
 
             dailyDtos.add(dto);
 
@@ -261,8 +250,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // 자원의 (예약 가능 시간대 포함) 모든 시간대 목록 조회
     @Override
     @Transactional(readOnly = true)
-    public AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId,
-        final LocalDate date) {
+    public AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId, final LocalDate date) {
 
         userReader.findById(userId);
 
@@ -273,11 +261,10 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         ZoneId zone = ZoneId.of("Asia/Seoul");
 
-        List<TimeSlot> timeSlots = AvailableTimeSlotCalculator.calculateAvailableSlots(reservations,
-            date, zone);
+        List<TimeSlot> timeSlots = AvailableTimeSlotCalculator.calculateAvailableSlots(reservations, date, zone);
 
         List<TimeSlotDto> timeSlotDtos =
-            timeSlots.stream().map(slot -> TimeSlotDto.create(slot, zone)).toList();
+                timeSlots.stream().map(slot -> TimeSlotDto.create(slot, zone)).toList();
 
         return AssetTimeResponseDto.create(assetId, timeSlotDtos);
     }
@@ -286,32 +273,28 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Transactional(readOnly = true)
     public Reservation getReservationById(Long id) {
         Reservation reservation = reservationJpaRepository
-            .findById(id)
-            .orElseThrow(
-                () -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+                .findById(id)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
         return reservation;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Reservation> getReservationsByUserAndYearMonth(
-        final Long userId, final Instant from, final Instant to) {
+            final Long userId, final Instant from, final Instant to) {
 
         // userId 유효한지 확인
         userReader.findById(userId);
 
-        List<Reservation> reservations = reservationJpaRepository.findByUserIdAndYearMonth(userId,
-            from, to);
+        List<Reservation> reservations = reservationJpaRepository.findByUserIdAndYearMonth(userId, from, to);
         return reservations;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Reservation> getReservationsByUserAndWeek(final Long userId, final Instant start,
-        final Instant end) {
+    public List<Reservation> getReservationsByUserAndWeek(final Long userId, final Instant start, final Instant end) {
         userReader.findById(userId);
-        List<Reservation> reservations = reservationJpaRepository.findByUserIdAndWeek(userId, start,
-            end);
+        List<Reservation> reservations = reservationJpaRepository.findByUserIdAndWeek(userId, start, end);
 
         return reservations;
     }
@@ -329,8 +312,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Reservation> getReservationsByAssetAndDate(final Long assetId,
-        final LocalDate date) {
+    public List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date) {
 
         ZoneId zone = ZoneId.of("Asia/Seoul");
 
@@ -358,8 +340,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     }
 
     public static Integer statusToInt(final String status) {
-        if (status == null || status.isBlank())
-            return null;
+        if (status == null || status.isBlank()) return null;
 
         return switch (status.toUpperCase()) {
             case "PENDING" -> 0;
@@ -384,11 +365,11 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         Instant startDay = yearMonth.atDay(1).atStartOfDay(zone).toInstant();
 
         Instant endDay = yearMonth
-            .plusMonths(1)
-            .atDay(1)
-            .atStartOfDay(zone)
-            .minusNanos(1)
-            .toInstant();
+                .plusMonths(1)
+                .atDay(1)
+                .atStartOfDay(zone)
+                .minusNanos(1)
+                .toInstant();
         return DateRange.create(startDay, endDay);
     }
 
@@ -413,8 +394,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         }
 
         reservations = reservations.stream()
-            .sorted(Comparator.comparing(Reservation::getStartAt))
-            .toList();
+                .sorted(Comparator.comparing(Reservation::getStartAt))
+                .toList();
 
         if (reservations.get(0).getStartAt().isAfter(dayStart)) {
             return true;
@@ -432,5 +413,4 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         Instant lastEnd = reservations.get(reservations.size() - 1).getEndAt();
         return lastEnd.isBefore(dayEnd);
     }
-
 }

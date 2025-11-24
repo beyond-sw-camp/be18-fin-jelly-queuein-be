@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.booking.dto.reservation.response.raw;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

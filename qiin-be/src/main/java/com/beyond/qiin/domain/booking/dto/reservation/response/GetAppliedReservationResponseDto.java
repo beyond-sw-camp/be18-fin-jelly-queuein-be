@@ -37,8 +37,7 @@ public class GetAppliedReservationResponseDto {
     // 사유
     private final String reason;
 
-    public static GetAppliedReservationResponseDto fromRaw(
-        RawAppliedReservationResponseDto raw, boolean isReservable) {
+    public static GetAppliedReservationResponseDto fromRaw(RawAppliedReservationResponseDto raw, boolean isReservable) {
         return GetAppliedReservationResponseDto.builder()
                 .assetName(raw.getAssetName())
                 .reservationId(raw.getReservationId())
