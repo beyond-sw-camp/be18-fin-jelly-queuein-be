@@ -76,32 +76,27 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
         // 0계층 / 1계층
         if (condition.getLayerZero() != null) {
             builder.and(closure.depth
-                .eq(0)
-                .and(closure.assetClosureId.descendantId.eq(asset.id))
-                .and(closure.assetClosureId.ancestorId.eq(
-                    Long.parseLong(condition.getLayerZero()))));
+                    .eq(0)
+                    .and(closure.assetClosureId.descendantId.eq(asset.id))
+                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero()))));
         }
 
         if (condition.getLayerOne() != null) {
             builder.and(closure.depth
-                .eq(1)
-                .and(closure.assetClosureId.descendantId.eq(asset.id))
-                .and(
-                    closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
+                    .eq(1)
+                    .and(closure.assetClosureId.descendantId.eq(asset.id))
+                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
         }
 
         return query.select(Projections.constructor(
-                RawReservableAssetResponseDto.class,
-                asset.id,
-                asset.name,
-                category.name,
-                asset.needsApproval
-            ))
-            .from(asset)
-            .leftJoin(category).on(category.id.eq(asset.categoryId))
-            .leftJoin(closure).on(closure.assetClosureId.descendantId.eq(asset.id))
-            .where(builder)
-            .distinct()   // 중복 제거
-            .fetch();
+                        RawReservableAssetResponseDto.class, asset.id, asset.name, category.name, asset.needsApproval))
+                .from(asset)
+                .leftJoin(category)
+                .on(category.id.eq(asset.categoryId))
+                .leftJoin(closure)
+                .on(closure.assetClosureId.descendantId.eq(asset.id))
+                .where(builder)
+                .distinct() // 중복 제거
+                .fetch();
     }
 }

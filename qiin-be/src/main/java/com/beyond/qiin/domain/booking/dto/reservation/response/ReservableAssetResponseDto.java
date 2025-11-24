@@ -36,7 +36,8 @@ public class ReservableAssetResponseDto {
                 .categoryName(raw.getCategoryName())
                 //            .assetStatus(raw.getAssetStatus())
                 .needsApproval(raw.isNeedsApproval())
-                .reservationStatus(ReservationStatus.from(raw.getReservationStatus()).name())
+                .reservationStatus(
+                        ReservationStatus.from(raw.getReservationStatus()).name())
                 .isReservable(true)
                 .build();
     }

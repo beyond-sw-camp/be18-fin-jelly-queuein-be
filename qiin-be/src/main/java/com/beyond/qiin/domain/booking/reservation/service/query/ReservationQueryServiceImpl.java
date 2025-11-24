@@ -146,8 +146,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         userReader.findById(userId);
 
-        List<RawReservableAssetResponseDto> rawPages = reservableAssetsQueryRepository.search(
-            condition);
+        List<RawReservableAssetResponseDto> rawPages = reservableAssetsQueryRepository.search(condition);
 
         LocalDate date = condition.getDate();
 
@@ -158,18 +157,16 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             boolean isReservable = isAssetReservableOnDate(raw.getAssetId(), date);
 
             if (isReservable) {
-                reservableAssets.add(ReservableAssetResponseDto.fromRaw(raw)); //생성 조건이 true이므로 인자로 받지 않음
+                reservableAssets.add(ReservableAssetResponseDto.fromRaw(raw)); // 생성 조건이 true이므로 인자로 받지 않음
             }
         }
-        
+
         int startIdx = (int) pageable.getOffset();
         int endIdx = Math.min(startIdx + pageable.getPageSize(), reservableAssets.size());
 
-        List<ReservableAssetResponseDto> pageContent =
-            reservableAssets.subList(startIdx, endIdx);
+        List<ReservableAssetResponseDto> pageContent = reservableAssets.subList(startIdx, endIdx);
 
-        Page<ReservableAssetResponseDto> page =
-            new PageImpl<>(pageContent, pageable, reservableAssets.size());
+        Page<ReservableAssetResponseDto> page = new PageImpl<>(pageContent, pageable, reservableAssets.size());
 
         return PageResponseDto.from(page);
     }
@@ -424,10 +421,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     private boolean isAssetReservableOnDate(Long assetId, LocalDate date) {
 
-
         // 날짜에 해당하는 예약만 조회하는 메서드
-        List<Reservation> reservations =
-            getReservationsByAssetAndDate(assetId, date);
+        List<Reservation> reservations = getReservationsByAssetAndDate(assetId, date);
 
         // 하루 기준 gap 존재 여부 판단
         return isReservableForDay(date, reservations);
@@ -445,8 +440,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         }
 
         reservations = reservations.stream()
-            .sorted(Comparator.comparing(Reservation::getStartAt))
-            .toList();
+                .sorted(Comparator.comparing(Reservation::getStartAt))
+                .toList();
 
         if (reservations.get(0).getStartAt().isAfter(dayStart)) {
             return true;
