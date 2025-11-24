@@ -18,8 +18,7 @@ public class GetAppliedReservationSearchCondition {
     private String isApproved;
     private String isReservable;
 
-    @NotNull
-    private String assetName; // TODO : assetName이 unique가 안되면 id로 변경 필요
+    private String assetName; // 검색용이므로 unique 안하고 여러개 떠도 됨
 
     private String assetType;
     private String categoryName;
