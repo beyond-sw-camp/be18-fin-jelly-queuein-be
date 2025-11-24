@@ -23,8 +23,9 @@ spring:
     listener:
       auto-startup: false
     topic:
-      reservation: reservation-topic-dev
-      notification: notification-topic-dev
+      topics:
+        reservation-created: reservation-created-topic
+        reservation-updated: reservation-updated-topic
 
   data:
     redis:
