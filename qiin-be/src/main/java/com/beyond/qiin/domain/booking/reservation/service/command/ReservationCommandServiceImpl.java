@@ -26,6 +26,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -91,24 +92,21 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             log.info("[LOCK-ACQUIRED] assetId={} 락 획득 성공", assetId);
             Asset asset = assetCommandService.getAssetById(assetId);
             User applicant = userReader.findById(userId);
-            userReader.validateAllExist(
-                createReservationRequestDto.getAttendantIds()); // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
-            List<User> attendantUsers = userReader.findAllByIds(
-                createReservationRequestDto.getAttendantIds());
+            userReader.validateAllExist(createReservationRequestDto.getAttendantIds()); // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
+            List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
             assetCommandService.isAvailable(assetId);
             // 해당 시간에 사용 가능한 자원인지 확인
             validateReservationAvailability(
-                asset.getId(), createReservationRequestDto.getStartAt(),
-                createReservationRequestDto.getEndAt());
+                    asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
 
             // 선착순 자원은 자동 승인
-            Reservation reservation = createReservationRequestDto.toEntity(asset, applicant,
-                ReservationStatus.APPROVED);
+            Reservation reservation =
+                    createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
             reservation.setIsApproved(true); // 승인됨
 
             List<Attendant> attendants = attendantUsers.stream()
-                .map(user -> Attendant.create(user, reservation))
-                .collect(Collectors.toList());
+                    .map(user -> Attendant.create(user, reservation))
+                    .collect(Collectors.toList());
 
             reservation.addAttendants(attendants);
 
@@ -121,7 +119,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 lock.unlock();
             }
         }
-
     }
 
     @Override
