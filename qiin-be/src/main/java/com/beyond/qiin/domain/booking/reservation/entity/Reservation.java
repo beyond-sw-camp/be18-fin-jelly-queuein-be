@@ -194,16 +194,14 @@ public class Reservation extends BaseEntity {
     }
 
     public void changeAttendants(List<User> users) {
-        if (this.status != ReservationStatus.PENDING.getCode()
-            && this.status != ReservationStatus.APPROVED.getCode()) {
+        if (this.status != ReservationStatus.PENDING.getCode() && this.status != ReservationStatus.APPROVED.getCode()) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_CANCEL_NOT_ALLOWED);
         }
         List<Attendant> attendants =
-            users.stream().map(user -> Attendant.create(user, this)).toList();
+                users.stream().map(user -> Attendant.create(user, this)).toList();
 
         this.attendants.clear();
         this.attendants.addAll(attendants);
-
     }
 
     // 예약 정보 수정 메서드

@@ -18,11 +18,15 @@ import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationCommandServiceImpl implements ReservationCommandService {
@@ -31,6 +35,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final ReservationReader reservationReader;
     private final ReservationWriter reservationWriter;
     private final AssetCommandService assetCommandService;
+    private final RedissonClient redissonClient;
 
     // TODO : 선착순, 승인 예약 중복 처리
     // TODO : entity 생성은 entity 안에서
@@ -65,28 +70,58 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     public ReservationResponseDto instantConfirmReservation(
             final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
-        Asset asset = assetCommandService.getAssetById(assetId);
-        User applicant = userReader.findById(userId);
-        userReader.validateAllExist(createReservationRequestDto.getAttendantIds()); // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
-        List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
-        assetCommandService.isAvailable(assetId);
-        // 해당 시간에 사용 가능한 자원인지 확인
-        validateReservationAvailability(
-                asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
+        String lockKey = "lock:reservation:asset:" + assetId;
+        RLock lock = redissonClient.getLock(lockKey);
 
-        // 선착순 자원은 자동 승인
-        Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
-        reservation.setIsApproved(true); // 승인됨
+        boolean isLocked = lock.isLocked();
+        boolean isMine = lock.isHeldByCurrentThread();
+        long remain = lock.remainTimeToLive();
 
-        List<Attendant> attendants = attendantUsers.stream()
+        log.info("locked? {}", isLocked);
+        log.info("my thread? {}", isMine);
+        log.info("TTL: {} ms", remain);
+
+        try {
+            // 5초 동안 락 획득 시도, 획득하면 10초 동안 점유
+            boolean available = lock.tryLock(5, 10, TimeUnit.SECONDS);
+
+            if (!available) {
+                throw new ReservationException(ReservationErrorCode.RESERVATION_REQUEST_DUPLICATED);
+            }
+            log.info("[LOCK-ACQUIRED] assetId={} 락 획득 성공", assetId);
+            Asset asset = assetCommandService.getAssetById(assetId);
+            User applicant = userReader.findById(userId);
+            userReader.validateAllExist(
+                createReservationRequestDto.getAttendantIds()); // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
+            List<User> attendantUsers = userReader.findAllByIds(
+                createReservationRequestDto.getAttendantIds());
+            assetCommandService.isAvailable(assetId);
+            // 해당 시간에 사용 가능한 자원인지 확인
+            validateReservationAvailability(
+                asset.getId(), createReservationRequestDto.getStartAt(),
+                createReservationRequestDto.getEndAt());
+
+            // 선착순 자원은 자동 승인
+            Reservation reservation = createReservationRequestDto.toEntity(asset, applicant,
+                ReservationStatus.APPROVED);
+            reservation.setIsApproved(true); // 승인됨
+
+            List<Attendant> attendants = attendantUsers.stream()
                 .map(user -> Attendant.create(user, reservation))
                 .collect(Collectors.toList());
 
-        reservation.addAttendants(attendants);
+            reservation.addAttendants(attendants);
 
-        reservationWriter.save(reservation);
+            reservationWriter.save(reservation);
+            return ReservationResponseDto.fromEntity(reservation);
+        } catch (InterruptedException e) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_CREATE_FAILED);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
 
-        return ReservationResponseDto.fromEntity(reservation);
     }
 
     @Override
@@ -99,7 +134,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         User respondent = userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
         Asset asset = reservation.getAsset();
-        // 해당 시간에 사용 가능한 자원인지 확인 TODO : 날짜까지 포함해야하네
         validateReservationAvailability(asset.getId(), reservation.getStartAt(), reservation.getEndAt());
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
