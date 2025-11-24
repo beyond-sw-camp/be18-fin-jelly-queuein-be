@@ -3,10 +3,12 @@ package com.beyond.qiin.domain.booking.reservation.service.query;
 import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
@@ -24,9 +26,9 @@ public interface ReservationQueryService {
     PageResponseDto<GetUserReservationResponseDto> getReservationsByUserId(
             final Long userId, final GetUserReservationSearchCondition condition, final Pageable pageable);
 
-    //    PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
-    //            final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable);
-    //
+    PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
+            final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable);
+
     PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(
             final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable);
 

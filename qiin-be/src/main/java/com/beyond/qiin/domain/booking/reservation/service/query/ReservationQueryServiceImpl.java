@@ -3,18 +3,21 @@ package com.beyond.qiin.domain.booking.reservation.service.query;
 import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationDailyResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.TimeSlotDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationDailyResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
@@ -43,6 +46,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,20 +137,42 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return PageResponseDto.from(page);
     }
 
-    //    // TODO : 목록 조회 - querydsl 대상
-    //    // 예약 가능 자원 목록 조회
-    //    @Override
-    //    @Transactional(readOnly = true)
-    //    public PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
-    //            final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable) {
-    //
-    //        userReader.findById(userId);
-    //
-    //        Page<RawReservableAssetResponseDto> rawPage = reservableAssetsQueryRepository.search(condition, pageable);
-    //
-    //        Page<ReservableAssetResponseDto> page = rawPage.map(ReservableAssetResponseDto::fromRaw);
-    //
-    //        return PageResponseDto.from(page);
+    // TODO : 목록 조회 - querydsl 대상
+    // 예약 가능 자원 목록 조회
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDto<ReservableAssetResponseDto> getReservableAssets(
+            final Long userId, final ReservableAssetSearchCondition condition, Pageable pageable) {
+
+        userReader.findById(userId);
+
+        List<RawReservableAssetResponseDto> rawPages = reservableAssetsQueryRepository.search(
+            condition);
+
+        LocalDate date = condition.getDate();
+
+        List<ReservableAssetResponseDto> reservableAssets = new ArrayList<>();
+
+        for (RawReservableAssetResponseDto raw : rawPages) {
+
+            boolean isReservable = isAssetReservableOnDate(raw.getAssetId(), date);
+
+            if (isReservable) {
+                reservableAssets.add(ReservableAssetResponseDto.fromRaw(raw)); //생성 조건이 true이므로 인자로 받지 않음
+            }
+        }
+        
+        int startIdx = (int) pageable.getOffset();
+        int endIdx = Math.min(startIdx + pageable.getPageSize(), reservableAssets.size());
+
+        List<ReservableAssetResponseDto> pageContent =
+            reservableAssets.subList(startIdx, endIdx);
+
+        Page<ReservableAssetResponseDto> page =
+            new PageImpl<>(pageContent, pageable, reservableAssets.size());
+
+        return PageResponseDto.from(page);
+    }
     //
     //        //        // 사용 가능 상태의 자원들을 가져옴 - 빌 수 있음
     //        //        List<Asset> assets = assetRepository.findAvailableAssets();
@@ -396,41 +422,47 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return DateRange.create(startDay, endDay);
     }
 
-    public boolean isAssetReservableToday(Long assetId) {
+    private boolean isAssetReservableOnDate(Long assetId, LocalDate date) {
 
-        Instant start =
-                LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
 
-        Instant end = LocalDate.now()
-                .plusDays(1)
-                .atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant();
+        // 날짜에 해당하는 예약만 조회하는 메서드
+        List<Reservation> reservations =
+            getReservationsByAssetAndDate(assetId, date);
 
-        List<Reservation> reservations = getReservationsByAssetId(assetId);
+        // 하루 기준 gap 존재 여부 판단
+        return isReservableForDay(date, reservations);
+    }
 
-        if (reservations.isEmpty()) return true;
+    private boolean isReservableForDay(LocalDate date, List<Reservation> reservations) {
 
-        // 시작 시간 순으로 정렬
-        reservations.sort(Comparator.comparing(Reservation::getStartAt).reversed());
+        ZoneId zone = ZoneId.of("Asia/Seoul");
 
-        // TODO: 첫 예약이 오늘 시작 시간 이후면 앞쪽에 빈 구간 있음
-        if (reservations.get(0).getStartAt().isAfter(start)) return true;
+        Instant dayStart = date.atStartOfDay(zone).toInstant();
+        Instant dayEnd = date.plusDays(1).atStartOfDay(zone).toInstant();
 
-        for (int i = 0; i < reservations.size(); i++) {
+        if (reservations.isEmpty()) {
+            return true;
+        }
+
+        reservations = reservations.stream()
+            .sorted(Comparator.comparing(Reservation::getStartAt))
+            .toList();
+
+        if (reservations.get(0).getStartAt().isAfter(dayStart)) {
+            return true;
+        }
+
+        for (int i = 0; i < reservations.size() - 1; i++) {
             Instant currentEnd = reservations.get(i).getEndAt();
             Instant nextStart = reservations.get(i + 1).getStartAt();
 
             if (currentEnd.isBefore(nextStart)) {
-                return true; // 사이에 빈 구간 존재
+                return true;
             }
         }
 
         Instant lastEnd = reservations.get(reservations.size() - 1).getEndAt();
-        if (lastEnd.isBefore(end)) {
-            return true;
-        }
-        return false;
+        return lastEnd.isBefore(dayEnd);
     }
 
     //

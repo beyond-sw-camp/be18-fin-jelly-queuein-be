@@ -7,19 +7,13 @@ import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 // TODO : is reservable을 어떻게 포함해줄지에 대해 고려
@@ -36,7 +30,7 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
     private static final QCategory category = QCategory.category;
 
     @Override
-    public Page<RawReservableAssetResponseDto> search(ReservableAssetSearchCondition condition, Pageable pageable) {
+    public List<RawReservableAssetResponseDto> search(ReservableAssetSearchCondition condition) {
         BooleanBuilder builder = new BooleanBuilder();
 
         // 날짜(Instant)
@@ -82,64 +76,32 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
         // 0계층 / 1계층
         if (condition.getLayerZero() != null) {
             builder.and(closure.depth
-                    .eq(0)
-                    .and(closure.assetClosureId.descendantId.eq(asset.id))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero()))));
+                .eq(0)
+                .and(closure.assetClosureId.descendantId.eq(asset.id))
+                .and(closure.assetClosureId.ancestorId.eq(
+                    Long.parseLong(condition.getLayerZero()))));
         }
 
         if (condition.getLayerOne() != null) {
             builder.and(closure.depth
-                    .eq(1)
-                    .and(closure.assetClosureId.descendantId.eq(asset.id))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
+                .eq(1)
+                .and(closure.assetClosureId.descendantId.eq(asset.id))
+                .and(
+                    closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
         }
 
-        List<RawReservableAssetResponseDto> content = query.select(Projections.constructor(
-                        RawReservableAssetResponseDto.class,
-                        reservation.id,
-                        asset.id,
-                        asset.name,
-                        //                        asset.type,
-                        category.name,
-                        //                        asset.status,
-                        asset.needsApproval,
-                        reservation.status))
-                .from(reservation)
-                .join(asset)
-                .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
-                .leftJoin(closure)
-                .on(closureOn)
-                .where(builder)
-                .orderBy(getOrderSpecifiers(pageable))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        long total = query.select(reservation.count())
-                .from(reservation)
-                .join(asset)
-                .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(closure)
-                .on(closureOn)
-                .where(builder)
-                .fetchOne();
-
-        return new PageImpl<>(content, pageable, total);
-    }
-
-    private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
-        return pageable.getSort().stream()
-                .map(order -> {
-                    String property = order.getProperty(); // "startAt", "status" ...
-
-                    Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-
-                    PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
-
-                    return new OrderSpecifier(direction, path.get(property));
-                })
-                .toArray(OrderSpecifier[]::new);
+        return query.select(Projections.constructor(
+                RawReservableAssetResponseDto.class,
+                asset.id,
+                asset.name,
+                category.name,
+                asset.needsApproval
+            ))
+            .from(asset)
+            .leftJoin(category).on(category.id.eq(asset.categoryId))
+            .leftJoin(closure).on(closure.assetClosureId.descendantId.eq(asset.id))
+            .where(builder)
+            .distinct()   // 중복 제거
+            .fetch();
     }
 }

@@ -6,10 +6,12 @@ import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationR
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
@@ -198,17 +200,17 @@ public class ReservationController {
         return ResponseEntity.ok(page);
     }
 
-    //    // 예약 가능 자원 목록 조회
-    //    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
-    //    @GetMapping("/reservable-assets")
-    //    public ResponseEntity<PageResponseDto<ReservableAssetResponseDto>> getReservableAssets(
-    //            @AuthenticationPrincipal CustomUserDetails user,
-    //            @Valid @ModelAttribute ReservableAssetSearchCondition condition,
-    //            Pageable pageable) {
-    //        PageResponseDto<ReservableAssetResponseDto> page =
-    //                reservationQueryService.getReservableAssets(user.getUserId(), condition, pageable);
-    //        return ResponseEntity.ok(page);
-    //    }
+    // 예약 가능 자원 목록 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @GetMapping("/reservable-assets")
+    public ResponseEntity<PageResponseDto<ReservableAssetResponseDto>> getReservableAssets(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Valid @ModelAttribute ReservableAssetSearchCondition condition,
+            Pageable pageable) {
+        PageResponseDto<ReservableAssetResponseDto> page =
+                reservationQueryService.getReservableAssets(user.getUserId(), condition, pageable);
+        return ResponseEntity.ok(page);
+    }
 
     // page x 조회
 
