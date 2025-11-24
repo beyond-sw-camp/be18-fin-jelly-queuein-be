@@ -68,16 +68,16 @@ public class Reservation extends BaseEntity {
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
     private List<Attendant> attendants = new ArrayList<>();
 
-    @Column(name = "start_at", nullable = false)
+    @Column(name = "start_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
     private Instant startAt;
 
-    @Column(name = "end_at", nullable = false)
+    @Column(name = "end_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
     private Instant endAt;
 
-    @Column(name = "actual_start_at", nullable = true)
+    @Column(name = "actual_start_at", nullable = true, columnDefinition = "TIMESTAMP(6)")
     private Instant actualStartAt;
 
-    @Column(name = "actual_end_at", nullable = true)
+    @Column(name = "actual_end_at", nullable = true, columnDefinition = "TIMESTAMP(6)")
     private Instant actualEndAt;
 
     @Column(name = "status", nullable = false)
@@ -98,31 +98,17 @@ public class Reservation extends BaseEntity {
     @Version
     private Long version;
 
-    @Column(name = "is_approved", nullable = false)
-    @Builder.Default
-    private boolean isApproved = false;
+    @Column(name = "is_approved", nullable = true)
+    private Boolean isApproved;
 
     @Column(name = "reason", length = 255, nullable = true) // 255 기본
     private String reason;
 
-    // 수정 메서드
-    public void update(String description, List<User> users) {
+    // TODO : 생성 메서드 엔티티 안으로
 
-        this.description = description;
-
-        List<Attendant> attendants = users.stream()
-                .map(user -> {
-                    Attendant attendant = Attendant.create(user, this);
-
-                    return attendant;
-                })
-                .toList();
-
-        this.attendants.clear(); // empty list
-        this.attendants.addAll(attendants); // add into list
-    }
 
     // 연관관계 편의 메서드
+
     public void setApplicant(User user) {
         this.applicant = user;
     }
@@ -133,6 +119,20 @@ public class Reservation extends BaseEntity {
 
     public void setAsset(Asset asset) {
         this.asset = asset;
+    }
+
+    public void setIsApproved(boolean isApproved) {
+        this.isApproved = isApproved;
+    }
+
+    public ReservationStatus getStatus() {
+
+        return ReservationStatus.from(this.status);
+    }
+
+    public void setStatus(ReservationStatus reservationStatus) {
+        this.reservationStatus = reservationStatus;
+        this.status = reservationStatus.getCode();
     }
 
     public void addAttendant(Attendant attendant) {
@@ -163,15 +163,20 @@ public class Reservation extends BaseEntity {
         attendant.setReservation(null);
     }
 
-    //
-    public void validateApproved() {
-        if (!isApproved()) {
-            throw new IllegalStateException("예약이 승인되지 않았습니다.");
-        }
-    }
+    // 예약 정보 수정 메서드
+    public void update(String description, List<User> users) {
 
-    public void setIsApproved(boolean isApproved) {
-        this.isApproved = isApproved;
+        this.description = description;
+
+        List<Attendant> attendants = users.stream()
+            .map(user -> {
+                Attendant attendant = Attendant.create(user, this);
+                return attendant;
+            })
+            .toList();
+
+        this.attendants.clear();
+        this.attendants.addAll(attendants);
     }
 
     // 예약 승인
@@ -181,6 +186,7 @@ public class Reservation extends BaseEntity {
         this.setStatus(ReservationStatus.APPROVED); // this.status = 1;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
+        this.isApproved = true;
     }
 
     // 예약 거절
@@ -190,6 +196,7 @@ public class Reservation extends BaseEntity {
         this.setStatus(ReservationStatus.REJECTED); // this.status = 3;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
         this.respondent = respondent;
+        this.isApproved = false;
     }
 
     // 사용 시작
@@ -210,17 +217,10 @@ public class Reservation extends BaseEntity {
 
     // 예약 취소
     public void cancel() {
+        if(this.getStatus() ==  ReservationStatus.COMPLETED) //완료 후 취소 불가
+            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.CANCELED);
         // this.status = 4;
     }
 
-    public ReservationStatus getStatus() {
-
-        return ReservationStatus.from(this.status);
-    }
-
-    public void setStatus(ReservationStatus reservationStatus) {
-        this.reservationStatus = reservationStatus;
-        this.status = reservationStatus.getCode();
-    }
 }

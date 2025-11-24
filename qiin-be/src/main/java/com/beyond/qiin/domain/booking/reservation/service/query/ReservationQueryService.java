@@ -19,8 +19,6 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 public interface ReservationQueryService {
-    Reservation getReservationById(final Long id);
-
     ReservationDetailResponseDto getReservation(final Long userId, final Long reservationId);
 
     PageResponseDto<GetUserReservationResponseDto> getReservationsByUserId(
@@ -38,13 +36,6 @@ public interface ReservationQueryService {
 
     MonthReservationListResponseDto getMonthlyReservations(final Long userId, final YearMonth yearMonth);
 
-    List<Reservation> getReservationsByUserAndYearMonth(final Long userId, final Instant from, final Instant to);
-
-    List<Reservation> getReservationsByUserAndWeek(final Long userId, final Instant start, final Instant end);
-
-    List<Reservation> getReservationsByAssetId(final Long assetId);
-
-    List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date);
 
     //    List<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageable);
 

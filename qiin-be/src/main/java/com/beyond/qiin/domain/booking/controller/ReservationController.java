@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -244,5 +245,14 @@ public class ReservationController {
         AssetTimeResponseDto assetTimeResponseDto =
                 reservationQueryService.getAssetTimes(user.getUserId(), assetId, date);
         return ResponseEntity.ok(assetTimeResponseDto);
+    }
+
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @DeleteMapping("/{reservationId}")
+    public ResponseEntity<Void> deleteReservation(
+        @AuthenticationPrincipal CustomUserDetails user,
+        @PathVariable("reservationId") Long reservationId) {
+        reservationCommandService.deleteReservation(user.getUserId(), reservationId);
+        return  ResponseEntity.noContent().build();
     }
 }

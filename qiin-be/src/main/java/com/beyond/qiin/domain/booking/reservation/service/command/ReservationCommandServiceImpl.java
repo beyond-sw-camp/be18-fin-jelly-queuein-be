@@ -9,7 +9,9 @@ import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import com.beyond.qiin.domain.booking.reservation.enums.ReservationStatus;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
+import com.beyond.qiin.domain.booking.reservation.reader.ReservationReader;
 import com.beyond.qiin.domain.booking.reservation.repository.ReservationJpaRepository;
+import com.beyond.qiin.domain.booking.reservation.writer.ReservationWriter;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.entity.Asset;
@@ -26,11 +28,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReservationCommandServiceImpl implements ReservationCommandService {
 
-    private final ReservationJpaRepository reservationJpaRepository;
     private final UserReader userReader;
+    private final ReservationReader reservationReader;
+    private final ReservationWriter reservationWriter;
     private final AssetCommandService assetCommandService;
 
-    // 선착순 예약
+    //TODO : 선착순, 승인 예약 중복 처리
+    //TODO : entity 생성은 entity 안에서 
+    // 승인 예약
     @Override
     @Transactional
     public ReservationResponseDto applyReservation(
@@ -40,7 +45,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         User applicant = userReader.findById(userId);
         userReader.validateAllExist(createReservationRequestDto.getAttendantIds());
         List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
-        assetCommandService.isAvailable(assetId); //        // 자원 자체가 지금 사용 가능한가에 대한 확인
+        assetCommandService.isAvailable(assetId); // 자원 자체가 지금 사용 가능한가에 대한 확인
 
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.PENDING);
 
@@ -50,12 +55,12 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservation.addAttendants(attendants);
 
-        reservationJpaRepository.save(reservation);
+        reservationWriter.save(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
 
-    // 예약 신청
+    // 선착순 예약
     @Override
     @Transactional
     public ReservationResponseDto instantConfirmReservation(
@@ -65,18 +70,14 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         User applicant = userReader.findById(userId);
         userReader.validateAllExist(createReservationRequestDto.getAttendantIds()); // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
         List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
-
+        assetCommandService.isAvailable(assetId);
         // 해당 시간에 사용 가능한 자원인지 확인
         validateReservationAvailability(
                 asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
 
-        // 자원 자체가 지금 사용 가능한가에 대한 확인
-        assetCommandService.isAvailable(assetId);
-
         // 선착순 자원은 자동 승인
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
-
-        reservation.setIsApproved(true);
+        reservation.setIsApproved(true); //승인됨
 
         List<Attendant> attendants = attendantUsers.stream()
                 .map(user -> Attendant.create(user, reservation))
@@ -84,7 +85,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservation.addAttendants(attendants);
 
-        reservationJpaRepository.save(reservation);
+        reservationWriter.save(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -97,12 +98,14 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             final ConfirmReservationRequestDto confirmReservationRequestDto) {
 
         User respondent = userReader.findById(userId);
-
-        Reservation reservation = getReservationById(reservationId);
+        Reservation reservation = reservationReader.getReservationById(reservationId);
+        Asset asset = reservation.getAsset();
+        // 해당 시간에 사용 가능한 자원인지 확인
+        validateReservationAvailability(
+            asset.getId(), reservation.getStartAt(), reservation.getEndAt());
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
-
-        reservationJpaRepository.save(reservation);
+        reservationWriter.save(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -114,13 +117,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             final ConfirmReservationRequestDto confirmReservationRequestDto) {
 
         User respondent = userReader.findById(userId);
-
-        Reservation reservation = getReservationById(reservationId);
-
+        Reservation reservation = reservationReader.getReservationById(reservationId);
         reservation.reject(respondent, confirmReservationRequestDto.getReason()); // status rejected
-
-        reservationJpaRepository.save(reservation);
-
+        reservationWriter.save(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -131,13 +130,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
-
-        // 실제 시작 시간 추가
-        Reservation reservation = getReservationById(reservationId);
-
-        reservation.start(); // status using
-
-        reservationJpaRepository.save(reservation);
+        Reservation reservation = reservationReader.getReservationById(reservationId);
+        reservation.start(); // status using, 실제 시작 시간 추가
+        reservationWriter.save(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -146,34 +141,27 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Transactional
     public ReservationResponseDto endUsingReservation(
             final Long userId, final Long reservationId, final Instant actualEndAt) {
-
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
-
-        Reservation reservation = getReservationById(reservationId);
-
-        reservation.end(); // status complete
-
-        reservationJpaRepository.save(reservation);
+        Reservation reservation = reservationReader.getReservationById(reservationId);
+        reservation.end(); // status complete, 실제 종료 시간 추가
+        reservationWriter.save(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
 
-    // 사용 시간 30분 전인 경우 허용
+    // 예약 취소
     @Override
     @Transactional
     public ReservationResponseDto cancelReservation(final Long userId, final Long reservationId) {
 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
+        Reservation reservation = reservationReader.getReservationById(reservationId);
+        validateReservationCanceling(reservation); //30분 전인 경우 허용
+        reservation.cancel();
 
-        Reservation reservation = getReservationById(reservationId);
-
-        validateReservationCanceling(reservation);
-
-        reservation.cancel(); // status complete
-
-        reservationJpaRepository.save(reservation);
+        reservationWriter.save(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -188,7 +176,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
-        Reservation reservation = getReservationById(reservationId);
+        Reservation reservation = reservationReader.getReservationById(reservationId);
 
         List<Long> userIds = updateReservationRequestDto.getAttendantIds();
 
@@ -200,30 +188,23 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         // attendants는 reservation 안에서 생성
         reservation.update(updateReservationRequestDto.getDescription(), attendantUsers);
 
-        reservationJpaRepository.save(reservation);
+        reservationWriter.save(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
 
-    // 자원 자체 (예외처리 포함)
     @Override
-    @Transactional(readOnly = true)
-    public Reservation getReservationById(final Long id) {
-        Reservation reservation = reservationJpaRepository
-                .findById(id)
-                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-        return reservation;
+    @Transactional
+    public void deleteReservation(final Long userId, final Long reservationId){
+        userReader.findById(userId);
+        Reservation reservation = reservationReader.getReservationById(reservationId);
+        if(reservation.getStatus() == ReservationStatus.USING){
+            throw new ReservationException(ReservationErrorCode.USING_RESERVATION_NOT_DELETED);
+        }
+        reservation.delete(userId);
+        reservationWriter.save(reservation);
     }
 
-    // 자원 목록 (예외처리 포함)
-    @Override
-    @Transactional(readOnly = true)
-    public List<Reservation> getReservationsByAssetId(final Long assetId) {
-        // assetId 유효한지 확인
-
-        List<Reservation> reservations = reservationJpaRepository.findByAssetId(assetId);
-        return reservations;
-    }
 
     // api x 비즈니스 메서드
     private void validateReservationAvailability(final Long assetId, final Instant startAt, final Instant endAt) {
@@ -241,7 +222,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private boolean isReservationTimeAvailable(final Long assetId, final Instant startAt, final Instant endAt) {
         // assetId 유효 확인
 
-        List<Reservation> reservations = getReservationsByAssetId(assetId);
+        List<Reservation> reservations = reservationReader.getReservationsByAssetId(assetId);
 
         // 2-6인 경우 1-7, 2-4, 4-6, 3-4 모두 불가해야함
         for (Reservation reservation : reservations) {

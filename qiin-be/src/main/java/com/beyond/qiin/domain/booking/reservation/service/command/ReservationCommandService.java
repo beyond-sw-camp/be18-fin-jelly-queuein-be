@@ -7,6 +7,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationRespon
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface ReservationCommandService {
 
@@ -35,7 +36,5 @@ public interface ReservationCommandService {
     ReservationResponseDto updateReservation(
             final Long userId, final Long reservationId, final UpdateReservationRequestDto createReservationRequestDto);
 
-    Reservation getReservationById(final Long id);
-
-    List<Reservation> getReservationsByAssetId(final Long assetId);
+    void deleteReservation(final Long userId, final Long reservationId);
 }

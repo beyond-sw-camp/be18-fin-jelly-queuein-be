@@ -10,7 +10,9 @@ public enum ReservationErrorCode implements ErrorCode {
     RESERVE_TIME_DUPLICATED(HttpStatus.CONFLICT, "RESERVATION_TIME_CONFLICT", "예약 시간이 다른 예약과 중복됩니다."),
     RESERVATION_CANCEL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "RESERVATION_CANCEL_NOT_ALLOWED", "예약 시간 30분 전에만 취소 가능합니다."),
     RESERVATION_STATUS_CHANGE_NOT_ALLOWED(
-            HttpStatus.BAD_REQUEST, "RESERVATION_CHANGE_NOT_ALLOWED", "예약 상태에 대한 변경 순서가 잘못되었습니다.");
+            HttpStatus.BAD_REQUEST, "RESERVATION_CHANGE_NOT_ALLOWED", "예약 상태에 대한 변경 순서가 잘못되었습니다."),
+    USING_RESERVATION_NOT_DELETED(
+        HttpStatus.BAD_REQUEST, "USING_RESERVATION_NOT_DELETED", "사용중인 자원은 삭제 불가합니다. 사용 완료하세요.");
 
     private final HttpStatus status;
     private final String error;
