@@ -23,42 +23,42 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AssetCommandController {
 
-  private final AssetCommandService assetCommandService;
+    private final AssetCommandService assetCommandService;
 
-  @PostMapping
-  public ResponseEntity<CreateAssetResponseDto> createAsset(
-      @Valid @RequestBody CreateAssetRequestDto createAssetRequestDto) {
+    @PostMapping
+    public ResponseEntity<CreateAssetResponseDto> createAsset(
+            @Valid @RequestBody CreateAssetRequestDto createAssetRequestDto) {
 
-    CreateAssetResponseDto createAssetResponseDto = assetCommandService.createAsset(createAssetRequestDto);
+        CreateAssetResponseDto createAssetResponseDto = assetCommandService.createAsset(createAssetRequestDto);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(createAssetResponseDto);
-  }
+        return ResponseEntity.status(HttpStatus.CREATED).body(createAssetResponseDto);
+    }
 
-  @PatchMapping("/{assetId}")
-  public ResponseEntity<UpdateAssetResponseDto> updateAsset(
-      @PathVariable Long assetId, @Valid @RequestBody UpdateAssetRequestDto updateAssetRequestDto) {
+    @PatchMapping("/{assetId}")
+    public ResponseEntity<UpdateAssetResponseDto> updateAsset(
+            @PathVariable Long assetId, @Valid @RequestBody UpdateAssetRequestDto updateAssetRequestDto) {
 
-    UpdateAssetResponseDto updateAssetResponseDto = assetCommandService.updateAsset(updateAssetRequestDto, assetId);
+        UpdateAssetResponseDto updateAssetResponseDto = assetCommandService.updateAsset(updateAssetRequestDto, assetId);
 
-    return ResponseEntity.status(HttpStatus.OK).body(updateAssetResponseDto);
-  }
+        return ResponseEntity.status(HttpStatus.OK).body(updateAssetResponseDto);
+    }
 
-  @DeleteMapping("/{assetId}")
-  public ResponseEntity<Void> deleteAsset(@PathVariable Long assetId
-      //            ,@AuthenticationPrincipal UserDetailsDto user
-  ) {
+    @DeleteMapping("/{assetId}")
+    public ResponseEntity<Void> deleteAsset(@PathVariable Long assetId
+            //            ,@AuthenticationPrincipal UserDetailsDto user
+            ) {
 
-    //        assetCommandService.deleteAsset(assetId, userId);
+        //        assetCommandService.deleteAsset(assetId, userId);
 
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-  }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
 
-  @PatchMapping("/{assetId}/move")
-  public ResponseEntity<Void> moveAsset(
-      @PathVariable Long assetId, @Valid @RequestBody MoveAssetRequestDto moveAssetRequestDto) {
+    @PatchMapping("/{assetId}/move")
+    public ResponseEntity<Void> moveAsset(
+            @PathVariable Long assetId, @Valid @RequestBody MoveAssetRequestDto moveAssetRequestDto) {
 
-    assetCommandService.moveAsset(assetId, moveAssetRequestDto.getParentName());
+        assetCommandService.moveAsset(assetId, moveAssetRequestDto.getParentName());
 
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-  }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
 }

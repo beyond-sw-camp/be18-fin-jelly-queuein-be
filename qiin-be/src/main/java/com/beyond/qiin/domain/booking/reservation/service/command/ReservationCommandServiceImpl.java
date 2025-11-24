@@ -63,7 +63,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         Asset asset = assetCommandService.getAssetById(assetId);
         User applicant = userReader.findById(userId);
-        userReader.validateAllExist(createReservationRequestDto.getAttendantIds());         // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
+        userReader.validateAllExist(createReservationRequestDto.getAttendantIds()); // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
         List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
 
         // 해당 시간에 사용 가능한 자원인지 확인

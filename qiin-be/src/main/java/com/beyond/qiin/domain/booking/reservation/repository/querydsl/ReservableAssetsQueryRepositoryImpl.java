@@ -9,9 +9,6 @@ import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -39,13 +36,13 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
             builder.and(asset.name.containsIgnoreCase(condition.getAssetName()));
         }
 
-        //자원 유형
-//        if (condition.getAssetType() != null) {
-//            try {
-//                builder.and(asset.type.eq(condition.getAssetType()));
-//            } catch (NumberFormatException ignored) {
-//            }
-//        }
+        // 자원 유형
+        //        if (condition.getAssetType() != null) {
+        //            try {
+        //                builder.and(asset.type.eq(condition.getAssetType()));
+        //            } catch (NumberFormatException ignored) {
+        //            }
+        //        }
 
         // 카테고리
         if (condition.getCategoryName() != null) {
@@ -78,20 +75,15 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
                     .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
         }
 
-        return query.select(
-                Projections.constructor(
-                    RawReservableAssetResponseDto.class,
-                    asset.id,
-                    asset.name,
-                    category.name,
-                    asset.needsApproval
-                )
-            )
-            .from(asset)
-            .leftJoin(category).on(category.id.eq(asset.categoryId))
-            .leftJoin(closure).on(closure.assetClosureId.descendantId.eq(asset.id))
-            .where(builder)
-            .distinct()
-            .fetch();
+        return query.select(Projections.constructor(
+                        RawReservableAssetResponseDto.class, asset.id, asset.name, category.name, asset.needsApproval))
+                .from(asset)
+                .leftJoin(category)
+                .on(category.id.eq(asset.categoryId))
+                .leftJoin(closure)
+                .on(closure.assetClosureId.descendantId.eq(asset.id))
+                .where(builder)
+                .distinct()
+                .fetch();
     }
 }

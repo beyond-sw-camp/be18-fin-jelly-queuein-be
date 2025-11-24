@@ -30,7 +30,6 @@ import com.beyond.qiin.domain.booking.reservation.util.AvailableTimeSlotCalculat
 import com.beyond.qiin.domain.booking.reservation.vo.DateRange;
 import com.beyond.qiin.domain.booking.reservation.vo.TimeSlot;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
-import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
 import com.beyond.qiin.infra.redis.reservation.ReservationRedisRepository;
 import java.time.DayOfWeek;
@@ -251,7 +250,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return MonthReservationListResponseDto.builder().reservations(dailyDtos).build();
     }
 
-    //자원의 (예약 가능 시간대 포함) 모든 시간대 목록 조회
+    // 자원의 (예약 가능 시간대 포함) 모든 시간대 목록 조회
     @Override
     @Transactional(readOnly = true)
     public AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId, final LocalDate date) {
