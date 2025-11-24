@@ -1,9 +1,8 @@
 package com.beyond.qiin.domain.accounting.dto.usage_history.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.time.Instant;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +19,7 @@ public class UsageHistoryListResponseDto {
 
     @JsonIgnore
     private final BigDecimal reservationMinutes;
+
     private final String reservationDurationText;
 
     private final Instant actualStartAt;
@@ -27,10 +27,12 @@ public class UsageHistoryListResponseDto {
 
     @JsonIgnore
     private final BigDecimal actualMinutes;
+
     private final String actualDurationText;
 
     @JsonIgnore
     private final BigDecimal usageRatioRaw;
+
     private final String usageRatio;
 
     /**

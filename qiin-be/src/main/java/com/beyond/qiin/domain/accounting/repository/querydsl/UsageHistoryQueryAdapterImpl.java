@@ -1,5 +1,11 @@
 package com.beyond.qiin.domain.accounting.repository.querydsl;
 
+import static com.beyond.qiin.domain.accounting.entity.QSettlement.settlement;
+import static com.beyond.qiin.domain.accounting.entity.QUsageHistory.usageHistory;
+import static com.beyond.qiin.domain.accounting.entity.QUserHistory.userHistory;
+import static com.beyond.qiin.domain.iam.entity.QUser.user;
+import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
+
 import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistorySearchRequestDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
@@ -8,21 +14,14 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.Instant;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-
-import java.time.Instant;
-import java.util.List;
-
-import static com.beyond.qiin.domain.accounting.entity.QSettlement.settlement;
-import static com.beyond.qiin.domain.accounting.entity.QUsageHistory.usageHistory;
-import static com.beyond.qiin.domain.accounting.entity.QUserHistory.userHistory;
-import static com.beyond.qiin.domain.iam.entity.QUser.user;
-import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
+import org.springframework.util.StringUtils;
 
 @Repository
 @RequiredArgsConstructor
@@ -79,7 +78,8 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
         Long total = queryFactory
                 .select(usageHistory.count())
                 .from(usageHistory)
-                .join(asset).on(asset.id.eq(usageHistory.assetId))
+                .join(asset)
+                .on(asset.id.eq(usageHistory.assetId))
                 .where(builder)
                 .fetchOne();
 
@@ -100,7 +100,7 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                         settlement.usageCost, // billAmount (예약 기준 금액)
                         settlement.totalUsageCost, // actualBillAmount (실제 사용 기준)
                         settlement.periodCostShare // fixedCost
-                ))
+                        ))
                 .from(usageHistory)
                 .join(asset)
                 .on(asset.id.eq(usageHistory.assetId))

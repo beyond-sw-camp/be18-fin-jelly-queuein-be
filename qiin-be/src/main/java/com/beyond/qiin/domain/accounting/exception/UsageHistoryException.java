@@ -17,11 +17,7 @@ public class UsageHistoryException extends BaseException {
 
     @Getter
     public enum UsageHistoryErrorCode implements ErrorCode {
-        USAGE_HISTORY_NOT_FOUND(
-                HttpStatus.NOT_FOUND,
-                "USAGE_HISTORY_NOT_FOUND",
-                "해당 사용 이력을 찾을 수 없습니다."
-        );
+        USAGE_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "USAGE_HISTORY_NOT_FOUND", "해당 사용 이력을 찾을 수 없습니다.");
 
         private final HttpStatus status;
         private final String error;
