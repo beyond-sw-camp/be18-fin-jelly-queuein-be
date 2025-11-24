@@ -4,10 +4,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservation
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
-import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
 import java.time.Instant;
-import java.util.List;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface ReservationCommandService {
 

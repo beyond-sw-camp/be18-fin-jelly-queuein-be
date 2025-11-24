@@ -106,7 +106,6 @@ public class Reservation extends BaseEntity {
 
     // TODO : 생성 메서드 엔티티 안으로
 
-
     // 연관관계 편의 메서드
 
     public void setApplicant(User user) {
@@ -169,11 +168,11 @@ public class Reservation extends BaseEntity {
         this.description = description;
 
         List<Attendant> attendants = users.stream()
-            .map(user -> {
-                Attendant attendant = Attendant.create(user, this);
-                return attendant;
-            })
-            .toList();
+                .map(user -> {
+                    Attendant attendant = Attendant.create(user, this);
+                    return attendant;
+                })
+                .toList();
 
         this.attendants.clear();
         this.attendants.addAll(attendants);
@@ -217,10 +216,9 @@ public class Reservation extends BaseEntity {
 
     // 예약 취소
     public void cancel() {
-        if(this.getStatus() ==  ReservationStatus.COMPLETED) //완료 후 취소 불가
-            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        if (this.getStatus() == ReservationStatus.COMPLETED) // 완료 후 취소 불가
+        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.CANCELED);
         // this.status = 4;
     }
-
 }

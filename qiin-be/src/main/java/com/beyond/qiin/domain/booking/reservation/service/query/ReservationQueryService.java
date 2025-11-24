@@ -11,11 +11,8 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationL
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
-import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 public interface ReservationQueryService {
@@ -35,7 +32,6 @@ public interface ReservationQueryService {
     WeekReservationListResponseDto getWeeklyReservations(final Long userId, final LocalDate date);
 
     MonthReservationListResponseDto getMonthlyReservations(final Long userId, final YearMonth yearMonth);
-
 
     //    List<Reservation> getReservationsPendingAndDate(final Long userId, final LocalDate date, Pageable pageable);
 

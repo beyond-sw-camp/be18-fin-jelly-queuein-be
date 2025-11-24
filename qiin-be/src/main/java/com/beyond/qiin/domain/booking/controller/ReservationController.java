@@ -250,9 +250,8 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> deleteReservation(
-        @AuthenticationPrincipal CustomUserDetails user,
-        @PathVariable("reservationId") Long reservationId) {
+            @AuthenticationPrincipal CustomUserDetails user, @PathVariable("reservationId") Long reservationId) {
         reservationCommandService.deleteReservation(user.getUserId(), reservationId);
-        return  ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
     }
 }

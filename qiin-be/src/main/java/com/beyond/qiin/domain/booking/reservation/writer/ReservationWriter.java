@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ReservationWriter {
-  private final ReservationJpaRepository reservationJpaRepository;
+    private final ReservationJpaRepository reservationJpaRepository;
 
-  public void save(Reservation reservation) {
-    reservationJpaRepository.save(reservation);
-  }
+    public void save(Reservation reservation) {
+        reservationJpaRepository.save(reservation);
+    }
 }

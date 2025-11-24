@@ -10,7 +10,6 @@ import com.beyond.qiin.domain.booking.reservation.enums.ReservationStatus;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
 import com.beyond.qiin.domain.booking.reservation.reader.ReservationReader;
-import com.beyond.qiin.domain.booking.reservation.repository.ReservationJpaRepository;
 import com.beyond.qiin.domain.booking.reservation.writer.ReservationWriter;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
@@ -33,8 +32,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final ReservationWriter reservationWriter;
     private final AssetCommandService assetCommandService;
 
-    //TODO : 선착순, 승인 예약 중복 처리
-    //TODO : entity 생성은 entity 안에서 
+    // TODO : 선착순, 승인 예약 중복 처리
+    // TODO : entity 생성은 entity 안에서
     // 승인 예약
     @Override
     @Transactional
@@ -77,7 +76,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         // 선착순 자원은 자동 승인
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
-        reservation.setIsApproved(true); //승인됨
+        reservation.setIsApproved(true); // 승인됨
 
         List<Attendant> attendants = attendantUsers.stream()
                 .map(user -> Attendant.create(user, reservation))
@@ -101,8 +100,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Reservation reservation = reservationReader.getReservationById(reservationId);
         Asset asset = reservation.getAsset();
         // 해당 시간에 사용 가능한 자원인지 확인
-        validateReservationAvailability(
-            asset.getId(), reservation.getStartAt(), reservation.getEndAt());
+        validateReservationAvailability(asset.getId(), reservation.getStartAt(), reservation.getEndAt());
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
         reservationWriter.save(reservation);
@@ -158,7 +156,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
-        validateReservationCanceling(reservation); //30분 전인 경우 허용
+        validateReservationCanceling(reservation); // 30분 전인 경우 허용
         reservation.cancel();
 
         reservationWriter.save(reservation);
@@ -195,16 +193,15 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
     @Override
     @Transactional
-    public void deleteReservation(final Long userId, final Long reservationId){
+    public void deleteReservation(final Long userId, final Long reservationId) {
         userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
-        if(reservation.getStatus() == ReservationStatus.USING){
+        if (reservation.getStatus() == ReservationStatus.USING) {
             throw new ReservationException(ReservationErrorCode.USING_RESERVATION_NOT_DELETED);
         }
         reservation.delete(userId);
         reservationWriter.save(reservation);
     }
-
 
     // api x 비즈니스 메서드
     private void validateReservationAvailability(final Long assetId, final Instant startAt, final Instant endAt) {

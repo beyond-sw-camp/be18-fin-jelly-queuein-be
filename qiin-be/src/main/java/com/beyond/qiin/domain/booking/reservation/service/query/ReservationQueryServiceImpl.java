@@ -20,10 +20,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedRes
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
-import com.beyond.qiin.domain.booking.reservation.exception.ReservationErrorCode;
-import com.beyond.qiin.domain.booking.reservation.exception.ReservationException;
 import com.beyond.qiin.domain.booking.reservation.reader.ReservationReader;
-import com.beyond.qiin.domain.booking.reservation.repository.ReservationJpaRepository;
 import com.beyond.qiin.domain.booking.reservation.repository.querydsl.AppliedReservationsQueryRepository;
 import com.beyond.qiin.domain.booking.reservation.repository.querydsl.ReservableAssetsQueryRepository;
 import com.beyond.qiin.domain.booking.reservation.repository.querydsl.UserReservationsQueryRepository;

@@ -50,7 +50,7 @@ public class ReservationDetailResponseDto {
 
     private final String reason;
 
-    private final Long version; //수정을 위한 상세 조회 시 응답에 포함해 전달, 수정 시 요청으로 포함되어옴 
+    private final Long version; // 수정을 위한 상세 조회 시 응답에 포함해 전달, 수정 시 요청으로 포함되어옴
 
     private final boolean isApproved;
 
