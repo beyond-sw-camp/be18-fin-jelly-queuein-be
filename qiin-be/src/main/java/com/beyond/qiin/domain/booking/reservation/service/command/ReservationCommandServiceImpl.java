@@ -176,15 +176,19 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
 
-        List<Long> userIds = updateReservationRequestDto.getAttendantIds();
+        if (updateReservationRequestDto.getDescription() != null) {
+            reservation.changeDescription(updateReservationRequestDto.getDescription());
+        }
 
-        // 예약자들 있는지 확인
-        userReader.validateAllExist(userIds);
+        if (updateReservationRequestDto.getStartAt() != null && updateReservationRequestDto.getEndAt() != null) {
+            reservation.changeSchedule(updateReservationRequestDto.getStartAt(), updateReservationRequestDto.getEndAt());
+        }
 
-        List<User> attendantUsers = userReader.findAllByIds(userIds);
-
-        // attendants는 reservation 안에서 생성
-        reservation.update(updateReservationRequestDto.getDescription(), attendantUsers);
+        if (updateReservationRequestDto.getAttendantIds() != null && !updateReservationRequestDto.getAttendantIds().isEmpty()) {
+            userReader.validateAllExist(updateReservationRequestDto.getAttendantIds());
+            List<User> attendants = userReader.findAllByIds(updateReservationRequestDto.getAttendantIds());
+            reservation.changeAttendants(attendants);
+        }
 
         reservationWriter.save(reservation);
 
