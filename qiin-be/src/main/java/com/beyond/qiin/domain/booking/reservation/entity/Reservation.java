@@ -105,27 +105,27 @@ public class Reservation extends BaseEntity {
     private String reason;
 
     // TODO : 생성 메서드 엔티티 안으로
-    //인자가 많아서 dto로 두는 게 나아보임
-//    public static Reservation create(
-//        User applicant,
-//        Asset asset,
-//        Instant startAt,
-//        Instant endAt,
-//        String description,
-//
-//    ){
-//        return Reservation.builder()
-//            .applicant(applicant)
-//            .respondent(null)
-//            .asset(asset)
-//            .startAt(startAt)
-//            .endAt(endAt)
-//            .description(description)
-//            .status(ReservationStatus.PENDING.getCode())
-//            .build();
-//    }
-//
-    
+    // 인자가 많아서 dto로 두는 게 나아보임
+    //    public static Reservation create(
+    //        User applicant,
+    //        Asset asset,
+    //        Instant startAt,
+    //        Instant endAt,
+    //        String description,
+    //
+    //    ){
+    //        return Reservation.builder()
+    //            .applicant(applicant)
+    //            .respondent(null)
+    //            .asset(asset)
+    //            .startAt(startAt)
+    //            .endAt(endAt)
+    //            .description(description)
+    //            .status(ReservationStatus.PENDING.getCode())
+    //            .build();
+    //    }
+    //
+
     // 연관관계 편의 메서드
 
     public void setApplicant(User user) {
@@ -195,34 +195,32 @@ public class Reservation extends BaseEntity {
     }
 
     public void changeAttendants(List<User> users) {
-        if (this.status != ReservationStatus.PENDING.getCode()
-            || this.status == ReservationStatus.APPROVED.getCode()) {
+        if (this.status != ReservationStatus.PENDING.getCode() || this.status == ReservationStatus.APPROVED.getCode()) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         }
 
-        List<Attendant> attendants = users.stream()
-            .map(user -> Attendant.create(user, this))
-            .toList();
+        List<Attendant> attendants =
+                users.stream().map(user -> Attendant.create(user, this)).toList();
 
         this.attendants.clear();
         this.attendants.addAll(attendants);
     }
 
     // 예약 정보 수정 메서드
-//    public void update(String description, List<User> users) {
-//
-//        this.description = description;
-//
-//        List<Attendant> attendants = users.stream()
-//                .map(user -> {
-//                    Attendant attendant = Attendant.create(user, this);
-//                    return attendant;
-//                })
-//                .toList();
-//
-//        this.attendants.clear();
-//        this.attendants.addAll(attendants);
-//    }
+    //    public void update(String description, List<User> users) {
+    //
+    //        this.description = description;
+    //
+    //        List<Attendant> attendants = users.stream()
+    //                .map(user -> {
+    //                    Attendant attendant = Attendant.create(user, this);
+    //                    return attendant;
+    //                })
+    //                .toList();
+    //
+    //        this.attendants.clear();
+    //        this.attendants.addAll(attendants);
+    //    }
 
     // 예약 승인
     public void approve(User respondent, String reason) {

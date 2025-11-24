@@ -181,10 +181,12 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         }
 
         if (updateReservationRequestDto.getStartAt() != null && updateReservationRequestDto.getEndAt() != null) {
-            reservation.changeSchedule(updateReservationRequestDto.getStartAt(), updateReservationRequestDto.getEndAt());
+            reservation.changeSchedule(
+                    updateReservationRequestDto.getStartAt(), updateReservationRequestDto.getEndAt());
         }
 
-        if (updateReservationRequestDto.getAttendantIds() != null && !updateReservationRequestDto.getAttendantIds().isEmpty()) {
+        if (updateReservationRequestDto.getAttendantIds() != null
+                && !updateReservationRequestDto.getAttendantIds().isEmpty()) {
             userReader.validateAllExist(updateReservationRequestDto.getAttendantIds());
             List<User> attendants = userReader.findAllByIds(updateReservationRequestDto.getAttendantIds());
             reservation.changeAttendants(attendants);
