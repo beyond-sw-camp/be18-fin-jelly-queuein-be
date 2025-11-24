@@ -50,8 +50,8 @@ public class UsageHistory {
     @Column(name = "actual_end_at", columnDefinition = "TIMESTAMP(6)")
     private Instant actualEndAt;
 
-    @Column(name = "actual_usage_time")
-    private Integer actualUsageTime;
+    @Column(name = "actual_usage_time", precision = 12, scale = 3)
+    private BigDecimal actualUsageTime;
 
     @Column(name = "start_at", columnDefinition = "TIMESTAMP(6)")
     private Instant startAt;
@@ -59,8 +59,8 @@ public class UsageHistory {
     @Column(name = "end_at", columnDefinition = "TIMESTAMP(6)")
     private Instant endAt;
 
-    @Column(name = "usage_time")
-    private Integer usageTime;
+    @Column(name = "usage_time", precision = 12, scale = 3)
+    private BigDecimal usageTime;
 
     @Column(name = "usage_ratio", precision = 12, scale = 3)
     private BigDecimal usageRatio;

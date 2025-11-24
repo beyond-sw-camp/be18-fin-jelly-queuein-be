@@ -45,11 +45,13 @@ public class UsageHistoryQueryServiceImpl implements UsageHistoryQueryService {
     // ---------------------------------------
     // 변환 Helper
     // ---------------------------------------
-    private String convertMinutes(Integer minutes) {
+    private String convertMinutes(BigDecimal minutes) {
         if (minutes == null) return "-";
 
-        int h = minutes / 60;
-        int m = minutes % 60;
+        int totalMinutes = minutes.intValue(); // 소수점 버림
+
+        int h = totalMinutes / 60;
+        int m = totalMinutes % 60;
 
         if (h > 0 && m > 0) return h + "시간 " + m + "분";
         if (h > 0) return h + "시간";

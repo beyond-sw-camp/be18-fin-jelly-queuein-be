@@ -16,13 +16,13 @@ public class UsageHistoryListResponseDto {
     private final Instant reservationStartAt;
     private final Instant reservationEndAt;
 
-    private final Integer reservationMinutes;
+    private final BigDecimal reservationMinutes;
     private final String reservationDurationText;
 
     private final Instant actualStartAt;
     private final Instant actualEndAt;
 
-    private final Integer actualMinutes;
+    private final BigDecimal actualMinutes;
     private final String actualDurationText;
 
     private final BigDecimal usageRatioRaw;

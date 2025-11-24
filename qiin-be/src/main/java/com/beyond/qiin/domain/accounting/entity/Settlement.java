@@ -24,17 +24,18 @@ public class Settlement {
     @Column(name = "asset_id", nullable = false)
     private Long assetId;
 
-    // 사용 시간
-    @Column(name = "usage_hours")
-    private Integer usageHours;
+    @Column(name = "usage_hours", precision = 12, scale = 3)
+    private BigDecimal usageHours;
 
-    // 가용 시간
-    @Column(name = "available_hours")
-    private Integer availableHours;
+    @Column(name = "available_hours", precision = 12, scale = 3)
+    private BigDecimal availableHours;
 
-    // 자원 단가
     @Column(name = "cost_per_hour_snapshot", precision = 12, scale = 3)
     private BigDecimal costPerHourSnapshot;
+
+    // 예약 기준 청구 금액
+    @Column(name = "usage_cost", precision = 12, scale = 3, nullable = false)
+    private BigDecimal usageCost;
 
     // 실제 청구 금액
     @Column(name = "total_usage_cost", precision = 12, scale = 3)
@@ -46,4 +47,20 @@ public class Settlement {
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
     private Instant createdAt;
+
+    @Column(name = "created_by")
+    private Long createdBy;
+
+    @Column(name = "deleted_at", columnDefinition = "TIMESTAMP(6)")
+    private Instant deletedAt;
+
+    @Column(name = "deleted_by")
+    private Long deletedBy;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = Instant.now();
+        }
+    }
 }

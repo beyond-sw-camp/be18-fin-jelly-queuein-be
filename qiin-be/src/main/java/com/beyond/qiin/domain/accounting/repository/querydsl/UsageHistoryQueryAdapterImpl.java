@@ -1,8 +1,5 @@
 package com.beyond.qiin.domain.accounting.repository.querydsl;
 
-import static com.beyond.qiin.domain.accounting.entity.QUsageHistory.usageHistory;
-import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
-
 import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistorySearchRequestDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
@@ -10,12 +7,19 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static com.beyond.qiin.domain.accounting.entity.QSettlement.settlement;
+import static com.beyond.qiin.domain.accounting.entity.QUsageHistory.usageHistory;
+import static com.beyond.qiin.domain.accounting.entity.QUserHistory.userHistory;
+import static com.beyond.qiin.domain.iam.entity.QUser.user;
+import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
 
 @Repository
 @RequiredArgsConstructor
@@ -70,20 +74,47 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
     @Override
     public UsageHistoryDetailResponseDto getUsageHistoryDetail(final Long usageHistoryId) {
 
-        return queryFactory
+        // 1) 기본 정보 + 정산 정보 + 자원명 조회
+        UsageHistoryDetailResponseDto base = queryFactory
                 .select(Projections.constructor(
                         UsageHistoryDetailResponseDto.class,
                         usageHistory.id,
-                        asset.name,
-                        Expressions.nullExpression(String.class),
-                        Expressions.nullExpression(List.class),
-                        usageHistory.usageRatio,
-                        usageHistory.usageRatio,
-                        usageHistory.usageRatio))
+
+                        asset.name,                     // assetName
+                        Expressions.nullExpression(String.class), // assetImage (추후 필요하면 조인)
+
+                        Expressions.nullExpression(List.class), // reserverNames -> 아래에서 채움
+
+                        settlement.usageCost,           // billAmount (예약 기준 금액)
+                        settlement.totalUsageCost,      // actualBillAmount (실제 사용 기준)
+                        settlement.periodCostShare      // fixedCost
+                ))
                 .from(usageHistory)
-                .join(asset)
-                .on(asset.id.eq(usageHistory.assetId))
+                .join(asset).on(asset.id.eq(usageHistory.assetId))
+                .leftJoin(settlement).on(settlement.usageHistoryId.eq(usageHistory.id))
                 .where(usageHistory.id.eq(usageHistoryId))
                 .fetchOne();
+
+        if (base == null) return null;
+
+        // 2) 참여자 이름 조회 (최대 3명)
+        List<String> names = queryFactory
+                .select(user.userName)
+                .from(userHistory)
+                .join(user).on(user.id.eq(userHistory.userId))
+                .where(userHistory.usageHistoryId.eq(usageHistoryId))
+                .fetch();
+
+        // 3) 최종 DTO 재구성
+        return UsageHistoryDetailResponseDto.builder()
+                .usageHistoryId(base.getUsageHistoryId())
+                .assetName(base.getAssetName())
+                .assetImage(base.getAssetImage())
+                .reserverNames(names)
+                .billAmount(base.getBillAmount())
+                .actualBillAmount(base.getActualBillAmount())
+                .fixedCost(base.getFixedCost())
+                .build();
     }
+
 }
