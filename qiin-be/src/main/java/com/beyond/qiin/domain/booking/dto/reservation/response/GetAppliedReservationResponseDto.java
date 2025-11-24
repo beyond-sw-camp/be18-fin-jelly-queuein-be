@@ -30,23 +30,24 @@ public class GetAppliedReservationResponseDto {
     private final String respondentName;
 
     // 승인 여부
-    private final Boolean isApproved; // null o : 승인 전일 수 있음
+    private final Boolean isApproved;
 
     private final String reservationStatus;
 
     // 사유
     private final String reason;
 
-    public static GetAppliedReservationResponseDto fromRaw(RawAppliedReservationResponseDto raw) {
+    public static GetAppliedReservationResponseDto fromRaw(
+        RawAppliedReservationResponseDto raw, boolean isReservable) {
         return GetAppliedReservationResponseDto.builder()
                 .assetName(raw.getAssetName())
                 .reservationId(raw.getReservationId())
                 .applicantName(raw.getApplicantName())
-                // TODO:.isReservable(false)
                 .respondentName(raw.getRespondentName())
                 .reservationStatus(
                         ReservationStatus.from(raw.getReservationStatus()).name())
-                .isApproved(raw.isApproved())
+                .isApproved(raw.getIsApproved())
+                .isReservable(isReservable)
                 .reason(raw.getReason())
                 .build();
     }

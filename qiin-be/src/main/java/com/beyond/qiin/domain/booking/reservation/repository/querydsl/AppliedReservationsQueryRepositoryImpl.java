@@ -38,8 +38,8 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
     private static final QUser respondent = new QUser("respondent");
 
     @Override
-    public Page<RawAppliedReservationResponseDto> search(
-            GetAppliedReservationSearchCondition condition, Pageable pageable) {
+    public List<RawAppliedReservationResponseDto> search(
+            GetAppliedReservationSearchCondition condition) {
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(reservation.status.eq(0)); // pending인 경우 == 신청된 reservations
@@ -62,15 +62,6 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         // 승인자 이름 검색
         if (condition.getRespondentName() != null) {
             builder.and(respondent.userName.containsIgnoreCase(condition.getRespondentName()));
-        }
-
-        // TODO: isReservable = true → 해당 시간대 다른 예약 없음
-        if (condition.getIsReservable() != null) {
-            boolean isReservable = Boolean.parseBoolean(condition.getIsReservable());
-
-            BooleanExpression reservableCondition = isReservable ? reservation.status.eq(0) : reservation.status.ne(0);
-
-            builder.and(reservableCondition);
         }
 
         // 승인 여부
@@ -120,7 +111,7 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         }
 
         // 조회
-        List<RawAppliedReservationResponseDto> content = query.select(Projections.constructor(
+        return query.select(Projections.constructor(
                         RawAppliedReservationResponseDto.class,
                         asset.id,
                         asset.name,
@@ -131,49 +122,15 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                         reservation.isApproved,
                         reservation.reason))
                 .from(reservation)
-                .join(asset)
-                .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
+                .join(reservation.asset, asset)
+                .leftJoin(asset.category, category)
                 .leftJoin(closure)
-                .on(closureOn)
-
-                // applicant/respondent: 매핑 기반
+                .on(closure.assetClosureId.descendantId.eq(asset.id))
                 .leftJoin(reservation.applicant, applicant)
                 .leftJoin(reservation.respondent, respondent)
                 .where(builder)
-                .orderBy(getOrderSpecifiers(pageable))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
                 .fetch();
 
-        Long total = query.select(reservation.count())
-                .from(reservation)
-                .join(asset)
-                .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
-                .leftJoin(closure)
-                .on(closureOn)
-                .leftJoin(reservation.applicant, applicant)
-                .leftJoin(reservation.respondent, respondent)
-                .where(builder)
-                .fetchOne();
-
-        return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
 
-    private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
-        return pageable.getSort().stream()
-                .map(order -> {
-                    String property = order.getProperty(); // "startAt", "status" ...
-
-                    Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-
-                    PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
-
-                    return new OrderSpecifier(direction, path.get(property));
-                })
-                .toArray(OrderSpecifier[]::new);
-    }
 }

@@ -1,5 +1,6 @@
 package com.beyond.qiin.domain.booking.dto.reservation.request.search_condition;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ReservableAssetSearchCondition {
+    @NotNull
     private LocalDate date;
 
     private String assetName;

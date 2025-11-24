@@ -1,5 +1,6 @@
 package com.beyond.qiin.domain.booking.dto.reservation.response.raw;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,8 +14,6 @@ public class RawAppliedReservationResponseDto {
     private final String applicantName;
     private final String respondentName;
     private final int reservationStatus;
-    private final boolean isApproved;
-    // TODO : status로 생각하기엔 말그대로 승인 / 거절
-    // 근데 isApproved -> 이미 거절된 것으로 보일 수 있기 때문에 사실상 entity에 Boolean이어야하지 않나 싶네
+    private final Boolean isApproved;
     private final String reason;
 }
