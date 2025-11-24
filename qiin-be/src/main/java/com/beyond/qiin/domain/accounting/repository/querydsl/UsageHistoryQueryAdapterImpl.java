@@ -1,24 +1,28 @@
 package com.beyond.qiin.domain.accounting.repository.querydsl;
 
+import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistorySearchRequestDto;
+import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
+import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
+import com.beyond.qiin.domain.accounting.exception.UsageHistoryException;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+
+import java.time.Instant;
+import java.util.List;
+
 import static com.beyond.qiin.domain.accounting.entity.QSettlement.settlement;
 import static com.beyond.qiin.domain.accounting.entity.QUsageHistory.usageHistory;
 import static com.beyond.qiin.domain.accounting.entity.QUserHistory.userHistory;
 import static com.beyond.qiin.domain.iam.entity.QUser.user;
 import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
-
-import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistorySearchRequestDto;
-import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
-import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -31,11 +35,22 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
             final UsageHistorySearchRequestDto req, final Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (req.getStartDate() != null) builder.and(usageHistory.startAt.goe(req.getStartDate()));
+        Instant start = req.getStartDate();
+        Instant end = req.getEndDate();
+        String keyword = req.getKeyword();
 
-        if (req.getEndDate() != null) builder.and(usageHistory.endAt.loe(req.getEndDate()));
+        if (start != null) {
+            builder.and(usageHistory.endAt.goe(start));
+        }
 
-        if (req.getKeyword() != null && !req.getKeyword().isBlank()) builder.and(asset.name.contains(req.getKeyword()));
+        if (end != null) {
+            builder.and(usageHistory.startAt.loe(end));
+        }
+
+        if (StringUtils.hasText(keyword)) {
+            keyword = keyword.trim();
+            builder.and(asset.name.containsIgnoreCase(keyword));
+        }
 
         List<UsageHistoryListResponseDto> items = queryFactory
                 .select(Projections.constructor(
@@ -64,6 +79,7 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
         Long total = queryFactory
                 .select(usageHistory.count())
                 .from(usageHistory)
+                .join(asset).on(asset.id.eq(usageHistory.assetId))
                 .where(builder)
                 .fetchOne();
 
@@ -84,7 +100,7 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                         settlement.usageCost, // billAmount (예약 기준 금액)
                         settlement.totalUsageCost, // actualBillAmount (실제 사용 기준)
                         settlement.periodCostShare // fixedCost
-                        ))
+                ))
                 .from(usageHistory)
                 .join(asset)
                 .on(asset.id.eq(usageHistory.assetId))
@@ -93,7 +109,9 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                 .where(usageHistory.id.eq(usageHistoryId))
                 .fetchOne();
 
-        if (base == null) return null;
+        if (base == null) {
+            throw UsageHistoryException.notFound();
+        }
 
         // 2) 참여자 이름 조회 (최대 3명)
         List<String> names = queryFactory
