@@ -83,8 +83,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         log.info("TTL: {} ms", remain);
 
         try {
-            // 5초 동안 락 획득 시도, 획득하면 10초 동안 점유
-            boolean available = lock.tryLock(5, 10, TimeUnit.SECONDS);
+            // 5초 동안 락 획득 시도, 획득하면 10초 동안 점유 -> wait time만(lease time x)
+            boolean available = lock.tryLock(5, TimeUnit.SECONDS);
 
             if (!available) {
                 throw new ReservationException(ReservationErrorCode.RESERVATION_REQUEST_DUPLICATED);
