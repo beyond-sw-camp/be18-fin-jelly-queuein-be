@@ -77,7 +77,7 @@ public class ReservationResponseDto {
                 .description(reservation.getDescription())
                 .reason(reservation.getReason())
                 .version(reservation.getVersion())
-                .isApproved(reservation.isApproved())
+                .isApproved(reservation.getIsApproved())
                 .status(reservation.getStatus().name())
                 .attendants(reservation.getAttendants().stream()
                         .map(attendant -> AttendantResponseDto.fromEntity(attendant))

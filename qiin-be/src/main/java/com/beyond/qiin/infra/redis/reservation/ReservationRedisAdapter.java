@@ -20,7 +20,7 @@ public class ReservationRedisAdapter {
                         reservation.getRespondent() != null
                                 ? reservation.getRespondent().getUserName()
                                 : null)
-                .isApproved(reservation.isApproved())
+                .isApproved(reservation.getIsApproved())
                 .statusCode(reservation.getStatus().getCode())
                 .startAt(reservation.getStartAt().getEpochSecond())
                 .endAt(reservation.getEndAt().getEpochSecond())

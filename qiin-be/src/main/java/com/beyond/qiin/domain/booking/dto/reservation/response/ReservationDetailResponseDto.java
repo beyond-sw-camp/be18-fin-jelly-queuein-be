@@ -71,7 +71,7 @@ public class ReservationDetailResponseDto {
                 .description(reservation.getDescription())
                 .reason(reservation.getReason())
                 .version(reservation.getVersion())
-                .isApproved(reservation.isApproved())
+                .isApproved(reservation.getIsApproved())
                 .attendants( // new ArrayList<>() 이므로 null 처리 생략
                         reservation.getAttendants().stream()
                                 .map(attendant -> AttendantResponseDto.fromEntity(attendant))
