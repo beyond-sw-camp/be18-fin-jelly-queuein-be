@@ -23,7 +23,6 @@ public class UpdateReservationRequestDto {
     private final Instant startAt;
     private final Instant endAt;
 
-    @NotNull
     @Builder.Default
     private List<Long> attendantIds = new ArrayList<>();
 }

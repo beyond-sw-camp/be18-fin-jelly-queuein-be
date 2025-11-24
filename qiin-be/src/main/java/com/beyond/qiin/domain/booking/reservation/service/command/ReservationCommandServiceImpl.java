@@ -99,7 +99,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         User respondent = userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
         Asset asset = reservation.getAsset();
-        // 해당 시간에 사용 가능한 자원인지 확인
+        // 해당 시간에 사용 가능한 자원인지 확인 TODO : 날짜까지 포함해야하네
         validateReservationAvailability(asset.getId(), reservation.getStartAt(), reservation.getEndAt());
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved

@@ -65,7 +65,7 @@ public class Reservation extends BaseEntity {
 
     // 참여자들
     @Builder.Default
-    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attendant> attendants = new ArrayList<>();
 
     @Column(name = "start_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
@@ -187,23 +187,23 @@ public class Reservation extends BaseEntity {
     }
 
     public void changeSchedule(Instant startAt, Instant endAt) {
-        if (this.status != ReservationStatus.PENDING.getCode()) {
+        if (this.status != ReservationStatus.PENDING.getCode())
             throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
-        }
         this.startAt = startAt;
         this.endAt = endAt;
     }
 
     public void changeAttendants(List<User> users) {
-        if (this.status != ReservationStatus.PENDING.getCode() || this.status == ReservationStatus.APPROVED.getCode()) {
-            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        if (this.status != ReservationStatus.PENDING.getCode()
+            && this.status != ReservationStatus.APPROVED.getCode()) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_CANCEL_NOT_ALLOWED);
         }
-
         List<Attendant> attendants =
-                users.stream().map(user -> Attendant.create(user, this)).toList();
+            users.stream().map(user -> Attendant.create(user, this)).toList();
 
         this.attendants.clear();
         this.attendants.addAll(attendants);
+
     }
 
     // 예약 정보 수정 메서드
