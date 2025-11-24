@@ -170,6 +170,10 @@ public class Reservation extends BaseEntity {
         }
     }
 
+    public void setIsApproved(boolean isApproved) {
+        this.isApproved = isApproved;
+    }
+
     // 예약 승인
     public void approve(User respondent, String reason) {
         if (this.getStatus() != ReservationStatus.PENDING) // (this.status != 0)

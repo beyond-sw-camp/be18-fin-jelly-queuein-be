@@ -33,29 +33,19 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
     public List<RawReservableAssetResponseDto> search(ReservableAssetSearchCondition condition) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        // 날짜(Instant)
-        if (condition.getDate() != null) {
-            LocalDate date = condition.getDate();
-
-            Instant start = date.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
-            Instant end = date.plusDays(1).atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
-
-            builder.and(reservation.startAt.between(start, end));
-        }
-
         // 자원 관련
         // 이름 검색
         if (condition.getAssetName() != null) {
             builder.and(asset.name.containsIgnoreCase(condition.getAssetName()));
         }
 
-        // 자원 유형
-        //        if (condition.getAssetType() != null) {
-        //            try {
-        //                builder.and(asset.type.eq(assetType));
-        //            } catch (NumberFormatException ignored) {
-        //            }
-        //        }
+        //자원 유형
+//        if (condition.getAssetType() != null) {
+//            try {
+//                builder.and(asset.type.eq(condition.getAssetType()));
+//            } catch (NumberFormatException ignored) {
+//            }
+//        }
 
         // 카테고리
         if (condition.getCategoryName() != null) {
@@ -88,15 +78,20 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
                     .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne()))));
         }
 
-        return query.select(Projections.constructor(
-                        RawReservableAssetResponseDto.class, asset.id, asset.name, category.name, asset.needsApproval))
-                .from(asset)
-                .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
-                .leftJoin(closure)
-                .on(closure.assetClosureId.descendantId.eq(asset.id))
-                .where(builder)
-                .distinct() // 중복 제거
-                .fetch();
+        return query.select(
+                Projections.constructor(
+                    RawReservableAssetResponseDto.class,
+                    asset.id,
+                    asset.name,
+                    category.name,
+                    asset.needsApproval
+                )
+            )
+            .from(asset)
+            .leftJoin(category).on(category.id.eq(asset.categoryId))
+            .leftJoin(closure).on(closure.assetClosureId.descendantId.eq(asset.id))
+            .where(builder)
+            .distinct()
+            .fetch();
     }
 }

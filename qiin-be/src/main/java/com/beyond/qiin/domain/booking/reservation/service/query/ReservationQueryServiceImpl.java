@@ -84,12 +84,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         // 사용자 있는지 확인
         userReader.findById(userId);
 
-        // condition 자체의 필드들은 모두 null 가능
-        // status는 int가 아닌 Integer이 됨
-        // Integer reservationStatus = statusToInt(condition.getReservationStatus());
-
-        // Page<GetUserReservationResponseDto> page =
-        //        userReservationsQueryRepository.search(userId, condition, reservationStatus, pageable);
         log.info(
                 "date={}, status={}, approved={}, assetName={}, assetType={}, layerZero={}",
                 condition.getDate(),
@@ -137,7 +131,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return PageResponseDto.from(page);
     }
 
-    // TODO : 목록 조회 - querydsl 대상
     // 예약 가능 자원 목록 조회
     @Override
     @Transactional(readOnly = true)
@@ -170,39 +163,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         return PageResponseDto.from(page);
     }
-    //
-    //        //        // 사용 가능 상태의 자원들을 가져옴 - 빌 수 있음
-    //        //        List<Asset> assets = assetRepository.findAvailableAssets();
-    //        //
-    //        //        // 예약 가능한 자원들을 담는 용도
-    //        //        List<ReservableAssetResponseDto> responseList = new ArrayList<>();
-    //        //
-    //        //        for (Asset asset : assets) {
-    //        //            // 해당 날짜의 해당 자원의 목록 조회
-    //        //            List<Reservation> reservations = getReservationsByAssetAndDate(asset.getId(), date);
-    //        //
-    //        //            // 모든 시간에 대해 예약이 차있지 않은 경우만 추가
-    //        //            boolean reservableAsset =
-    //        //                    AvailableTimeSlotCalculator.isReservable(reservations, date,
-    // ZoneId.of("Asia/Seoul"));
-    //        //
-    //        //            if (reservableAsset) {
-    //        //                // 시간대가 있는 경우 해당 자원에 대해 dto 추가
-    //        //
-    //        //                ReservableAssetResponseDto reservableAssetResponseDto =
-    //        //                        ReservableAssetResponseDto.fromEntity(asset, statusToString(asset.getType()));
-    //        //                responseList.add(reservableAssetResponseDto);
-    //        //            }
-    //        //        }
-    //        //
-    //        //        ReservableAssetListResponseDto reservationListResponseDto =
-    // ReservableAssetListResponseDto.builder()
-    //        //                .reservations(responseList)
-    //        //                .build();
-    //        //
-    //        //        return reservableAssetListResponseDto;
-    //    }
-    //
 
     // 주별 일정 조회
     @Override
@@ -291,13 +251,14 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return MonthReservationListResponseDto.builder().reservations(dailyDtos).build();
     }
 
+    //자원의 (예약 가능 시간대 포함) 모든 시간대 목록 조회
     @Override
     @Transactional(readOnly = true)
     public AssetTimeResponseDto getAssetTimes(final Long userId, final Long assetId, final LocalDate date) {
 
         userReader.findById(userId);
 
-        Asset asset = assetQueryService.getAssetById(assetId);
+        assetQueryService.getAssetById(assetId);
 
         // 해당 자원의 해당 날짜 예약 목록
         List<Reservation> reservations = getReservationsByAssetAndDate(assetId, date);
@@ -356,9 +317,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Override
     @Transactional(readOnly = true)
     public List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date) {
-
-        // assetId 유효한지 확인
-        Asset asset = assetQueryService.getAssetById(assetId);
 
         ZoneId zone = ZoneId.of("Asia/Seoul");
 

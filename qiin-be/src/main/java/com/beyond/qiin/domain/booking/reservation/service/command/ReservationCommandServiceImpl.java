@@ -62,12 +62,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
         Asset asset = assetCommandService.getAssetById(assetId);
-
         User applicant = userReader.findById(userId);
-
-        // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
-        userReader.validateAllExist(createReservationRequestDto.getAttendantIds());
-
+        userReader.validateAllExist(createReservationRequestDto.getAttendantIds());         // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
         List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
 
         // 해당 시간에 사용 가능한 자원인지 확인
@@ -79,7 +75,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         // 선착순 자원은 자동 승인
         Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
-        reservation.approve(null, null);
+
+        reservation.setIsApproved(true);
 
         List<Attendant> attendants = attendantUsers.stream()
                 .map(user -> Attendant.create(user, reservation))

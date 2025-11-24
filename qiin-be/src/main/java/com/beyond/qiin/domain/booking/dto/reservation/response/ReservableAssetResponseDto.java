@@ -22,9 +22,7 @@ public class ReservableAssetResponseDto {
 
     //    private final String assetStatus;
 
-    private final boolean needsApproval; // 자원의 승인 필요 여부
-
-    private final String reservationStatus;
+    private final boolean needsApproval;
 
     private final boolean isReservable;
 
@@ -36,8 +34,6 @@ public class ReservableAssetResponseDto {
                 .categoryName(raw.getCategoryName())
                 //            .assetStatus(raw.getAssetStatus())
                 .needsApproval(raw.isNeedsApproval())
-                .reservationStatus(
-                        ReservationStatus.from(raw.getReservationStatus()).name())
                 .isReservable(true)
                 .build();
     }
