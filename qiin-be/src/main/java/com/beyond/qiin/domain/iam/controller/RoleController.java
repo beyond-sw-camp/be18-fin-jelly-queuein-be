@@ -27,25 +27,15 @@ public class RoleController {
     private final RoleCommandService roleCommandService;
     private final RoleQueryService roleQueryService;
 
+    // -------------------------------------------
+    // Command
+    // -------------------------------------------
+
     // 역할 생성
     @PostMapping
     @PreAuthorize("hasAuthority('MASTER')")
     public ResponseEntity<RoleResponseDto> createRole(@Valid @RequestBody final CreateRoleRequestDto request) {
         return ResponseEntity.ok(roleCommandService.createRole(request));
-    }
-
-    // 역할 상세 조회
-    @GetMapping("/{roleId}")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
-    public ResponseEntity<RoleResponseDto> getRole(@PathVariable final Long roleId) {
-        return ResponseEntity.ok(roleQueryService.getRole(roleId));
-    }
-
-    // 역할 목록 조회
-    @GetMapping
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
-    public ResponseEntity<RoleListResponseDto> getRoleList() {
-        return ResponseEntity.ok(roleQueryService.getRoles());
     }
 
     // REVIEW: PUT 유지하고 2개의 필드 무조건 보내게 하는거 프론트에서 검증하게 하며,
@@ -64,5 +54,23 @@ public class RoleController {
     public ResponseEntity<Void> deleteRole(@PathVariable final Long roleId) {
         roleCommandService.deleteRole(roleId);
         return ResponseEntity.noContent().build();
+    }
+
+    // -------------------------------------------
+    // Query
+    // -------------------------------------------
+
+    // 역할 상세 조회
+    @GetMapping("/{roleId}")
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    public ResponseEntity<RoleResponseDto> getRole(@PathVariable final Long roleId) {
+        return ResponseEntity.ok(roleQueryService.getRole(roleId));
+    }
+
+    // 역할 목록 조회
+    @GetMapping
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    public ResponseEntity<RoleListResponseDto> getRoleList() {
+        return ResponseEntity.ok(roleQueryService.getRoles());
     }
 }

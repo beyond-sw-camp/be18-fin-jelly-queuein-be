@@ -39,7 +39,8 @@ public class UserCommandServiceImpl implements UserCommandService {
         final String tempPassword = PasswordGenerator.generate();
         final String encrypted = passwordEncoder.encode(tempPassword);
 
-        final User user = User.builder()
+        // TODO: 빌더 엔티티로
+        User user = User.builder()
                 .dptId(request.getDptId())
                 .userNo(request.getUserNo())
                 .userName(request.getUserName())
@@ -48,12 +49,11 @@ public class UserCommandServiceImpl implements UserCommandService {
                 .passwordExpired(true)
                 .build();
 
-        final User saved = userWriter.save(user);
+        User saved = userWriter.save(user);
 
-        final Role defaultRole = roleReader.findByRoleName("GENERAL");
+        Role defaultRole = roleReader.findByRoleName("GENERAL");
 
-        final UserRole userRole =
-                UserRole.builder().user(saved).role(defaultRole).build();
+        UserRole userRole = UserRole.builder().user(saved).role(defaultRole).build();
 
         userRoleWriter.save(userRole);
 

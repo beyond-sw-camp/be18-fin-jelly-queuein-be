@@ -1,13 +1,12 @@
 package com.beyond.qiin.domain.iam.entity;
 
+import com.beyond.qiin.common.BaseEntity;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -30,13 +29,9 @@ import org.hibernate.annotations.SQLRestriction;
             @Index(name = "idx_role_permission_role_id", columnList = "role_id"),
             @Index(name = "idx_role_permission_permission_id", columnList = "permission_id")
         })
+@AttributeOverride(name = "id", column = @Column(name = "role_permission_id"))
 @SQLRestriction("deleted_at IS NULL")
-public class RolePermission {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_permission_id")
-    private Long id;
+public class RolePermission extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -46,12 +41,8 @@ public class RolePermission {
     @JoinColumn(name = "permission_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Permission permission;
 
-    // TODO: BaseEntity 상속 예정, flyway 반영
-    /*
-        // 소프트딜리트
+    // 소프트딜리트
     public void softDelete(final Long deleterId) {
         this.delete(deleterId);
     }
-     */
-
 }
