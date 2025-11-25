@@ -2,7 +2,6 @@ package com.beyond.qiin.domain.booking.repository.querydsl;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
-import com.beyond.qiin.domain.booking.entity.QReservation;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
@@ -74,12 +73,11 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
 
         return query.select(Projections.constructor(
                         RawReservableAssetResponseDto.class,
-                asset.id,
-                asset.name,
-                asset.type,
-                category.name,
-                asset.needsApproval
-            ))
+                        asset.id,
+                        asset.name,
+                        asset.type,
+                        category.name,
+                        asset.needsApproval))
                 .from(asset)
                 .leftJoin(category)
                 .on(category.id.eq(asset.categoryId))

@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.booking.dto.reservation.response.reservable_asset;
 
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
-import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
