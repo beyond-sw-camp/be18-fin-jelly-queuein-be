@@ -1,56 +1,56 @@
- package com.beyond.qiin.domain.booking.service.query;
+package com.beyond.qiin.domain.booking.service.query;
 
- import com.beyond.qiin.common.dto.PageResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.applied_reservation.GetAppliedReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.asset_time.AssetTimeResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.asset_time.TimeSlotDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.month_reservation.MonthReservationDailyResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.month_reservation.MonthReservationListResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.month_reservation.MonthReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.reservable_asset.ReservableAssetResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.user_reservation.GetUserReservationResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.WeekReservationDailyResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.WeekReservationListResponseDto;
- import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.WeekReservationResponseDto;
- import com.beyond.qiin.domain.booking.entity.Reservation;
- import com.beyond.qiin.domain.booking.repository.querydsl.AppliedReservationsQueryRepository;
- import com.beyond.qiin.domain.booking.repository.querydsl.ReservableAssetsQueryRepository;
- import com.beyond.qiin.domain.booking.repository.querydsl.UserReservationsQueryRepository;
- import com.beyond.qiin.domain.booking.support.ReservationReader;
- import com.beyond.qiin.domain.booking.util.AvailableTimeSlotCalculator;
- import com.beyond.qiin.domain.booking.vo.DateRange;
- import com.beyond.qiin.domain.booking.vo.TimeSlot;
- import com.beyond.qiin.domain.iam.support.user.UserReader;
- import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
- import java.time.DayOfWeek;
- import java.time.Instant;
- import java.time.LocalDate;
- import java.time.YearMonth;
- import java.time.ZoneId;
- import java.util.ArrayList;
- import java.util.Comparator;
- import java.util.List;
- import java.util.Map;
- import java.util.stream.Collectors;
- import lombok.RequiredArgsConstructor;
- import lombok.extern.slf4j.Slf4j;
- import org.springframework.data.domain.Page;
- import org.springframework.data.domain.PageImpl;
- import org.springframework.data.domain.Pageable;
- import org.springframework.stereotype.Service;
- import org.springframework.transaction.annotation.Transactional;
+import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.applied_reservation.GetAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.asset_time.AssetTimeResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.asset_time.TimeSlotDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.month_reservation.MonthReservationDailyResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.month_reservation.MonthReservationListResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.month_reservation.MonthReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.reservable_asset.ReservableAssetResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.user_reservation.GetUserReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.WeekReservationDailyResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.WeekReservationListResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.WeekReservationResponseDto;
+import com.beyond.qiin.domain.booking.entity.Reservation;
+import com.beyond.qiin.domain.booking.repository.querydsl.AppliedReservationsQueryRepository;
+import com.beyond.qiin.domain.booking.repository.querydsl.ReservableAssetsQueryRepository;
+import com.beyond.qiin.domain.booking.repository.querydsl.UserReservationsQueryRepository;
+import com.beyond.qiin.domain.booking.support.ReservationReader;
+import com.beyond.qiin.domain.booking.util.AvailableTimeSlotCalculator;
+import com.beyond.qiin.domain.booking.vo.DateRange;
+import com.beyond.qiin.domain.booking.vo.TimeSlot;
+import com.beyond.qiin.domain.iam.support.user.UserReader;
+import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
- @Slf4j
- @Service
- @RequiredArgsConstructor
- public class ReservationQueryServiceImpl implements ReservationQueryService {
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     private final UserReader userReader;
     private final ReservationReader reservationReader;
@@ -359,4 +359,4 @@
         Instant lastEnd = reservations.get(reservations.size() - 1).getEndAt();
         return lastEnd.isBefore(dayEnd);
     }
- }
+}

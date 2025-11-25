@@ -1,26 +1,25 @@
- package com.beyond.qiin.domain.booking.repository.querydsl;
+package com.beyond.qiin.domain.booking.repository.querydsl;
 
- import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
- import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.entity.QReservation;
+import com.beyond.qiin.domain.iam.entity.QUser;
+import com.beyond.qiin.domain.inventory.entity.QAsset;
+import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
+import com.beyond.qiin.domain.inventory.entity.QCategory;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
- import com.beyond.qiin.domain.booking.entity.QReservation;
- import com.beyond.qiin.domain.iam.entity.QUser;
- import com.beyond.qiin.domain.inventory.entity.QAsset;
- import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
- import com.beyond.qiin.domain.inventory.entity.QCategory;
- import com.querydsl.core.BooleanBuilder;
- import com.querydsl.core.types.Projections;
- import com.querydsl.jpa.impl.JPAQueryFactory;
- import java.time.Instant;
- import java.time.LocalDate;
- import java.time.ZoneId;
- import java.util.List;
- import lombok.RequiredArgsConstructor;
- import org.springframework.stereotype.Repository;
-
- @Repository
- @RequiredArgsConstructor
- public class AppliedReservationsQueryRepositoryImpl implements AppliedReservationsQueryRepository {
+@Repository
+@RequiredArgsConstructor
+public class AppliedReservationsQueryRepositoryImpl implements AppliedReservationsQueryRepository {
 
     private final JPAQueryFactory query;
 
@@ -124,4 +123,4 @@
                 .where(builder)
                 .fetch();
     }
- }
+}
