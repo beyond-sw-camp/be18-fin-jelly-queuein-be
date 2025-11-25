@@ -14,6 +14,7 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDt
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +27,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/assets")
@@ -57,7 +56,7 @@ public class AssetController {
 
         return ResponseEntity.status(HttpStatus.OK).body(updateAssetResponseDto);
     }
-    
+
     // 자원 삭제
     @DeleteMapping("/{assetId}")
     public ResponseEntity<Void> deleteAsset(@PathVariable Long assetId

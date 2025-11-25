@@ -10,6 +10,7 @@ import com.beyond.qiin.domain.inventory.dto.category.response.UpdateCategoryResp
 import com.beyond.qiin.domain.inventory.service.command.CategoryCommandService;
 import com.beyond.qiin.domain.inventory.service.query.CategoryQueryService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/assets/categories")
