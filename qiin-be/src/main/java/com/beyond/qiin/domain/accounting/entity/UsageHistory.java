@@ -2,6 +2,7 @@ package com.beyond.qiin.domain.accounting.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -22,24 +23,12 @@ public class UsageHistory {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(
-            name = "asset_id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "asset_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Asset asset;
 
-    //    @ManyToOne(fetch = LAZY)
-    //    @JoinColumn(
-    //            name = "reservation_id",
-    //            insertable = false,
-    //            updatable = false,
-    //            foreignKey = @ForeignKey(NO_CONSTRAINT)
-    //    )
-    //    private Reservation reservation;
-
-    @Column(name = "reservation_id", nullable = false)
-    private Long reservationId;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "reservation_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Reservation reservation;
 
     @Column(name = "actual_start_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
     private Instant actualStartAt;
@@ -70,13 +59,22 @@ public class UsageHistory {
         this.createdAt = Instant.now();
     }
 
-    // final 추가 bow 써라
-    public static UsageHistory create(Asset asset, Long reservationId, Instant startAt, Instant endAt) {
+    public static UsageHistory createReservationBase(
+            final Asset asset,
+            final Reservation reservation,
+            final Instant startAt,
+            final Instant endAt,
+            final Integer usageTime) {
         return UsageHistory.builder()
-                .asset(asset) // ✔ Asset 엔티티 넣기
-                .reservationId(reservationId) // ✔ 그대로 유지
+                .asset(asset)
+                .reservation(reservation)
                 .startAt(startAt)
                 .endAt(endAt)
+                .usageTime(usageTime)
+                .actualStartAt(startAt) // 초기값: 예약값 기반
+                .actualEndAt(endAt)
+                .actualUsageTime(0) // 아직 실제 사용 없음
+                .usageRatio(BigDecimal.ZERO) // NOT NULL이므로 기본값
                 .createdAt(Instant.now())
                 .build();
     }

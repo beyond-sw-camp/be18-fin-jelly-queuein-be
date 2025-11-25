@@ -20,18 +20,10 @@ public class UserHistory {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(
-            name = "user_id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(
-            name = "usage_history_id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "usage_history_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private UsageHistory usageHistory;
 }

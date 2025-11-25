@@ -3,6 +3,7 @@ package com.beyond.qiin.domain.accounting.repository.querydsl;
 import static com.beyond.qiin.domain.accounting.entity.QSettlement.settlement;
 import static com.beyond.qiin.domain.accounting.entity.QUsageHistory.usageHistory;
 import static com.beyond.qiin.domain.accounting.entity.QUserHistory.userHistory;
+import static com.beyond.qiin.domain.booking.entity.QReservation.reservation;
 import static com.beyond.qiin.domain.iam.entity.QUser.user;
 import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
 
@@ -14,14 +15,12 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 @Repository
 @RequiredArgsConstructor
@@ -30,82 +29,82 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<UsageHistoryListResponseDto> searchUsageHistory(
-            final UsageHistorySearchRequestDto req, final Pageable pageable) {
+    public Page<UsageHistoryListResponseDto> searchUsageHistory(UsageHistorySearchRequestDto req, Pageable pageable) {
+
         BooleanBuilder builder = new BooleanBuilder();
 
-        Instant start = req.getStartDate();
-        Instant end = req.getEndDate();
-        String keyword = req.getKeyword();
-
-        if (start != null) {
-            builder.and(usageHistory.endAt.goe(start));
+        // 날짜 검색
+        if (req.getStartDate() != null) {
+            builder.and(usageHistory.startAt.goe(req.getStartDate()));
         }
 
-        if (end != null) {
-            builder.and(usageHistory.startAt.loe(end));
+        if (req.getEndDate() != null) {
+            builder.and(usageHistory.endAt.loe(req.getEndDate()));
         }
 
-        if (StringUtils.hasText(keyword)) {
-            keyword = keyword.trim();
-            builder.and(asset.name.containsIgnoreCase(keyword));
+        // 키워드 검색 (자원명, 예약자명)
+        if (req.getKeyword() != null && !req.getKeyword().isBlank()) {
+            String keyword = req.getKeyword();
+
+            builder.and(asset.name.containsIgnoreCase(keyword).or(user.userName.containsIgnoreCase(keyword)));
         }
 
-        List<UsageHistoryListResponseDto> items = queryFactory
+        List<UsageHistoryListResponseDto> result = queryFactory
                 .select(Projections.constructor(
                         UsageHistoryListResponseDto.class,
-                        usageHistory.id,
-                        asset.name,
-                        usageHistory.startAt,
-                        usageHistory.endAt,
-                        usageHistory.usageTime,
-                        Expressions.nullExpression(String.class),
-                        usageHistory.actualStartAt,
-                        usageHistory.actualEndAt,
-                        usageHistory.actualUsageTime,
-                        Expressions.nullExpression(String.class),
-                        usageHistory.usageRatio,
-                        Expressions.nullExpression(String.class)))
+                        usageHistory.id, // usageHistoryId
+                        asset.name, // assetName
+                        usageHistory.startAt, // reservationStartAt
+                        usageHistory.endAt, // reservationEndAt
+                        usageHistory.usageTime, // reservationMinutes
+                        usageHistory.actualStartAt, // actualStartAt
+                        usageHistory.actualEndAt, // actualEndAt
+                        usageHistory.actualUsageTime, // actualMinutes
+                        usageHistory.usageRatio // usageRatio
+                        ))
                 .from(usageHistory)
-                .join(asset)
-                .on(asset.id.eq(usageHistory.assetId))
+                .join(usageHistory.asset, asset)
+                .leftJoin(usageHistory.reservation, reservation)
+                .leftJoin(userHistory)
+                .on(userHistory.usageHistory.eq(usageHistory))
+                .leftJoin(userHistory.user, user)
                 .where(builder)
+                .orderBy(usageHistory.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(usageHistory.createdAt.desc(), usageHistory.id.desc())
                 .fetch();
 
-        Long total = queryFactory
+        Long count = queryFactory
                 .select(usageHistory.count())
                 .from(usageHistory)
-                .join(asset)
-                .on(asset.id.eq(usageHistory.assetId))
+                .join(usageHistory.asset, asset)
+                .leftJoin(usageHistory.reservation, reservation)
+                .leftJoin(userHistory)
+                .on(userHistory.usageHistory.eq(usageHistory))
+                .leftJoin(userHistory.user, user)
                 .where(builder)
                 .fetchOne();
 
-        return new PageImpl<>(items, pageable, total == null ? 0 : total);
+        return new PageImpl<>(result, pageable, count == null ? 0L : count);
     }
 
     @Override
     public UsageHistoryDetailResponseDto getUsageHistoryDetail(final Long usageHistoryId) {
 
-        // 1) 기본 정보 + 정산 정보 + 자원명 조회
         UsageHistoryDetailResponseDto base = queryFactory
                 .select(Projections.constructor(
                         UsageHistoryDetailResponseDto.class,
                         usageHistory.id,
-                        asset.name, // assetName
-                        Expressions.nullExpression(String.class), // assetImage (추후 필요하면 조인)
-                        Expressions.nullExpression(List.class), // reserverNames -> 아래에서 채움
-                        settlement.usageCost, // billAmount (예약 기준 금액)
-                        settlement.totalUsageCost, // actualBillAmount (실제 사용 기준)
-                        settlement.periodCostShare // fixedCost
-                        ))
+                        asset.name,
+                        Expressions.nullExpression(String.class),
+                        Expressions.nullExpression(List.class),
+                        settlement.totalUsageCost,
+                        settlement.actualUsageCost,
+                        settlement.periodCostShare))
                 .from(usageHistory)
-                .join(asset)
-                .on(asset.id.eq(usageHistory.assetId))
+                .join(usageHistory.asset, asset) //  변경됨
                 .leftJoin(settlement)
-                .on(settlement.usageHistoryId.eq(usageHistory.id))
+                .on(settlement.usageHistory.eq(usageHistory)) // FK 기반 조인
                 .where(usageHistory.id.eq(usageHistoryId))
                 .fetchOne();
 
@@ -113,16 +112,14 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
             throw UsageHistoryException.notFound();
         }
 
-        // 2) 참여자 이름 조회 (최대 3명)
+        // 참여자 조회
         List<String> names = queryFactory
                 .select(user.userName)
                 .from(userHistory)
-                .join(user)
-                .on(user.id.eq(userHistory.userId))
-                .where(userHistory.usageHistoryId.eq(usageHistoryId))
+                .join(userHistory.user, user) // 변경됨
+                .where(userHistory.usageHistory.id.eq(usageHistoryId))
                 .fetch();
 
-        // 3) 최종 DTO 재구성
         return UsageHistoryDetailResponseDto.builder()
                 .usageHistoryId(base.getUsageHistoryId())
                 .assetName(base.getAssetName())

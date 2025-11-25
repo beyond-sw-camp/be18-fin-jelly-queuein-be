@@ -5,10 +5,8 @@ import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistoryS
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
 import com.beyond.qiin.domain.accounting.repository.querydsl.UsageHistoryQueryAdapter;
-import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,40 +24,13 @@ public class UsageHistoryQueryServiceImpl implements UsageHistoryQueryService {
 
         Page<UsageHistoryListResponseDto> rawPage = usageHistoryQueryAdapter.searchUsageHistory(req, pageable);
 
-        var convertedItems = rawPage.getContent().stream()
-                .map(item -> item.withConvertedValues(
-                        convertMinutes(item.getReservationMinutes()),
-                        convertMinutes(item.getActualMinutes()),
-                        formatRatio(item.getUsageRatioRaw())))
-                .toList();
-
-        return PageResponseDto.from(new PageImpl<>(convertedItems, pageable, rawPage.getTotalElements()));
+        // 가공 없이 그대로 반환
+        return PageResponseDto.from(rawPage);
     }
 
     @Override
     @Transactional(readOnly = true)
     public UsageHistoryDetailResponseDto getUsageHistoryDetail(final Long usageHistoryId) {
         return usageHistoryQueryAdapter.getUsageHistoryDetail(usageHistoryId);
-    }
-
-    // ---------------------------------------
-    // 변환 Helper (삭제, 프론트 책임)
-    // ---------------------------------------
-    private String convertMinutes(BigDecimal minutes) {
-        if (minutes == null) return "-";
-
-        int totalMinutes = minutes.intValue(); // 소수점 버림
-
-        int h = totalMinutes / 60;
-        int m = totalMinutes % 60;
-
-        if (h > 0 && m > 0) return h + "시간 " + m + "분";
-        if (h > 0) return h + "시간";
-        return m + "분";
-    }
-
-    private String formatRatio(BigDecimal ratio) {
-        if (ratio == null) return "-";
-        return ratio.stripTrailingZeros().toPlainString() + "%";
     }
 }

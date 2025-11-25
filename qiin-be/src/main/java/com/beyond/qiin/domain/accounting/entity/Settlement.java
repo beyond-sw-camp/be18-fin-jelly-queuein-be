@@ -22,19 +22,11 @@ public class Settlement {
     private Long id;
 
     @OneToOne(fetch = LAZY)
-    @JoinColumn(
-            name = "usage_history_id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "usage_history_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private UsageHistory usageHistory;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(
-            name = "asset_id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "asset_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Asset asset;
 
     @Column(name = "usage_hours", nullable = false)
