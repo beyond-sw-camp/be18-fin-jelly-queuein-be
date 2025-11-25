@@ -23,4 +23,7 @@ public interface AssetQueryAdapter {
     List<Asset> findByIds(List<Long> ids);
 
     Page<DescendantAssetResponseDto> findAllForDescendant(Pageable pageable);
+
+    // 자원 상세 조회
+    Optional<Asset> findByAssetId(Long assetId);
 }
