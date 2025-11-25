@@ -11,16 +11,13 @@ import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
 import com.beyond.qiin.domain.inventory.exception.CategoryException;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
-import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
+import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryAdapter;
-import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -136,11 +133,10 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     @Transactional(readOnly = true)
     public AssetDetailResponseDto getAssetDetail(final Long assetId) {
 
-        Asset asset = assetQueryAdapter.findByAssetId(assetId)
-                                       .orElseThrow(AssetException::notFound);
+        Asset asset = assetQueryAdapter.findByAssetId(assetId).orElseThrow(AssetException::notFound);
 
-        String categoryName = categoryQueryAdapter.findNameById(asset.getCategoryId())
-                                                  .orElseThrow(CategoryException::notFound);
+        String categoryName =
+                categoryQueryAdapter.findNameById(asset.getCategoryId()).orElseThrow(CategoryException::notFound);
 
         return AssetDetailResponseDto.fromEntity(asset, categoryName);
     }

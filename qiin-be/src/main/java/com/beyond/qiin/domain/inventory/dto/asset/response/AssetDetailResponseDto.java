@@ -1,12 +1,11 @@
 package com.beyond.qiin.domain.inventory.dto.asset.response;
 
 import com.beyond.qiin.domain.inventory.entity.Asset;
+import java.math.BigDecimal;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.math.BigDecimal;
-import java.time.Instant;
 
 @Getter
 @Builder
@@ -43,20 +42,20 @@ public class AssetDetailResponseDto {
 
     public static AssetDetailResponseDto fromEntity(Asset asset, String categoryName) {
         return AssetDetailResponseDto.builder()
-                                     .assetId(asset.getId())
-                                     .categoryId(asset.getCategoryId())
-                                     .categoryName(categoryName)
-                                     .name(asset.getName())
-                                     .description(asset.getDescription())
-                                     .image(asset.getImage())
-                                     .status(asset.getStatus())
-                                     .type(asset.getType())
-                                     .accessLevel(asset.getAccessLevel())
-                                     .approvalStatus(asset.isNeedsApproval())
-                                     .costPerHour(asset.getCostPerHour())
-                                     .periodCost(asset.getPeriodCost())
-                                     .createdAt(asset.getCreatedAt())
-                                     .createdBy(asset.getCreatedBy())
-                                     .build();
+                .assetId(asset.getId())
+                .categoryId(asset.getCategoryId())
+                .categoryName(categoryName)
+                .name(asset.getName())
+                .description(asset.getDescription())
+                .image(asset.getImage())
+                .status(asset.getStatus())
+                .type(asset.getType())
+                .accessLevel(asset.getAccessLevel())
+                .approvalStatus(asset.isNeedsApproval())
+                .costPerHour(asset.getCostPerHour())
+                .periodCost(asset.getPeriodCost())
+                .createdAt(asset.getCreatedAt())
+                .createdBy(asset.getCreatedBy())
+                .build();
     }
 }

@@ -10,7 +10,6 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -63,14 +62,13 @@ public class CategoryQueryAdapterImpl implements CategoryQueryAdapter {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<String > findNameById(Long categoryId) {
+    public Optional<String> findNameById(Long categoryId) {
 
         Category result = jpaQueryFactory
                 .selectFrom(category)
                 .where(category.id.eq(categoryId))
                 .fetchOne();
 
-        return Optional.ofNullable(result)
-                       .map(Category::getName);
+        return Optional.ofNullable(result).map(Category::getName);
     }
 }

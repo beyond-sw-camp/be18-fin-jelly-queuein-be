@@ -61,7 +61,7 @@ public class AssetQueryController {
 
         return ResponseEntity.status(HttpStatus.OK).body(tree);
     }
-    
+
     // 자원 상세 조회
     @GetMapping("/{assetId}")
     public ResponseEntity<AssetDetailResponseDto> getAssetDetail(@PathVariable Long assetId) {
