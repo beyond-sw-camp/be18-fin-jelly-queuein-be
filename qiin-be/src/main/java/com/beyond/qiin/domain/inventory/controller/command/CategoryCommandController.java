@@ -52,9 +52,7 @@ public class CategoryCommandController {
     // 카테고리 삭제
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId,
-                                               @AccessToken final String accessToken) {
-
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId, @AccessToken final String accessToken) {
 
         //        categoryCommandService.deleteCategory(categoryId, user.getUserId());
 

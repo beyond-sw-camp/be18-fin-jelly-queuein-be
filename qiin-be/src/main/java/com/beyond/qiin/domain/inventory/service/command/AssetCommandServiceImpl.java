@@ -15,11 +15,10 @@ import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.CategoryJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +36,6 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
     private final UserReader userReader;
 
-
     // 생성
     @Override
     @Transactional
@@ -50,11 +48,10 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             throw AssetException.duplicateName();
         }
 
-
-//        categoryCommandService.validateCategoryId(requestDto.getCategoryId());
+        //        categoryCommandService.validateCategoryId(requestDto.getCategoryId());
         // categoryId 존재 여부 검증
-        Category category = categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(
-                CategoryException::notFound);
+        Category category =
+                categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
 
         Asset asset = requestDto.toEntity(category);
 
@@ -107,8 +104,8 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         if (requestDto.getCategoryId() != null) {
             categoryCommandService.validateCategoryId(requestDto.getCategoryId());
         }
-        Category category = categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(
-                CategoryException::notFound);
+        Category category =
+                categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
 
         Asset asset = getAssetById(assetId);
 

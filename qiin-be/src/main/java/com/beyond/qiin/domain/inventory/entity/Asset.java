@@ -36,14 +36,11 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at IS NULL")
 public class Asset extends BaseEntity {
 
-//    @Column(name = "category_id", nullable = false)
-//    private Long categoryId;
+    //    @Column(name = "category_id", nullable = false)
+    //    private Long categoryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "category_id",
-            nullable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "category_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Category category;
 
     @Column(name = "name", length = 100, nullable = false, unique = true)
@@ -84,7 +81,7 @@ public class Asset extends BaseEntity {
     private Long version;
 
     public void apply(Category category, UpdateAssetRequestDto requestDto) {
-        if(category != null) this.category = category;
+        if (category != null) this.category = category;
         if (requestDto.getName() != null) this.name = requestDto.getName();
         if (requestDto.getDescription() != null) this.description = requestDto.getDescription();
         if (requestDto.getImage() != null) this.image = requestDto.getImage();

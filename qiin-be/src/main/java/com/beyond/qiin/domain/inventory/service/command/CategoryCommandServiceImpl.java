@@ -20,7 +20,6 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
 
     private final UserReader userReader;
 
-
     // 생성
     @Override
     @Transactional
@@ -65,7 +64,7 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
     public void softDeleteCategory(final Long categoryId, final Long userId) {
 
         // 나중에 권한 검증 추가
-        
+
         // 삭제하는 유저 찾기
         userReader.findById(userId);
 

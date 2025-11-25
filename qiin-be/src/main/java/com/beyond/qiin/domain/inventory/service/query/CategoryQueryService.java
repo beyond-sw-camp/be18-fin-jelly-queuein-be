@@ -3,8 +3,6 @@ package com.beyond.qiin.domain.inventory.service.query;
 import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.DropdownCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.ManageCategoryResponseDto;
-import com.beyond.qiin.domain.inventory.entity.Category;
-
 import java.util.List;
 
 public interface CategoryQueryService {
@@ -13,9 +11,9 @@ public interface CategoryQueryService {
     List<DropdownCategoryResponseDto> getDropdownList();
 
     // 관리자용 목록 조회
-    PageResponseDto<ManageCategoryResponseDto> getManageList(final int page,final int size);
+    PageResponseDto<ManageCategoryResponseDto> getManageList(final int page, final int size);
 
     // id로 카테고리 가져오기
-//    Category getCategoryById(final Long categoryId);
+    //    Category getCategoryById(final Long categoryId);
 
 }
