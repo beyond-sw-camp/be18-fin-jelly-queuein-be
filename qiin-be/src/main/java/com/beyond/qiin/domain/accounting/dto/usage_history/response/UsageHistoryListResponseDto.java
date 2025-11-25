@@ -3,7 +3,6 @@ package com.beyond.qiin.domain.accounting.dto.usage_history.response;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.time.Instant;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

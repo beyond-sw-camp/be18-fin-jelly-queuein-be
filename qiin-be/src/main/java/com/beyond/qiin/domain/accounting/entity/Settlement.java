@@ -1,12 +1,12 @@
 package com.beyond.qiin.domain.accounting.entity;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.*;
-
-import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter

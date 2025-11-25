@@ -1,10 +1,10 @@
 package com.beyond.qiin.domain.accounting.entity;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 import com.beyond.qiin.domain.iam.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
-
-import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
