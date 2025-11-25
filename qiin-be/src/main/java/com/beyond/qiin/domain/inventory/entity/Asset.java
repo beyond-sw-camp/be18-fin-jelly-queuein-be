@@ -2,6 +2,8 @@ package com.beyond.qiin.domain.inventory.entity;
 
 import com.beyond.qiin.common.BaseEntity;
 import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -12,6 +14,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.Version;
 import java.math.BigDecimal;
 import lombok.AccessLevel;
@@ -33,14 +36,13 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("deleted_at IS NULL")
 public class Asset extends BaseEntity {
 
-    @Column(name = "category_id", nullable = false)
-    private Long categoryId;
+//    @Column(name = "category_id", nullable = false)
+//    private Long categoryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "category_id",
-            insertable = false,
-            updatable = false,
+            nullable = false,
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Category category;
 
@@ -56,8 +58,14 @@ public class Asset extends BaseEntity {
     @Column(name = "status", nullable = false)
     private int status;
 
+    @Transient
+    private AssetStatus assetStatus;
+
     @Column(name = "type", nullable = false)
     private int type;
+
+    @Transient
+    private AssetType assetType;
 
     @Column(name = "access_level", nullable = false)
     private int accessLevel;
@@ -75,8 +83,8 @@ public class Asset extends BaseEntity {
     @Column(name = "version", nullable = false)
     private Long version;
 
-    public void apply(UpdateAssetRequestDto requestDto) {
-        if (requestDto.getCategoryId() != null) this.categoryId = requestDto.getCategoryId();
+    public void apply(Category category, UpdateAssetRequestDto requestDto) {
+        if(category != null) this.category = category;
         if (requestDto.getName() != null) this.name = requestDto.getName();
         if (requestDto.getDescription() != null) this.description = requestDto.getDescription();
         if (requestDto.getImage() != null) this.image = requestDto.getImage();
@@ -86,5 +94,18 @@ public class Asset extends BaseEntity {
         if (requestDto.getApprovalStatus() != null) this.needsApproval = requestDto.getApprovalStatus();
         if (requestDto.getCostPerHour() != null) this.costPerHour = requestDto.getCostPerHour();
         if (requestDto.getPeriodCost() != null) this.periodCost = requestDto.getPeriodCost();
+    }
+
+    public AssetStatus getAssetStatus() {
+        return AssetStatus.from(this.status);
+    }
+
+    public AssetType getAssetType() {
+        return AssetType.from(this.type);
+    }
+
+    // softDelete
+    public void softDelete(Long assetId) {
+        this.delete(assetId);
     }
 }

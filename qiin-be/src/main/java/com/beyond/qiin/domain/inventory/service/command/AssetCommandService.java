@@ -15,10 +15,12 @@ public interface AssetCommandService {
     UpdateAssetResponseDto updateAsset(final UpdateAssetRequestDto requestDto, final Long assetId);
 
     // delete
-    void deleteAsset(final Long assetId, final Long userId);
+    void softDeleteAsset(final Long assetId, final Long userId);
 
     // move
     void moveAsset(final Long assetId, final String newParentName);
+
+    Asset getAssetByName(final String assetName);
 
     Asset getAssetById(final Long assetId);
 

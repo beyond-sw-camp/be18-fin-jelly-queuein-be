@@ -29,4 +29,6 @@ public class UpdateAssetRequestDto {
     private BigDecimal costPerHour;
 
     private BigDecimal periodCost;
+
+    private Long version;
 }

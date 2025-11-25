@@ -3,6 +3,7 @@ package com.beyond.qiin.domain.inventory.service.query;
 import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.DropdownCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.ManageCategoryResponseDto;
+import com.beyond.qiin.domain.inventory.entity.Category;
 import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryAdapter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,4 +34,10 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
 
         return PageResponseDto.from(categoryManageResponseDtoPage);
     }
+
+//    @Override
+//    @Transactional(readOnly = true)
+//    public Category getCategoryById(final Long categoryId) {
+//
+//    }
 }

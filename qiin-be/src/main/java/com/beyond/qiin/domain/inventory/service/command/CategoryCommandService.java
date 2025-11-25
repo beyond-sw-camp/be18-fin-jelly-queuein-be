@@ -14,7 +14,7 @@ public interface CategoryCommandService {
     UpdateCategoryResponseDto updateCategory(final UpdateCategoryRequestDto requestDto, final Long categoryId);
 
     // delete
-    void deleteCategory(final Long categoryId, final Long userId);
+    void softDeleteCategory(final Long categoryId, final Long userId);
 
     // 카테고리 검증
     void validateCategoryId(final Long categoryId);

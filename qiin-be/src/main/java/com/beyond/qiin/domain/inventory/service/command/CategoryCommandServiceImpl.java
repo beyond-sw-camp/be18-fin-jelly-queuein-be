@@ -1,5 +1,6 @@
 package com.beyond.qiin.domain.inventory.service.command;
 
+import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.dto.category.request.CreateCategoryRequestDto;
 import com.beyond.qiin.domain.inventory.dto.category.request.UpdateCategoryRequestDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.CreateCategoryResponseDto;
@@ -16,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class CategoryCommandServiceImpl implements CategoryCommandService {
 
     private final CategoryJpaRepository categoryJpaRepository;
+
+    private final UserReader userReader;
+
 
     // 생성
     @Override
@@ -58,13 +62,19 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
     // 삭제
     @Override
     @Transactional
-    public void deleteCategory(final Long categoryId, final Long userId) {
+    public void softDeleteCategory(final Long categoryId, final Long userId) {
 
         // 나중에 권한 검증 추가
+        
+        // 삭제하는 유저 찾기
+        userReader.findById(userId);
 
+        // 삭제할 카테고리 찾기
         Category category = categoryJpaRepository.findById(categoryId).orElseThrow(CategoryException::notFound);
 
-        category.delete(userId);
+        // softDelete로 삭제 처리
+        category.softDelete(userId);
+        categoryJpaRepository.save(category);
     }
 
     // 카테고리 id 존재 검증 메소드
