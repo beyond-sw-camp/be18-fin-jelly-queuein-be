@@ -221,15 +221,15 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         if (updateReservationRequestDto.getAttendantIds() != null
                 && !updateReservationRequestDto.getAttendantIds().isEmpty()) {
 
-            //기존 참여자들 삭제
+            // 기존 참여자들 삭제
             List<Attendant> existingAttendants = reservation.getAttendants();
             existingAttendants.forEach(attendant -> attendantJpaRepository.delete(attendant));
 
-            //추가할 참여자들에 대해 검증
+            // 추가할 참여자들에 대해 검증
             userReader.validateAllExist(updateReservationRequestDto.getAttendantIds());
             List<User> attendants = userReader.findAllByIds(updateReservationRequestDto.getAttendantIds());
 
-            //예약의 참여자들 변경
+            // 예약의 참여자들 변경
             reservation.changeAttendants(attendants);
         }
 
@@ -238,7 +238,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         return ReservationResponseDto.fromEntity(reservation);
     }
 
-    //예약에 대해  soft delete
+    // 예약에 대해  soft delete
     @Override
     @Transactional
     public void softDeleteReservation(final Long userId, final Long reservationId) {
@@ -247,7 +247,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         if (reservation.getStatus() == ReservationStatus.USING) {
             throw new ReservationException(ReservationErrorCode.USING_RESERVATION_NOT_DELETED);
         }
-        reservation.softDeleteAll(userId); //예약, 참여자 둘다 soft delete 처리
+        reservation.softDeleteAll(userId); // 예약, 참여자 둘다 soft delete 처리
         reservationWriter.save(reservation);
     }
 

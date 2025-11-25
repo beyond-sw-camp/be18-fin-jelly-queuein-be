@@ -2,8 +2,8 @@ package com.beyond.qiin.domain.booking.repository.querydsl;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
-import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
+import com.beyond.qiin.domain.booking.reservation.entity.QReservation;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;

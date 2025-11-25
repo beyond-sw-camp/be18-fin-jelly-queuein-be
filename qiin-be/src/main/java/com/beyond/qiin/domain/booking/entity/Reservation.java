@@ -7,7 +7,6 @@ import com.beyond.qiin.domain.booking.exception.ReservationException;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -176,13 +175,12 @@ public class Reservation extends BaseEntity {
         attendant.setReservation(null);
     }
 
-    //예약, 참여자들 모두 soft delete
+    // 예약, 참여자들 모두 soft delete
     public void softDeleteAll(Long userId) {
-        this.delete(userId); //예약 soft delete
+        this.delete(userId); // 예약 soft delete
 
-        attendants.forEach(a -> a.delete(userId)); //참여자들 soft delete
+        attendants.forEach(a -> a.delete(userId)); // 참여자들 soft delete
     }
-
 
     public void clear(Attendant attendant) {
         attendants.remove(attendant);

@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.booking.event;
 
-import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

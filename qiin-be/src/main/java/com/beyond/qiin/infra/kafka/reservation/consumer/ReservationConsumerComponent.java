@@ -7,7 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 // 메시지 수신용
-//TODO : Reservation Event Listener과 중복됨 - 뭘로 할지 정해야함
+// TODO : Reservation Event Listener과 중복됨 - 뭘로 할지 정해야함
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
