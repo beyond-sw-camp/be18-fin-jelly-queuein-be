@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.booking.event;
+package com.beyond.qiin.infra.event.reservation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

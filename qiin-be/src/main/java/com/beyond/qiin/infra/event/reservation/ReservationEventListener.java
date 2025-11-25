@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.booking.event;
+package com.beyond.qiin.infra.event.reservation;
 
 import com.beyond.qiin.infra.kafka.reservation.consumer.ReservationConsumerService;
 import lombok.RequiredArgsConstructor;

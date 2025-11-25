@@ -1,7 +1,7 @@
 package com.beyond.qiin.infra.kafka.reservation.producer;
 
-import com.beyond.qiin.domain.booking.event.ReservationCreatedEvent;
-import com.beyond.qiin.domain.booking.event.ReservationUpdatedEvent;
+import com.beyond.qiin.infra.event.reservation.ReservationCreatedEvent;
+import com.beyond.qiin.infra.event.reservation.ReservationUpdatedEvent;
 import com.beyond.qiin.infra.kafka.KafkaProducerService;
 import com.beyond.qiin.infra.kafka.KafkaTopicProperties;
 import lombok.RequiredArgsConstructor;
