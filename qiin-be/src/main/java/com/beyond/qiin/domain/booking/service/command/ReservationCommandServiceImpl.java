@@ -20,11 +20,9 @@ import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +69,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     // 선착순 예약 분산락 키 : 자원 id로만 두기 제한적
     @Override
     @Transactional
-    @DistributedLock(key = "'reservation:' + #assetId + ':' + #createReservationRequestDto.startAt + ':' + #createReservationRequestDto.endAt")
+    @DistributedLock(
+            key =
+                    "'reservation:' + #assetId + ':' + #createReservationRequestDto.startAt + ':' + #createReservationRequestDto.endAt")
     public ReservationResponseDto instantConfirmReservation(
             final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
@@ -85,8 +85,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
 
         // 선착순 자원은 자동 승인
-        Reservation reservation =
-                createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
+        Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
         reservation.setIsApproved(true); // 승인됨
 
         List<Attendant> attendants = attendantUsers.stream()
@@ -97,7 +96,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservationWriter.save(reservation);
         return ReservationResponseDto.fromEntity(reservation);
-
     }
 
     @Override
