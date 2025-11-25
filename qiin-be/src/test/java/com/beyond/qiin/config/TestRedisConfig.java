@@ -1,4 +1,4 @@
-package com.beyond.qiin;
+package com.beyond.qiin.config;
 
 import org.mockito.Mockito;
 import org.redisson.api.RedissonClient;
