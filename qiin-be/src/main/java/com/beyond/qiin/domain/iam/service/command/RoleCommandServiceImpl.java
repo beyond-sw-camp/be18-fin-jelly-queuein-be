@@ -30,10 +30,7 @@ public class RoleCommandServiceImpl implements RoleCommandService {
 
         roleReader.validateNameDuplication(request.getRoleName());
 
-        Role role = Role.builder()
-                .roleName(request.getRoleName())
-                .roleDescription(request.getRoleDescription())
-                .build();
+        Role role = Role.create(request);
 
         Role savedRole = roleWriter.save(role);
 
@@ -53,9 +50,7 @@ public class RoleCommandServiceImpl implements RoleCommandService {
         validateNotMaster(role.getRoleName());
         validateNotSystemRole(role.getRoleName());
 
-        role.update(request.getRoleName(), request.getRoleDescription());
-
-        Role updated = roleWriter.save(role);
+        Role updated = updateAndSave(role, request);
 
         // redis projection
         projectionHandler.onRoleUpdated(updated);
@@ -83,6 +78,12 @@ public class RoleCommandServiceImpl implements RoleCommandService {
     // -------------------------------
     // 헬퍼 메서드
     // -------------------------------
+
+    // update, save 캡슐화
+    private Role updateAndSave(final Role role, final UpdateRoleRequestDto request) {
+        role.update(request.getRoleName(), request.getRoleDescription());
+        return roleWriter.save(role);
+    }
 
     // MASTER 역할 보호
     private void validateNotMaster(final String roleName) {
