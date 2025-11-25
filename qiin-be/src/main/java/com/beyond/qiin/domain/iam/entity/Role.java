@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.iam.dto.role.request.CreateRoleRequestDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,6 +40,13 @@ public class Role extends BaseEntity {
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     @Builder.Default
     private List<RolePermission> rolePermissions = new ArrayList<>();
+
+    public static Role create(final CreateRoleRequestDto request) {
+        return Role.builder()
+                .roleName(request.getRoleName())
+                .roleDescription(request.getRoleDescription())
+                .build();
+    }
 
     // 역할 수정
     public void update(final String roleName, final String roleDescription) {
