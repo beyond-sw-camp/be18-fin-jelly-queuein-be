@@ -305,9 +305,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             return "REJECTED";
         } else if (status == 4) {
             return "CANCELED";
-        } else if (status == 5){
+        } else if (status == 5) {
             return "COMPLETED";
         }
-        return null;
+        return "INVALID";
     }
 }
