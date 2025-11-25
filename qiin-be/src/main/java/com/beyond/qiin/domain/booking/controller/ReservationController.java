@@ -251,7 +251,7 @@ public class ReservationController {
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> deleteReservation(
             @AuthenticationPrincipal CustomUserDetails user, @PathVariable("reservationId") Long reservationId) {
-        reservationCommandService.sofDeleteReservation(user.getUserId(), reservationId);
+        reservationCommandService.softDeleteReservation(user.getUserId(), reservationId);
         return ResponseEntity.noContent().build();
     }
 }
