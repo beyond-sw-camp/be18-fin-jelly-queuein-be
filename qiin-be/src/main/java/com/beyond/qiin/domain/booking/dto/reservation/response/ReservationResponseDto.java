@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.dto.reservation.response;
 
-import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
+import com.beyond.qiin.domain.booking.dto.reservation.response.attendant.AttendantResponseDto;
+import com.beyond.qiin.domain.booking.entity.Reservation;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

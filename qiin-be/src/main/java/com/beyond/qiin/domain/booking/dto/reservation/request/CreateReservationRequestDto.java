@@ -1,7 +1,7 @@
 package com.beyond.qiin.domain.booking.dto.reservation.request;
 
-import com.beyond.qiin.domain.booking.reservation.entity.Reservation;
-import com.beyond.qiin.domain.booking.reservation.enums.ReservationStatus;
+import com.beyond.qiin.domain.booking.entity.Reservation;
+import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.validation.constraints.NotNull;

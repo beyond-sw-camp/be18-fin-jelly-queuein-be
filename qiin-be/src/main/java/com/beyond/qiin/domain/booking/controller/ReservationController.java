@@ -7,16 +7,16 @@ import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationR
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetAppliedReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
-import com.beyond.qiin.domain.booking.dto.reservation.response.AssetTimeResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.GetAppliedReservationResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.GetUserReservationResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.MonthReservationListResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.ReservableAssetResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.asset_time.AssetTimeResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.applied_reservation.GetAppliedReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.user_reservation.GetUserReservationResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.month_reservation.MonthReservationListResponseDto;
+import com.beyond.qiin.domain.booking.dto.reservation.response.reservable_asset.ReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.WeekReservationListResponseDto;
-import com.beyond.qiin.domain.booking.reservation.service.command.ReservationCommandService;
-import com.beyond.qiin.domain.booking.reservation.service.query.ReservationQueryService;
+import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.WeekReservationListResponseDto;
+import com.beyond.qiin.domain.booking.service.command.ReservationCommandService;
+import com.beyond.qiin.domain.booking.service.query.ReservationQueryService;
 import com.beyond.qiin.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -251,7 +251,7 @@ public class ReservationController {
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> deleteReservation(
             @AuthenticationPrincipal CustomUserDetails user, @PathVariable("reservationId") Long reservationId) {
-        reservationCommandService.deleteReservation(user.getUserId(), reservationId);
+        reservationCommandService.softDeleteReservation(user.getUserId(), reservationId);
         return ResponseEntity.noContent().build();
     }
 }

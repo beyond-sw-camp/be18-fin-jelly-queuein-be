@@ -1,0 +1,28 @@
+package com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation;
+
+import com.beyond.qiin.domain.booking.dto.reservation.response.month_reservation.MonthReservationDailyResponseDto;
+import com.beyond.qiin.domain.booking.entity.Reservation;
+import java.time.Instant;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class WeekReservationDailyResponseDto {
+    private final Long reservationId;
+
+    private final Instant startAt;
+
+    private final String assetName;
+
+    public static MonthReservationDailyResponseDto fromEntity(final Reservation reservation) {
+        return MonthReservationDailyResponseDto.builder()
+                .reservationId(reservation.getId())
+                .startAt(reservation.getStartAt())
+                .assetName(reservation.getAsset().getName())
+                .build();
+    }
+}

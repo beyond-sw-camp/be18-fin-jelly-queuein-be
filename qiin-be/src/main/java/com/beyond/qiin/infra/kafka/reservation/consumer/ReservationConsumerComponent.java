@@ -1,13 +1,13 @@
 package com.beyond.qiin.infra.kafka.reservation.consumer;
 
-import com.beyond.qiin.domain.booking.reservation.event.ReservationCreatedEvent;
-import com.beyond.qiin.domain.booking.reservation.event.ReservationUpdatedEvent;
+import com.beyond.qiin.domain.booking.event.ReservationCreatedEvent;
+import com.beyond.qiin.domain.booking.event.ReservationUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 // 메시지 수신용
-
+//TODO : Reservation Event Listener과 중복됨 - 뭘로 할지 정해야함
 @Slf4j
 @Component
 @RequiredArgsConstructor
