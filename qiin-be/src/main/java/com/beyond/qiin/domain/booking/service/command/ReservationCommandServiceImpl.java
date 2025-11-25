@@ -251,6 +251,11 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservationWriter.save(reservation);
     }
 
+    //하드 딜리트
+    public void hardDeleteReservation(final Long reservationId){
+        reservationWriter.hardDelete(reservationId);
+    }
+
     // api x 비즈니스 메서드
     private void validateReservationAvailability(final Long assetId, final Instant startAt, final Instant endAt) {
         if (!isReservationTimeAvailable(assetId, startAt, endAt))
