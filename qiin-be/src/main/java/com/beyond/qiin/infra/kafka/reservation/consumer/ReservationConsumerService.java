@@ -1,9 +1,9 @@
 package com.beyond.qiin.infra.kafka.reservation.consumer;
 
 import com.beyond.qiin.domain.booking.entity.Reservation;
+import com.beyond.qiin.domain.booking.repository.ReservationJpaRepository;
 import com.beyond.qiin.infra.event.reservation.ReservationCreatedEvent;
 import com.beyond.qiin.infra.event.reservation.ReservationUpdatedEvent;
-import com.beyond.qiin.domain.booking.repository.ReservationJpaRepository;
 import com.beyond.qiin.infra.redis.reservation.ReservationRedisAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
