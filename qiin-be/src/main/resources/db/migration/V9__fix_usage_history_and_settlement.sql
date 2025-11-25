@@ -20,7 +20,7 @@ ALTER TABLE `settlement`
     MODIFY COLUMN `period_cost_share` DECIMAL(12,3) NOT NULL COMMENT '정산 기간 내 고정비 배분 비율';
 
 ALTER TABLE `settlement`
-    ADD COLUMN `actual_usage_cost` DECIMAL(12,3) NOT NULL COMMENT '실제 사용 시간 × 단가' AFTER total_usage_cost;
+    ADD COLUMN `actual_usage_cost` DECIMAL(12,3) NOT NULL COMMENT '실제 사용 시간 × 단가' AFTER `total_usage_cost`;
 
 ALTER TABLE `settlement`
 DROP COLUMN `created_by`,
