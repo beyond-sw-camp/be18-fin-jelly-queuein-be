@@ -20,13 +20,18 @@ public interface AssetCommandService {
     // move
     void moveAsset(final Long assetId, final String newParentName);
 
-    Asset getAssetByName(final String assetName);
+    // 이름으로 자원 가져오기
+    Asset getAssetByName(String assetName);
 
-    Asset getAssetById(final Long assetId);
+    // id로 자원 가져오기
+    Asset getAssetById(Long assetId);
 
-    boolean isAvailable(final Long assetId);
+    // 자원 사용 가능 여부
+    boolean isAvailable(Long assetId);
 
-    String assetStatusToString(final Integer status);
+    // 자원 상태 변환 // 읽기용으로 옮길 예정
+    String assetStatusToString(Integer status);
 
-    String assetTypeToString(final Integer type);
+    // 자원 타입 변환 // 읽기용으로 옮길 예정
+    String assetTypeToString(Integer type);
 }

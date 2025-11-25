@@ -1,0 +1,11 @@
+package com.beyond.qiin.domain.booking.repository.querydsl;
+
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
+import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+public interface UserReservationsQueryRepository {
+    Page<RawUserReservationResponseDto> search(
+            Long userId, GetUserReservationSearchCondition condition, Pageable pageable);
+}

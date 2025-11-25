@@ -3,6 +3,8 @@ INTERNAL_MASTER_KEY: "aj39sdfkjasd93jkflasjf93jkflasj93"
 INTERNAL_API_KEY: "8Gf21f93jsla81fj29ff3kssl29s8fa1"
 
 spring:
+  autoconfigure:
+    exclude: org.redisson.spring.starter.RedissonAutoConfiguration
   config:
     activate:
       on-profile: test
@@ -23,8 +25,9 @@ spring:
     listener:
       auto-startup: false
     topic:
-      reservation: reservation-topic-dev
-      notification: notification-topic-dev
+      topics:
+        reservation-created: reservation-created-topic
+        reservation-updated: reservation-updated-topic
 
   data:
     redis:
