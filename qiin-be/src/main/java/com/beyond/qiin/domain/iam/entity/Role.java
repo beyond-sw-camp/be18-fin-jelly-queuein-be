@@ -39,4 +39,15 @@ public class Role extends BaseEntity {
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     @Builder.Default
     private List<RolePermission> rolePermissions = new ArrayList<>();
+
+    // 역할 수정
+    public void update(final String roleName, final String roleDescription) {
+        this.roleName = roleName;
+        this.roleDescription = roleDescription;
+    }
+
+    // 소프트딜리트
+    public void softDelete(final Long deleterId) {
+        this.delete(deleterId);
+    }
 }
