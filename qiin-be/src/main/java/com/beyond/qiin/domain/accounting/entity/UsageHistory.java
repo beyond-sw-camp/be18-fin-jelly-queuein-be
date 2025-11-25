@@ -73,6 +73,7 @@ public class UsageHistory {
         this.createdAt = Instant.now();
     }
 
+    // final 추가 bow 써라
     public static UsageHistory create(Long assetId, Long reservationId, Instant startAt, Instant endAt) {
         return UsageHistory.builder()
                 .assetId(assetId)

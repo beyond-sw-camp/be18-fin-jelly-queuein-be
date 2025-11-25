@@ -1,9 +1,12 @@
 package com.beyond.qiin.domain.accounting.entity;
 
+import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.*;
+
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
@@ -18,11 +21,21 @@ public class Settlement {
     @Column(name = "settlement_id")
     private Long id;
 
-    @Column(name = "usage_history_id", nullable = false)
-    private Long usageHistoryId;
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(
+            name = "usage_history_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private UsageHistory usageHistory;
 
-    @Column(name = "asset_id", nullable = false)
-    private Long assetId;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(
+            name = "asset_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Asset asset;
 
     @Column(name = "usage_hours", precision = 12, scale = 3)
     private BigDecimal usageHours;

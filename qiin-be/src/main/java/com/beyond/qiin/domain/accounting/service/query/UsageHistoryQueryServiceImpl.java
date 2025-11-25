@@ -43,7 +43,7 @@ public class UsageHistoryQueryServiceImpl implements UsageHistoryQueryService {
     }
 
     // ---------------------------------------
-    // 변환 Helper
+    // 변환 Helper (삭제, 프론트 책임)
     // ---------------------------------------
     private String convertMinutes(BigDecimal minutes) {
         if (minutes == null) return "-";

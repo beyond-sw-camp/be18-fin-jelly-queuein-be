@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@AllArgsConstructor // ★ private → public (QueryDSL에서 호출 가능)
+@AllArgsConstructor
 public class UsageHistoryDetailResponseDto {
 
     private final Long usageHistoryId;

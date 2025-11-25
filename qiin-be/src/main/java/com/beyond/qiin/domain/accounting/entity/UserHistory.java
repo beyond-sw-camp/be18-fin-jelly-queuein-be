@@ -1,7 +1,10 @@
 package com.beyond.qiin.domain.accounting.entity;
 
+import com.beyond.qiin.domain.iam.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
@@ -16,9 +19,19 @@ public class UserHistory {
     @Column(name = "user_history_id")
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(
+            name = "user_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User user;
 
-    @Column(name = "usage_history_id", nullable = false)
-    private Long usageHistoryId;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(
+            name = "usage_history_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private UsageHistory usageHistory;
 }

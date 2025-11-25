@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor
 public class UsageHistoryListResponseDto {
 
     private final Long usageHistoryId;
@@ -38,6 +38,7 @@ public class UsageHistoryListResponseDto {
     /**
      * 기존 DTO(raw) 값에서 텍스트 변환 값을 적용한 새로운 DTO 생성
      */
+    // 빌더 사용, from Entity 변경
     public UsageHistoryListResponseDto withConvertedValues(
             String reservationDurationText, String actualDurationText, String usageRatioText) {
         return new UsageHistoryListResponseDto(

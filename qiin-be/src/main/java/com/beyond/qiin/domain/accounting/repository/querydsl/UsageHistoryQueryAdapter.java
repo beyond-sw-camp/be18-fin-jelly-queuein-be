@@ -8,8 +8,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface UsageHistoryQueryAdapter {
 
-    // 목록 조회
-    Page<UsageHistoryListResponseDto> searchUsageHistory(UsageHistorySearchRequestDto req, Pageable pageable);
+    // 목록 조회 ( final 추가)
+    Page<UsageHistoryListResponseDto> searchUsageHistory(final UsageHistorySearchRequestDto req, Pageable pageable);
 
     // 상세 조회
     UsageHistoryDetailResponseDto getUsageHistoryDetail(final Long usageHistoryId);
