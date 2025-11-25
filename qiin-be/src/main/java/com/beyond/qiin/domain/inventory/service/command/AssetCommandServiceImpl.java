@@ -7,7 +7,6 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDt
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
-import com.beyond.qiin.domain.inventory.exception.AssetException.AssetErrorCode;
 import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
@@ -194,7 +193,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     //// 일반 메소드들 모음
 
     // 이름으로 자원 가져오기
-    @Transactional(readOnly = true)
+    @Override
     public Asset getAssetByName(final String assetName) {
         return assetJpaRepository.findByName(assetName).orElseThrow(AssetException::notFound);
     }
@@ -208,11 +207,10 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
     // 자원 사용 가능 여부
     @Override
-    @Transactional(readOnly = true)
     public boolean isAvailable(final Long assetId) {
         Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
         if (asset.getStatus() == 1 || asset.getStatus() == 2) {
-            throw new AssetException(AssetErrorCode.ASSET_NOT_AVAILABLE);
+            return false;
         }
         return true;
     }
@@ -229,6 +227,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         }
     }
 
+    // 자원 타입 변환 // 읽기용으로 옮길 예정
     @Override
     public String assetTypeToString(final Integer type) {
         if (type == 1) {
