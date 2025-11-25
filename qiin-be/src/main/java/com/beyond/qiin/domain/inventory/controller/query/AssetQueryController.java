@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.inventory.controller.query;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.response.AssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.RootAssetResponseDto;
@@ -52,6 +53,7 @@ public class AssetQueryController {
         return ResponseEntity.status(HttpStatus.OK).body(descendantAssetList);
     }
 
+    // 자원 계층 조회
     @GetMapping("/tree")
     public ResponseEntity<List<TreeAssetResponseDto>> getTreeAssets() {
 
@@ -59,7 +61,13 @@ public class AssetQueryController {
 
         return ResponseEntity.status(HttpStatus.OK).body(tree);
     }
-    //
-    //    @GetMapping("/{assetId}")
-    //    public ResponseEntity<>
+    
+    // 자원 상세 조회
+    @GetMapping("/{assetId}")
+    public ResponseEntity<AssetDetailResponseDto> getAssetDetail(@PathVariable Long assetId) {
+
+        AssetDetailResponseDto assetDetail = assetQueryService.getAssetDetail(assetId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(assetDetail);
+    }
 }

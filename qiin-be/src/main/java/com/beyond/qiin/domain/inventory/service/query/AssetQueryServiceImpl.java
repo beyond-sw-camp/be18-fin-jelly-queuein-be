@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.inventory.service.query;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.response.AssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.RootAssetResponseDto;
@@ -8,6 +9,7 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.TreeAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
+import com.beyond.qiin.domain.inventory.exception.CategoryException;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
@@ -16,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryAdapter;
+import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +34,7 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
     private final AssetQueryAdapter assetQueryAdapter;
 
-    private final AssetClosureQueryAdapter assetClosureQueryAdapter;
+    private final CategoryQueryAdapter categoryQueryAdapter;
 
     private final AssetJpaRepository assetJpaRepository;
 
@@ -125,6 +130,19 @@ public class AssetQueryServiceImpl implements AssetQueryService {
                 .toList();
 
         return TreeAssetResponseDto.of(asset.getId(), asset.getName(), children);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AssetDetailResponseDto getAssetDetail(final Long assetId) {
+
+        Asset asset = assetQueryAdapter.findByAssetId(assetId)
+                                       .orElseThrow(AssetException::notFound);
+
+        String categoryName = categoryQueryAdapter.findNameById(asset.getCategoryId())
+                                                  .orElseThrow(CategoryException::notFound);
+
+        return AssetDetailResponseDto.fromEntity(asset, categoryName);
     }
 
     @Override

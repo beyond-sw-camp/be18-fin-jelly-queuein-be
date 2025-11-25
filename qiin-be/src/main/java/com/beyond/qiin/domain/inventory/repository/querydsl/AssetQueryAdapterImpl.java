@@ -104,4 +104,14 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
 
         return new PageImpl<>(contnet, pageable, totalCount);
     }
+
+    @Override
+    public Optional<Asset> findByAssetId(Long assetId) {
+        Asset result = jpaQueryFactory
+                .selectFrom(asset)
+                .where(asset.id.eq(assetId))
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
 }
