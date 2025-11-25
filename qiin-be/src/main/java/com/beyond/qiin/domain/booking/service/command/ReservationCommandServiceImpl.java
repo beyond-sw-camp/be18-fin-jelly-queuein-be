@@ -251,8 +251,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservationWriter.save(reservation);
     }
 
-    //하드 딜리트
-    public void hardDeleteReservation(final Long reservationId){
+    // 하드 딜리트
+    public void hardDeleteReservation(final Long reservationId) {
         reservationWriter.hardDelete(reservationId);
     }
 
