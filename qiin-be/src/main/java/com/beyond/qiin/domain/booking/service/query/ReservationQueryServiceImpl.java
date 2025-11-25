@@ -280,9 +280,10 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             return "REJECTED";
         } else if (status == 4) {
             return "CANCELED";
-        } else {
-            return "COMPLETED";
+        } else if(status == 5) {
+            return "INVALID";
         }
+        return null;
     }
 
     public static Integer statusToInt(final String status) {
