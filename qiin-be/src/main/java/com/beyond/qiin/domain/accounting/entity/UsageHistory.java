@@ -73,8 +73,8 @@ public class UsageHistory {
     // final 추가 bow 써라
     public static UsageHistory create(Asset asset, Long reservationId, Instant startAt, Instant endAt) {
         return UsageHistory.builder()
-                .asset(asset)                      // ✔ Asset 엔티티 넣기
-                .reservationId(reservationId)      // ✔ 그대로 유지
+                .asset(asset) // ✔ Asset 엔티티 넣기
+                .reservationId(reservationId) // ✔ 그대로 유지
                 .startAt(startAt)
                 .endAt(endAt)
                 .createdAt(Instant.now())
