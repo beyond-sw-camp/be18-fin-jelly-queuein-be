@@ -17,8 +17,8 @@ import lombok.*;
 public class Settlement {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "settlement_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(fetch = LAZY)
@@ -37,38 +37,29 @@ public class Settlement {
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Asset asset;
 
-    @Column(name = "usage_hours", precision = 12, scale = 3)
-    private BigDecimal usageHours;
+    @Column(name = "usage_hours", nullable = false)
+    private Integer usageHours;
 
-    @Column(name = "available_hours", precision = 12, scale = 3)
-    private BigDecimal availableHours;
+    @Column(name = "actual_usage_time", nullable = false)
+    private Integer actualUsageTime;
 
-    @Column(name = "cost_per_hour_snapshot", precision = 12, scale = 3)
+    @Column(name = "cost_per_hour_snapshot", precision = 12, scale = 3, nullable = false)
     private BigDecimal costPerHourSnapshot;
 
     // 예약 기준 청구 금액
-    @Column(name = "usage_cost", precision = 12, scale = 3, nullable = false)
-    private BigDecimal usageCost;
-
-    // 실제 청구 금액
-    @Column(name = "total_usage_cost", precision = 12, scale = 3)
+    @Column(name = "total_usage_cost", precision = 12, scale = 3, nullable = false)
     private BigDecimal totalUsageCost;
 
+    // 실제 청구 금액
+    @Column(name = "actual_usage_cost", precision = 12, scale = 3, nullable = false)
+    private BigDecimal actualUsageCost;
+
     // 고정비
-    @Column(name = "period_cost_share", precision = 12, scale = 3)
+    @Column(name = "period_cost_share", precision = 12, scale = 3, nullable = false)
     private BigDecimal periodCostShare;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
     private Instant createdAt;
-
-    @Column(name = "created_by")
-    private Long createdBy;
-
-    @Column(name = "deleted_at", columnDefinition = "TIMESTAMP(6)")
-    private Instant deletedAt;
-
-    @Column(name = "deleted_by")
-    private Long deletedBy;
 
     @PrePersist
     public void prePersist() {

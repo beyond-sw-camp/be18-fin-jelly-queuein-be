@@ -21,9 +21,6 @@ public class UsageHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "asset_id", nullable = false)
-    private Long assetId;
-
     @ManyToOne(fetch = LAZY)
     @JoinColumn(
             name = "asset_id",
@@ -44,25 +41,25 @@ public class UsageHistory {
     @Column(name = "reservation_id", nullable = false)
     private Long reservationId;
 
-    @Column(name = "actual_start_at", columnDefinition = "TIMESTAMP(6)")
+    @Column(name = "actual_start_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
     private Instant actualStartAt;
 
-    @Column(name = "actual_end_at", columnDefinition = "TIMESTAMP(6)")
+    @Column(name = "actual_end_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
     private Instant actualEndAt;
 
-    @Column(name = "actual_usage_time", precision = 12, scale = 3)
-    private BigDecimal actualUsageTime;
+    @Column(name = "actual_usage_time", nullable = false)
+    private Integer actualUsageTime;
 
-    @Column(name = "start_at", columnDefinition = "TIMESTAMP(6)")
+    @Column(name = "start_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
     private Instant startAt;
 
-    @Column(name = "end_at", columnDefinition = "TIMESTAMP(6)")
+    @Column(name = "end_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
     private Instant endAt;
 
-    @Column(name = "usage_time", precision = 12, scale = 3)
-    private BigDecimal usageTime;
+    @Column(name = "usage_time", nullable = false)
+    private Integer usageTime;
 
-    @Column(name = "usage_ratio", precision = 12, scale = 3)
+    @Column(name = "usage_ratio", precision = 12, scale = 3, nullable = false)
     private BigDecimal usageRatio;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
@@ -74,10 +71,10 @@ public class UsageHistory {
     }
 
     // final 추가 bow 써라
-    public static UsageHistory create(Long assetId, Long reservationId, Instant startAt, Instant endAt) {
+    public static UsageHistory create(Asset asset, Long reservationId, Instant startAt, Instant endAt) {
         return UsageHistory.builder()
-                .assetId(assetId)
-                .reservationId(reservationId)
+                .asset(asset)                      // ✔ Asset 엔티티 넣기
+                .reservationId(reservationId)      // ✔ 그대로 유지
                 .startAt(startAt)
                 .endAt(endAt)
                 .createdAt(Instant.now())
