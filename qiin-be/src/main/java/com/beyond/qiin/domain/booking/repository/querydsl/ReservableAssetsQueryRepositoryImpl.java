@@ -13,8 +13,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-// TODO : is reservable을 어떻게 포함해줄지에 대해 고려
-
 @Repository
 @RequiredArgsConstructor
 public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQueryRepository {
@@ -22,7 +20,6 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
     private final JPAQueryFactory query;
 
     private static final QAsset asset = QAsset.asset;
-    private static final QReservation reservation = QReservation.reservation;
     private static final QAssetClosure closure = QAssetClosure.assetClosure;
     private static final QCategory category = QCategory.category;
 
@@ -76,7 +73,13 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
         }
 
         return query.select(Projections.constructor(
-                        RawReservableAssetResponseDto.class, asset.id, asset.name, category.name, asset.needsApproval))
+                        RawReservableAssetResponseDto.class,
+                asset.id,
+                asset.name,
+                asset.type,
+                category.name,
+                asset.needsApproval
+            ))
                 .from(asset)
                 .leftJoin(category)
                 .on(category.id.eq(asset.categoryId))
