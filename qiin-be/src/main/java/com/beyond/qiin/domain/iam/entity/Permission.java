@@ -26,6 +26,7 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @SQLRestriction("deleted_at IS NULL")
+// @SoftDelete(columnName = "deleted_at", strategy = SoftDeleteType.DELETED)
 public class Permission extends BaseEntity {
 
     @Column(name = "permission_name", nullable = false, length = 100, unique = true)

@@ -31,6 +31,7 @@ import org.hibernate.annotations.SQLRestriction;
         })
 @AttributeOverride(name = "id", column = @Column(name = "user_role_id"))
 @SQLRestriction("deleted_at IS NULL")
+// @SoftDelete(columnName = "deleted_at", strategy = SoftDeleteType.DELETED)
 public class UserRole extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

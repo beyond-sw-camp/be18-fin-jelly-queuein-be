@@ -30,6 +30,7 @@ import org.hibernate.annotations.SQLRestriction;
         indexes = {@Index(name = "idx_user_dpt_id", columnList = "dpt_id")})
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
 @SQLRestriction("deleted_at IS NULL")
+// @SoftDelete(columnName = "deleted_at", strategy = SoftDeleteType.DELETED)
 public class User extends BaseEntity {
 
     //      @ManyToOne(fetch = FetchType.LAZY)

@@ -25,10 +25,24 @@ public class PermissionReader {
     }
 
     // 중복된 권한명 있는지
+    //    public void validateDuplication(final String name) {
+    //        if (permissionJpaRepository.existsByPermissionName(name)) {
+    //            throw PermissionException.permissionAlreadyExists();
+    //        }
+    //    }
+
+    // 중복된 권한명 있는지(Softdelete Unique)
     public void validateDuplication(final String name) {
-        if (permissionJpaRepository.existsByPermissionName(name)) {
-            throw PermissionException.permissionAlreadyExists();
+
+        Permission existed = permissionJpaRepository.findIncludeDeletedByName(name);
+
+        if (existed == null) return;
+
+        if (existed.getDeletedAt() != null) {
+            throw PermissionException.permissionAlreadyDeleted();
         }
+
+        throw PermissionException.permissionAlreadyExists();
     }
 
     public List<Permission> findAll() {
