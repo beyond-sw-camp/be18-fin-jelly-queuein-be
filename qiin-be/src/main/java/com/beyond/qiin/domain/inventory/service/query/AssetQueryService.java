@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.inventory.service.query;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.response.AssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.RootAssetResponseDto;
@@ -23,6 +24,9 @@ public interface AssetQueryService {
     TreeAssetResponseDto getAssetTree(final Long assetId);
 
     List<TreeAssetResponseDto> getFullAssetTree();
+
+    // 자원 상세 조회
+    AssetDetailResponseDto getAssetDetail(final Long assetId);
 
     Asset getAssetById(final Long assetId);
 
