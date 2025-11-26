@@ -24,10 +24,30 @@ public class RoleReader {
     }
 
     // 역할명 중복 체크
+    /*
     public void validateNameDuplication(final String roleName) {
         if (roleJpaRepository.findByRoleName(roleName).isPresent()) {
             throw RoleException.roleAlreadyExists();
         }
+    }
+    */
+
+    // 역할명 중복 체크 (소프트 딜리트)
+    public void validateNameDuplication(final String roleName) {
+
+        Role existed = roleJpaRepository.findIncludeDeletedByName(roleName);
+
+        if (existed == null) {
+            return; // 완전 신규
+        }
+
+        // soft delete 된 역할명
+        if (existed.getDeletedAt() != null) {
+            throw RoleException.roleAlreadyDeleted();
+        }
+
+        // 현재 사용 중인 역할명
+        throw RoleException.roleAlreadyExists();
     }
 
     // 역할 전체 조회
