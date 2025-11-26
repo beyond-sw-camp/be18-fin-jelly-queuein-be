@@ -39,13 +39,13 @@ public class User extends BaseEntity {
     @Column(name = "dpt_id", nullable = false)
     private Long dptId;
 
-    @Column(name = "user_no", length = 50, nullable = false, unique = true)
+    @Column(name = "user_no", length = 50, nullable = false) // UNIQUE
     private String userNo;
 
     @Column(name = "user_name", length = 100, nullable = false)
     private String userName;
 
-    @Column(name = "email", length = 100, nullable = false, unique = true)
+    @Column(name = "email", length = 100, nullable = false) // UNIQUE
     private String email;
 
     @Column(name = "password", length = 255, nullable = false)
