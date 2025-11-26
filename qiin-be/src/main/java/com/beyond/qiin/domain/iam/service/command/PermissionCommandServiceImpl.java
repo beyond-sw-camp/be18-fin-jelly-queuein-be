@@ -51,11 +51,27 @@ public class PermissionCommandServiceImpl implements PermissionCommandService {
 
         Permission permission = permissionReader.findById(permissionId);
 
-        if (rolePermissionReader.existsByPermission(permission)) {
-            throw PermissionException.permissionInUse();
-        }
+        validateDeletable(permission);
 
         permission.delete(SecurityUtils.getCurrentUserId());
         permissionWriter.save(permission);
+    }
+
+    // ---------------------------------------
+    // 헬퍼 메서드
+    // ---------------------------------------
+
+    // 삭제 가능한지
+    private void validateDeletable(final Permission permission) {
+
+        // 410
+        if (permission.getDeletedAt() != null) {
+            throw PermissionException.permissionAlreadyDeleted();
+        }
+
+        // 409
+        if (rolePermissionReader.existsByPermission(permission)) {
+            throw PermissionException.permissionInUse();
+        }
     }
 }
