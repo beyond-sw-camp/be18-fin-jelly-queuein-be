@@ -14,6 +14,7 @@ public class PermissionQueryServiceImpl implements PermissionQueryService {
 
     private final PermissionReader permissionReader;
 
+    // 권한 상세 조회
     @Override
     @Transactional(readOnly = true)
     public PermissionResponseDto getPermission(final Long permissionId) {
@@ -21,6 +22,7 @@ public class PermissionQueryServiceImpl implements PermissionQueryService {
         return PermissionResponseDto.fromEntity(permission);
     }
 
+    // 권한 목록 조회
     @Override
     @Transactional(readOnly = true)
     public PermissionListResponseDto getPermissions() {
