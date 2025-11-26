@@ -88,7 +88,7 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
                         DescendantAssetResponseDto.class,
                         asset.id,
                         asset.name,
-                        asset.categoryId,
+                        asset.category.id,
                         asset.status,
                         asset.type,
                         asset.needsApproval,

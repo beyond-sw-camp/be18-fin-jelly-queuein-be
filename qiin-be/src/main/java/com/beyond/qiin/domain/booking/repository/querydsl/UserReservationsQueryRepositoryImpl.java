@@ -133,7 +133,7 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                 .join(asset)
                 .on(asset.id.eq(reservation.asset.id))
                 .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
+                .on(category.id.eq(asset.category.id))
                 .leftJoin(closure)
                 .on(closureOn)
                 .where(builder)

@@ -18,6 +18,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -38,6 +39,7 @@ public class AssetController {
     private final AssetQueryService assetQueryService;
 
     // 자원 생성
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @PostMapping
     public ResponseEntity<CreateAssetResponseDto> createAsset(
             @Valid @RequestBody CreateAssetRequestDto createAssetRequestDto) {
@@ -48,6 +50,7 @@ public class AssetController {
     }
 
     // 자원 수정
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @PatchMapping("/{assetId}")
     public ResponseEntity<UpdateAssetResponseDto> updateAsset(
             @PathVariable Long assetId, @Valid @RequestBody UpdateAssetRequestDto updateAssetRequestDto) {
@@ -58,6 +61,7 @@ public class AssetController {
     }
 
     // 자원 삭제
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @DeleteMapping("/{assetId}")
     public ResponseEntity<Void> deleteAsset(@PathVariable Long assetId
             //            ,@AuthenticationPrincipal UserDetailsDto user
@@ -69,6 +73,7 @@ public class AssetController {
     }
 
     // 자원 이동
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @PatchMapping("/{assetId}/move")
     public ResponseEntity<Void> moveAsset(
             @PathVariable Long assetId, @Valid @RequestBody MoveAssetRequestDto moveAssetRequestDto) {
@@ -79,6 +84,7 @@ public class AssetController {
     }
 
     // 0계층 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/roots")
     public ResponseEntity<List<RootAssetResponseDto>> getRootAssets() {
 
@@ -88,6 +94,7 @@ public class AssetController {
     }
 
     // 1계층 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/{rootId}/one-depth")
     public ResponseEntity<List<OneDepthAssetResponseDto>> getOneDepthAssets(@PathVariable Long rootId) {
 
@@ -97,6 +104,7 @@ public class AssetController {
     }
 
     // 예약 가능한 자원들 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/descendants")
     public ResponseEntity<PageResponseDto<DescendantAssetResponseDto>> getDescendantAssets(
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "010") int size) {
@@ -108,6 +116,7 @@ public class AssetController {
     }
 
     // 자원 계층 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/tree")
     public ResponseEntity<List<TreeAssetResponseDto>> getTreeAssets() {
 
@@ -117,6 +126,7 @@ public class AssetController {
     }
 
     // 자원 상세 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/{assetId}")
     public ResponseEntity<AssetDetailResponseDto> getAssetDetail(@PathVariable Long assetId) {
 
