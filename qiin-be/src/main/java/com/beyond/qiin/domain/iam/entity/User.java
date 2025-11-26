@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import jakarta.persistence.AttributeOverride;
@@ -68,6 +69,17 @@ public class User extends BaseEntity {
 
     @Column(name = "retire_date", columnDefinition = "TIMESTAMP(6)")
     private Instant retireDate;
+
+    public static User create(final CreateUserRequestDto request, final String encryptedPassword) {
+        return User.builder()
+                .dptId(request.getDptId())
+                .userNo(request.getUserNo())
+                .userName(request.getUserName())
+                .email(request.getEmail())
+                .password(encryptedPassword)
+                .passwordExpired(true)
+                .build();
+    }
 
     // 비밀번호 수정
     public void updatePassword(final String encrypted) {

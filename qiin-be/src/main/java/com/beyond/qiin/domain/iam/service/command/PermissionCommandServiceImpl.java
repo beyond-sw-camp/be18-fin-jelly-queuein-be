@@ -40,6 +40,7 @@ public class PermissionCommandServiceImpl implements PermissionCommandService {
 
         Permission permission = permissionReader.findById(permissionId);
 
+        permission.update(request);
         Permission updated = permissionWriter.save(permission);
 
         return PermissionResponseDto.fromEntity(updated);

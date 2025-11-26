@@ -39,22 +39,12 @@ public class UserCommandServiceImpl implements UserCommandService {
         final String tempPassword = PasswordGenerator.generate();
         final String encrypted = passwordEncoder.encode(tempPassword);
 
-        // TODO: 빌더 엔티티로
-        User user = User.builder()
-                .dptId(request.getDptId())
-                .userNo(request.getUserNo())
-                .userName(request.getUserName())
-                .email(request.getEmail())
-                .password(encrypted)
-                .passwordExpired(true)
-                .build();
-
+        User user = User.create(request, encrypted);
         User saved = userWriter.save(user);
 
         Role defaultRole = roleReader.findByRoleName("GENERAL");
 
-        UserRole userRole = UserRole.builder().user(saved).role(defaultRole).build();
-
+        UserRole userRole = UserRole.create(saved, defaultRole);
         userRoleWriter.save(userRole);
 
         return CreateUserResponseDto.fromEntity(saved, tempPassword);
@@ -82,7 +72,6 @@ public class UserCommandServiceImpl implements UserCommandService {
         }
 
         user.updatePassword(passwordEncoder.encode(newPassword));
-
         userWriter.save(user);
     }
 
@@ -100,7 +89,6 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         // 새 비밀번호 저장
         user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
-
         userWriter.save(user);
     }
 

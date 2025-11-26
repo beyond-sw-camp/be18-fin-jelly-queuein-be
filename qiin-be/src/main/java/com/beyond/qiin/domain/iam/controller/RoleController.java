@@ -4,7 +4,10 @@ import com.beyond.qiin.domain.iam.dto.role.request.CreateRoleRequestDto;
 import com.beyond.qiin.domain.iam.dto.role.request.UpdateRoleRequestDto;
 import com.beyond.qiin.domain.iam.dto.role.response.RoleListResponseDto;
 import com.beyond.qiin.domain.iam.dto.role.response.RoleResponseDto;
+import com.beyond.qiin.domain.iam.dto.role_permission.request.AddRolePermissionsRequestDto;
+import com.beyond.qiin.domain.iam.dto.role_permission.request.ReplaceRolePermissionsRequestDto;
 import com.beyond.qiin.domain.iam.service.command.RoleCommandService;
+import com.beyond.qiin.domain.iam.service.command.RolePermissionCommandService;
 import com.beyond.qiin.domain.iam.service.query.RoleQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +28,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoleController {
 
     private final RoleCommandService roleCommandService;
+    private final RolePermissionCommandService rolePermissionCommandService;
+
     private final RoleQueryService roleQueryService;
 
     // -------------------------------------------
     // Command
     // -------------------------------------------
+    // Role Command
+    // -----------------------
 
     // 역할 생성
     @PostMapping
@@ -56,9 +63,45 @@ public class RoleController {
         return ResponseEntity.noContent().build();
     }
 
+    // -----------------------
+    // RolePermission Command
+    // -----------------------
+
+    // 1개의 역할에 여러 권한 추가
+    @PostMapping("/{roleId}/permissions")
+    @PreAuthorize("hasAuthority('MASTER')")
+    public ResponseEntity<Void> addPermissions(
+            @PathVariable final Long roleId, @RequestBody final AddRolePermissionsRequestDto request) {
+
+        rolePermissionCommandService.addPermissions(roleId, request.getPermissionIds());
+        return ResponseEntity.ok().build();
+    }
+
+    // 역할-권한 매핑 수정
+    @PutMapping("/{roleId}/permissions")
+    @PreAuthorize("hasAuthority('MASTER')")
+    public ResponseEntity<Void> replacePermissions(
+            @PathVariable final Long roleId, @RequestBody final ReplaceRolePermissionsRequestDto request) {
+
+        rolePermissionCommandService.replacePermissions(roleId, request.getPermissionIds());
+        return ResponseEntity.ok().build();
+    }
+
+    // 역할-권한 삭제
+    @DeleteMapping("/{roleId}/permissions/{permissionId}")
+    @PreAuthorize("hasAuthority('MASTER')")
+    public ResponseEntity<Void> deletePermission(
+            @PathVariable final Long roleId, @PathVariable final Long permissionId) {
+
+        rolePermissionCommandService.removePermission(roleId, permissionId);
+        return ResponseEntity.ok().build();
+    }
+
     // -------------------------------------------
     // Query
     // -------------------------------------------
+    // Role Query
+    // -----------------------
 
     // 역할 상세 조회
     @GetMapping("/{roleId}")
@@ -73,4 +116,9 @@ public class RoleController {
     public ResponseEntity<RoleListResponseDto> getRoleList() {
         return ResponseEntity.ok(roleQueryService.getRoles());
     }
+
+    // -----------------------
+    // RolePermission Query
+    // -----------------------
+
 }

@@ -42,6 +42,10 @@ public class RolePermission extends BaseEntity {
     @JoinColumn(name = "permission_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Permission permission;
 
+    public static RolePermission create(final Role role, final Permission permission) {
+        return RolePermission.builder().role(role).permission(permission).build();
+    }
+
     // 소프트딜리트
     public void softDelete(final Long deleterId) {
         this.delete(deleterId);

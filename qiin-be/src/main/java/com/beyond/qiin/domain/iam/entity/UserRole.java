@@ -42,6 +42,10 @@ public class UserRole extends BaseEntity {
     @JoinColumn(name = "role_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Role role;
 
+    public static UserRole create(final User user, final Role role) {
+        return UserRole.builder().user(user).role(role).build();
+    }
+
     public void softDelete(final Long deleterId) {
         this.delete(deleterId);
     }
