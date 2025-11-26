@@ -31,7 +31,7 @@ public class DescendantAssetResponseDto {
         return DescendantAssetResponseDto.builder()
                 .assetId(asset.getId())
                 .name(asset.getName())
-                .categoryId(asset.getCategoryId())
+                .categoryId(asset.getCategory().getId())
                 .status(asset.getStatus())
                 .type(asset.getType())
                 .needApproval(asset.isNeedsApproval())

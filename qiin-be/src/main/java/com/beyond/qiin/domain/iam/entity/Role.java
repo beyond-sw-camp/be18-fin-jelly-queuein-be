@@ -28,7 +28,7 @@ import org.hibernate.annotations.SQLRestriction;
 // @SoftDelete(columnName = "deleted_at", strategy = SoftDeleteType.DELETED)
 public class Role extends BaseEntity {
 
-    @Column(name = "role_name", nullable = false, length = 50, unique = true)
+    @Column(name = "role_name", nullable = false, length = 50) // UNIQUE
     private String roleName; // MASTER, ADMIN, MANAGER, USER
 
     @Column(name = "role_description", length = 255)
