@@ -57,7 +57,7 @@ public class RoleController {
 
     // 역할 삭제
     @DeleteMapping("/{roleId}")
-    @PreAuthorize("hasAuthority('MASTER')")
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
     public ResponseEntity<Void> deleteRole(@PathVariable final Long roleId) {
         roleCommandService.deleteRole(roleId);
         return ResponseEntity.noContent().build();
@@ -69,7 +69,7 @@ public class RoleController {
 
     // 1개의 역할에 여러 권한 추가
     @PostMapping("/{roleId}/permissions")
-    @PreAuthorize("hasAuthority('MASTER')")
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
     public ResponseEntity<Void> addPermissions(
             @PathVariable final Long roleId, @RequestBody final AddRolePermissionsRequestDto request) {
 
@@ -79,7 +79,7 @@ public class RoleController {
 
     // 역할-권한 매핑 수정
     @PutMapping("/{roleId}/permissions")
-    @PreAuthorize("hasAuthority('MASTER')")
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
     public ResponseEntity<Void> replacePermissions(
             @PathVariable final Long roleId, @RequestBody final ReplaceRolePermissionsRequestDto request) {
 
@@ -89,7 +89,7 @@ public class RoleController {
 
     // 역할-권한 삭제
     @DeleteMapping("/{roleId}/permissions/{permissionId}")
-    @PreAuthorize("hasAuthority('MASTER')")
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
     public ResponseEntity<Void> deletePermission(
             @PathVariable final Long roleId, @PathVariable final Long permissionId) {
 
