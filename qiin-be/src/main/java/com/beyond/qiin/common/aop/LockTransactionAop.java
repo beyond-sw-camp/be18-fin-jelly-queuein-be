@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class TransactionAop {
+public class LockTransactionAop {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW) // 부모 transaction 유무와 상관없이 별도 transaction으로 실행
     public Object proceed(final ProceedingJoinPoint joinPoint) throws Throwable {

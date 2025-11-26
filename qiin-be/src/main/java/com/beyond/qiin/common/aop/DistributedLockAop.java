@@ -25,7 +25,7 @@ public class DistributedLockAop {
 
     private final RedissonClient redissonClient;
 
-    private final TransactionAop transactionAop;
+    private final LockTransactionAop transactionAop;
 
     @Around("@annotation(com.beyond.qiin.common.annotation.DistributedLock)") // pointcut
     public Object lock(final ProceedingJoinPoint joinPoint) throws Throwable { // aspect 대상 메서드

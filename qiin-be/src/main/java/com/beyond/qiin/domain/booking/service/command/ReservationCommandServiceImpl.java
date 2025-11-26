@@ -11,6 +11,7 @@ import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
+import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
 import com.beyond.qiin.domain.booking.support.ReservationWriter;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -19,6 +20,7 @@ import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final UserReader userReader;
     private final ReservationReader reservationReader;
     private final ReservationWriter reservationWriter;
+    private final AttendantWriter attendantWriter;
     private final AssetCommandService assetCommandService;
     private final RedissonClient redissonClient;
     private final AttendantJpaRepository attendantJpaRepository;
@@ -193,19 +196,23 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                     updateReservationRequestDto.getStartAt(), updateReservationRequestDto.getEndAt());
         }
 
-        if (updateReservationRequestDto.getAttendantIds() != null
-                && !updateReservationRequestDto.getAttendantIds().isEmpty()) {
+        //수정 시 참여자들을 무조건 받는 구조 : id 없는 경우 -> 빈 배열일 때도 이전 추가된 참여들을 위해 삭제해야함
+        // 기존 참여자들 삭제
+        for (Attendant a : new ArrayList<>(reservation.getAttendants())) {
+            reservation.removeAttendant(a);   // 양방향 끊기
+            attendantJpaRepository.delete(a); // DB에서 삭제
+        }
 
-            // 기존 참여자들 삭제
-            List<Attendant> existingAttendants = reservation.getAttendants();
-            existingAttendants.forEach(attendant -> attendantJpaRepository.delete(attendant));
-
+        //
+        if (!updateReservationRequestDto.getAttendantIds().isEmpty()) {
             // 추가할 참여자들에 대해 검증
             userReader.validateAllExist(updateReservationRequestDto.getAttendantIds());
-            List<User> attendants = userReader.findAllByIds(updateReservationRequestDto.getAttendantIds());
+            List<User> newAttendants = userReader.findAllByIds(
+                updateReservationRequestDto.getAttendantIds());
 
             // 예약의 참여자들 변경
-            reservation.changeAttendants(attendants);
+            List<Attendant> attendants = reservation.changeAttendants(newAttendants);
+            attendantWriter.saveAll(attendants);
         }
 
         reservationWriter.save(reservation);

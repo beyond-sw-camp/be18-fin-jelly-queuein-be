@@ -6,14 +6,16 @@ import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
+@Profile("dev")
 @Configuration
 public class RedissonConfig {
 
-    @Value("${spring.redis.host}")
+    @Value("${REDIS_HOST}")
     private String redisHost;
 
-    @Value("${spring.redis.port}")
+    @Value("${REDIS_PORT}")
     private String redisPort;
 
     private static final String REDISSON_HOST_PREFIX = "redis://";
