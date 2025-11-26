@@ -33,4 +33,10 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
 
         return PageResponseDto.from(categoryManageResponseDtoPage);
     }
+
+    //    @Override
+    //    @Transactional(readOnly = true)
+    //    public Category getCategoryById(final Long categoryId) {
+    //
+    //    }
 }
