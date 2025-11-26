@@ -68,6 +68,7 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
+    // 카테고리 드롭다운 메뉴 조회
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/dropdown-menu")
     public ResponseEntity<List<DropdownCategoryResponseDto>> getDropdownCategory() {
@@ -77,6 +78,7 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.OK).body(categories);
     }
 
+    // 카테고리 관리자용 목록 조회
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/management")
     public ResponseEntity<PageResponseDto<ManageCategoryResponseDto>> getManageCategory(
