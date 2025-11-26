@@ -59,22 +59,22 @@ public class UsageHistory {
         this.createdAt = Instant.now();
     }
 
-    public static UsageHistory createReservationBase(
+    public static UsageHistory create(
             final Asset asset,
             final Reservation reservation,
-            final Instant startAt,
-            final Instant endAt,
-            final Integer usageTime) {
+            final int usageTime,
+            final int actualUsageTime,
+            final BigDecimal usageRatio) {
         return UsageHistory.builder()
                 .asset(asset)
                 .reservation(reservation)
-                .startAt(startAt)
-                .endAt(endAt)
+                .startAt(reservation.getStartAt())
+                .endAt(reservation.getEndAt())
+                .actualStartAt(reservation.getActualStartAt())
+                .actualEndAt(reservation.getActualEndAt())
                 .usageTime(usageTime)
-                .actualStartAt(startAt) // 초기값: 예약값 기반
-                .actualEndAt(endAt)
-                .actualUsageTime(0) // 아직 실제 사용 없음
-                .usageRatio(BigDecimal.ZERO) // NOT NULL이므로 기본값
+                .actualUsageTime(actualUsageTime)
+                .usageRatio(usageRatio)
                 .createdAt(Instant.now())
                 .build();
     }

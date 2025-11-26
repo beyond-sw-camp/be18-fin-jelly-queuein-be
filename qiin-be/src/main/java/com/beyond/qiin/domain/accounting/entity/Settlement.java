@@ -59,4 +59,25 @@ public class Settlement {
             this.createdAt = Instant.now();
         }
     }
+
+    public static Settlement create(
+            final UsageHistory usageHistory,
+            final Integer usageHours,
+            final Integer actualUsageTime,
+            final BigDecimal costPerHourSnapshot,
+            final BigDecimal totalUsageCost,
+            final BigDecimal actualUsageCost,
+            final BigDecimal periodCostShare) {
+        return Settlement.builder()
+                .usageHistory(usageHistory)
+                .asset(usageHistory.getAsset())
+                .usageHours(usageHours)
+                .actualUsageTime(actualUsageTime)
+                .costPerHourSnapshot(costPerHourSnapshot)
+                .totalUsageCost(totalUsageCost)
+                .actualUsageCost(actualUsageCost)
+                .periodCostShare(periodCostShare)
+                .createdAt(Instant.now())
+                .build();
+    }
 }
