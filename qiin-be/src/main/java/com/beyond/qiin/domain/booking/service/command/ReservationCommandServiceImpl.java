@@ -196,10 +196,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                     updateReservationRequestDto.getStartAt(), updateReservationRequestDto.getEndAt());
         }
 
-        //수정 시 참여자들을 무조건 받는 구조 : id 없는 경우 -> 빈 배열일 때도 이전 추가된 참여들을 위해 삭제해야함
+        // 수정 시 참여자들을 무조건 받는 구조 : id 없는 경우 -> 빈 배열일 때도 이전 추가된 참여들을 위해 삭제해야함
         // 기존 참여자들 삭제
         for (Attendant a : new ArrayList<>(reservation.getAttendants())) {
-            reservation.removeAttendant(a);   // 양방향 끊기
+            reservation.removeAttendant(a); // 양방향 끊기
             attendantJpaRepository.delete(a); // DB에서 삭제
         }
 
@@ -207,8 +207,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         if (!updateReservationRequestDto.getAttendantIds().isEmpty()) {
             // 추가할 참여자들에 대해 검증
             userReader.validateAllExist(updateReservationRequestDto.getAttendantIds());
-            List<User> newAttendants = userReader.findAllByIds(
-                updateReservationRequestDto.getAttendantIds());
+            List<User> newAttendants = userReader.findAllByIds(updateReservationRequestDto.getAttendantIds());
 
             // 예약의 참여자들 변경
             List<Attendant> attendants = reservation.changeAttendants(newAttendants);
