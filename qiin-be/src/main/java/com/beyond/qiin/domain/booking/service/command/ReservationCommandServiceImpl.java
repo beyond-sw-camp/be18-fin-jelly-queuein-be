@@ -1,5 +1,6 @@
 package com.beyond.qiin.domain.booking.service.command;
 
+import com.beyond.qiin.common.annotation.DistributedLock;
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
@@ -10,6 +11,7 @@ import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
+import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
 import com.beyond.qiin.domain.booking.support.ReservationWriter;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -18,12 +20,11 @@ import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final UserReader userReader;
     private final ReservationReader reservationReader;
     private final ReservationWriter reservationWriter;
+    private final AttendantWriter attendantWriter;
     private final AssetCommandService assetCommandService;
     private final RedissonClient redissonClient;
     private final AttendantJpaRepository attendantJpaRepository;
@@ -67,60 +69,36 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         return ReservationResponseDto.fromEntity(reservation);
     }
 
-    // 선착순 예약
+    // 선착순 예약 분산락 키 : 자원 id로만 두기 제한적
     @Override
     @Transactional
+    @DistributedLock(
+            key =
+                    "'reservation:' + #assetId + ':' + #createReservationRequestDto.startAt + ':' + #createReservationRequestDto.endAt")
     public ReservationResponseDto instantConfirmReservation(
             final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
-        String lockKey = "lock:reservation:asset:" + assetId;
-        RLock lock = redissonClient.getLock(lockKey);
+        Asset asset = assetCommandService.getAssetById(assetId);
+        User applicant = userReader.findById(userId);
+        userReader.validateAllExist(createReservationRequestDto.getAttendantIds()); // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
+        List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
+        assetCommandService.isAvailable(assetId);
+        // 해당 시간에 사용 가능한 자원인지 확인
+        validateReservationAvailability(
+                asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
 
-        boolean isLocked = lock.isLocked();
-        boolean isMine = lock.isHeldByCurrentThread();
-        long remain = lock.remainTimeToLive();
+        // 선착순 자원은 자동 승인
+        Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
+        reservation.setIsApproved(true); // 승인됨
 
-        log.info("locked? {}", isLocked);
-        log.info("my thread? {}", isMine);
-        log.info("TTL: {} ms", remain);
+        List<Attendant> attendants = attendantUsers.stream()
+                .map(user -> Attendant.create(user, reservation))
+                .collect(Collectors.toList());
 
-        try {
-            // 5초 동안 락 획득 시도, 획득하면 10초 동안 점유 -> wait time만(lease time x)
-            boolean available = lock.tryLock(5, TimeUnit.SECONDS);
+        reservation.addAttendants(attendants);
 
-            if (!available) {
-                throw new ReservationException(ReservationErrorCode.RESERVATION_REQUEST_DUPLICATED);
-            }
-            log.info("[LOCK-ACQUIRED] assetId={} 락 획득 성공", assetId);
-            Asset asset = assetCommandService.getAssetById(assetId);
-            User applicant = userReader.findById(userId);
-            userReader.validateAllExist(createReservationRequestDto.getAttendantIds()); // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
-            List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
-            assetCommandService.isAvailable(assetId);
-            // 해당 시간에 사용 가능한 자원인지 확인
-            validateReservationAvailability(
-                    asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
-
-            // 선착순 자원은 자동 승인
-            Reservation reservation =
-                    createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
-            reservation.setIsApproved(true); // 승인됨
-
-            List<Attendant> attendants = attendantUsers.stream()
-                    .map(user -> Attendant.create(user, reservation))
-                    .collect(Collectors.toList());
-
-            reservation.addAttendants(attendants);
-
-            reservationWriter.save(reservation);
-            return ReservationResponseDto.fromEntity(reservation);
-        } catch (InterruptedException e) {
-            throw new ReservationException(ReservationErrorCode.RESERVATION_CREATE_FAILED);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
-        }
+        reservationWriter.save(reservation);
+        return ReservationResponseDto.fromEntity(reservation);
     }
 
     @Override
@@ -218,19 +196,22 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                     updateReservationRequestDto.getStartAt(), updateReservationRequestDto.getEndAt());
         }
 
-        if (updateReservationRequestDto.getAttendantIds() != null
-                && !updateReservationRequestDto.getAttendantIds().isEmpty()) {
+        // 수정 시 참여자들을 무조건 받는 구조 : id 없는 경우 -> 빈 배열일 때도 이전 추가된 참여들을 위해 삭제해야함
+        // 기존 참여자들 삭제
+        for (Attendant a : new ArrayList<>(reservation.getAttendants())) {
+            reservation.removeAttendant(a); // 양방향 끊기
+            attendantJpaRepository.delete(a); // DB에서 삭제
+        }
 
-            // 기존 참여자들 삭제
-            List<Attendant> existingAttendants = reservation.getAttendants();
-            existingAttendants.forEach(attendant -> attendantJpaRepository.delete(attendant));
-
+        //
+        if (!updateReservationRequestDto.getAttendantIds().isEmpty()) {
             // 추가할 참여자들에 대해 검증
             userReader.validateAllExist(updateReservationRequestDto.getAttendantIds());
-            List<User> attendants = userReader.findAllByIds(updateReservationRequestDto.getAttendantIds());
+            List<User> newAttendants = userReader.findAllByIds(updateReservationRequestDto.getAttendantIds());
 
             // 예약의 참여자들 변경
-            reservation.changeAttendants(attendants);
+            List<Attendant> attendants = reservation.changeAttendants(newAttendants);
+            attendantWriter.saveAll(attendants);
         }
 
         reservationWriter.save(reservation);

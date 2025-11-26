@@ -191,14 +191,16 @@ public class Reservation extends BaseEntity {
         this.description = description;
     }
 
-    public void changeSchedule(final Instant startAt, final Instant endAt) {
+    public void changeSchedule(Instant startAt, Instant endAt) {
+        // pending일때 시간 변경 가능(승인전)
         if (this.status != ReservationStatus.PENDING.getCode())
             throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.startAt = startAt;
         this.endAt = endAt;
     }
 
-    public void changeAttendants(final List<User> users) {
+    public List<Attendant> changeAttendants(List<User> users) {
+        // pending 일때 가능, approved일때 가능 == 사용전
         if (this.status != ReservationStatus.PENDING.getCode() && this.status != ReservationStatus.APPROVED.getCode()) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_CANCEL_NOT_ALLOWED);
         }
@@ -207,6 +209,7 @@ public class Reservation extends BaseEntity {
 
         this.attendants.clear();
         this.attendants.addAll(attendants);
+        return attendants;
     }
 
     // 예약 정보 수정 메서드
