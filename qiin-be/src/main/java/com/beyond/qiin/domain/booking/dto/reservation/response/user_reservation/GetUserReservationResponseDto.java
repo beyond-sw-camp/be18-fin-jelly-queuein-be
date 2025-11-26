@@ -2,6 +2,8 @@ package com.beyond.qiin.domain.booking.dto.reservation.response.user_reservation
 
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
