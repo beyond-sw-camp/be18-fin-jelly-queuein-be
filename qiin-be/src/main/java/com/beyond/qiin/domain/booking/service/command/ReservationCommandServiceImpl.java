@@ -8,6 +8,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationRespon
 import com.beyond.qiin.domain.booking.entity.Attendant;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
+import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
@@ -18,6 +19,7 @@ import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
+import com.beyond.qiin.domain.outbox.support.OutboxEventWriter;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -25,7 +27,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +40,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final ReservationWriter reservationWriter;
     private final AttendantWriter attendantWriter;
     private final AssetCommandService assetCommandService;
-    private final RedissonClient redissonClient;
+    private final OutboxEventWriter outboxEventWriter;
+    private final ReservationEventPublisher reservationEventPublisher;
     private final AttendantJpaRepository attendantJpaRepository;
 
     // TODO : 선착순, 승인 예약 중복 처리
@@ -65,6 +67,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.addAttendants(attendants);
 
         reservationWriter.save(reservation);
+
+        reservationEventPublisher.publishCreated(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -98,6 +102,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.addAttendants(attendants);
 
         reservationWriter.save(reservation);
+
+        reservationEventPublisher.publishCreated(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -129,6 +135,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Reservation reservation = reservationReader.getReservationById(reservationId);
         reservation.reject(respondent, confirmReservationRequestDto.getReason()); // status rejected
         reservationWriter.save(reservation);
+
+        reservationEventPublisher.publishUpdated(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -142,6 +150,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Reservation reservation = reservationReader.getReservationById(reservationId);
         reservation.start(); // status using, 실제 시작 시간 추가
         reservationWriter.save(reservation);
+
+        reservationEventPublisher.publishUpdated(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -155,6 +165,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Reservation reservation = reservationReader.getReservationById(reservationId);
         reservation.end(); // status complete, 실제 종료 시간 추가
         reservationWriter.save(reservation);
+
+        reservationEventPublisher.publishUpdated(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -171,6 +183,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.cancel();
 
         reservationWriter.save(reservation);
+
+        reservationEventPublisher.publishUpdated(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -215,6 +229,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         }
 
         reservationWriter.save(reservation);
+
+        reservationEventPublisher.publishUpdated(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
