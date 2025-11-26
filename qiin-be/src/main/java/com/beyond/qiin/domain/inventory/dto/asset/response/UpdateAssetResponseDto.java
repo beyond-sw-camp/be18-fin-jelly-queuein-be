@@ -38,10 +38,12 @@ public class UpdateAssetResponseDto {
 
     private final Long updatedBy;
 
+    private final Long version;
+
     public static UpdateAssetResponseDto fromEntity(Asset asset) {
         return UpdateAssetResponseDto.builder()
                 .assetId(asset.getId())
-                .categoryId(asset.getCategoryId())
+                .categoryId(asset.getCategory().getId())
                 .name(asset.getName())
                 .description(asset.getDescription())
                 .image(asset.getImage())
@@ -53,6 +55,7 @@ public class UpdateAssetResponseDto {
                 .periodCost(asset.getPeriodCost())
                 .updatedAt(asset.getUpdatedAt())
                 .updatedBy(asset.getUpdatedBy())
+                .version(asset.getVersion())
                 .build();
     }
 }

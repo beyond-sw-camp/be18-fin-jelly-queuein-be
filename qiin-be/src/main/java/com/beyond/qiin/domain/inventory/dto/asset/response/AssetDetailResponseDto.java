@@ -43,7 +43,7 @@ public class AssetDetailResponseDto {
     public static AssetDetailResponseDto fromEntity(Asset asset, String categoryName) {
         return AssetDetailResponseDto.builder()
                 .assetId(asset.getId())
-                .categoryId(asset.getCategoryId())
+                .categoryId(asset.getCategory().getId())
                 .categoryName(categoryName)
                 .name(asset.getName())
                 .description(asset.getDescription())
