@@ -136,7 +136,7 @@ public class AssetQueryServiceImpl implements AssetQueryService {
         Asset asset = assetQueryAdapter.findByAssetId(assetId).orElseThrow(AssetException::notFound);
 
         String categoryName =
-                categoryQueryAdapter.findNameById(asset.getCategoryId()).orElseThrow(CategoryException::notFound);
+                categoryQueryAdapter.findNameById(asset.getCategory().getId()).orElseThrow(CategoryException::notFound);
 
         return AssetDetailResponseDto.fromEntity(asset, categoryName);
     }

@@ -33,4 +33,9 @@ public class Category extends BaseEntity {
         if (requestDto.getName() != null) this.name = requestDto.getName();
         if (requestDto.getDescription() != null) this.description = requestDto.getDescription();
     }
+
+    // softDelete
+    public void softDelete(Long categoryId) {
+        this.delete(categoryId);
+    }
 }
