@@ -40,7 +40,8 @@ public class UserException extends BaseException {
         INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "INVALID_PASSWORD", "비밀번호가 일치하지 않습니다."),
         PASSWORD_EXPIRED(HttpStatus.UNAUTHORIZED, "PASSWORD_EXPIRED", "임시 비밀번호 사용자는 비밀번호를 변경해야 합니다."),
         PASSWORD_CHANGE_NOT_ALLOWED(
-                HttpStatus.FORBIDDEN, "PASSWORD_CHANGE_NOT_ALLOWED", "해당 사용자는 임시 비밀번호 변경을 수행할 수 없습니다.");
+                HttpStatus.FORBIDDEN, "PASSWORD_CHANGE_NOT_ALLOWED", "해당 사용자는 임시 비밀번호 변경을 수행할 수 없습니다."),
+        USER_GONE(HttpStatus.GONE, "USER_GONE", "이미 삭제된 사용자입니다.");
 
         private final HttpStatus status;
         private final String error;
