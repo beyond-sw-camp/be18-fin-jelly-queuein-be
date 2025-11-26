@@ -40,8 +40,16 @@ public class AssetException extends BaseException {
     public enum AssetErrorCode implements ErrorCode {
         ASSET_NOT_FOUND(HttpStatus.NOT_FOUND, "ASSET_NOT_FOUND", "해당 자원를 찾을 수 없습니다."),
         ASSET_DUPLICATE_NAME(HttpStatus.CONFLICT, "ASSET_DUPLICATE_NAME", "이미 존재하는 자원입니다."),
+        ASSET_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "ASSET_NOT_AVAILABLE", "자원이 사용 가능 상태가 아닙니다."),
+        ASSET_HAS_CHILDREN(HttpStatus.BAD_REQUEST,"ASSET_HAS_CHILDREN","해당 자원에 자식 자원이 있어 삭제할 수 없습니다."),
+        ASSET_PARENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ASSET_PARENT_NOT_FOUND", "부모 자원을 찾을 수 없습니다."),
+
         ASSET_CANNOT_MOVE_TO_CHILD(HttpStatus.BAD_REQUEST, "ASSET_CANNOT_MOVE_TO_CHILD", "자식 자원으로 이동할 수 없습니다."),
-        ASSET_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "ASSET_NOT_AVAILABLE", "자원이 사용 가능 상태가 아닙니다.");
+        ASSET_CANNOT_MOVE_TO_SELF(HttpStatus.BAD_REQUEST, "ASSET_CANNOT_MOVE_TO_SELF", "자원은 자기 자신 아래로 이동할 수 없습니다."),
+        ASSET_ALREADY_ROOT(HttpStatus.BAD_REQUEST, "ASSET_ALREADY_ROOT", "이미 루트 자원입니다."),
+
+
+        ;
 
         private final HttpStatus status;
         private final String error;
