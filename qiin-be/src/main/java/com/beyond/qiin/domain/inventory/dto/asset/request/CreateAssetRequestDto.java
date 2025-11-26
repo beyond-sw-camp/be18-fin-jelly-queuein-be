@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.inventory.dto.asset.request;
 
 import com.beyond.qiin.domain.inventory.entity.Asset;
+import com.beyond.qiin.domain.inventory.entity.Category;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -43,9 +44,9 @@ public class CreateAssetRequestDto {
     @NotNull
     private BigDecimal periodCost;
 
-    public Asset toEntity() {
+    public Asset toEntity(Category category) {
         return Asset.builder()
-                .categoryId(categoryId)
+                .category(category)
                 .name(name)
                 .description(description)
                 .image(image)

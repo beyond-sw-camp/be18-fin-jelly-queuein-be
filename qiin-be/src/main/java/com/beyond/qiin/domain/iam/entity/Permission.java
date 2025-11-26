@@ -27,7 +27,7 @@ import org.hibernate.annotations.SQLRestriction;
 // @SQLRestriction("deleted_at = null")
 public class Permission extends BaseEntity {
 
-    @Column(name = "permission_name", nullable = false, length = 100, unique = true)
+    @Column(name = "permission_name", nullable = false, length = 100) // UNIQUE
     private String permissionName;
 
     @Column(name = "permission_description", length = 255)

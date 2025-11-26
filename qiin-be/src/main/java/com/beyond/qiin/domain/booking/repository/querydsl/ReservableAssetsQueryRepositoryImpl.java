@@ -79,7 +79,7 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
                         RawReservableAssetResponseDto.class, asset.id, asset.name, category.name, asset.needsApproval))
                 .from(asset)
                 .leftJoin(category)
-                .on(category.id.eq(asset.categoryId))
+                .on(category.id.eq(asset.category.id))
                 .leftJoin(closure)
                 .on(closure.assetClosureId.descendantId.eq(asset.id))
                 .where(builder)

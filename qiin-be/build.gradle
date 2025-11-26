@@ -72,6 +72,9 @@ dependencies {
     //redisson
     implementation 'org.redisson:redisson-spring-boot-starter:3.20.0'
 
+    //key value 로그용
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
     // QueryDsl
     // Open Feign QueryDSL (latest security patched version)
     implementation("io.github.openfeign.querydsl:querydsl-core:7.0")

@@ -9,11 +9,13 @@ import com.beyond.qiin.domain.inventory.dto.category.response.ManageCategoryResp
 import com.beyond.qiin.domain.inventory.dto.category.response.UpdateCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.service.command.CategoryCommandService;
 import com.beyond.qiin.domain.inventory.service.query.CategoryQueryService;
+import com.beyond.qiin.security.resolver.AccessToken;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,6 +36,7 @@ public class CategoryController {
     private final CategoryQueryService categoryQueryService;
 
     // 카테고리 생성
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @PostMapping
     public ResponseEntity<CreateCategoryResponseDto> createCategory(
             @Valid @RequestBody CreateCategoryRequestDto requestDto) {
@@ -44,6 +47,7 @@ public class CategoryController {
     }
 
     // 카테고리 수정
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @PatchMapping("/{categoryId}")
     public ResponseEntity<UpdateCategoryResponseDto> updateCategory(
             @PathVariable Long categoryId, @Valid @RequestBody UpdateCategoryRequestDto requestDto) {
@@ -55,16 +59,17 @@ public class CategoryController {
     }
 
     // 카테고리 삭제
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId
-            //            ,@AuthenticationPrincipal UserDetailsDto user
-            ) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId, @AccessToken final String accessToken) {
 
         //        categoryCommandService.deleteCategory(categoryId, user.getUserId());
 
         return ResponseEntity.noContent().build();
     }
 
+    // 카테고리 드롭다운 메뉴 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/dropdown-menu")
     public ResponseEntity<List<DropdownCategoryResponseDto>> getDropdownCategory() {
 
@@ -73,6 +78,8 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.OK).body(categories);
     }
 
+    // 카테고리 관리자용 목록 조회
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/management")
     public ResponseEntity<PageResponseDto<ManageCategoryResponseDto>> getManageCategory(
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "010") int size) {
