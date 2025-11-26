@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class UsageHistorySearchRequestDto {
+public class UsageHistoryListSearchRequestDto {
 
     private Instant startDate;
     private Instant endDate;

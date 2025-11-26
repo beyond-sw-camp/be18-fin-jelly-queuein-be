@@ -7,7 +7,7 @@ import static com.beyond.qiin.domain.booking.entity.QReservation.reservation;
 import static com.beyond.qiin.domain.iam.entity.QUser.user;
 import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
 
-import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistorySearchRequestDto;
+import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistoryListSearchRequestDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
 import com.beyond.qiin.domain.accounting.exception.UsageHistoryException;
@@ -29,7 +29,8 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<UsageHistoryListResponseDto> searchUsageHistory(UsageHistorySearchRequestDto req, Pageable pageable) {
+    public Page<UsageHistoryListResponseDto> searchUsageHistory(
+            UsageHistoryListSearchRequestDto req, Pageable pageable) {
 
         BooleanBuilder builder = new BooleanBuilder();
 

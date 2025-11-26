@@ -1,7 +1,7 @@
 package com.beyond.qiin.domain.accounting.service.query;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
-import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistorySearchRequestDto;
+import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistoryListSearchRequestDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
 import com.beyond.qiin.domain.accounting.repository.querydsl.UsageHistoryQueryAdapter;
@@ -20,7 +20,7 @@ public class UsageHistoryQueryServiceImpl implements UsageHistoryQueryService {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<UsageHistoryListResponseDto> getUsageHistoryList(
-            final UsageHistorySearchRequestDto req, final Pageable pageable) {
+            final UsageHistoryListSearchRequestDto req, final Pageable pageable) {
 
         Page<UsageHistoryListResponseDto> rawPage = usageHistoryQueryAdapter.searchUsageHistory(req, pageable);
 
