@@ -1,11 +1,10 @@
 package com.beyond.qiin.domain.inventory.dto.asset.response.raw;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.math.BigDecimal;
-import java.time.Instant;
 
 @Getter
 @Builder
@@ -41,5 +40,4 @@ public class RawAssetDetailResponseDto {
     private final Instant createdAt;
 
     private final Long createdBy;
-
 }
