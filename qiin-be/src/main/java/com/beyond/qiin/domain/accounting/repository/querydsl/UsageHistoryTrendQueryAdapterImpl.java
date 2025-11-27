@@ -7,12 +7,11 @@ import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,12 +24,7 @@ public class UsageHistoryTrendQueryAdapterImpl implements UsageHistoryTrendQuery
 
     @Override
     public UsageHistoryTrendRawDto getTrendData(
-            int baseYear,
-            int compareYear,
-            Long assetId,
-            String assetName,
-            int ignoredMonths
-    ) {
+            int baseYear, int compareYear, Long assetId, String assetName, int ignoredMonths) {
 
         AssetInfoResult info = resolveAsset(assetId, assetName);
 
@@ -49,16 +43,15 @@ public class UsageHistoryTrendQueryAdapterImpl implements UsageHistoryTrendQuery
     private AssetInfoResult resolveAsset(Long assetId, String assetName) {
 
         if (assetId != null) {
-            String name = queryFactory.select(a.name)
-                    .from(a)
-                    .where(a.id.eq(assetId))
-                    .fetchOne();
+            String name =
+                    queryFactory.select(a.name).from(a).where(a.id.eq(assetId)).fetchOne();
 
             return new AssetInfoResult(name, 1);
         }
 
         if (assetName != null && !assetName.isBlank()) {
-            List<String> names = queryFactory.select(a.name)
+            List<String> names = queryFactory
+                    .select(a.name)
                     .from(a)
                     .where(a.name.contains(assetName))
                     .limit(1)
@@ -71,9 +64,7 @@ public class UsageHistoryTrendQueryAdapterImpl implements UsageHistoryTrendQuery
         return new AssetInfoResult("전체", cnt != null ? cnt.intValue() : 0);
     }
 
-    private Map<Integer, UsageAggregate> getMonthlyUsage(
-            int year, Long assetId, String assetName
-    ) {
+    private Map<Integer, UsageAggregate> getMonthlyUsage(int year, Long assetId, String assetName) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(u.startAt.year().eq(year));
 
@@ -86,11 +77,7 @@ public class UsageHistoryTrendQueryAdapterImpl implements UsageHistoryTrendQuery
         var reservedSumExpr = u.usageTime.sumLong();
 
         List<Tuple> rows = queryFactory
-                .select(
-                        monthExpr,
-                        actualSumExpr,
-                        reservedSumExpr
-                )
+                .select(monthExpr, actualSumExpr, reservedSumExpr)
                 .from(u)
                 .join(u.asset, a)
                 .where(builder)
@@ -104,18 +91,18 @@ public class UsageHistoryTrendQueryAdapterImpl implements UsageHistoryTrendQuery
             Long actual = row.get(actualSumExpr);
             Long reserved = row.get(reservedSumExpr);
 
-            map.put(m, UsageAggregate.builder()
-                    .actualUsage(actual == null ? 0 : actual.intValue())
-                    .reservedUsage(reserved == null ? 0 : reserved.intValue())
-                    .build());
+            map.put(
+                    m,
+                    UsageAggregate.builder()
+                            .actualUsage(actual == null ? 0 : actual.intValue())
+                            .reservedUsage(reserved == null ? 0 : reserved.intValue())
+                            .build());
         }
 
         // ✔ 항상 1~12월 채움
         for (int m = 1; m <= 12; m++) {
-            map.putIfAbsent(m, UsageAggregate.builder()
-                    .actualUsage(0)
-                    .reservedUsage(0)
-                    .build());
+            map.putIfAbsent(
+                    m, UsageAggregate.builder().actualUsage(0).reservedUsage(0).build());
         }
 
         return map;
