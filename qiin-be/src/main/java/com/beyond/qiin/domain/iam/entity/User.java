@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import jakarta.persistence.AttributeOverride;
@@ -30,6 +31,7 @@ import org.hibernate.annotations.SQLRestriction;
         indexes = {@Index(name = "idx_user_dpt_id", columnList = "dpt_id")})
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
 @SQLRestriction("deleted_at IS NULL")
+// @SoftDelete(columnName = "deleted_at", strategy = SoftDeleteType.DELETED)
 public class User extends BaseEntity {
 
     //      @ManyToOne(fetch = FetchType.LAZY)
@@ -39,13 +41,13 @@ public class User extends BaseEntity {
     @Column(name = "dpt_id", nullable = false)
     private Long dptId;
 
-    @Column(name = "user_no", length = 50, nullable = false, unique = true)
+    @Column(name = "user_no", length = 50, nullable = false) // UNIQUE
     private String userNo;
 
     @Column(name = "user_name", length = 100, nullable = false)
     private String userName;
 
-    @Column(name = "email", length = 100, nullable = false, unique = true)
+    @Column(name = "email", length = 100, nullable = false) // UNIQUE
     private String email;
 
     @Column(name = "password", length = 255, nullable = false)
@@ -67,6 +69,17 @@ public class User extends BaseEntity {
 
     @Column(name = "retire_date", columnDefinition = "TIMESTAMP(6)")
     private Instant retireDate;
+
+    public static User create(final CreateUserRequestDto request, final String encryptedPassword) {
+        return User.builder()
+                .dptId(request.getDptId())
+                .userNo(request.getUserNo())
+                .userName(request.getUserName())
+                .email(request.getEmail())
+                .password(encryptedPassword)
+                .passwordExpired(true)
+                .build();
+    }
 
     // 비밀번호 수정
     public void updatePassword(final String encrypted) {

@@ -9,6 +9,8 @@ import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.exception.RoleException;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.role.RoleWriter;
+import com.beyond.qiin.domain.iam.support.rolepermission.RolePermissionReader;
+import com.beyond.qiin.domain.iam.support.rolepermission.RolePermissionWriter;
 import com.beyond.qiin.infra.redis.iam.role.RoleProjectionHandler;
 import com.beyond.qiin.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,9 @@ public class RoleCommandServiceImpl implements RoleCommandService {
     private final RoleReader roleReader;
     private final RoleWriter roleWriter;
     private final RoleProjectionHandler projectionHandler;
+
+    private final RolePermissionReader rolePermissionReader;
+    private final RolePermissionWriter rolePermissionWriter;
 
     // 역할 생성
     @Override
