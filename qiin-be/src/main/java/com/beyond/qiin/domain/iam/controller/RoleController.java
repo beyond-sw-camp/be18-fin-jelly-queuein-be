@@ -6,10 +6,12 @@ import com.beyond.qiin.domain.iam.dto.role.response.RoleListResponseDto;
 import com.beyond.qiin.domain.iam.dto.role.response.RoleResponseDto;
 import com.beyond.qiin.domain.iam.dto.role_permission.request.AddRolePermissionsRequestDto;
 import com.beyond.qiin.domain.iam.dto.role_permission.request.ReplaceRolePermissionsRequestDto;
+import com.beyond.qiin.domain.iam.dto.role_permission.response.RolePermissionListResponseDto;
 import com.beyond.qiin.domain.iam.service.command.RoleCommandService;
 import com.beyond.qiin.domain.iam.service.command.RolePermissionCommandService;
 import com.beyond.qiin.domain.iam.service.query.RoleQueryService;
 import jakarta.validation.Valid;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -80,11 +82,15 @@ public class RoleController {
     // 역할-권한 매핑 수정
     @PutMapping("/{roleId}/permissions")
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
-    public ResponseEntity<Void> replacePermissions(
+    public ResponseEntity<RolePermissionListResponseDto> replacePermissions(
             @PathVariable final Long roleId, @RequestBody final ReplaceRolePermissionsRequestDto request) {
 
-        rolePermissionCommandService.replacePermissions(roleId, request.getPermissionIds());
-        return ResponseEntity.ok().build();
+        RolePermissionListResponseDto updated =
+                rolePermissionCommandService.replacePermissions(roleId, request.getPermissionIds());
+
+        URI redirectUri = URI.create("/api/v1/roles/" + roleId + "/permissions");
+
+        return ResponseEntity.status(200).location(redirectUri).body(updated);
     }
 
     // 역할-권한 삭제
