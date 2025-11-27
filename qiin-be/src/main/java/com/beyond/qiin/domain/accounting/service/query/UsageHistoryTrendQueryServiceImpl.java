@@ -1,13 +1,18 @@
+// file: src/main/java/com/beyond/qiin/domain/accounting/service/query/UsageHistoryTrendQueryServiceImpl.java
 package com.beyond.qiin.domain.accounting.service.query;
 
 import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistoryTrendRequestDto;
+import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendRawDto;
+import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendRawDto.UsageAggregate;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendResponseDto.*;
-import com.beyond.qiin.domain.accounting.repository.querydsl.UsageHistoryTrendQueryRepository;
-import com.beyond.qiin.domain.inventory.entity.Asset;
-import com.beyond.qiin.domain.inventory.repository.AssetRepository;
+import com.beyond.qiin.domain.accounting.repository.querydsl.UsageHistoryTrendQueryAdapter;
+
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,150 +20,133 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQueryService {
 
-    private final UsageHistoryTrendQueryRepository trendRepository;
-    private final AssetRepository assetRepository;
+    private final UsageHistoryTrendQueryAdapter trendQueryAdapter;
 
     @Override
     public UsageHistoryTrendResponseDto getUsageHistoryTrend(UsageHistoryTrendRequestDto request) {
 
-        // 1. 기본 연도 설정
         int currentYear = LocalDate.now().getYear();
+        int currentMonth = LocalDate.now().getMonthValue();
+
+        int baseYear = request.getBaseYear() != null ? request.getBaseYear() : currentYear - 1;
         int compareYear = request.getCompareYear() != null ? request.getCompareYear() : currentYear;
-        int baseYear = request.getBaseYear() != null ? request.getBaseYear() : compareYear - 1;
 
-        // 2. 비교할 월수 설정 (compareYear 기준)
-        int months = (compareYear == currentYear) ? LocalDate.now().getMonthValue() - 1 : 12;
+        UsageHistoryTrendRawDto raw = trendQueryAdapter.getTrendData(
+                baseYear, compareYear, request.getAssetId(), request.getAssetName(), 0
+        );
 
-        if (months <= 0) months = 1;
+        // 월별 데이터 1~12월
+        List<MonthlyUsageData> monthlyList = buildMonthlyList(raw.getBaseYearData(), raw.getCompareYearData());
 
-        // 3. 자원 조회 (ID 우선 → 이름 검색)
-        Asset asset = resolveAsset(request);
+        // summary 계산: valid month 기준
+        UsageIncreaseSummary summary =
+                calculateIncrease(raw.getBaseYearData(), raw.getCompareYearData(),
+                        raw.getAssetCount(), currentMonth);
 
-        // 4. QueryDSL로 월별 사용량 집계 조회
-        Map<Integer, UsageAggregate> baseYearData = trendRepository.getMonthlyUsage(baseYear, asset.getId(), months);
-
-        Map<Integer, UsageAggregate> compareYearData =
-                trendRepository.getMonthlyUsage(compareYear, asset.getId(), months);
-
-        // 5. 월별 사용률 계산
-        List<MonthlyUsageData> monthlyUsageData = buildMonthlyUsageData(baseYearData, compareYearData, months);
-
-        // 6. 증가율 계산
-        UsageIncreaseSummary summary = calculateIncreaseSummary(baseYearData, compareYearData, months);
-
-        // 7. Response 조립
         return UsageHistoryTrendResponseDto.builder()
-                .asset(AssetInfo.builder()
-                        .assetId(asset.getId())
-                        .assetName(asset.getName())
-                        .assetCategory(
-                                asset.getCategory() != null
-                                        ? asset.getCategory().getName()
-                                        : null)
-                        .assetImageUrl(asset.getImageUrl())
-                        .build())
-                .yearRange(YearRangeInfo.builder()
-                        .baseYear(baseYear)
-                        .compareYear(compareYear)
-                        .months(months)
-                        .build())
-                .monthlyData(monthlyUsageData)
+                .asset(new AssetInfo(raw.getAssetId(), raw.getAssetName()))
+                .yearRange(new YearRangeInfo(baseYear, compareYear, 12))
+                .monthlyData(monthlyList)
                 .summary(summary)
                 .build();
     }
 
-    // -------------------------------------------------------
-    // 🔸 자원 조회 (ID → AssetName 순)
-    // -------------------------------------------------------
-    private Asset resolveAsset(UsageHistoryTrendRequestDto request) {
-        if (request.getAssetId() != null) {
-            return assetRepository
-                    .findById(request.getAssetId())
-                    .orElseThrow(() -> new IllegalArgumentException("자원을 찾을 수 없습니다."));
-        }
-
-        if (request.getAssetName() != null) {
-            return assetRepository
-                    .findByNameContaining(request.getAssetName())
-                    .orElseThrow(() -> new IllegalArgumentException("자원을 찾을 수 없습니다."));
-        }
-
-        throw new IllegalArgumentException("assetId 또는 assetName 중 하나는 반드시 필요합니다.");
-    }
-
-    // -------------------------------------------------------
-    // 🔸 월별 사용률 데이터 계산
-    // -------------------------------------------------------
-    private List<MonthlyUsageData> buildMonthlyUsageData(
-            Map<Integer, UsageAggregate> baseData, Map<Integer, UsageAggregate> compareData, int months) {
+    // -------------------------------------------------------------------------
+    // 1~12월 전체 반환 (UI 표시용)
+    // -------------------------------------------------------------------------
+    private List<MonthlyUsageData> buildMonthlyList(
+            Map<Integer, UsageAggregate> baseData,
+            Map<Integer, UsageAggregate> compareData
+    ) {
         List<MonthlyUsageData> result = new ArrayList<>();
 
-        for (int month = 1; month <= months; month++) {
-            UsageAggregate b = baseData.getOrDefault(month, new UsageAggregate());
-            UsageAggregate c = compareData.getOrDefault(month, new UsageAggregate());
-
-            Double baseRate = calculateUsageRate(b.actualUsage, b.reservedUsage);
-            Double compareRate = calculateUsageRate(c.actualUsage, c.reservedUsage);
+        for (int m = 1; m <= 12; m++) {
+            UsageAggregate b = baseData.getOrDefault(m, empty());
+            UsageAggregate c = compareData.getOrDefault(m, empty());
 
             result.add(MonthlyUsageData.builder()
-                    .month(month)
-                    .baseYearUsageRate(baseRate)
-                    .compareYearUsageRate(compareRate)
+                    .month(m)
+                    .baseYearUsageRate(round1(calcUsageRate(b)))
+                    .compareYearUsageRate(round1(calcUsageRate(c)))
                     .build());
         }
         return result;
     }
 
-    // -------------------------------------------------------
-    // 🔸 단일 월 사용률 계산
-    // -------------------------------------------------------
-    private Double calculateUsageRate(int actual, int reserved) {
-        if (reserved == 0) return 0.0;
-        return (actual * 100.0) / reserved;
+    private UsageAggregate empty() {
+        return UsageAggregate.builder().actualUsage(0).reservedUsage(0).build();
     }
 
-    // -------------------------------------------------------
-    // 🔸 증가율 3종 계산
-    // -------------------------------------------------------
-    private UsageIncreaseSummary calculateIncreaseSummary(
-            Map<Integer, UsageAggregate> base, Map<Integer, UsageAggregate> compare, int months) {
+    private double calcUsageRate(UsageAggregate agg) {
+        if (agg.getReservedUsage() == 0) return 0.0;
+        return (double) agg.getActualUsage() / agg.getReservedUsage() * 100.0;
+    }
 
-        int baseActual = base.values().stream().mapToInt(a -> a.actualUsage).sum();
-        int baseReserved = base.values().stream().mapToInt(a -> a.reservedUsage).sum();
-        int compareActual =
-                compare.values().stream().mapToInt(a -> a.actualUsage).sum();
-        int compareReserved =
-                compare.values().stream().mapToInt(a -> a.reservedUsage).sum();
+    // -------------------------------------------------------------------------
+    // summary 계산: 월별로 valid month만 비교
+    // -------------------------------------------------------------------------
+    private UsageIncreaseSummary calculateIncrease(
+            Map<Integer, UsageAggregate> base,
+            Map<Integer, UsageAggregate> compare,
+            int assetCount,
+            int currentMonth
+    ) {
 
-        // 사용률 증가율
-        double baseRate = calculateUsageRate(baseActual, baseReserved);
-        double compareRate = calculateUsageRate(compareActual, compareReserved);
-        double usageRateIncrease = calcRateIncrease(baseRate, compareRate);
+        // ✔ 월별로 base와 compare 둘 다 reservedUsage>0인 월만 선택
+        List<Integer> validMonths = IntStream.rangeClosed(1, 12)
+                .filter(m -> m < currentMonth)                         // 현재 월 제외
+                .filter(m -> base.get(m).getReservedUsage() > 0)
+                .filter(m -> compare.get(m).getReservedUsage() > 0)
+                .boxed()
+                .collect(Collectors.toList());
 
-        // 실사용 증가율
-        double actualUsageIncrease = calcRateIncrease(baseActual / (double) months, compareActual / (double) months);
+        // ✔ 유효 월 없음 → summary = 0
+        if (validMonths.isEmpty()) {
+            return UsageIncreaseSummary.builder()
+                    .usageRateIncrease(0.0)
+                    .actualUsageIncrease(0.0)
+                    .resourceUtilizationIncrease(0.0)
+                    .build();
+        }
 
-        // 자원 활용도 증가율 (예약사용 시간 기반)
-        double resourceUtilizationIncrease =
-                calcRateIncrease(baseReserved / (double) months, compareReserved / (double) months);
+        // 합산
+        int baseActual = validMonths.stream().mapToInt(m -> base.get(m).getActualUsage()).sum();
+        int compareActual = validMonths.stream().mapToInt(m -> compare.get(m).getActualUsage()).sum();
+
+        int baseReserved = validMonths.stream().mapToInt(m -> base.get(m).getReservedUsage()).sum();
+        int compareReserved = validMonths.stream().mapToInt(m -> compare.get(m).getReservedUsage()).sum();
+
+        // ✔ 비교년도 데이터가 없어도 summary=0
+        if (baseReserved == 0 || compareReserved == 0) {
+            return UsageIncreaseSummary.builder()
+                    .usageRateIncrease(0.0)
+                    .actualUsageIncrease(0.0)
+                    .resourceUtilizationIncrease(0.0)
+                    .build();
+        }
+
+        // 증가율 계산
+        double usageRateIncrease = ((double) (compareReserved - baseReserved) / baseReserved) * 100.0;
+
+        double baseRatio = (double) baseActual / baseReserved;
+        double compareRatio = (double) compareActual / compareReserved;
+        double actualUsageIncrease = (compareRatio - baseRatio) * 100.0;
+
+        int months = validMonths.size();
+        int totalMinutes = assetCount * 24 * 60 * months;
+
+        double baseUtil = (double) baseReserved / totalMinutes;
+        double compareUtil = (double) compareReserved / totalMinutes;
+        double utilizationIncrease = (compareUtil - baseUtil) * 100.0;
 
         return UsageIncreaseSummary.builder()
-                .usageRateIncrease(usageRateIncrease)
-                .actualUsageIncrease(actualUsageIncrease)
-                .resourceUtilizationIncrease(resourceUtilizationIncrease)
+                .usageRateIncrease(round1(usageRateIncrease))
+                .actualUsageIncrease(round1(actualUsageIncrease))
+                .resourceUtilizationIncrease(round1(utilizationIncrease))
                 .build();
     }
 
-    private double calcRateIncrease(double base, double compare) {
-        if (base == 0) return compare == 0 ? 0 : 100;
-        return ((compare - base) / base) * 100.0;
-    }
-
-    // -------------------------------------------------------
-    // 🔸 내부 집계 구조 (QueryDSL 반환값)
-    // -------------------------------------------------------
-    public static class UsageAggregate {
-        public int actualUsage = 0;
-        public int reservedUsage = 0;
+    private double round1(double value) {
+        return Math.round(value * 10.0) / 10.0;
     }
 }

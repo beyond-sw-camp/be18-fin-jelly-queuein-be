@@ -2,8 +2,10 @@ package com.beyond.qiin.domain.accounting.dto.usage_history.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class UsageHistoryTrendRequestDto {
 

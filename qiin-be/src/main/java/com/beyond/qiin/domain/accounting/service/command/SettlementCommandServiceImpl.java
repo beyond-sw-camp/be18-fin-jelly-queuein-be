@@ -18,7 +18,7 @@ public class SettlementCommandServiceImpl implements SettlementCommandService {
     private final SettlementJpaRepository settlementJpaRepository;
 
     @Override
-    public Settlement createSettlement(UsageHistory history) {
+    public Settlement createSettlement(final UsageHistory history) {
 
         Asset asset = history.getAsset();
 
@@ -40,7 +40,7 @@ public class SettlementCommandServiceImpl implements SettlementCommandService {
 
         BigDecimal actualUsageCost = actualUsageHours.multiply(costPerHourSnapshot);
 
-        // 🔥 고정비 계산 (시간당 고정비 × 실제 사용시간)
+        // 고정비 계산 (시간당 고정비 × 실제 사용시간)
         BigDecimal periodCostPerHour = asset.getPeriodCost(); // 시간당 고정비
 
         BigDecimal periodCostShare = actualUsageHours.multiply(periodCostPerHour);

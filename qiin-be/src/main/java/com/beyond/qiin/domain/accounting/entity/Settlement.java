@@ -77,7 +77,6 @@ public class Settlement {
                 .totalUsageCost(totalUsageCost)
                 .actualUsageCost(actualUsageCost)
                 .periodCostShare(periodCostShare)
-                .createdAt(Instant.now())
                 .build();
     }
 }

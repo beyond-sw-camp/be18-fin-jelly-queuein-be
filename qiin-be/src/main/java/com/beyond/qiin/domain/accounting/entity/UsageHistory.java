@@ -75,7 +75,6 @@ public class UsageHistory {
                 .usageTime(usageTime)
                 .actualUsageTime(actualUsageTime)
                 .usageRatio(usageRatio)
-                .createdAt(Instant.now())
                 .build();
     }
 }

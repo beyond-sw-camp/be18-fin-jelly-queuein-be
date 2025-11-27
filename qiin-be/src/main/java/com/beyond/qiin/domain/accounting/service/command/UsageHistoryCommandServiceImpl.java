@@ -14,12 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class UsageHistoryCommandServiceImpl implements UsageHistoryCommandService {
 
     private final UsageHistoryJpaRepository usageHistoryJpaRepository;
     private final SettlementCommandService settlementCommandService;
 
+    @Transactional
     @Override
     public UsageHistory createUsageHistory(Asset asset, Reservation reservation) {
 
