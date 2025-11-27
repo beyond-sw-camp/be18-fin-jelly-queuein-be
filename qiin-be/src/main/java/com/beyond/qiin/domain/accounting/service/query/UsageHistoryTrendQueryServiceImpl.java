@@ -1,11 +1,11 @@
 // file: src/main/java/com/beyond/qiin/domain/accounting/service/query/UsageHistoryTrendQueryServiceImpl.java
 package com.beyond.qiin.domain.accounting.service.query;
 
-import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistoryTrendRequestDto;
-import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendRawDto;
-import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendRawDto.UsageAggregate;
+import com.beyond.qiin.domain.accounting.dto.common.ReportingComparisonRequestDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendResponseDto.*;
+import com.beyond.qiin.domain.accounting.dto.usage_history.response.raw.UsageHistoryTrendRawDto;
+import com.beyond.qiin.domain.accounting.dto.usage_history.response.raw.UsageHistoryTrendRawDto.UsageAggregate;
 import com.beyond.qiin.domain.accounting.repository.querydsl.UsageHistoryTrendQueryAdapter;
 import java.time.LocalDate;
 import java.util.*;
@@ -21,7 +21,7 @@ public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQuery
     private final UsageHistoryTrendQueryAdapter trendQueryAdapter;
 
     @Override
-    public UsageHistoryTrendResponseDto getUsageHistoryTrend(UsageHistoryTrendRequestDto request) {
+    public UsageHistoryTrendResponseDto getUsageHistoryTrend(ReportingComparisonRequestDto request) {
 
         int currentYear = LocalDate.now().getYear();
         int currentMonth = LocalDate.now().getMonthValue();

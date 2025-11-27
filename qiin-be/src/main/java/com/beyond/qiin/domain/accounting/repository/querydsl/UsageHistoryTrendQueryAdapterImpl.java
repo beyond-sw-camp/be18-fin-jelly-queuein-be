@@ -1,7 +1,7 @@
 package com.beyond.qiin.domain.accounting.repository.querydsl;
 
-import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendRawDto;
-import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendRawDto.UsageAggregate;
+import com.beyond.qiin.domain.accounting.dto.usage_history.response.raw.UsageHistoryTrendRawDto;
+import com.beyond.qiin.domain.accounting.dto.usage_history.response.raw.UsageHistoryTrendRawDto.UsageAggregate;
 import com.beyond.qiin.domain.accounting.entity.QUsageHistory;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.querydsl.core.BooleanBuilder;

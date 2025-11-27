@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.accounting.dto.usage_history.request;
+package com.beyond.qiin.domain.accounting.dto.common;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UsageHistoryTrendRequestDto {
+public class ReportingComparisonRequestDto {
 
     private Integer baseYear; // null이면 서버에서 자동으로 올해-1 계산
     private Integer compareYear; // null이면 올해

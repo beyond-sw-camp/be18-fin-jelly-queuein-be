@@ -1,6 +1,6 @@
 package com.beyond.qiin.domain.accounting.repository.querydsl;
 
-import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendRawDto;
+import com.beyond.qiin.domain.accounting.dto.usage_history.response.raw.UsageHistoryTrendRawDto;
 
 public interface UsageHistoryTrendQueryAdapter {
 

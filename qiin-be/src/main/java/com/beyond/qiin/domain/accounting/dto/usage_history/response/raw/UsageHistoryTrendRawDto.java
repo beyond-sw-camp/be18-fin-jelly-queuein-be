@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.accounting.dto.usage_history.response;
+package com.beyond.qiin.domain.accounting.dto.usage_history.response.raw;
 
 import java.util.Map;
 import lombok.Builder;

@@ -100,8 +100,7 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                         Expressions.nullExpression(String.class),
                         Expressions.nullExpression(List.class),
                         settlement.totalUsageCost,
-                        settlement.actualUsageCost,
-                        settlement.periodCostShare))
+                        settlement.actualUsageCost))
                 .from(usageHistory)
                 .join(usageHistory.asset, asset) //  변경됨
                 .leftJoin(settlement)
