@@ -17,40 +17,36 @@ import lombok.*;
 public class Settlement {
 
     @Id
-    @Column(name = "settlement_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "settlement_id")
     private Long id;
 
     @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "usage_history_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "usage_history_id", nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private UsageHistory usageHistory;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "asset_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "asset_id", nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Asset asset;
 
-    @Column(name = "usage_hours", nullable = false)
-    private Integer usageHours;
-
-    @Column(name = "actual_usage_time", nullable = false)
-    private Integer actualUsageTime;
+    @Column(name = "usage_target_id", nullable = false)
+    private Long usageTargetId;
 
     @Column(name = "cost_per_hour_snapshot", precision = 12, scale = 3, nullable = false)
     private BigDecimal costPerHourSnapshot;
 
-    // 예약 기준 청구 금액
     @Column(name = "total_usage_cost", precision = 12, scale = 3, nullable = false)
     private BigDecimal totalUsageCost;
 
-    // 실제 청구 금액
     @Column(name = "actual_usage_cost", precision = 12, scale = 3, nullable = false)
     private BigDecimal actualUsageCost;
 
-    // 고정비
-    @Column(name = "period_cost_share", precision = 12, scale = 3, nullable = false)
-    private BigDecimal periodCostShare;
+    @Column(name = "usage_gap_cost", precision = 12, scale = 3, nullable = false)
+    private BigDecimal usageGapCost;
 
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
+    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
     private Instant createdAt;
 
     @PrePersist
@@ -61,22 +57,21 @@ public class Settlement {
     }
 
     public static Settlement create(
-            final UsageHistory usageHistory,
-            final Integer usageHours,
-            final Integer actualUsageTime,
-            final BigDecimal costPerHourSnapshot,
-            final BigDecimal totalUsageCost,
-            final BigDecimal actualUsageCost,
-            final BigDecimal periodCostShare) {
+            UsageHistory usageHistory,
+            Long usageTargetId,
+            BigDecimal costPerHourSnapshot,
+            BigDecimal totalUsageCost,
+            BigDecimal actualUsageCost,
+            BigDecimal usageGapCost) {
+
         return Settlement.builder()
                 .usageHistory(usageHistory)
                 .asset(usageHistory.getAsset())
-                .usageHours(usageHours)
-                .actualUsageTime(actualUsageTime)
+                .usageTargetId(usageTargetId)
                 .costPerHourSnapshot(costPerHourSnapshot)
                 .totalUsageCost(totalUsageCost)
                 .actualUsageCost(actualUsageCost)
-                .periodCostShare(periodCostShare)
+                .usageGapCost(usageGapCost)
                 .build();
     }
 }

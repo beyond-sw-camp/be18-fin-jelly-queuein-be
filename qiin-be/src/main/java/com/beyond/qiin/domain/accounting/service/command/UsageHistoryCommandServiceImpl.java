@@ -19,8 +19,8 @@ public class UsageHistoryCommandServiceImpl implements UsageHistoryCommandServic
     private final UsageHistoryJpaRepository usageHistoryJpaRepository;
     private final SettlementCommandService settlementCommandService;
 
-    @Transactional
     @Override
+    @Transactional
     public UsageHistory createUsageHistory(Asset asset, Reservation reservation) {
 
         // 계산
