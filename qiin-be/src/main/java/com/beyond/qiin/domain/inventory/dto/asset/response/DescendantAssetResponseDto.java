@@ -1,8 +1,6 @@
 package com.beyond.qiin.domain.inventory.dto.asset.response;
 
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
-import com.beyond.qiin.domain.inventory.entity.Asset;
-import com.beyond.qiin.domain.inventory.entity.Category;
 import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import lombok.AllArgsConstructor;

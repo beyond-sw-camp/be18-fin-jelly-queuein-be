@@ -11,7 +11,6 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAsse
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
-import com.beyond.qiin.domain.inventory.exception.CategoryException;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
 import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryAdapter;
@@ -71,9 +70,9 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<RawDescendantAssetResponseDto> rawPage =
-                assetQueryAdapter.findAllForDescendant(pageable);
-        Page<DescendantAssetResponseDto> descendantAssetResponseDtoPage = rawPage.map(DescendantAssetResponseDto::fromEntity);
+        Page<RawDescendantAssetResponseDto> rawPage = assetQueryAdapter.findAllForDescendant(pageable);
+        Page<DescendantAssetResponseDto> descendantAssetResponseDtoPage =
+                rawPage.map(DescendantAssetResponseDto::fromEntity);
 
         return PageResponseDto.from(descendantAssetResponseDtoPage);
     }

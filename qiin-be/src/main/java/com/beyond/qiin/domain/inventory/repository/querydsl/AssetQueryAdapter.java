@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
-import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
@@ -31,5 +30,4 @@ public interface AssetQueryAdapter {
 
     // 자기 부모 이름 찾기
     String findParentName(final Long assetId);
-
 }

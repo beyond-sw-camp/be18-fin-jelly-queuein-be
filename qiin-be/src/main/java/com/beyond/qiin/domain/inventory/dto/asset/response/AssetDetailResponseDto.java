@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.inventory.dto.asset.response;
 
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailResponseDto;
-import com.beyond.qiin.domain.inventory.entity.Asset;
 import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -45,22 +44,22 @@ public class AssetDetailResponseDto {
 
     public static AssetDetailResponseDto fromRaw(RawAssetDetailResponseDto raw, String parentName) {
         return AssetDetailResponseDto.builder()
-                                     .assetId(raw.getAssetId())
-                                     .parentName(parentName)
-                                     .categoryId(raw.getCategoryId())
-                                     .categoryName(raw.getCategoryName())
-                                     .name(raw.getName())
-                                     .description(raw.getDescription())
-                                     .image(raw.getImage())
-                                     .status(convertStatus(raw.getStatus()))
-                                     .type(convertType(raw.getType()))
-                                     .accessLevel(raw.getAccessLevel())
-                                     .approvalStatus(raw.getApprovalStatus())
-                                     .costPerHour(raw.getCostPerHour())
-                                     .periodCost(raw.getPeriodCost())
-                                     .createdAt(raw.getCreatedAt())
-                                     .createdBy(raw.getCreatedBy())
-                                     .build();
+                .assetId(raw.getAssetId())
+                .parentName(parentName)
+                .categoryId(raw.getCategoryId())
+                .categoryName(raw.getCategoryName())
+                .name(raw.getName())
+                .description(raw.getDescription())
+                .image(raw.getImage())
+                .status(convertStatus(raw.getStatus()))
+                .type(convertType(raw.getType()))
+                .accessLevel(raw.getAccessLevel())
+                .approvalStatus(raw.getApprovalStatus())
+                .costPerHour(raw.getCostPerHour())
+                .periodCost(raw.getPeriodCost())
+                .createdAt(raw.getCreatedAt())
+                .createdBy(raw.getCreatedBy())
+                .build();
     }
 
     private static String convertStatus(Integer s) {

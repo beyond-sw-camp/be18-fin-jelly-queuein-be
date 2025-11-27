@@ -107,19 +107,18 @@ public class Asset extends BaseEntity {
         this.delete(assetId);
     }
 
-    public static Asset create(Category category, CreateAssetRequestDto requestDto, int statusCode, int typeCode){
+    public static Asset create(Category category, CreateAssetRequestDto requestDto, int statusCode, int typeCode) {
         return Asset.builder()
-                    .category(category)
-                    .name(requestDto.getName())
-                    .description(requestDto.getDescription())
-                    .image(requestDto.getImage())
-                    .status(statusCode)
-                    .type(typeCode)
-                    .accessLevel(requestDto.getAccessLevel())
-                    .needsApproval(requestDto.getApprovalStatus())
-                    .costPerHour(requestDto.getCostPerHour())
-                    .periodCost(requestDto.getPeriodCost())
-                    .build();
+                .category(category)
+                .name(requestDto.getName())
+                .description(requestDto.getDescription())
+                .image(requestDto.getImage())
+                .status(statusCode)
+                .type(typeCode)
+                .accessLevel(requestDto.getAccessLevel())
+                .needsApproval(requestDto.getApprovalStatus())
+                .costPerHour(requestDto.getCostPerHour())
+                .periodCost(requestDto.getPeriodCost())
+                .build();
     }
-
 }

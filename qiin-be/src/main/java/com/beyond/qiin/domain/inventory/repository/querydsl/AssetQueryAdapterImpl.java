@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
-import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
@@ -126,8 +125,7 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
                         asset.costPerHour,
                         asset.periodCost,
                         asset.createdAt,
-                        asset.createdBy
-                ))
+                        asset.createdBy))
                 .from(asset)
                 .where(asset.id.eq(assetId))
                 .fetchOne();
@@ -143,12 +141,9 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
         return jpaQueryFactory
                 .select(parent.name)
                 .from(assetClosure)
-                .leftJoin(parent).on(parent.id.eq(assetClosure.assetClosureId.ancestorId))
-                .where(
-                        assetClosure.assetClosureId.descendantId.eq(assetId),
-                        assetClosure.depth.eq(1)
-                )
+                .leftJoin(parent)
+                .on(parent.id.eq(assetClosure.assetClosureId.ancestorId))
+                .where(assetClosure.assetClosureId.descendantId.eq(assetId), assetClosure.depth.eq(1))
                 .fetchOne();
     }
-
 }
