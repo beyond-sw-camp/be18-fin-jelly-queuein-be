@@ -1,5 +1,6 @@
 package com.beyond.qiin.domain.inventory.dto.asset.response;
 
+import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -14,6 +15,8 @@ public class AssetDetailResponseDto {
 
     private final Long assetId;
 
+    private final String parentName;
+
     private final Long categoryId;
 
     private final String categoryName;
@@ -24,11 +27,11 @@ public class AssetDetailResponseDto {
 
     private final String image;
 
-    private final int status;
+    private final String status;
 
-    private final int type;
+    private final String type;
 
-    private final int accessLevel;
+    private final Integer accessLevel;
 
     private final Boolean approvalStatus;
 
@@ -40,22 +43,40 @@ public class AssetDetailResponseDto {
 
     private final Long createdBy;
 
-    public static AssetDetailResponseDto fromEntity(Asset asset, String categoryName) {
+    public static AssetDetailResponseDto fromRaw(RawAssetDetailResponseDto raw, String parentName) {
         return AssetDetailResponseDto.builder()
-                .assetId(asset.getId())
-                .categoryId(asset.getCategory().getId())
-                .categoryName(categoryName)
-                .name(asset.getName())
-                .description(asset.getDescription())
-                .image(asset.getImage())
-                .status(asset.getStatus())
-                .type(asset.getType())
-                .accessLevel(asset.getAccessLevel())
-                .approvalStatus(asset.isNeedsApproval())
-                .costPerHour(asset.getCostPerHour())
-                .periodCost(asset.getPeriodCost())
-                .createdAt(asset.getCreatedAt())
-                .createdBy(asset.getCreatedBy())
-                .build();
+                                     .assetId(raw.getAssetId())
+                                     .parentName(parentName)
+                                     .categoryId(raw.getCategoryId())
+                                     .categoryName(raw.getCategoryName())
+                                     .name(raw.getName())
+                                     .description(raw.getDescription())
+                                     .image(raw.getImage())
+                                     .status(convertStatus(raw.getStatus()))
+                                     .type(convertType(raw.getType()))
+                                     .accessLevel(raw.getAccessLevel())
+                                     .approvalStatus(raw.getApprovalStatus())
+                                     .costPerHour(raw.getCostPerHour())
+                                     .periodCost(raw.getPeriodCost())
+                                     .createdAt(raw.getCreatedAt())
+                                     .createdBy(raw.getCreatedBy())
+                                     .build();
+    }
+
+    private static String convertStatus(Integer s) {
+        return switch (s) {
+            case 0 -> "AVAILABLE";
+            case 1 -> "UNAVAILABLE";
+            case 2 -> "MAINTENANCE";
+            default -> "UNKNOWN";
+        };
+    }
+
+    private static String convertType(Integer t) {
+        return switch (t) {
+            case 0 -> "STATIC";
+            case 1 -> "DYNAMIC";
+            default -> "UNKNOWN";
+        };
     }
 }

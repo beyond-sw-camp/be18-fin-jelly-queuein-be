@@ -107,7 +107,13 @@ public class AssetController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/descendants")
     public ResponseEntity<PageResponseDto<DescendantAssetResponseDto>> getDescendantAssets(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "010") int size) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Long rootId,
+            @RequestParam(required = false) Long oneDepthId,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String status) {
 
         PageResponseDto<DescendantAssetResponseDto> descendantAssetList =
                 assetQueryService.getDescendantAssetList(page, size);

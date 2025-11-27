@@ -13,8 +13,6 @@ public class RawAssetDetailResponseDto {
 
     private final Long assetId;
 
-    private final String parentName;
-
     private final Long categoryId;
 
     private final String categoryName;
@@ -25,9 +23,9 @@ public class RawAssetDetailResponseDto {
 
     private final String image;
 
-    private final String status;
+    private final int status;
 
-    private final String type;
+    private final int type;
 
     private final Integer accessLevel;
 

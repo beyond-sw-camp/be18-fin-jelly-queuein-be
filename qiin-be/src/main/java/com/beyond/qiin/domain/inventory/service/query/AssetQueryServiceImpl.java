@@ -6,6 +6,8 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetRespon
 import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.RootAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.TreeAssetResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
@@ -69,8 +71,9 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<DescendantAssetResponseDto> descendantAssetResponseDtoPage =
+        Page<RawDescendantAssetResponseDto> rawPage =
                 assetQueryAdapter.findAllForDescendant(pageable);
+        Page<DescendantAssetResponseDto> descendantAssetResponseDtoPage = rawPage.map(DescendantAssetResponseDto::fromEntity);
 
         return PageResponseDto.from(descendantAssetResponseDtoPage);
     }
@@ -133,12 +136,11 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     @Transactional(readOnly = true)
     public AssetDetailResponseDto getAssetDetail(final Long assetId) {
 
-        Asset asset = assetQueryAdapter.findByAssetId(assetId).orElseThrow(AssetException::notFound);
+        RawAssetDetailResponseDto raw = assetQueryAdapter.findByAssetId(assetId).orElseThrow(AssetException::notFound);
 
-        String categoryName =
-                categoryQueryAdapter.findNameById(asset.getCategory().getId()).orElseThrow(CategoryException::notFound);
+        String parentName = assetQueryAdapter.findParentName(assetId);
 
-        return AssetDetailResponseDto.fromEntity(asset, categoryName);
+        return AssetDetailResponseDto.fromRaw(raw, parentName);
     }
 
     @Override

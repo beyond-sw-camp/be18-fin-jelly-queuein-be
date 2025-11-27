@@ -1,6 +1,10 @@
 package com.beyond.qiin.domain.inventory.dto.asset.response;
 
+import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
+import com.beyond.qiin.domain.inventory.entity.Category;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,11 +19,11 @@ public class DescendantAssetResponseDto {
 
     private final String name;
 
-    private final Long categoryId;
+    private final String categoryName;
 
-    private final int status;
+    private final String status;
 
-    private final int type;
+    private final String type;
 
     private final Boolean needApproval;
 
@@ -27,16 +31,16 @@ public class DescendantAssetResponseDto {
 
     private final Long version;
 
-    public static DescendantAssetResponseDto fromEntity(Asset asset) {
+    public static DescendantAssetResponseDto fromEntity(RawDescendantAssetResponseDto raw) {
         return DescendantAssetResponseDto.builder()
-                .assetId(asset.getId())
-                .name(asset.getName())
-                .categoryId(asset.getCategory().getId())
-                .status(asset.getStatus())
-                .type(asset.getType())
-                .needApproval(asset.isNeedsApproval())
-                .reservable(asset.getStatus() == 0)
-                .version(asset.getVersion())
+                .assetId(raw.getAssetId())
+                .name(raw.getName())
+                .categoryName(raw.getCategoryName())
+                .status(AssetStatus.from(raw.getStatus()).name())
+                .type(AssetType.from(raw.getType()).name())
+                .needApproval(raw.getNeedApproval())
+                .reservable(raw.getStatus() == 0)
+                .version(raw.getVersion())
                 .build();
     }
 }

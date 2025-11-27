@@ -82,7 +82,7 @@ public class CategoryController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/management")
     public ResponseEntity<PageResponseDto<ManageCategoryResponseDto>> getManageCategory(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "010") int size) {
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
 
         PageResponseDto<ManageCategoryResponseDto> categories = categoryQueryService.getManageList(page, size);
 

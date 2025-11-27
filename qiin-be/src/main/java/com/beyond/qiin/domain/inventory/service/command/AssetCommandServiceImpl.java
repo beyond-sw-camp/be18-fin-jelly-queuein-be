@@ -53,7 +53,10 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         Category category =
                 categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
 
-        Asset asset = requestDto.toEntity(category);
+        int statusCode = convertStatus(requestDto.getStatus());
+        int typeCode = convertType(requestDto.getType());
+
+        Asset asset = Asset.create(category, requestDto, statusCode, typeCode);
 
         assetJpaRepository.save(asset);
 
@@ -104,12 +107,16 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         if (requestDto.getCategoryId() != null) {
             categoryCommandService.validateCategoryId(requestDto.getCategoryId());
         }
+
+        int statusCode = convertStatus(requestDto.getStatus());
+        int typeCode = convertType(requestDto.getType());
+
         Category category =
                 categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
 
         Asset asset = getAssetById(assetId);
 
-        asset.apply(category, requestDto);
+        asset.apply(category, requestDto, statusCode, typeCode);
 
         return UpdateAssetResponseDto.fromEntity(asset);
     }
@@ -188,6 +195,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         for (Long id : subtreeIds) {
             System.out.println("subtree id 생성: " + id);
+            // if문 써서 값이 없으면 넣기
             assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
         }
     }
@@ -257,5 +265,23 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         } else {
             return "DYNAMIC";
         }
+    }
+
+    // status 값 변환
+    private int convertStatus(String status) {
+        return switch (status) {
+            case "AVAILABLE" -> 0;
+            case "UNAVAILABLE" -> 1;
+            case "MAINTENANCE" -> 2;
+            default -> throw new IllegalArgumentException("Invalid status");
+        };
+    }
+
+    private int convertType(String type) {
+        return switch (type) {
+            case "STATIC" -> 0;
+            case "DYNAMIC" -> 1;
+            default -> throw new IllegalArgumentException("Invalid type");
+        };
     }
 }

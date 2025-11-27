@@ -1,13 +1,12 @@
 package com.beyond.qiin.domain.inventory.dto.asset.request;
 
-import com.beyond.qiin.domain.inventory.entity.Asset;
-import com.beyond.qiin.domain.inventory.entity.Category;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.math.BigDecimal;
 
 @Getter
 @Builder
@@ -26,11 +25,11 @@ public class CreateAssetRequestDto {
 
     private String image;
 
-    @NotNull
-    private Integer status;
+    @NotBlank
+    private String status;
 
-    @NotNull
-    private Integer type;
+    @NotBlank
+    private String type;
 
     @NotNull
     private Integer accessLevel;
@@ -44,18 +43,6 @@ public class CreateAssetRequestDto {
     @NotNull
     private BigDecimal periodCost;
 
-    public Asset toEntity(Category category) {
-        return Asset.builder()
-                .category(category)
-                .name(name)
-                .description(description)
-                .image(image)
-                .status(status)
-                .type(type)
-                .accessLevel(accessLevel)
-                .needsApproval(approvalStatus)
-                .costPerHour(costPerHour)
-                .periodCost(periodCost)
-                .build();
-    }
 }
+
+
