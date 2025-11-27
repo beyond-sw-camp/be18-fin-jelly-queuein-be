@@ -33,13 +33,11 @@ public class SettlementCommandServiceImpl implements SettlementCommandService {
         BigDecimal costPerHour = asset.getCostPerHour();
 
         // (1) 예약 기준 시간 → 비용
-        BigDecimal reservedHours = BigDecimal.valueOf(reservedMinutes)
-                .divide(sixty, 3, RoundingMode.HALF_UP);
+        BigDecimal reservedHours = BigDecimal.valueOf(reservedMinutes).divide(sixty, 3, RoundingMode.HALF_UP);
         BigDecimal totalUsageCost = reservedHours.multiply(costPerHour);
 
         // (2) 실제 기준 시간 → 비용
-        BigDecimal actualHours = BigDecimal.valueOf(actualMinutes)
-                .divide(sixty, 3, RoundingMode.HALF_UP);
+        BigDecimal actualHours = BigDecimal.valueOf(actualMinutes).divide(sixty, 3, RoundingMode.HALF_UP);
         BigDecimal actualUsageCost = actualHours.multiply(costPerHour);
 
         // (3) 목표 사용률 조회
@@ -47,7 +45,8 @@ public class SettlementCommandServiceImpl implements SettlementCommandService {
                 .atZone(java.time.ZoneId.systemDefault())
                 .getYear();
 
-        UsageTarget usageTarget = usageTargetJpaRepository.findByYear(year)
+        UsageTarget usageTarget = usageTargetJpaRepository
+                .findByYear(year)
                 .orElseThrow(() -> new IllegalStateException("Usage target not found for year: " + year));
 
         BigDecimal targetRate = usageTarget.getTargetRate(); // 예: 0.8 (80%)
@@ -64,15 +63,8 @@ public class SettlementCommandServiceImpl implements SettlementCommandService {
 
         // (5) 정산 생성
         Settlement settlement = Settlement.create(
-                history,
-                usageTarget.getId(),
-                costPerHour,
-                totalUsageCost,
-                actualUsageCost,
-                usageGapCost
-        );
+                history, usageTarget.getId(), costPerHour, totalUsageCost, actualUsageCost, usageGapCost);
 
         return settlementJpaRepository.save(settlement);
     }
 }
-

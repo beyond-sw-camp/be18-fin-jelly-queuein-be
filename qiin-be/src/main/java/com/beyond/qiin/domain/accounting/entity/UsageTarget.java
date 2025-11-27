@@ -1,10 +1,9 @@
 package com.beyond.qiin.domain.accounting.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.Instant;
+import lombok.*;
 
 @Entity
 @Getter
@@ -14,12 +13,10 @@ import java.time.Instant;
 @Table(
         name = "usage_target",
         uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uq_usage_target_year",
-                        columnNames = {"year"}
-                )
-        }
-)
+            @UniqueConstraint(
+                    name = "uq_usage_target_year",
+                    columnNames = {"year"})
+        })
 public class UsageTarget {
 
     @Id
