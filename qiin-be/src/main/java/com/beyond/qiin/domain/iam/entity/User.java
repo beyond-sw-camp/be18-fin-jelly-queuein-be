@@ -12,6 +12,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -70,14 +71,20 @@ public class User extends BaseEntity {
     @Column(name = "retire_date", columnDefinition = "TIMESTAMP(6)")
     private Instant retireDate;
 
-    public static User create(final CreateUserRequestDto request, final String encryptedPassword) {
+    public static User create(
+            final CreateUserRequestDto request, final String generatedUserNo, final String encryptedPassword) {
+
+        final Instant hireInstant =
+                request.getHireDate().atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+
         return User.builder()
                 .dptId(request.getDptId())
-                .userNo(request.getUserNo())
+                .userNo(generatedUserNo)
                 .userName(request.getUserName())
                 .email(request.getEmail())
                 .password(encryptedPassword)
                 .passwordExpired(true)
+                .hireDate(hireInstant)
                 .build();
     }
 

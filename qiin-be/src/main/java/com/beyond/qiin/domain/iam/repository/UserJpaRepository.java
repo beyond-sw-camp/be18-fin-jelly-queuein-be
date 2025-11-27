@@ -3,6 +3,7 @@ package com.beyond.qiin.domain.iam.repository;
 import com.beyond.qiin.domain.iam.entity.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -18,4 +19,14 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
     Boolean existsByUserName(final String userName);
 
     User findByUserName(final String userName);
+
+    @Query(
+            """
+    SELECT u.userNo
+    FROM User u
+    WHERE u.userNo LIKE CONCAT(:prefix, '%')
+    ORDER BY u.userNo DESC
+    LIMIT 1
+""")
+    Optional<String> findLastUserNoByPrefix(final String prefix);
 }

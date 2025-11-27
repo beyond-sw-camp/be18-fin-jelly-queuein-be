@@ -14,6 +14,11 @@ import com.beyond.qiin.domain.iam.support.user.UserWriter;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
 import com.beyond.qiin.security.PasswordGenerator;
 import com.beyond.qiin.security.SecurityUtils;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,7 +44,9 @@ public class UserCommandServiceImpl implements UserCommandService {
         final String tempPassword = PasswordGenerator.generate();
         final String encrypted = passwordEncoder.encode(tempPassword);
 
-        User user = User.create(request, encrypted);
+        String userNo = generateUserNo(request.getHireDate());
+
+        User user = User.create(request, userNo, encrypted);
         User saved = userWriter.save(user);
 
         Role defaultRole = roleReader.findByRoleName("GENERAL");
@@ -102,5 +109,27 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         user.softDelete(currentUserId);
         userWriter.save(user);
+    }
+
+    // --------------------------------------
+    // 헬퍼 메서드
+    // --------------------------------------
+
+    // 사번 생성 로직
+    private String generateUserNo(final LocalDate hireDate) {
+        Instant hireInstant = hireDate.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+
+        String prefix = hireDate.format(DateTimeFormatter.ofPattern("yyyyMM"));
+
+        Optional<String> lastUserNoOpt = userReader.findLastUserNoByPrefix(prefix);
+
+        int nextSeq = lastUserNoOpt
+                .map(last -> Integer.parseInt(last.substring(prefix.length())))
+                .map(num -> num + 1)
+                .orElse(1);
+
+        String seq = String.format("%03d", nextSeq);
+
+        return prefix + seq;
     }
 }
