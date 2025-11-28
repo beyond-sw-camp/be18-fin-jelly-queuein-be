@@ -1,7 +1,7 @@
 package com.beyond.qiin.security.resolver;
 
 import com.beyond.qiin.domain.auth.exception.AuthException;
-import lombok.RequiredArgsConstructor;
+import com.beyond.qiin.security.CustomUserDetails;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,21 +12,20 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
-@RequiredArgsConstructor
-public class ArgumentResolver implements HandlerMethodArgumentResolver {
+public class CurrentUserIdResolver implements HandlerMethodArgumentResolver {
 
     @Override
-    public boolean supportsParameter(final MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(AccessToken.class)
-                && parameter.getParameterType().equals(String.class);
+    public boolean supportsParameter(MethodParameter parameter) {
+        return parameter.hasParameterAnnotation(CurrentUserId.class)
+                && parameter.getParameterType().equals(Long.class);
     }
 
     @Override
     public Object resolveArgument(
-            final MethodParameter parameter,
-            final ModelAndViewContainer mavContainer,
-            final NativeWebRequest webRequest,
-            final WebDataBinderFactory binderFactory) {
+            MethodParameter parameter,
+            ModelAndViewContainer mavContainer,
+            NativeWebRequest webRequest,
+            WebDataBinderFactory binderFactory) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -34,18 +33,13 @@ public class ArgumentResolver implements HandlerMethodArgumentResolver {
             throw AuthException.unauthorized();
         }
 
-        String header = webRequest.getHeader("Authorization");
+        // 사용자 정보 가져오기
+        Object principal = authentication.getPrincipal();
 
-        if (header == null || !header.startsWith("Bearer ")) {
+        if (!(principal instanceof CustomUserDetails user)) {
             throw AuthException.unauthorized();
         }
 
-        Object token = authentication.getDetails();
-
-        if (token == null) {
-            throw AuthException.unauthorized();
-        }
-
-        return token.toString();
+        return user.getUserId();
     }
 }
