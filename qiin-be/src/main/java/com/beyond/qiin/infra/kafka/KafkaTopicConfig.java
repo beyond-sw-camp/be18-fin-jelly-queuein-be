@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 // application 시작 시 spring yml에서 topic value들로 토픽 생성 자동화
 // config에 해당하나 프레임워크 전반이 아니라 kafka 전용의 설정이므로 kafka 폴더 안에 넣음(카프카의 토픽 설정을 위한 것)
+
 @Configuration
 @RequiredArgsConstructor
 public class KafkaTopicConfig {

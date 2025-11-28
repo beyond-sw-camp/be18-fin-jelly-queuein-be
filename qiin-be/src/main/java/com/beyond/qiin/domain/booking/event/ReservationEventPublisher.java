@@ -17,7 +17,7 @@ public class ReservationEventPublisher {
 
     public void publishCreated(Reservation reservation) {
         ReservationCreatedPayload payload = ReservationCreatedPayload.from(reservation);
-        publish("reservation-created", payload, reservation.getId()); //topic의 key 
+        publish("reservation-created", payload, reservation.getId()); // topic의 key
     }
 
     public void publishUpdated(Reservation reservation) {

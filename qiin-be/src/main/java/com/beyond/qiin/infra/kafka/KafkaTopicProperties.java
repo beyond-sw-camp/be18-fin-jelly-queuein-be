@@ -16,7 +16,7 @@ public class KafkaTopicProperties {
     private final Map<String, String> topics = new HashMap<>();
 
     public String get(String key) {
-        return topics.get(key); //key에 해당하는 value 반환
+        return topics.get(key); // key에 해당하는 value 반환
     }
 
     public Set<String> keys() {

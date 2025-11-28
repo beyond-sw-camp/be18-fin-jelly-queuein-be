@@ -2,7 +2,6 @@ package com.beyond.qiin.domain.outbox.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Lob;
@@ -22,15 +21,15 @@ import org.hibernate.type.SqlTypes;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@Entity //TODO : flyway 추가 후
+@Entity // TODO : flyway 추가 후
 @Table(
         name = "outbox",
         indexes = {
             @Index(name = "idx_outbox_published", columnList = "is_published"),
             @Index(name = "idx_outbox_aggregate", columnList = "aggregate_id, aggregate_type")
         })
-//해당 조건으로 outbox processor이 쿼리(publish되지 않은 event 조회
-//특정 도메인의 이벤트에 대해 조회
+// 해당 조건으로 outbox processor이 쿼리(publish되지 않은 event 조회
+// 특정 도메인의 이벤트에 대해 조회
 public class OutboxEvent { // outbox(table) : 저장소, outbox event : 이벤트 한건
 
     @Id
@@ -42,8 +41,11 @@ public class OutboxEvent { // outbox(table) : 저장소, outbox event : 이벤�
     @Column(name = "event_type", nullable = false, length = 100)
     private String eventType; // ex: reservation-created
 
-    @Lob //large object(긴 문자열)
-    @Column(name = "payload", nullable = false, columnDefinition = "LONGTEXT") //columnDefinition="JSON" 불가 (db에 long text로 저장)
+    @Lob // large object(긴 문자열)
+    @Column(
+            name = "payload",
+            nullable = false,
+            columnDefinition = "LONGTEXT") // columnDefinition="JSON" 불가 (db에 long text로 저장)
     private String payload; // 이벤트 데이터
 
     @Column(name = "is_published", nullable = false)

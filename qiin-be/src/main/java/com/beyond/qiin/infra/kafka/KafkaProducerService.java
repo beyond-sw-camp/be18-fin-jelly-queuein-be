@@ -14,12 +14,12 @@ public class KafkaProducerService {
     private final KafkaTopicProperties kafkaTopicProperties;
 
     // message를 kafka 서버로 전송
-    public void sendMessage(String topicKey, Object message) { //event type == topic key - outbox processor에서 전달
+    public void sendMessage(String topicKey, Object message) { // event type == topic key - outbox processor에서 전달
         if (topicKey == null) {
             log.error("Kafka ERROR: topic key is null. message={}", message);
         }
-        String topic = kafkaTopicProperties.get(topicKey); //topic value 가져옴
-        kafkaTemplate.send(topic, message); //실제 topic value로 메시지를 전달
+        String topic = kafkaTopicProperties.get(topicKey); // topic value 가져옴
+        kafkaTemplate.send(topic, message); // 실제 topic value로 메시지를 전달
     }
 
     // topic key, message
