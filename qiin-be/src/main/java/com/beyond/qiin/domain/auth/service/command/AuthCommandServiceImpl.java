@@ -60,6 +60,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
+        // 리프레시 토큰 폐기
         redisTokenRepository.deleteRefreshToken(userId);
 
         long expiresIn = jwtTokenProvider.getRemainingValidityMillis(accessToken);
