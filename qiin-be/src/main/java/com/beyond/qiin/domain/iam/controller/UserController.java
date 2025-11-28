@@ -32,32 +32,15 @@ public class UserController {
     private final UserCommandService userCommandService;
     private final UserQueryService userQueryService;
 
+    // -------------------------------------------
+    // Command
+    // -------------------------------------------
+
     // 사용자 생성
     @PostMapping
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
     public ResponseEntity<CreateUserResponseDto> createUser(@Valid @RequestBody final CreateUserRequestDto request) {
         return ResponseEntity.ok(userCommandService.createUser(request));
-    }
-
-    // 사용자 목록 조회 (MASTER, ADMIN, MANAGER)
-    @GetMapping
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
-    public List<ListUserResponseDto> getUsers() {
-        return userQueryService.getUsers();
-    }
-
-    // 사용자 상세 조회
-    @GetMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
-    public DetailUserResponseDto getUser(@PathVariable final Long userId) {
-        return userQueryService.getUser(userId);
-    }
-
-    // 내 정보 조회
-    @GetMapping("/me")
-    public DetailUserResponseDto getMe() {
-        final Long userId = SecurityUtils.getCurrentUserId();
-        return userQueryService.getUser(userId);
     }
 
     // 사용자 수정
@@ -93,5 +76,30 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable final Long userId) {
         userCommandService.deleteUser(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    // -------------------------------------------
+    // Query
+    // -------------------------------------------
+
+    // 사용자 목록 조회 (MASTER, ADMIN, MANAGER)
+    @GetMapping
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
+    public List<ListUserResponseDto> getUsers() {
+        return userQueryService.getUsers();
+    }
+
+    // 사용자 상세 조회
+    @GetMapping("/{userId}")
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
+    public DetailUserResponseDto getUser(@PathVariable final Long userId) {
+        return userQueryService.getUser(userId);
+    }
+
+    // 내 정보 조회
+    @GetMapping("/me")
+    public DetailUserResponseDto getMe() {
+        final Long userId = SecurityUtils.getCurrentUserId();
+        return userQueryService.getUser(userId);
     }
 }

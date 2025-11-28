@@ -31,6 +31,7 @@ import org.hibernate.annotations.SQLRestriction;
         })
 @AttributeOverride(name = "id", column = @Column(name = "user_role_id"))
 @SQLRestriction("deleted_at IS NULL")
+// @SoftDelete(columnName = "deleted_at", strategy = SoftDeleteType.DELETED)
 public class UserRole extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,6 +41,10 @@ public class UserRole extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Role role;
+
+    public static UserRole create(final User user, final Role role) {
+        return UserRole.builder().user(user).role(role).build();
+    }
 
     public void softDelete(final Long deleterId) {
         this.delete(deleterId);
