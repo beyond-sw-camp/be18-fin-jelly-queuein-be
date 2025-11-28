@@ -247,25 +247,4 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         }
         return true;
     }
-
-    // 자원 상태 변환 // 읽기용으로 옮길 예정
-    @Override
-    public String assetStatusToString(final Integer status) {
-        if (status == 0) {
-            return "AVAILABLE";
-        } else if (status == 1) {
-            return "UNAVAILABLE";
-        } else {
-            return "MAINTENANCE";
-        }
-    }
-
-    @Override
-    public String assetTypeToString(final Integer type) {
-        if (type == 1) {
-            return "STATIC";
-        } else {
-            return "DYNAMIC";
-        }
-    }
 }
