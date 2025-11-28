@@ -35,6 +35,14 @@ public class AssetException extends BaseException {
         return new AssetException((AssetErrorCode.ASSET_NOT_AVAILABLE));
     }
 
+    public static AssetException invalidStatus() {
+        return new AssetException(AssetErrorCode.ASSET_INVALID_STATUS);
+    }
+
+    public static AssetException invalidType() {
+        return new AssetException(AssetErrorCode.ASSET_INVALID_TYPE);
+    }
+
     // ErrorCode 내부 정의
     @Getter
     public enum AssetErrorCode implements ErrorCode {
@@ -47,6 +55,9 @@ public class AssetException extends BaseException {
         ASSET_CANNOT_MOVE_TO_CHILD(HttpStatus.BAD_REQUEST, "ASSET_CANNOT_MOVE_TO_CHILD", "자식 자원으로 이동할 수 없습니다."),
         ASSET_CANNOT_MOVE_TO_SELF(HttpStatus.BAD_REQUEST, "ASSET_CANNOT_MOVE_TO_SELF", "자원은 자기 자신 아래로 이동할 수 없습니다."),
         ASSET_ALREADY_ROOT(HttpStatus.BAD_REQUEST, "ASSET_ALREADY_ROOT", "이미 루트 자원입니다."),
+
+        ASSET_INVALID_STATUS(HttpStatus.BAD_REQUEST, "ASSET_INVALID_STATUS", "유효하지 않은 자원 상태 코드입니다."),
+        ASSET_INVALID_TYPE(HttpStatus.BAD_REQUEST, "ASSET_INVALID_TYPE", "유효하지 않은 자원 유형 코드입니다."),
         ;
 
         private final HttpStatus status;

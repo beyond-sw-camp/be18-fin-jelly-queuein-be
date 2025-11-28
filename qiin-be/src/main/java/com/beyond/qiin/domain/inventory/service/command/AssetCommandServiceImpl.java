@@ -8,6 +8,8 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDt
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.entity.Category;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
 import com.beyond.qiin.domain.inventory.exception.AssetException.AssetErrorCode;
 import com.beyond.qiin.domain.inventory.exception.CategoryException;
@@ -53,8 +55,8 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         Category category =
                 categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
 
-        int statusCode = convertStatus(requestDto.getStatus());
-        int typeCode = convertType(requestDto.getType());
+        int statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
+        int typeCode = AssetType.fromName(requestDto.getType()).toCode();
 
         Asset asset = Asset.create(category, requestDto, statusCode, typeCode);
 
@@ -108,8 +110,8 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             categoryCommandService.validateCategoryId(requestDto.getCategoryId());
         }
 
-        int statusCode = convertStatus(requestDto.getStatus());
-        int typeCode = convertType(requestDto.getType());
+        int statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
+        int typeCode = AssetType.fromName(requestDto.getType()).toCode();
 
         Category category =
                 categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
@@ -265,23 +267,5 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         } else {
             return "DYNAMIC";
         }
-    }
-
-    // status 값 변환
-    private int convertStatus(String status) {
-        return switch (status) {
-            case "AVAILABLE" -> 0;
-            case "UNAVAILABLE" -> 1;
-            case "MAINTENANCE" -> 2;
-            default -> throw new IllegalArgumentException("Invalid status");
-        };
-    }
-
-    private int convertType(String type) {
-        return switch (type) {
-            case "STATIC" -> 0;
-            case "DYNAMIC" -> 1;
-            default -> throw new IllegalArgumentException("Invalid type");
-        };
     }
 }

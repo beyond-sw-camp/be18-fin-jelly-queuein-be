@@ -95,11 +95,11 @@ public class Asset extends BaseEntity {
     }
 
     public AssetStatus getAssetStatus() {
-        return AssetStatus.from(this.status);
+        return AssetStatus.fromCode(this.status);
     }
 
     public AssetType getAssetType() {
-        return AssetType.from(this.type);
+        return AssetType.fromCode(this.type);
     }
 
     // softDelete

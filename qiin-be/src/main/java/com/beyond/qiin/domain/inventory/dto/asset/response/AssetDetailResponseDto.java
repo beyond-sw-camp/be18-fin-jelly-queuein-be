@@ -3,6 +3,9 @@ package com.beyond.qiin.domain.inventory.dto.asset.response;
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailResponseDto;
 import java.math.BigDecimal;
 import java.time.Instant;
+
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,8 +54,8 @@ public class AssetDetailResponseDto {
                 .name(raw.getName())
                 .description(raw.getDescription())
                 .image(raw.getImage())
-                .status(convertStatus(raw.getStatus()))
-                .type(convertType(raw.getType()))
+                .status(AssetStatus.fromCode(raw.getStatus()).toName())
+                .type(AssetType.fromCode(raw.getType()).toName())
                 .accessLevel(raw.getAccessLevel())
                 .approvalStatus(raw.getApprovalStatus())
                 .costPerHour(raw.getCostPerHour())
@@ -60,22 +63,5 @@ public class AssetDetailResponseDto {
                 .createdAt(raw.getCreatedAt())
                 .createdBy(raw.getCreatedBy())
                 .build();
-    }
-
-    private static String convertStatus(Integer s) {
-        return switch (s) {
-            case 0 -> "AVAILABLE";
-            case 1 -> "UNAVAILABLE";
-            case 2 -> "MAINTENANCE";
-            default -> "UNKNOWN";
-        };
-    }
-
-    private static String convertType(Integer t) {
-        return switch (t) {
-            case 0 -> "STATIC";
-            case 1 -> "DYNAMIC";
-            default -> "UNKNOWN";
-        };
     }
 }
