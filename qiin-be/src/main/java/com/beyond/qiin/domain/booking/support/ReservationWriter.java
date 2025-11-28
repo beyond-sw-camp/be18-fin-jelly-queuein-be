@@ -22,6 +22,6 @@ public class ReservationWriter {
     }
 
     public List<Reservation> findFutureUsableReservations(Long assetId) {
-        return reservationJpaRepository.findFutureUsableReservationsByUserAndAsset(assetId);
+        return reservationJpaRepository.findFutureUsableReservationsByAsset(assetId);
     }
 }
