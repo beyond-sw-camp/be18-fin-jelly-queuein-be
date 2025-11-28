@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.dto.reservation.response.reservable_asset;
 
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,11 +16,9 @@ public class ReservableAssetResponseDto {
 
     private final String assetName;
 
-    //    private final String assetType;
+    private final String assetType;
 
     private final String categoryName;
-
-    //    private final String assetStatus;
 
     private final boolean needsApproval;
 
@@ -29,9 +28,8 @@ public class ReservableAssetResponseDto {
         return ReservableAssetResponseDto.builder()
                 .assetId(raw.getAssetId())
                 .assetName(raw.getAssetName())
-                //            .assetType(raw.getAssetType())
+                .assetType(AssetType.from(raw.getAssetType()).name())
                 .categoryName(raw.getCategoryName())
-                //            .assetStatus(raw.getAssetStatus())
                 .needsApproval(raw.isNeedsApproval())
                 .isReservable(true)
                 .build();
