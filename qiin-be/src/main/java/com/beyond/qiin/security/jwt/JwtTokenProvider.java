@@ -82,15 +82,15 @@ public class JwtTokenProvider {
 
             final String tokenType = claims.get("token_type", String.class);
             if (tokenType == null || !tokenType.equals(expectedType)) {
-                log.warn("JWT 타입 불일치 — 기대: {}, 실제: {}", expectedType, tokenType);
+                log.debug("[JWT] 타입 불일치");
                 return false;
             }
 
             return true;
         } catch (ExpiredJwtException e) {
-            log.warn("[Validation] {} 토큰 만료: {}", expectedType, e.getMessage());
+            log.debug("[Validation] {} 토큰 만료", expectedType);
         } catch (JwtException | IllegalArgumentException e) {
-            log.warn("[Validation] {} 토큰 유효하지 않음: {}", expectedType, e.getMessage());
+            log.debug("[Validation] {} 토큰 유효하지 않음", expectedType);
         }
         return false;
     }
