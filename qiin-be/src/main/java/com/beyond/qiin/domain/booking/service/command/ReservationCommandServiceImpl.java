@@ -103,7 +103,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservation.addAttendants(attendants);
 
-
         reservationWriter.save(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
