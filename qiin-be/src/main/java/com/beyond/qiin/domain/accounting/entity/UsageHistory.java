@@ -2,6 +2,7 @@ package com.beyond.qiin.domain.accounting.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import com.beyond.qiin.common.CreatedBaseEntity;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.persistence.*;
@@ -15,7 +16,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "usage_history")
-public class UsageHistory {
+public class UsageHistory extends CreatedBaseEntity {
 
     @Id
     @Column(name = "usage_history_id")
@@ -50,14 +51,6 @@ public class UsageHistory {
 
     @Column(name = "usage_ratio", precision = 12, scale = 3, nullable = false)
     private BigDecimal usageRatio;
-
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
-    private Instant createdAt;
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = Instant.now();
-    }
 
     public static UsageHistory create(
             final Asset asset,

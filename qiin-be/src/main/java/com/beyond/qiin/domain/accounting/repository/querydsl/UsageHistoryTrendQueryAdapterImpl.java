@@ -3,6 +3,7 @@ package com.beyond.qiin.domain.accounting.repository.querydsl;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.raw.UsageHistoryTrendRawDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.raw.UsageHistoryTrendRawDto.UsageAggregate;
 import com.beyond.qiin.domain.accounting.entity.QUsageHistory;
+import com.beyond.qiin.domain.accounting.exception.UsageHistoryException;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
@@ -42,25 +43,37 @@ public class UsageHistoryTrendQueryAdapterImpl implements UsageHistoryTrendQuery
 
     private AssetInfoResult resolveAsset(Long assetId, String assetName) {
 
+        // 1) assetId 직접 검색
         if (assetId != null) {
             String name =
                     queryFactory.select(a.name).from(a).where(a.id.eq(assetId)).fetchOne();
 
+            if (name == null) {
+                throw UsageHistoryException.invalidAssetId();
+            }
+
             return new AssetInfoResult(name, 1);
         }
 
+        // 2) assetName 검색
         if (assetName != null && !assetName.isBlank()) {
             List<String> names = queryFactory
                     .select(a.name)
                     .from(a)
-                    .where(a.name.contains(assetName))
+                    .where(a.name.containsIgnoreCase(assetName))
                     .limit(1)
                     .fetch();
 
-            return new AssetInfoResult(names.get(0), 1);
+            if (names.isEmpty()) {
+                throw UsageHistoryException.invalidAssetName();
+            }
+
+            return new AssetInfoResult(names.getFirst(), 1);
         }
 
+        // 3) 전체 자원 기준
         Long cnt = queryFactory.select(a.id.count()).from(a).fetchOne();
+
         return new AssetInfoResult("전체", cnt != null ? cnt.intValue() : 0);
     }
 
@@ -71,7 +84,6 @@ public class UsageHistoryTrendQueryAdapterImpl implements UsageHistoryTrendQuery
         if (assetId != null) builder.and(u.asset.id.eq(assetId));
         else if (assetName != null && !assetName.isBlank()) builder.and(u.asset.name.contains(assetName));
 
-        // ✔ QueryDSL 7 정식 문법
         var monthExpr = u.startAt.month();
         var actualSumExpr = u.actualUsageTime.sumLong();
         var reservedSumExpr = u.usageTime.sumLong();
@@ -99,7 +111,7 @@ public class UsageHistoryTrendQueryAdapterImpl implements UsageHistoryTrendQuery
                             .build());
         }
 
-        // ✔ 항상 1~12월 채움
+        // 항상 1~12월 채움
         for (int m = 1; m <= 12; m++) {
             map.putIfAbsent(
                     m, UsageAggregate.builder().actualUsage(0).reservedUsage(0).build());

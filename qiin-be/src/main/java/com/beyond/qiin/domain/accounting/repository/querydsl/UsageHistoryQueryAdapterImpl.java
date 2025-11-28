@@ -127,7 +127,6 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                 .reserverNames(names)
                 .billAmount(base.getBillAmount())
                 .actualBillAmount(base.getActualBillAmount())
-                .fixedCost(base.getFixedCost())
                 .build();
     }
 }

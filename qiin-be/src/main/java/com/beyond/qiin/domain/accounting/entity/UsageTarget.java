@@ -1,8 +1,8 @@
 package com.beyond.qiin.domain.accounting.entity;
 
+import com.beyond.qiin.common.CreatedBaseEntity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.Instant;
 import lombok.*;
 
 @Entity
@@ -17,7 +17,7 @@ import lombok.*;
                     name = "uq_usage_target_year",
                     columnNames = {"year"})
         })
-public class UsageTarget {
+public class UsageTarget extends CreatedBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,27 +30,19 @@ public class UsageTarget {
     @Column(name = "target_rate", precision = 12, scale = 3, nullable = false)
     private BigDecimal targetRate;
 
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP(6)", nullable = false)
-    private Instant createdAt;
-
     @Column(name = "created_by", nullable = false)
     private Long createdBy;
 
-    @PrePersist
-    public void prePersist() {
-        if (this.createdAt == null) {
-            this.createdAt = Instant.now();
-        }
-        if (this.createdBy == null) {
-            this.createdBy = 0L; // 시스템 계정 or 기본값
-        }
-    }
-
     public static UsageTarget create(int year, BigDecimal targetRate, Long createdBy) {
-        return UsageTarget.builder()
-                .year(year)
-                .targetRate(targetRate)
-                .createdBy(createdBy)
-                .build();
+        if (createdBy == null) {
+            throw new IllegalArgumentException("createdBy cannot be null");
+        }
+
+        UsageTarget target = new UsageTarget();
+        target.year = year;
+        target.targetRate = targetRate;
+        target.createdBy = createdBy;
+
+        return target;
     }
 }
