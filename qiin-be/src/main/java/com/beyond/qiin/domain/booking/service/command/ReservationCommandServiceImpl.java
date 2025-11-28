@@ -56,7 +56,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
         assetCommandService.isAvailable(assetId); // 자원 자체가 지금 사용 가능한가에 대한 확인
 
-        Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.PENDING);
+        Reservation reservation = Reservation.create(createReservationRequestDto , applicant, asset, ReservationStatus.PENDING);
 
         List<Attendant> attendants = attendantUsers.stream()
                 .map(user -> Attendant.create(user, reservation))
@@ -88,7 +88,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
 
         // 선착순 자원은 자동 승인
-        Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
+        Reservation reservation = Reservation.create(createReservationRequestDto, applicant, asset, ReservationStatus.APPROVED);
         reservation.setIsApproved(true); // 승인됨
 
         List<Attendant> attendants = attendantUsers.stream()
@@ -280,20 +280,5 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         return false;
     }
 
-    private String statusToString(final Integer status) {
-        if (status == 0) {
-            return "PENDING";
-        } else if (status == 1) {
-            return "APPROVED";
-        } else if (status == 2) {
-            return "USING";
-        } else if (status == 3) {
-            return "REJECTED";
-        } else if (status == 4) {
-            return "CANCELED";
-        } else if (status == 5) {
-            return "COMPLETED";
-        }
-        return "INVALID";
-    }
+
 }

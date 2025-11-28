@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
@@ -102,27 +103,28 @@ public class Reservation extends BaseEntity {
     @Column(name = "reason", length = 255, nullable = true) // 255 기본
     private String reason;
 
-    // TODO : 생성 메서드 엔티티 안으로
+    // TODO : 엔티티의 생성 메서드
     // 인자가 많아서 dto로 두는 게 나아보임
-    //    public static Reservation create(
-    //        User applicant,
-    //        Asset asset,
-    //        Instant startAt,
-    //        Instant endAt,
-    //        String description,
-    //
-    //    ){
-    //        return Reservation.builder()
-    //            .applicant(applicant)
-    //            .respondent(null)
-    //            .asset(asset)
-    //            .startAt(startAt)
-    //            .endAt(endAt)
-    //            .description(description)
-    //            .status(ReservationStatus.PENDING.getCode())
-    //            .build();
-    //    }
-    //
+    // dto에 의존적이게 되면 다른 상황별 생성 메서드 여러개 필요
+    // 빌더를 우선적으로 활요하기로 했으므로 그 장점을 살릴 수 있도록 dto에 우선적으로 맞춤
+    public static Reservation create(
+        final CreateReservationRequestDto createReservationRequestDto,
+        final User applicant,
+        final Asset asset,
+
+        final ReservationStatus reservationStatus
+    ){
+        return Reservation.builder()
+            .applicant(applicant)
+            .respondent(null)
+            .asset(asset)
+            .startAt(createReservationRequestDto.getStartAt())
+            .endAt(createReservationRequestDto.getEndAt())
+            .description(createReservationRequestDto.getDescription())
+            .status(reservationStatus.getCode())
+            .build();
+    }
+
 
     // 연관관계 편의 메서드
 
