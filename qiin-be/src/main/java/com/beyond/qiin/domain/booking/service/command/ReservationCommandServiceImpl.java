@@ -121,6 +121,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
         reservationWriter.save(reservation);
+        reservationEventPublisher.publishUpdated(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -151,7 +152,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.start(); // status using, 실제 시작 시간 추가
         reservationWriter.save(reservation);
 
-        reservationEventPublisher.publishUpdated(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -166,7 +166,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.end(); // status complete, 실제 종료 시간 추가
         reservationWriter.save(reservation);
 
-        reservationEventPublisher.publishUpdated(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -183,8 +182,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.cancel();
 
         reservationWriter.save(reservation);
-
-        reservationEventPublisher.publishUpdated(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -229,8 +226,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         }
 
         reservationWriter.save(reservation);
-
-        reservationEventPublisher.publishUpdated(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }

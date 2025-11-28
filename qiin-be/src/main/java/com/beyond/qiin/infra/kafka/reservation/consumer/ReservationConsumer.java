@@ -35,7 +35,7 @@ public class ReservationConsumer {
     public void onUpdated(String message) {
         try {
             ReservationUpdatedPayload payload = objectMapper.readValue(message, ReservationUpdatedPayload.class);
-            log.info("received reservation-created payload: {}", payload);
+            log.info("received reservation-updated payload: {}", payload);
 
             //            notificationService.notifyUpdated(payload);
 

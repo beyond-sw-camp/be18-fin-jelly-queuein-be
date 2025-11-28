@@ -13,6 +13,8 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReservationUpdatedPayload {
 
+    private Long reservationId;
+
     private Long assetId; // 자원 id
 
     @NotNull
@@ -42,6 +44,7 @@ public class ReservationUpdatedPayload {
     public static ReservationUpdatedPayload from(Reservation reservation) {
 
         return ReservationUpdatedPayload.builder()
+                .reservationId(reservation.getId())
                 .assetId(reservation.getAsset().getId())
                 .applicantId(reservation.getApplicant().getId())
                 .respondentId(
