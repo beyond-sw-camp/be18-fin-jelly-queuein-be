@@ -1,11 +1,10 @@
 package com.beyond.qiin.domain.inventory.dto.asset.response;
 
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailResponseDto;
-import java.math.BigDecimal;
-import java.time.Instant;
-
 import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
+import java.math.BigDecimal;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

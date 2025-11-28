@@ -1,11 +1,10 @@
 package com.beyond.qiin.domain.inventory.enums;
 
 import com.beyond.qiin.common.enums.EnumCode;
+import com.beyond.qiin.domain.inventory.exception.AssetException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.beyond.qiin.domain.inventory.exception.AssetException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +40,6 @@ public enum AssetStatus implements EnumCode {
         }
         return status;
     }
-
 
     // enum → int
     public int toCode() {
