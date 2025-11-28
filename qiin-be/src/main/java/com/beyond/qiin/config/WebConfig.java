@@ -2,7 +2,6 @@ package com.beyond.qiin.config;
 
 import com.beyond.qiin.security.resolver.ArgumentResolver;
 import com.beyond.qiin.security.resolver.CurrentUserIdResolver;
-import com.beyond.qiin.security.resolver.CurrentUserPermissionsResolver;
 import com.beyond.qiin.security.resolver.CurrentUserRoleResolver;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +16,11 @@ public class WebConfig implements WebMvcConfigurer {
     private final ArgumentResolver argumentResolver;
     private final CurrentUserIdResolver currentUserIdResolver;
     private final CurrentUserRoleResolver currentUserRoleResolver;
-    private final CurrentUserPermissionsResolver currentUserPermissionsResolver;
 
     @Override
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(argumentResolver);
         resolvers.add(currentUserIdResolver);
         resolvers.add(currentUserRoleResolver);
-        resolvers.add(currentUserPermissionsResolver);
     }
 }
