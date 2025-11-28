@@ -1,8 +1,6 @@
 package com.beyond.qiin.security.jwt;
 
 import com.beyond.qiin.domain.iam.entity.User;
-import com.beyond.qiin.domain.iam.repository.UserJpaRepository;
-import com.beyond.qiin.domain.iam.support.userrole.UserRoleReader;
 import com.beyond.qiin.infra.redis.iam.permission.PermissionCacheAdapter;
 import com.beyond.qiin.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
@@ -30,10 +28,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-
-    private final UserJpaRepository userJpaRepository;
-    private final UserRoleReader userRoleReader;
-
     private final PermissionCacheAdapter permissionCache;
     private final RedisTokenRepository redisTokenRepository;
     private final AuthenticationEntryPoint authenticationEntryPoint;
@@ -65,8 +59,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 블랙리스트 토큰이면 인증 없이 다음 필터로 넘김
         if (redisTokenRepository.isBlacklisted(token)) {
-            log.warn("[JwtFilter] 블랙리스트 토큰으로 요청 차단");
-            filterChain.doFilter(request, response);
+            authenticationEntryPoint.commence(
+                    request, response, new InsufficientAuthenticationException("블랙리스트 처리된 토큰입니다."));
             return;
         }
 
@@ -80,28 +74,23 @@ public class JwtFilter extends OncePerRequestFilter {
             Claims claims = jwtTokenProvider.getClaims(token);
             Long userId = Long.valueOf(claims.getSubject());
             String role = claims.get("role", String.class);
+            final String email = claims.get("email", String.class);
+            List<String> permissions = claims.get("permissions", List.class);
 
-            // TODO: DB 조회 제거
-            User user = userJpaRepository.findById(userId).orElse(null);
-            if (user == null) {
-                filterChain.doFilter(request, response);
-                return;
+            // JWT payload에 permissions 없으면 캐시 조회
+            if (permissions == null) {
+                permissions = permissionCache.get(userId);
             }
-
-            // 권한 캐시 조회
-            List<String> permissions = permissionCache.get(userId);
 
             if (permissions == null) {
-                permissions = userRoleReader.findPermissionsByUserId(userId);
-                permissionCache.save(userId, permissions, PERMISSION_TTL);
+                permissions = List.of();
             }
 
-            // GrantedAuthority 생성
-            final List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority(role));
             permissions.forEach(p -> authorities.add(new SimpleGrantedAuthority(p)));
 
-            CustomUserDetails userDetails = new CustomUserDetails(userId, user.getEmail(), authorities);
+            CustomUserDetails userDetails = new CustomUserDetails(userId, email, authorities);
 
             // 인증 객체 설정
             UsernamePasswordAuthenticationToken authentication =

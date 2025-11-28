@@ -13,6 +13,7 @@ import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.jwt.RedisTokenRepository;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,57 +35,34 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     @Transactional
     public LoginResult login(final LoginRequestDto request) {
 
-        // 로그인 키 확장성 유지 (현재는 email 기반)
-        String loginKey = request.getLoginKey();
-
-        // 사용자 조회
-        final User user = userReader.findByEmail(loginKey);
-        // final User user = userReader.findByUserNo(loginKey);
-
-        // 비밀번호 검증
+        final User user = getUserOrThrow(request.getLoginKey());
         validatePassword(request.getPassword(), user.getPassword());
+        final Long userId = user.getId();
 
-        // 사용자 역할 조회 (v1: 단일 역할)
-        final String role = userRoleReader.findRoleNameByUserId(user.getId());
+        final UserRoleContext ctx = getUserRoleContext(userId);
 
-        // JWT 발급
-        String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), role);
+        // access + refresh = 하나의 헬퍼에서 발급
+        TokenPair tokens = issueTokenPair(userId, ctx.role(), user.getEmail(), ctx.permissions());
 
-        // 임시 비밀번호 사용 여부 확인
         user.validateTempPasswordUsage();
-        // 최초 로그인(lastLoginAt == null) → 로그인 허용
-        // 그 이후 → 로그인 차단
         if (user.isTempPassword() && user.isFirstLogin()) {
-            return TempPwLoginResponseDto.fromEntity(user, accessToken);
+            return TempPwLoginResponseDto.fromEntity(user, tokens.access());
         }
 
-        // 리프레시 토큰 발급
-        final String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), role);
-
-        redisTokenRepository.saveRefreshToken(
-                user.getId(), refreshToken, Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidityMillis()));
-
-        // 로그인 시각 업데이트
         user.updateLastLoginAt(Instant.now());
 
-        // DTO 응답 생성
-        return LoginResponseDto.of(user, role, accessToken, refreshToken);
+        return LoginResponseDto.of(user, ctx.role(), tokens.access(), tokens.refresh());
     }
 
     @Override
     @Transactional
     public void logout(final String accessToken) {
 
-        // 사용자 ID 추출
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
-        // Refresh Token 삭제
         redisTokenRepository.deleteRefreshToken(userId);
 
-        // Access Token 남은 시간 계산
         long expiresIn = jwtTokenProvider.getRemainingValidityMillis(accessToken);
-
-        // Access Token 블랙리스트 추가
         redisTokenRepository.blacklistAccessToken(accessToken, Duration.ofMillis(expiresIn));
     }
 
@@ -92,33 +70,70 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     @Transactional
     public LoginResult refresh(final String refreshToken) {
 
+        validateRefreshToken(refreshToken);
+
+        final Long userId = jwtTokenProvider.getUserId(refreshToken);
+        final User user = userReader.findById(userId);
+
+        final UserRoleContext ctx = getUserRoleContext(userId);
+
+        TokenPair newTokens = issueTokenPair(userId, ctx.role(), user.getEmail(), ctx.permissions());
+
+        return LoginResponseDto.of(user, ctx.role(), newTokens.access(), newTokens.refresh());
+    }
+
+    // -----------------------
+    // 헬퍼 메서드
+    // -----------------------
+
+    // 이메일로 유저 검증
+    private User getUserOrThrow(final String loginKey) {
+        return userReader.findByEmail(loginKey);
+    }
+
+    // 리프레시 토큰 검증
+    private void validateRefreshToken(final String refreshToken) {
         if (!jwtTokenProvider.validateRefreshToken(refreshToken)) {
             throw AuthException.tokenExpired();
         }
 
         final Long userId = jwtTokenProvider.getUserId(refreshToken);
-
         final String storedToken = redisTokenRepository.getRefreshToken(userId);
-        if (storedToken == null || !storedToken.equals(refreshToken)) {
+
+        if (!refreshToken.equals(storedToken)) {
             throw AuthException.unauthorized();
         }
-
-        final User user = userReader.findById(userId);
-        final String role = userRoleReader.findRoleNameByUserId(userId);
-
-        final String newAccess = jwtTokenProvider.generateAccessToken(userId, role);
-        final String newRefresh = jwtTokenProvider.generateRefreshToken(userId, role);
-
-        redisTokenRepository.saveRefreshToken(
-                userId, newRefresh, Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidityMillis()));
-
-        return LoginResponseDto.of(user, role, newAccess, newRefresh);
     }
 
-    // 비밀번호 검증 헬퍼 메서드
-    private void validatePassword(final String rawPassword, final String encodedPassword) {
-        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+    // 비밀번호 일치 여부 검증
+    private void validatePassword(final String raw, final String encoded) {
+        if (!passwordEncoder.matches(raw, encoded)) {
             throw UserException.invalidPassword();
         }
     }
+
+    // 사용자 역할 및 권한 조회
+    private UserRoleContext getUserRoleContext(final Long userId) {
+        String role = userRoleReader.findRoleNameByUserId(userId);
+        List<String> permissions = userRoleReader.findPermissionsByUserId(userId);
+        return new UserRoleContext(role, permissions);
+    }
+
+    // AccessToken + RefreshToken 동시 발급
+    private TokenPair issueTokenPair(
+            final Long userId, final String role, final String email, final List<String> permissions) {
+        final String access = jwtTokenProvider.generateAccessToken(userId, role, email, permissions);
+        final String refresh = jwtTokenProvider.generateRefreshToken(userId, role);
+
+        redisTokenRepository.saveRefreshToken(
+                userId, refresh, Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidityMillis()));
+
+        return new TokenPair(access, refresh);
+    }
+
+    // JWT 2종 반환 DTO
+    private record TokenPair(String access, String refresh) {}
+
+    // 역할 + 권한 조회값 묶음
+    private record UserRoleContext(String role, List<String> permissions) {}
 }

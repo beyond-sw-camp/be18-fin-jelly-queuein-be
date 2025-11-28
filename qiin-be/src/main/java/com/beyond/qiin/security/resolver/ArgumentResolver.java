@@ -34,18 +34,6 @@ public class ArgumentResolver implements HandlerMethodArgumentResolver {
             throw AuthException.unauthorized();
         }
 
-        String header = webRequest.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw AuthException.unauthorized();
-        }
-
-        Object token = authentication.getDetails();
-
-        if (token == null) {
-            throw AuthException.unauthorized();
-        }
-
-        return token.toString();
+        return authentication.getDetails().toString();
     }
 }
