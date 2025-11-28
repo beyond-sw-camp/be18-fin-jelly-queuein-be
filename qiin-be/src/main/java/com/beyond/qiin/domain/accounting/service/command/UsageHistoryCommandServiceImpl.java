@@ -17,24 +17,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class UsageHistoryCommandServiceImpl implements UsageHistoryCommandService {
 
     private final UsageHistoryJpaRepository usageHistoryJpaRepository;
+    private final UserHistoryCommandService userHistoryCommandService;
     private final SettlementCommandService settlementCommandService;
 
     @Override
     @Transactional
     public UsageHistory createUsageHistory(Asset asset, Reservation reservation) {
 
-        // 계산
         int usageTime = calculateUsageTime(reservation.getStartAt(), reservation.getEndAt());
         int actualUsageTime = calculateActualUsageTime(reservation.getActualStartAt(), reservation.getActualEndAt());
         BigDecimal usageRatio = calculateUsageRatio(usageTime, actualUsageTime);
 
-        // 엔티티 생성 (값을 한번에 넣기)
+        // 1) UsageHistory 생성 & 저장
         UsageHistory history = UsageHistory.create(asset, reservation, usageTime, actualUsageTime, usageRatio);
         UsageHistory savedHistory = usageHistoryJpaRepository.save(history);
 
+        // 2) UserHistory 생성
+        userHistoryCommandService.createUserHistories(reservation, savedHistory);
+
+        // 3) Settlement 생성
         settlementCommandService.createSettlement(savedHistory);
 
-        // 저장
         return savedHistory;
     }
 

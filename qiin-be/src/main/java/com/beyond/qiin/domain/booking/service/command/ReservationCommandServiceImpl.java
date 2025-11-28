@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.service.command;
 
 import com.beyond.qiin.common.annotation.DistributedLock;
+import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandServiceImpl;
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
@@ -41,6 +42,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final AssetCommandService assetCommandService;
     private final RedissonClient redissonClient;
     private final AttendantJpaRepository attendantJpaRepository;
+    private final UsageHistoryCommandServiceImpl usageHistoryCommandService;
 
     // TODO : 선착순, 승인 예약 중복 처리
     // TODO : entity 생성은 entity 안에서
@@ -155,6 +157,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Reservation reservation = reservationReader.getReservationById(reservationId);
         reservation.end(); // status complete, 실제 종료 시간 추가
         reservationWriter.save(reservation);
+
+        usageHistoryCommandService.createUsageHistory(reservation.getAsset(), reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
