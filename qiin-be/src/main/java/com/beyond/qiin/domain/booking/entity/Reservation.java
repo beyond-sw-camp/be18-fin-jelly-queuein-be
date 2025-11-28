@@ -201,10 +201,10 @@ public class Reservation extends BaseEntity {
     public void markUnavailable(String reason) {
         ReservationStatus currentStatus = this.getStatus();
 
-        //미래에 사용 불가능한 경우
+        // 미래에 사용 불가능한 경우
         if (currentStatus == ReservationStatus.CANCELED
-            || currentStatus == ReservationStatus.COMPLETED
-            || currentStatus == ReservationStatus.REJECTED) {
+                || currentStatus == ReservationStatus.COMPLETED
+                || currentStatus == ReservationStatus.REJECTED) {
             return;
         }
 

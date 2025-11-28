@@ -64,15 +64,13 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
 """)
     List<Reservation> findByUserIdAndDate(Long userId, Instant startOfDay, Instant endOfDay);
 
-
-    @Query("""
+    @Query(
+            """
     SELECT r
     FROM Reservation r
     WHERE r.asset.id = :assetId
       AND r.startAt > CURRENT_TIMESTAMP
       AND r.status IN (0, 1, 2)
 """)
-    List<Reservation> findFutureUsableReservationsByAsset(
-        Long assetId
-    );
+    List<Reservation> findFutureUsableReservationsByAsset(Long assetId);
 }

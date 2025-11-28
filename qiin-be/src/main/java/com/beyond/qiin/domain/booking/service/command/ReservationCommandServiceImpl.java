@@ -234,7 +234,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservationWriter.save(reservation);
     }
 
-    //자원 상태 변경 시 예약 상태 변경
+    // 자원 상태 변경 시 예약 상태 변경
     @Override
     @Transactional
     public void updateReservationsForAsset(Long assetId, int assetStatus) {
