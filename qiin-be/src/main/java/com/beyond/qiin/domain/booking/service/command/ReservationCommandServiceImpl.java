@@ -166,7 +166,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.end(); // status complete, 실제 종료 시간 추가
         reservationWriter.save(reservation);
 
-
         return ReservationResponseDto.fromEntity(reservation);
     }
 
