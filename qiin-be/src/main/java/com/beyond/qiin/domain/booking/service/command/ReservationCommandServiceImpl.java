@@ -56,7 +56,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
         assetCommandService.isAvailable(assetId); // 자원 자체가 지금 사용 가능한가에 대한 확인
 
-        Reservation reservation = Reservation.create(createReservationRequestDto , applicant, asset, ReservationStatus.PENDING);
+        Reservation reservation =
+                Reservation.create(createReservationRequestDto, applicant, asset, ReservationStatus.PENDING);
 
         List<Attendant> attendants = attendantUsers.stream()
                 .map(user -> Attendant.create(user, reservation))
@@ -88,7 +89,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
 
         // 선착순 자원은 자동 승인
-        Reservation reservation = Reservation.create(createReservationRequestDto, applicant, asset, ReservationStatus.APPROVED);
+        Reservation reservation =
+                Reservation.create(createReservationRequestDto, applicant, asset, ReservationStatus.APPROVED);
         reservation.setIsApproved(true); // 승인됨
 
         List<Attendant> attendants = attendantUsers.stream()
@@ -232,6 +234,21 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservationWriter.save(reservation);
     }
 
+    //자원 상태 변경 시 예약 상태 변경
+    @Override
+    @Transactional
+    public void updateReservationsForAsset(Long assetId, int assetStatus) {
+        // 1 = UNAVAILABLE, 2 = MAINTENANCE
+        if (assetStatus != 1 && assetStatus != 2) return;
+
+        // pending, approved, using 대상(0, 1, 2)
+        List<Reservation> reservations = reservationWriter.findFutureUsableReservations(assetId);
+
+        for (Reservation reservation : reservations) {
+            reservation.markUnavailable("자원 사용 불가 상태에 따른 자동 취소");
+        }
+    }
+
     // 하드 딜리트
     public void hardDeleteReservation(final Long reservationId) {
         reservationWriter.hardDelete(reservationId);
@@ -279,6 +296,4 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         }
         return false;
     }
-
-
 }

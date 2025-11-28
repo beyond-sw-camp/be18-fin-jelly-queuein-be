@@ -108,23 +108,20 @@ public class Reservation extends BaseEntity {
     // dto에 의존적이게 되면 다른 상황별 생성 메서드 여러개 필요
     // 빌더를 우선적으로 활요하기로 했으므로 그 장점을 살릴 수 있도록 dto에 우선적으로 맞춤
     public static Reservation create(
-        final CreateReservationRequestDto createReservationRequestDto,
-        final User applicant,
-        final Asset asset,
-
-        final ReservationStatus reservationStatus
-    ){
+            final CreateReservationRequestDto createReservationRequestDto,
+            final User applicant,
+            final Asset asset,
+            final ReservationStatus reservationStatus) {
         return Reservation.builder()
-            .applicant(applicant)
-            .respondent(null)
-            .asset(asset)
-            .startAt(createReservationRequestDto.getStartAt())
-            .endAt(createReservationRequestDto.getEndAt())
-            .description(createReservationRequestDto.getDescription())
-            .status(reservationStatus.getCode())
-            .build();
+                .applicant(applicant)
+                .respondent(null)
+                .asset(asset)
+                .startAt(createReservationRequestDto.getStartAt())
+                .endAt(createReservationRequestDto.getEndAt())
+                .description(createReservationRequestDto.getDescription())
+                .status(reservationStatus.getCode())
+                .build();
     }
-
 
     // 연관관계 편의 메서드
 
@@ -199,6 +196,20 @@ public class Reservation extends BaseEntity {
             throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.startAt = startAt;
         this.endAt = endAt;
+    }
+
+    public void markUnavailable(String reason) {
+        ReservationStatus currentStatus = this.getStatus();
+
+        //미래에 사용 불가능한 경우
+        if (currentStatus == ReservationStatus.CANCELED
+            || currentStatus == ReservationStatus.COMPLETED
+            || currentStatus == ReservationStatus.REJECTED) {
+            return;
+        }
+
+        this.setStatus(ReservationStatus.UNAVAILABLE);
+        this.reason = reason;
     }
 
     public List<Attendant> changeAttendants(List<User> users) {

@@ -2,6 +2,7 @@ package com.beyond.qiin.domain.booking.support;
 
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.repository.ReservationJpaRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,5 +19,9 @@ public class ReservationWriter {
     public void hardDelete(Long reservationId) {
         Reservation reservation = reservationReader.getReservationById(reservationId);
         reservationJpaRepository.delete(reservation);
+    }
+
+    public List<Reservation> findFutureUsableReservations(Long assetId) {
+        return reservationJpaRepository.findFutureUsableReservationsByUserAndAsset(assetId);
     }
 }

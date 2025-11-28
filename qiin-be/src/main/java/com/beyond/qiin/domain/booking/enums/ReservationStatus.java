@@ -15,7 +15,8 @@ public enum ReservationStatus implements EnumCode {
     USING(2),
     REJECTED(3),
     CANCELED(4),
-    COMPLETED(5);
+    COMPLETED(5),
+    UNAVAILABLE(6); //자원 사용 불가 시
 
     private final int code;
 
