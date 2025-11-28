@@ -2,6 +2,7 @@ package com.beyond.qiin.security.jwt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -18,7 +19,7 @@ public class JwtTokenProviderTest {
         ReflectionTestUtils.setField(
                 jwtTokenProvider,
                 "secretKey",
-                "mySuperSecretKeyForJwtToken1234567890_mySuperSecretKeyForJwtToken1234567890");
+                "pZ8u2nXf4Yp7tPAkLWc9N3HzX7G8eU0LwD5mS2a8vQ9oT1rV6yF3kZ4uB7hJ9lQ2jM0xC5tR8uW3pS6oV4rM8iN2bF5gH7");
         ReflectionTestUtils.setField(jwtTokenProvider, "accessTokenExpiration", 60_000L);
         ReflectionTestUtils.setField(jwtTokenProvider, "refreshTokenExpiration", 120_000L);
 
@@ -27,7 +28,8 @@ public class JwtTokenProviderTest {
 
     @Test
     void testGenerateAndValidateAccessToken() {
-        String accessToken = jwtTokenProvider.generateAccessToken(1L, "ADMIN");
+        String accessToken = jwtTokenProvider.generateAccessToken(
+                1L, "ADMIN", "test@example.com", List.of("perm.read", "perm.write"));
         assertThat(accessToken).isNotNull();
 
         boolean isValid = jwtTokenProvider.validateAccessToken(accessToken);

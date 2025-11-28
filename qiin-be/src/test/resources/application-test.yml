@@ -33,6 +33,8 @@ spring:
     redis:
       host: 0
       port: 0
+      repositories:
+        enabled: false
 
   flyway:
     enabled: false
