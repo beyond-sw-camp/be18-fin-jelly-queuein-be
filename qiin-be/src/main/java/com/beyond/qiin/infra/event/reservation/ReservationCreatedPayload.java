@@ -29,7 +29,7 @@ public class ReservationCreatedPayload {
     private String endAt; // 예약 종료 시간
 
     @NotNull
-    private boolean isApproved; // 승인 여부
+    private Boolean isApproved; // 승인 여부
 
     @NotNull
     private String status; // 예약 상태
