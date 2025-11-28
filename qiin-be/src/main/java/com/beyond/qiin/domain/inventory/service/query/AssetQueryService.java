@@ -29,12 +29,4 @@ public interface AssetQueryService {
     AssetDetailResponseDto getAssetDetail(final Long assetId);
 
     Asset getAssetById(final Long assetId);
-
-    String assetStatusToString(final Integer status);
-
-    String assetTypeToString(final Integer type);
-
-    int assetStatusToInt(final String status);
-
-    int assetTypeToInt(final String type);
 }

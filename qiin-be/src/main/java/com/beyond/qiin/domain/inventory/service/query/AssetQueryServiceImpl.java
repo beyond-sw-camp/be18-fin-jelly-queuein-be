@@ -147,45 +147,4 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     public Asset getAssetById(final Long assetId) {
         return assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
     }
-
-    @Override
-    public String assetStatusToString(final Integer status) {
-        if (status == 0) {
-            return "AVAILABLE";
-        } else if (status == 1) {
-            return "UNAVAILABLE";
-        } else {
-            return "MAINTENANCE";
-        }
-    }
-
-    @Override
-    public String assetTypeToString(final Integer type) {
-        if (type == 0) {
-            return "STATIC";
-        } else {
-            return "DYNAMIC";
-        }
-    }
-
-    @Override
-    public int assetStatusToInt(final String status) {
-
-        return switch (status.toUpperCase()) {
-            case "AVAILABLE" -> 0;
-            case "UNAVAILABLE" -> 1;
-            case "MAINTENANCE" -> 2;
-            default -> -1;
-        };
-    }
-
-    @Override
-    public int assetTypeToInt(final String type) {
-
-        return switch (type.toUpperCase()) {
-            case "STATIC" -> 0;
-            case "DYNAMIC" -> 1;
-            default -> -1;
-        };
-    }
 }

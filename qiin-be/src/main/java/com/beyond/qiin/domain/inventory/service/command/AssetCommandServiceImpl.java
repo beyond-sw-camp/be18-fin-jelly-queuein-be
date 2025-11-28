@@ -11,7 +11,6 @@ import com.beyond.qiin.domain.inventory.entity.Category;
 import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
-import com.beyond.qiin.domain.inventory.exception.AssetException.AssetErrorCode;
 import com.beyond.qiin.domain.inventory.exception.CategoryException;
 import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
@@ -127,13 +126,18 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     @Transactional
     public void softDeleteAsset(final Long assetId, final Long userId) {
 
-        // 나중에 권한 검증 추가
-
         // 삭제하는 유저 찾기
         userReader.findById(userId);
 
         // 삭제할 자원 찾기
         Asset asset = getAssetById(assetId);
+
+        // 자식 자원 있으면 삭제 안됨 예외 처리
+        if (assetClosureQueryAdapter.existsChildren(assetId)) {
+            throw AssetException.hasChildren();
+        }
+
+        // 예약 중인 자원을 다 디나이 처리
 
         // softDelete로 삭제 처리
         asset.softDelete(userId);
@@ -243,7 +247,8 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     public boolean isAvailable(final Long assetId) {
         Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
         if (asset.getStatus() == 1 || asset.getStatus() == 2) {
-            throw new AssetException(AssetErrorCode.ASSET_NOT_AVAILABLE);
+            //            throw new AssetException(AssetErrorCode.ASSET_NOT_AVAILABLE);
+            throw AssetException.assetNotAvailable();
         }
         return true;
     }
