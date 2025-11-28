@@ -5,6 +5,8 @@ import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.jwt.RedisTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -31,24 +33,24 @@ public class ArgumentResolver implements HandlerMethodArgumentResolver {
             final NativeWebRequest webRequest,
             final WebDataBinderFactory binderFactory) {
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw AuthException.unauthorized();
+        }
+
         String header = webRequest.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
             throw AuthException.unauthorized();
         }
 
-        String token = header.substring(7);
+        Object token = authentication.getDetails();
 
-        // 블랙리스트 체크
-        if (redisTokenRepository.isBlacklisted(token)) {
+        if (token == null) {
             throw AuthException.unauthorized();
         }
 
-        // 액세스 토큰 유효성 검사
-        if (!jwtTokenProvider.validateAccessToken(token)) {
-            throw AuthException.tokenExpired();
-        }
-
-        return token;
+        return token.toString();
     }
 }
