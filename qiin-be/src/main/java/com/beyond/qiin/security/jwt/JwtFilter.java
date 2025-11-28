@@ -3,6 +3,7 @@ package com.beyond.qiin.security.jwt;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.repository.UserJpaRepository;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleReader;
+import com.beyond.qiin.infra.redis.iam.permission.PermissionCacheAdapter;
 import com.beyond.qiin.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -10,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +30,19 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+
     private final UserJpaRepository userJpaRepository;
     private final UserRoleReader userRoleReader;
+
+    private final PermissionCacheAdapter permissionCache;
     private final RedisTokenRepository redisTokenRepository;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
+    private static final Duration PERMISSION_TTL = Duration.ofMinutes(10);
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(
+            final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain)
             throws ServletException, IOException {
 
         final String header = request.getHeader("Authorization");
@@ -62,41 +70,53 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // RefreshToken은 인증에 사용하면 안 됨
-        if (jwtTokenProvider.validateAccessToken(token)) {
-            try {
-                Claims claims = jwtTokenProvider.getClaims(token);
-                Long userId = Long.valueOf(claims.getSubject());
+        if (!jwtTokenProvider.validateAccessToken(token)) {
+            authenticationEntryPoint.commence(
+                    request, response, new InsufficientAuthenticationException("유효하지 않은 토큰입니다."));
+            return;
+        }
 
-                // TODO: DB 조회 제거
-                User user = userJpaRepository.findById(userId).orElse(null);
+        try {
+            Claims claims = jwtTokenProvider.getClaims(token);
+            Long userId = Long.valueOf(claims.getSubject());
+            String role = claims.get("role", String.class);
 
-                String role = (String) claims.get("role");
-
-                if (user != null) {
-                    List<String> permissions = userRoleReader.findPermissionsByUserId(userId);
-
-                    List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-                    authorities.add(new SimpleGrantedAuthority(role)); // ROLE 기반
-                    permissions.forEach(p -> authorities.add(new SimpleGrantedAuthority(p))); // PERMISSION 기반
-
-                    CustomUserDetails userDetails = new CustomUserDetails(userId, user.getEmail(), authorities);
-
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
-
-                    // AccessToken 저장
-                    authentication.setDetails(token);
-
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-
-            } catch (Exception e) {
-                log.warn("[JwtFilter] Token processing failed: {}", e.getMessage());
-                authenticationEntryPoint.commence(
-                        request, response, new InsufficientAuthenticationException("유효하지 않은 토큰입니다."));
+            // TODO: DB 조회 제거
+            User user = userJpaRepository.findById(userId).orElse(null);
+            if (user == null) {
+                filterChain.doFilter(request, response);
                 return;
             }
+
+            // 권한 캐시 조회
+            List<String> permissions = permissionCache.get(userId);
+
+            if (permissions == null) {
+                permissions = userRoleReader.findPermissionsByUserId(userId);
+                permissionCache.save(userId, permissions, PERMISSION_TTL);
+            }
+
+            // GrantedAuthority 생성
+            final List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority(role));
+            permissions.forEach(p -> authorities.add(new SimpleGrantedAuthority(p)));
+
+            CustomUserDetails userDetails = new CustomUserDetails(userId, user.getEmail(), authorities);
+
+            // 인증 객체 설정
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+
+            // AccessToken 저장
+            authentication.setDetails(token);
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        } catch (final Exception e) {
+            log.warn("[JwtFilter] Token processing failed: {}", e.getMessage());
+            authenticationEntryPoint.commence(
+                    request, response, new InsufficientAuthenticationException("유효하지 않은 토큰입니다."));
+            return;
         }
 
         filterChain.doFilter(request, response);

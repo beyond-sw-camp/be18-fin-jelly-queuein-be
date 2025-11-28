@@ -1,10 +1,11 @@
 package com.beyond.qiin.security.jwt;
 
+import com.beyond.qiin.domain.auth.exception.AuthException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +32,7 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         log.info("JWT SecretKey 초기화 완료");
     }
 
@@ -81,18 +82,12 @@ public class JwtTokenProvider {
                     .getBody();
 
             final String tokenType = claims.get("token_type", String.class);
-            if (tokenType == null || !tokenType.equals(expectedType)) {
-                log.debug("[JWT] 타입 불일치");
-                return false;
-            }
+            return expectedType.equals(tokenType);
 
-            return true;
-        } catch (ExpiredJwtException e) {
-            log.debug("[Validation] {} 토큰 만료", expectedType);
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (Exception e) { // 전체 예외 처리
             log.debug("[Validation] {} 토큰 유효하지 않음", expectedType);
+            return false;
         }
-        return false;
     }
 
     // 토큰에서 사용자 ID 추출
@@ -112,11 +107,16 @@ public class JwtTokenProvider {
 
     // Claims 공통 조회
     Claims getClaims(final String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            log.warn("[JWT] Claims 파싱 실패: {}", e.getMessage());
+            throw AuthException.unauthorized(); // 401 로 변환
+        }
     }
 
     // Refresh Token TTL 조회
