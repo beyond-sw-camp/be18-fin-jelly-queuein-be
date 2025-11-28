@@ -7,7 +7,7 @@ import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-// yml별 topic의 key에 따른 value값을 하드코딩하지 않기 위한 용도
+// yml별 topic의 key에 따른 value들 반환 - kafka topic config에 쓰임
 @Component
 @ConfigurationProperties(prefix = "spring.kafka.topic")
 @Getter
@@ -16,7 +16,7 @@ public class KafkaTopicProperties {
     private final Map<String, String> topics = new HashMap<>();
 
     public String get(String key) {
-        return topics.get(key);
+        return topics.get(key); //key에 해당하는 value 반환
     }
 
     public Set<String> keys() {
