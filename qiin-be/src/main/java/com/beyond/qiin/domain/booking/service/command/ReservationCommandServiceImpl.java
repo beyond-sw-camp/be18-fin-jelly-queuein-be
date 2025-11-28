@@ -121,7 +121,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         User respondent = userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
         Asset asset = reservation.getAsset();
-        validateReservationAvailability(asset.getId(), reservation.getStartAt(), reservation.getEndAt(), reservation.getId());
+        validateReservationAvailability(
+                asset.getId(), reservation.getStartAt(), reservation.getEndAt(), reservation.getId());
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
         reservationWriter.save(reservation);
@@ -263,7 +264,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     }
 
     // api x 비즈니스 메서드
-    private void validateReservationAvailability(final Long assetId, final Instant startAt, final Instant endAt, final Long reservationId) {
+    private void validateReservationAvailability(
+            final Long assetId, final Instant startAt, final Instant endAt, final Long reservationId) {
         if (!isReservationTimeAvailable(assetId, startAt, endAt, reservationId))
             throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
     }
@@ -275,28 +277,24 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     }
 
     // 자원에 대한 예약 가능의 유무 -  비즈니스 책임이므로 command service로
-    private boolean isReservationTimeAvailable(final Long assetId, final Instant startAt, final Instant endAt, final Long reservationId) {
+    private boolean isReservationTimeAvailable(
+            final Long assetId, final Instant startAt, final Instant endAt, final Long reservationId) {
 
         LocalDate startDate = startAt.atZone(KST).toLocalDate();
         List<Reservation> reservations = reservationReader.getReservationsByAssetId(assetId);
 
         // 2-6인 경우 1-7, 2-4, 4-6, 3-4 모두 불가해야함
-        //자기 자신 제외
+        // 자기 자신 제외
         for (Reservation reservation : reservations) {
 
-            if (reservationId != null && reservation.getId().equals(reservationId))
-                continue;
+            if (reservationId != null && reservation.getId().equals(reservationId)) continue;
 
-            //reservation 날짜가 다르면 고려 대상 x
-            LocalDate existingDate =
-                reservation.getStartAt().atZone(KST).toLocalDate();
-            if (!startDate.equals(existingDate))
-                continue;
+            // reservation 날짜가 다르면 고려 대상 x
+            LocalDate existingDate = reservation.getStartAt().atZone(KST).toLocalDate();
+            if (!startDate.equals(existingDate)) continue;
 
             // 둘 중 하나라도 달성되지 않으면 불가
-            boolean overlaps =
-                startAt.isBefore(reservation.getEndAt()) &&
-                    endAt.isAfter(reservation.getStartAt());
+            boolean overlaps = startAt.isBefore(reservation.getEndAt()) && endAt.isAfter(reservation.getStartAt());
             if (overlaps) {
                 return false;
             }
