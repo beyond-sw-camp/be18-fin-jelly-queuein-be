@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class QuarterSettlementRequestDto {
+public class SettlementQuarterRequestDto {
 
     @NotNull
     private Integer year; // 조회할 연도 (필수)

@@ -4,17 +4,19 @@ import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
-public class QuarterSettlementRowDto {
+public class SettlementQuarterRowDto {
 
     private Long assetId;
     private String assetName;
 
     private int year;
-    private int quarter;
+    private Integer quarter;
 
     private Integer reservedHours; // 예약 시간
     private Integer actualHours; // 실제 사용 시간
