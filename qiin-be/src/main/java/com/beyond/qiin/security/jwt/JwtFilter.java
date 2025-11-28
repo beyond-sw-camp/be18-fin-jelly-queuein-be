@@ -2,6 +2,7 @@ package com.beyond.qiin.security.jwt;
 
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.repository.UserJpaRepository;
+import com.beyond.qiin.domain.iam.support.userrole.UserRoleReader;
 import com.beyond.qiin.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -9,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserJpaRepository userJpaRepository;
+    private final UserRoleReader userRoleReader;
     private final RedisTokenRepository redisTokenRepository;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
@@ -71,8 +74,16 @@ public class JwtFilter extends OncePerRequestFilter {
                 String role = (String) claims.get("role");
 
                 if (user != null) {
+                    List<String> permissions = userRoleReader.findPermissionsByUserId(userId);
+
+                    List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                    authorities.add(new SimpleGrantedAuthority(role)); // ROLE 기반
+                    permissions.forEach(p -> authorities.add(new SimpleGrantedAuthority(p))); // PERMISSION 기반
+
+                    CustomUserDetails userDetails = new CustomUserDetails(userId, user.getEmail(), authorities);
+
                     UsernamePasswordAuthenticationToken authentication =
-                            getUsernamePasswordAuthenticationToken(userId, user, role);
+                            new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
 
                     // AccessToken 저장
                     authentication.setDetails(token);

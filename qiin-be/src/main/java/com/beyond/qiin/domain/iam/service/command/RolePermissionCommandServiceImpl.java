@@ -75,7 +75,7 @@ public class RolePermissionCommandServiceImpl implements RolePermissionCommandSe
         Role role = roleReader.findById(roleId);
 
         // soft delete 기존 항목들
-        List<RolePermission> existed = rolePermissionReader.findByRole(role);
+        List<RolePermission> existed = rolePermissionReader.findAllByRole(role);
         existed.forEach(rp -> rp.softDelete(SecurityUtils.getCurrentUserId()));
         rolePermissionWriter.saveAll(existed);
 
@@ -90,7 +90,7 @@ public class RolePermissionCommandServiceImpl implements RolePermissionCommandSe
         Role role = roleReader.findById(roleId);
         Permission permission = permissionReader.findById(permissionId);
 
-        List<RolePermission> list = rolePermissionReader.findByRole(role).stream()
+        List<RolePermission> list = rolePermissionReader.findAllByRole(role).stream()
                 .filter(rp -> rp.getPermission().getId().equals(permissionId))
                 .toList();
 
@@ -102,7 +102,7 @@ public class RolePermissionCommandServiceImpl implements RolePermissionCommandSe
         rolePermissionWriter.saveAll(list);
 
         // 최신 상태 반환
-        List<RolePermission> remained = rolePermissionReader.findByRole(role);
+        List<RolePermission> remained = rolePermissionReader.findAllByRole(role);
 
         return RolePermissionListResponseDto.fromEntities(roleId, remained);
     }
