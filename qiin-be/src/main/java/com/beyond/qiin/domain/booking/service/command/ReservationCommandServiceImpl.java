@@ -63,6 +63,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 .map(user -> Attendant.create(user, reservation))
                 .collect(Collectors.toList());
 
+        attendantWriter.saveAll(attendants);
+
         reservation.addAttendants(attendants);
 
         reservationWriter.save(reservation);
@@ -97,7 +99,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 .map(user -> Attendant.create(user, reservation))
                 .collect(Collectors.toList());
 
+        attendantWriter.saveAll(attendants);
+
         reservation.addAttendants(attendants);
+
 
         reservationWriter.save(reservation);
         return ReservationResponseDto.fromEntity(reservation);
