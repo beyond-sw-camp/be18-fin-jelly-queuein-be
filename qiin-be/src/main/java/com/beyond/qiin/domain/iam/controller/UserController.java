@@ -1,18 +1,20 @@
 package com.beyond.qiin.domain.iam.controller;
 
+import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.ChangeTempPwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.search_condition.GetUsersSearchCondition;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
-import com.beyond.qiin.domain.iam.dto.user.response.ListUserResponseDto;
+import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
 import com.beyond.qiin.security.resolver.CurrentUserId;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -83,10 +85,11 @@ public class UserController {
     // -------------------------------------------
 
     // 사용자 목록 조회 (MASTER, ADMIN, MANAGER)
-    @GetMapping
+    @GetMapping("/search")
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
-    public List<ListUserResponseDto> getUsers() {
-        return userQueryService.getUsers();
+    public PageResponseDto<RawUserListResponseDto> searchUsers(GetUsersSearchCondition condition, Pageable pageable) {
+
+        return userQueryService.searchUsers(condition, pageable);
     }
 
     // 사용자 상세 조회
