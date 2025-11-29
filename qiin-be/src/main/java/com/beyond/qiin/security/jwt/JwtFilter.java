@@ -1,7 +1,6 @@
 package com.beyond.qiin.security.jwt;
 
 import com.beyond.qiin.domain.iam.entity.User;
-import com.beyond.qiin.infra.redis.iam.permission.PermissionCacheAdapter;
 import com.beyond.qiin.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -28,7 +27,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final PermissionCacheAdapter permissionCache;
     private final RedisTokenRepository redisTokenRepository;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
@@ -76,15 +74,6 @@ public class JwtFilter extends OncePerRequestFilter {
             String role = claims.get("role", String.class);
             final String email = claims.get("email", String.class);
             List<String> permissions = claims.get("permissions", List.class);
-
-            // JWT payload에 permissions 없으면 캐시 조회
-            if (permissions == null) {
-                permissions = permissionCache.get(userId);
-            }
-
-            if (permissions == null) {
-                permissions = List.of();
-            }
 
             List<SimpleGrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority(role));
