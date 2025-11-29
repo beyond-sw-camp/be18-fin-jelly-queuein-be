@@ -8,6 +8,7 @@ import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.repository.querydsl.UserQueryRepository;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +25,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     @Transactional(readOnly = true)
     public PageResponseDto<RawUserListResponseDto> searchUsers(
             final GetUsersSearchCondition condition, final Pageable pageable) {
-
-        var page = userQueryRepository.search(condition, pageable);
+        Page<RawUserListResponseDto> page = userQueryRepository.search(condition, pageable);
         return PageResponseDto.from(page);
     }
 

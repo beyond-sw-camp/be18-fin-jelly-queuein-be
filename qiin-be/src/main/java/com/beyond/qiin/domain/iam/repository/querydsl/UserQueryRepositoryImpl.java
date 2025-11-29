@@ -5,17 +5,22 @@ import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
 import com.beyond.qiin.domain.iam.entity.QRole;
 import com.beyond.qiin.domain.iam.entity.QUser;
 import com.beyond.qiin.domain.iam.entity.QUserRole;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,7 +33,10 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
     private static final QRole role = QRole.role;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<RawUserListResponseDto> search(final GetUsersSearchCondition condition, final Pageable pageable) {
+
+        final List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(pageable);
 
         final List<RawUserListResponseDto> results = jpaQueryFactory
                 .select(Projections.constructor(
@@ -48,6 +56,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                         dptIdEq(condition.getDptId()),
                         roleNameContains(condition.getRoleName()),
                         hireDateBetween(condition.getHireDateStart(), condition.getHireDateEnd()))
+                .orderBy(orderSpecifiers.toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -105,5 +114,34 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
         }
 
         return user.hireDate.loe(end.plusDays(1).atStartOfDay(zone).toInstant());
+    }
+
+    private List<OrderSpecifier<?>> getOrderSpecifiers(final Pageable pageable) {
+
+        List<OrderSpecifier<?>> orders = new ArrayList<>();
+
+        for (Sort.Order order : pageable.getSort()) {
+
+            Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+
+            switch (order.getProperty()) {
+                case "userName" -> orders.add(new OrderSpecifier<>(direction, user.userName));
+                case "email" -> orders.add(new OrderSpecifier<>(direction, user.email));
+                case "dptId" -> orders.add(new OrderSpecifier<>(direction, user.dptId));
+                case "roleName" -> orders.add(new OrderSpecifier<>(direction, role.roleName));
+                case "createdAt" -> orders.add(new OrderSpecifier<>(direction, user.createdAt));
+
+                default -> {
+                    /* 무시 또는 기본 정렬 */
+                }
+            }
+        }
+
+        // 기본 정렬 - createdAt DESC
+        if (orders.isEmpty()) {
+            orders.add(user.createdAt.desc());
+        }
+
+        return orders;
     }
 }
