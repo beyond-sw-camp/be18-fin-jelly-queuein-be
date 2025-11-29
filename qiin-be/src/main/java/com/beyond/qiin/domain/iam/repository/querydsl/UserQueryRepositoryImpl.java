@@ -9,6 +9,7 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -36,9 +37,15 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
     @Transactional(readOnly = true)
     public Page<RawUserListResponseDto> search(final GetUsersSearchCondition condition, final Pageable pageable) {
 
+        final boolean requireRoleJoin =
+                condition.getRoleName() != null && !condition.getRoleName().isBlank();
+
         final List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(pageable);
 
-        final List<RawUserListResponseDto> results = jpaQueryFactory
+        // -----------------------------
+        // SELECT QUERY
+        // -----------------------------
+        JPAQuery<RawUserListResponseDto> selectQuery = jpaQueryFactory
                 .select(Projections.constructor(
                         RawUserListResponseDto.class,
                         user.id,
@@ -47,40 +54,53 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                         user.dptId,
                         role.roleName,
                         user.createdAt))
-                .from(user)
-                .leftJoin(user.userRoles, userRole)
-                .leftJoin(userRole.role, role)
-                .where(
-                        userNameContains(condition.getUserName()),
-                        emailContains(condition.getEmail()),
-                        dptIdEq(condition.getDptId()),
-                        roleNameContains(condition.getRoleName()),
-                        hireDateBetween(condition.getHireDateStart(), condition.getHireDateEnd()))
-                .orderBy(orderSpecifiers.toArray(OrderSpecifier[]::new))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+                .from(user);
 
-        final Long total = jpaQueryFactory
+        selectQuery.leftJoin(user.userRoles, userRole).leftJoin(userRole.role, role);
+
+        selectQuery.where(
+                userNameContains(condition.getUserName()),
+                emailContains(condition.getEmail()),
+                dptIdEq(condition.getDptId()),
+                requireRoleJoin ? roleNameContains(condition.getRoleName()) : null,
+                hireDateBetween(condition.getHireDateStart(), condition.getHireDateEnd()));
+
+        selectQuery
+                .orderBy(orderSpecifiers.toArray(new OrderSpecifier<?>[0]))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        List<RawUserListResponseDto> results = selectQuery.fetch();
+
+        // -----------------------------
+        // COUNT QUERY (JOIN 제거 + 필요시 서브쿼리)
+        // -----------------------------
+        JPAQuery<Long> countQuery = jpaQueryFactory
                 .select(user.count())
                 .from(user)
-                .leftJoin(user.userRoles, userRole)
-                .leftJoin(userRole.role, role)
                 .where(
                         userNameContains(condition.getUserName()),
                         emailContains(condition.getEmail()),
                         dptIdEq(condition.getDptId()),
-                        roleNameContains(condition.getRoleName()),
-                        hireDateBetween(condition.getHireDateStart(), condition.getHireDateEnd()))
-                .fetchOne();
+                        hireDateBetween(condition.getHireDateStart(), condition.getHireDateEnd()));
 
-        return new PageImpl<>(results, pageable, total != null ? total : 0);
+        if (requireRoleJoin) {
+            countQuery.where(user.id.in(jpaQueryFactory
+                    .select(userRole.user.id)
+                    .from(userRole)
+                    .leftJoin(userRole.role, role)
+                    .where(role.roleName.containsIgnoreCase(condition.getRoleName()))));
+        }
+
+        Long total = countQuery.fetchOne();
+        if (total == null) total = 0L;
+
+        return new PageImpl<>(results, pageable, total);
     }
 
-    // --------------------------------------------
-    // 조건문 헬퍼메서드
-    // --------------------------------------------
-
+    // -----------------------------
+    // BooleanExpression helpers
+    // -----------------------------
     private BooleanExpression userNameContains(final String userName) {
         return (userName != null && !userName.isBlank()) ? user.userName.containsIgnoreCase(userName) : null;
     }
@@ -98,7 +118,6 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
     }
 
     private BooleanExpression hireDateBetween(final LocalDate start, final LocalDate end) {
-
         if (start == null && end == null) return null;
 
         final ZoneId zone = ZoneId.of("Asia/Seoul");
@@ -116,6 +135,9 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
         return user.hireDate.loe(end.plusDays(1).atStartOfDay(zone).toInstant());
     }
 
+    // -----------------------------
+    // Sorting
+    // -----------------------------
     private List<OrderSpecifier<?>> getOrderSpecifiers(final Pageable pageable) {
 
         List<OrderSpecifier<?>> orders = new ArrayList<>();
@@ -130,14 +152,9 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                 case "dptId" -> orders.add(new OrderSpecifier<>(direction, user.dptId));
                 case "roleName" -> orders.add(new OrderSpecifier<>(direction, role.roleName));
                 case "createdAt" -> orders.add(new OrderSpecifier<>(direction, user.createdAt));
-
-                default -> {
-                    /* 무시 또는 기본 정렬 */
-                }
             }
         }
 
-        // 기본 정렬 - createdAt DESC
         if (orders.isEmpty()) {
             orders.add(user.createdAt.desc());
         }

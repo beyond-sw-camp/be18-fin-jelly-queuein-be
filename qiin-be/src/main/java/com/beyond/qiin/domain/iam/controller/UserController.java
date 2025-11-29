@@ -88,7 +88,8 @@ public class UserController {
     // 사용자 목록 조회 (MASTER, ADMIN, MANAGER)
     @GetMapping
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
-    public PageResponseDto<RawUserListResponseDto> searchUsers(@ModelAttribute final GetUsersSearchCondition condition, final Pageable pageable) {
+    public PageResponseDto<RawUserListResponseDto> searchUsers(
+            @ModelAttribute final GetUsersSearchCondition condition, final Pageable pageable) {
 
         return userQueryService.searchUsers(condition, pageable);
     }
