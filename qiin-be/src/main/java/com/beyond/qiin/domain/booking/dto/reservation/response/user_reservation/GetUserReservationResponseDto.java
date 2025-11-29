@@ -2,6 +2,8 @@ package com.beyond.qiin.domain.booking.dto.reservation.response.user_reservation
 
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,15 +18,15 @@ public class GetUserReservationResponseDto {
 
     private final Long reservationId;
 
-    private final int assetType;
+    private final String assetType;
 
     private final String assetName;
 
     private final String categoryName;
 
-    private final int assetStatus;
+    private final String assetStatus;
 
-    private final boolean isApproved;
+    private final Boolean isApproved;
 
     private final Instant startAt;
 
@@ -40,10 +42,10 @@ public class GetUserReservationResponseDto {
     public static GetUserReservationResponseDto fromRaw(final RawUserReservationResponseDto raw) {
         return GetUserReservationResponseDto.builder()
                 .reservationId(raw.getReservationId())
-                .assetType(raw.getAssetType())
+                .assetType(AssetType.from(raw.getAssetType()).name())
                 .assetName(raw.getAssetName())
                 .categoryName(raw.getCategoryName())
-                .assetStatus(raw.getAssetStatus())
+                .assetStatus(AssetStatus.from(raw.getAssetStatus()).name())
                 .isApproved(raw.isApproved())
                 .startAt(raw.getStartAt())
                 .endAt(raw.getEndAt())

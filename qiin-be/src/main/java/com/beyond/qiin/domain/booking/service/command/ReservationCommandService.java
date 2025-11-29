@@ -24,9 +24,9 @@ public interface ReservationCommandService {
             final Long reservationId,
             final ConfirmReservationRequestDto confirmReservationRequestDto);
 
-    ReservationResponseDto startUsingReservation(final Long userId, final Long reservationId, final Instant startAt);
+    ReservationResponseDto startUsingReservation(final Long userId, final Long reservationId);
 
-    ReservationResponseDto endUsingReservation(final Long userId, final Long reservationId, final Instant endAt);
+    ReservationResponseDto endUsingReservation(final Long userId, final Long reservationId);
 
     ReservationResponseDto cancelReservation(final Long userId, final Long reservationId);
 

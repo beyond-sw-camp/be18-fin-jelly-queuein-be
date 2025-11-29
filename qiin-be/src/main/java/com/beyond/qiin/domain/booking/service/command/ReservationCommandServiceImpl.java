@@ -135,7 +135,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto startUsingReservation(
-            final Long userId, final Long reservationId, final Instant actualStartAt) {
+            final Long userId, final Long reservationId) {
 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
@@ -149,7 +149,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     public ReservationResponseDto endUsingReservation(
-            final Long userId, final Long reservationId, final Instant actualEndAt) {
+            final Long userId, final Long reservationId) {
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
@@ -245,23 +245,28 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     }
 
     // 자원에 대한 예약 가능의 유무 -  비즈니스 책임이므로 command service로
-    private boolean isReservationTimeAvailable(final Long assetId, final Instant startAt, final Instant endAt) {
-        // assetId 유효 확인
+    private boolean isReservationTimeAvailable(Long assetId, Instant startAt, Instant endAt) {
 
         List<Reservation> reservations = reservationReader.getReservationsByAssetId(assetId);
 
-        // 2-6인 경우 1-7, 2-4, 4-6, 3-4 모두 불가해야함
         for (Reservation reservation : reservations) {
+
             Instant existingStart = reservation.getStartAt();
             Instant existingEnd = reservation.getEndAt();
 
-            // 둘 중 하나라도 달성되지 않으면 불가
-            boolean overlaps = startAt.isBefore(existingEnd) && endAt.isAfter(existingStart);
-
-            if (overlaps) {
-                return false;
+            // 딱 맞닿는 경우는 허용
+            if (startAt.equals(existingEnd) || endAt.equals(existingStart)) {
+                continue;
             }
+
+            // 겹침 체크
+            boolean overlaps =
+                startAt.isBefore(existingEnd) &&
+                    endAt.isAfter(existingStart);
+
+            if (overlaps) return false;
         }
+
         return true;
     }
 
@@ -273,22 +278,5 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             return true; // 취소 가능
         }
         return false;
-    }
-
-    private String statusToString(final Integer status) {
-        if (status == 0) {
-            return "PENDING";
-        } else if (status == 1) {
-            return "APPROVED";
-        } else if (status == 2) {
-            return "USING";
-        } else if (status == 3) {
-            return "REJECTED";
-        } else if (status == 4) {
-            return "CANCELED";
-        } else if (status == 5) {
-            return "COMPLETED";
-        }
-        return "INVALID";
     }
 }
