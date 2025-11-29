@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
@@ -15,9 +16,9 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            org.springframework.security.core.AuthenticationException authException)
+            final HttpServletRequest request,
+            final HttpServletResponse response,
+            final AuthenticationException authException)
             throws IOException {
 
         log.warn("[AuthEntryPoint] 인증 실패: {}", authException.getMessage());
