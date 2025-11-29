@@ -105,8 +105,6 @@ public class JwtFilter extends OncePerRequestFilter {
         CustomUserDetails userDetails =
                 new CustomUserDetails(userId, user.getEmail(), List.of(new SimpleGrantedAuthority(role)));
 
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        return authentication;
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }

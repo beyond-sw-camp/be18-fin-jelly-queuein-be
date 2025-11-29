@@ -10,6 +10,7 @@ import com.beyond.qiin.domain.iam.dto.role_permission.response.RolePermissionLis
 import com.beyond.qiin.domain.iam.service.command.RoleCommandService;
 import com.beyond.qiin.domain.iam.service.command.RolePermissionCommandService;
 import com.beyond.qiin.domain.iam.service.query.RoleQueryService;
+import com.beyond.qiin.security.resolver.CurrentUserId;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -60,8 +61,8 @@ public class RoleController {
     // 역할 삭제
     @DeleteMapping("/{roleId}")
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
-    public ResponseEntity<Void> deleteRole(@PathVariable final Long roleId) {
-        roleCommandService.deleteRole(roleId);
+    public ResponseEntity<Void> deleteRole(@PathVariable final Long roleId, @CurrentUserId final Long deleterId) {
+        roleCommandService.deleteRole(roleId, deleterId);
         return ResponseEntity.noContent().build();
     }
 
@@ -83,10 +84,12 @@ public class RoleController {
     @PutMapping("/{roleId}/permissions")
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
     public ResponseEntity<RolePermissionListResponseDto> replacePermissions(
-            @PathVariable final Long roleId, @RequestBody final ReplaceRolePermissionsRequestDto request) {
+            @PathVariable final Long roleId,
+            @RequestBody final ReplaceRolePermissionsRequestDto request,
+            @CurrentUserId final Long userId) {
 
         RolePermissionListResponseDto updated =
-                rolePermissionCommandService.replacePermissions(roleId, request.getPermissionIds());
+                rolePermissionCommandService.replacePermissions(roleId, request.getPermissionIds(), userId);
 
         URI redirectUri = URI.create("/api/v1/roles/" + roleId + "/permissions");
 
@@ -97,9 +100,11 @@ public class RoleController {
     @DeleteMapping("/{roleId}/permissions/{permissionId}")
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
     public ResponseEntity<Void> deletePermission(
-            @PathVariable final Long roleId, @PathVariable final Long permissionId) {
+            @PathVariable final Long roleId,
+            @PathVariable final Long permissionId,
+            @CurrentUserId final Long deleterId) {
 
-        rolePermissionCommandService.removePermission(roleId, permissionId);
+        rolePermissionCommandService.removePermission(roleId, permissionId, deleterId);
         return ResponseEntity.ok().build();
     }
 

@@ -9,7 +9,7 @@ import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.ListUserResponseDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
-import com.beyond.qiin.security.SecurityUtils;
+import com.beyond.qiin.security.resolver.CurrentUserId;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -54,9 +54,9 @@ public class UserController {
 
     // 임시 비밀번호 수정
     @PatchMapping("/me/temp-password")
-    public ResponseEntity<Void> changeTempPassword(@Valid @RequestBody final ChangeTempPwRequestDto request) {
+    public ResponseEntity<Void> changeTempPassword(
+            @Valid @RequestBody final ChangeTempPwRequestDto request, @CurrentUserId final Long userId) {
 
-        final Long userId = SecurityUtils.getCurrentUserId();
         userCommandService.changeTempPassword(userId, request.getNewPassword());
 
         return ResponseEntity.ok().build();
@@ -64,8 +64,8 @@ public class UserController {
 
     // 본인 비밀번호 변경
     @PatchMapping("/me/password")
-    public ResponseEntity<Void> changeMyPassword(@Valid @RequestBody final ChangePwRequestDto request) {
-        final Long userId = SecurityUtils.getCurrentUserId();
+    public ResponseEntity<Void> changeMyPassword(
+            @Valid @RequestBody final ChangePwRequestDto request, @CurrentUserId final Long userId) {
         userCommandService.changePassword(userId, request);
         return ResponseEntity.ok().build();
     }
@@ -73,8 +73,8 @@ public class UserController {
     // 사용자 삭제
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
-    public ResponseEntity<Void> deleteUser(@PathVariable final Long userId) {
-        userCommandService.deleteUser(userId);
+    public ResponseEntity<Void> deleteUser(@PathVariable final Long userId, @CurrentUserId final Long deleterId) {
+        userCommandService.deleteUser(userId, deleterId);
         return ResponseEntity.noContent().build();
     }
 
@@ -98,8 +98,7 @@ public class UserController {
 
     // 내 정보 조회
     @GetMapping("/me")
-    public DetailUserResponseDto getMe() {
-        final Long userId = SecurityUtils.getCurrentUserId();
+    public DetailUserResponseDto getMe(@CurrentUserId final Long userId) {
         return userQueryService.getUser(userId);
     }
 }

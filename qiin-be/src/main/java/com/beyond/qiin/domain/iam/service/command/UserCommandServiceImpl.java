@@ -13,7 +13,6 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
 import com.beyond.qiin.security.PasswordGenerator;
-import com.beyond.qiin.security.SecurityUtils;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -102,12 +101,10 @@ public class UserCommandServiceImpl implements UserCommandService {
     // 사용자 삭제
     @Override
     @Transactional
-    public void deleteUser(final Long userId) {
+    public void deleteUser(final Long userId, final Long deleterId) {
         User user = userReader.findById(userId);
 
-        Long currentUserId = SecurityUtils.getCurrentUserId();
-
-        user.softDelete(currentUserId);
+        user.softDelete(deleterId);
         userWriter.save(user);
     }
 
