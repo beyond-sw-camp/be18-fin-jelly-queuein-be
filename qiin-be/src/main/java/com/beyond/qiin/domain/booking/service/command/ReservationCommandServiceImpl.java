@@ -19,6 +19,8 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final AssetCommandService assetCommandService;
     private final RedissonClient redissonClient;
     private final AttendantJpaRepository attendantJpaRepository;
+
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     // TODO : 선착순, 승인 예약 중복 처리
     // TODO : entity 생성은 entity 안에서
@@ -88,7 +92,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         assetCommandService.isAvailable(assetId);
         // 해당 시간에 사용 가능한 자원인지 확인
         validateReservationAvailability(
-                asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
+                asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt(), null);
 
         // 선착순 자원은 자동 승인
         Reservation reservation =
@@ -117,7 +121,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         User respondent = userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
         Asset asset = reservation.getAsset();
-        validateReservationAvailability(asset.getId(), reservation.getStartAt(), reservation.getEndAt());
+        validateReservationAvailability(
+                asset.getId(), reservation.getStartAt(), reservation.getEndAt(), reservation.getId());
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
         reservationWriter.save(reservation);
@@ -259,8 +264,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     }
 
     // api x 비즈니스 메서드
-    private void validateReservationAvailability(final Long assetId, final Instant startAt, final Instant endAt) {
-        if (!isReservationTimeAvailable(assetId, startAt, endAt))
+    private void validateReservationAvailability(
+            final Long assetId, final Instant startAt, final Instant endAt, final Long reservationId) {
+        if (!isReservationTimeAvailable(assetId, startAt, endAt, reservationId))
             throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
     }
 
@@ -271,19 +277,24 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     }
 
     // 자원에 대한 예약 가능의 유무 -  비즈니스 책임이므로 command service로
-    private boolean isReservationTimeAvailable(final Long assetId, final Instant startAt, final Instant endAt) {
-        // assetId 유효 확인
+    private boolean isReservationTimeAvailable(
+            final Long assetId, final Instant startAt, final Instant endAt, final Long reservationId) {
 
+        LocalDate startDate = startAt.atZone(KST).toLocalDate();
         List<Reservation> reservations = reservationReader.getReservationsByAssetId(assetId);
 
         // 2-6인 경우 1-7, 2-4, 4-6, 3-4 모두 불가해야함
+        // 자기 자신 제외
         for (Reservation reservation : reservations) {
-            Instant existingStart = reservation.getStartAt();
-            Instant existingEnd = reservation.getEndAt();
+
+            if (reservationId != null && reservation.getId().equals(reservationId)) continue;
+
+            // reservation 날짜가 다르면 고려 대상 x
+            LocalDate existingDate = reservation.getStartAt().atZone(KST).toLocalDate();
+            if (!startDate.equals(existingDate)) continue;
 
             // 둘 중 하나라도 달성되지 않으면 불가
-            boolean overlaps = startAt.isBefore(existingEnd) && endAt.isAfter(existingStart);
-
+            boolean overlaps = startAt.isBefore(reservation.getEndAt()) && endAt.isAfter(reservation.getStartAt());
             if (overlaps) {
                 return false;
             }
