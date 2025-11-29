@@ -134,8 +134,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
     @Override
     @Transactional
-    public ReservationResponseDto startUsingReservation(
-            final Long userId, final Long reservationId) {
+    public ReservationResponseDto startUsingReservation(final Long userId, final Long reservationId) {
 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
@@ -148,8 +147,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     // 실제 종료 시간 추가
     @Override
     @Transactional
-    public ReservationResponseDto endUsingReservation(
-            final Long userId, final Long reservationId) {
+    public ReservationResponseDto endUsingReservation(final Long userId, final Long reservationId) {
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
@@ -260,9 +258,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             }
 
             // 겹침 체크
-            boolean overlaps =
-                startAt.isBefore(existingEnd) &&
-                    endAt.isAfter(existingStart);
+            boolean overlaps = startAt.isBefore(existingEnd) && endAt.isAfter(existingStart);
 
             if (overlaps) return false;
         }
