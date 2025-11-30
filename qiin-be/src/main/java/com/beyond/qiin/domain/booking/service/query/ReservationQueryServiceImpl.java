@@ -308,24 +308,34 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             return true;
         }
 
-        reservations = reservations.stream()
-                .sorted(Comparator.comparing(Reservation::getStartAt))
-                .toList();
+        List<Reservation> sorted = reservations.stream()
+            .sorted(Comparator.comparing(Reservation::getStartAt))
+            .toList();
 
-        if (reservations.get(0).getStartAt().isAfter(dayStart)) {
-            return true;
-        }
+        Instant coveredStart = sorted.get(0).getStartAt();
+        Instant coveredEnd = sorted.get(0).getEndAt();
 
-        for (int i = 0; i < reservations.size() - 1; i++) {
-            Instant currentEnd = reservations.get(i).getEndAt();
-            Instant nextStart = reservations.get(i + 1).getStartAt();
+        if (coveredStart.isBefore(dayStart)) coveredStart = dayStart;
+        if (coveredEnd.isAfter(dayEnd)) coveredEnd = dayEnd;
 
-            if (currentEnd.isBefore(nextStart)) {
-                return true;
+        for (int i = 1; i < sorted.size(); i++) {
+            Instant s = sorted.get(i).getStartAt();
+            Instant e = sorted.get(i).getEndAt();
+
+            if (s.isAfter(coveredEnd)) {
+                return true; // gap 존재 → 하루 전체를 덮지 못함
+            }
+
+            if (e.isAfter(coveredEnd)) {
+                coveredEnd = e;
+                if (coveredEnd.isAfter(dayEnd)) {
+                    coveredEnd = dayEnd;
+                }
             }
         }
 
-        Instant lastEnd = reservations.get(reservations.size() - 1).getEndAt();
-        return lastEnd.isBefore(dayEnd);
+        // 하루 전체를 덮었는지 확인
+        return !(coveredStart.equals(dayStart) && coveredEnd.equals(dayEnd));
     }
+
 }
