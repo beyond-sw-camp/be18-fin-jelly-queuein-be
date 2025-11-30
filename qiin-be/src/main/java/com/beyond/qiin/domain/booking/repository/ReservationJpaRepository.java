@@ -46,10 +46,9 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
     SELECT r
     FROM Reservation r
     WHERE r.asset.id = :assetId
-      AND NOT (
-        r.startAt >= :endOfDay
-        OR r.endAt <= :startOfDay
-      )
+      AND r.startAt <= :endOfDay
+      AND r.endAt >= :startOfDay
+      
       AND r.status IN (1, 2, 5)
 """)
     List<Reservation> findAllByAssetIdAndDate(Long assetId, Instant startOfDay, Instant endOfDay);
