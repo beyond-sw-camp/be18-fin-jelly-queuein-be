@@ -309,8 +309,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         }
 
         List<Reservation> sorted = reservations.stream()
-            .sorted(Comparator.comparing(Reservation::getStartAt))
-            .toList();
+                .sorted(Comparator.comparing(Reservation::getStartAt))
+                .toList();
 
         Instant coveredStart = sorted.get(0).getStartAt();
         Instant coveredEnd = sorted.get(0).getEndAt();
@@ -337,5 +337,4 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         // 하루 전체를 덮었는지 확인
         return !(coveredStart.equals(dayStart) && coveredEnd.equals(dayEnd));
     }
-
 }
