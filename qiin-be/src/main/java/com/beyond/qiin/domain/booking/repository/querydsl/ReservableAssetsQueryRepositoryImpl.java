@@ -36,7 +36,7 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
             builder.and(asset.name.containsIgnoreCase(condition.getAssetName()));
         }
 
-        //자원 유형
+        // 자원 유형
         if (condition.getAssetType() != null) {
             try {
                 builder.and(asset.type.eq(Integer.parseInt(condition.getAssetType())));
@@ -74,7 +74,12 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
         }
 
         return query.select(Projections.constructor(
-                        RawReservableAssetResponseDto.class, asset.id, asset.name, asset.type, category.name, asset.needsApproval))
+                        RawReservableAssetResponseDto.class,
+                        asset.id,
+                        asset.name,
+                        asset.type,
+                        category.name,
+                        asset.needsApproval))
                 .from(asset)
                 .leftJoin(category)
                 .on(category.id.eq(asset.category.id))

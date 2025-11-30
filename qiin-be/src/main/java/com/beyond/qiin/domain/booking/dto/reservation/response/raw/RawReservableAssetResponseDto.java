@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.booking.dto.reservation.response.raw;
 
-import com.beyond.qiin.domain.inventory.enums.AssetType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
