@@ -61,10 +61,13 @@ public class ReservationDetailResponseDto {
     private final List<AttendantResponseDto> attendants = new ArrayList<>();
 
     public static ReservationDetailResponseDto fromEntity(final Reservation reservation) {
+        String respondentName = reservation.getRespondent() == null ? null : reservation.getRespondent().getUserName();
+        
         ReservationDetailResponseDto reservationDetailResponseDto = ReservationDetailResponseDto.builder()
                 .reservationId(reservation.getId())
                 .applicantName(reservation.getApplicant().getUserName())
                 .assetName(reservation.getAsset().getName())
+                .respondentName(respondentName)
                 .startAt(reservation.getStartAt())
                 .endAt(reservation.getEndAt())
                 .actualStartAt(reservation.getActualStartAt())
