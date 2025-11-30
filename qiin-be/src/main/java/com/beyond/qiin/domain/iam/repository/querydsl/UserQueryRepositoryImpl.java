@@ -2,6 +2,7 @@ package com.beyond.qiin.domain.iam.repository.querydsl;
 
 import com.beyond.qiin.domain.iam.dto.user.request.search_condition.GetUsersSearchCondition;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
+import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserLookupDto;
 import com.beyond.qiin.domain.iam.entity.QRole;
 import com.beyond.qiin.domain.iam.entity.QUser;
 import com.beyond.qiin.domain.iam.entity.QUserRole;
@@ -96,6 +97,25 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
         if (total == null) total = 0L;
 
         return new PageImpl<>(results, pageable, total);
+    }
+
+    // 참여자용 사용자 목록 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<RawUserLookupDto> lookup(final String keyword) {
+
+        if (keyword == null || keyword.isBlank()) {
+            return List.of();
+        }
+
+        final String normalized = keyword.trim();
+
+        return jpaQueryFactory
+                .select(Projections.constructor(RawUserLookupDto.class, user.id, user.userName, user.email))
+                .from(user)
+                .where(user.userName.containsIgnoreCase(normalized).or(user.email.containsIgnoreCase(normalized)))
+                .limit(10)
+                .fetch();
     }
 
     // -----------------------------

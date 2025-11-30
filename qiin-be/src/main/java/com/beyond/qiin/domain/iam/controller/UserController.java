@@ -8,11 +8,13 @@ import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.search_condition.GetUsersSearchCondition;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
+import com.beyond.qiin.domain.iam.dto.user.response.UserLookupResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
 import com.beyond.qiin.security.resolver.CurrentUserId;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -92,6 +95,13 @@ public class UserController {
             @ModelAttribute final GetUsersSearchCondition condition, final Pageable pageable) {
 
         return userQueryService.searchUsers(condition, pageable);
+    }
+
+    // 참여자용 사용자 목록조회
+    @GetMapping("/lookup")
+    public ResponseEntity<List<UserLookupResponseDto>> lookupUsers(@RequestParam final String keyword) {
+
+        return ResponseEntity.ok(userQueryService.lookupUsers(keyword));
     }
 
     // 사용자 상세 조회
