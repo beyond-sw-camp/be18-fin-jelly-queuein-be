@@ -1,14 +1,15 @@
 package com.beyond.qiin.security.jwt;
 
+import com.beyond.qiin.domain.auth.exception.AuthException;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private final RedisTokenRepository redisTokenRepository;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
-    private static final Duration PERMISSION_TTL = Duration.ofMinutes(10);
+    // TTL 추후 사용
+    // private static final Duration PERMISSION_TTL = Duration.ofMinutes(10);
 
     @Override
     protected void doFilterInternal(
@@ -62,12 +64,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!jwtTokenProvider.validateAccessToken(token)) {
-            authenticationEntryPoint.commence(
-                    request, response, new InsufficientAuthenticationException("유효하지 않은 토큰입니다."));
-            return;
-        }
-
         try {
             Claims claims = jwtTokenProvider.getClaims(token);
             Long userId = Long.valueOf(claims.getSubject());
@@ -90,11 +86,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        } catch (final ExpiredJwtException e) { // Access Token 만료 시
+            log.warn("[JwtFilter] AccessToken expired: {}", e.getMessage());
+            throw AuthException.tokenExpired();
+
+        } catch (final AuthException e) {
+            log.warn("[JwtFilter] Token processing failed: {}", e.getMessage());
+            throw e;
         } catch (final Exception e) {
             log.warn("[JwtFilter] Token processing failed: {}", e.getMessage());
-            authenticationEntryPoint.commence(
-                    request, response, new InsufficientAuthenticationException("유효하지 않은 토큰입니다."));
-            return;
+            throw AuthException.unauthorized();
         }
 
         filterChain.doFilter(request, response);

@@ -137,8 +137,11 @@ public class JwtTokenProvider {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
+        } catch (ExpiredJwtException e) {
+            log.warn("[JWT] Claims 파싱 실패 - 만료된 토큰: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
-            log.warn("[JWT] Claims 파싱 실패: {}", e.getMessage());
+            log.warn("[JWT] Claims 파싱 실패 - 유효하지 않은 토큰: {}", e.getMessage());
             throw AuthException.unauthorized(); // 401 로 변환
         }
     }
