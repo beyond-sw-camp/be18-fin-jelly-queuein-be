@@ -111,7 +111,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         User respondent = userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
         Asset asset = reservation.getAsset();
-        validateReservationAvailability(reservation.getId(), asset.getId(), reservation.getStartAt(), reservation.getEndAt());
+        validateReservationAvailability(
+                reservation.getId(), asset.getId(), reservation.getStartAt(), reservation.getEndAt());
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
         reservationWriter.save(reservation);
@@ -231,7 +232,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     }
 
     // api x 비즈니스 메서드
-    private void validateReservationAvailability(final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
+    private void validateReservationAvailability(
+            final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
         if (!isReservationTimeAvailable(reservationId, assetId, startAt, endAt))
             throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
     }
@@ -242,17 +244,18 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             throw new ReservationException(ReservationErrorCode.RESERVATION_CANCEL_NOT_ALLOWED);
     }
 
-    //todo : 날짜 기반으로 추가
+    // todo : 날짜 기반으로 추가
     // 자원에 대한 예약 가능의 유무 -  비즈니스 책임이므로 command service로
-    private boolean isReservationTimeAvailable(final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
+    private boolean isReservationTimeAvailable(
+            final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
 
         List<Reservation> reservations = reservationReader.getReservationsByAssetId(assetId);
 
         for (Reservation reservation : reservations) {
 
-            if (reservationId != null){ //생성시는 null
+            if (reservationId != null) { // 생성시는 null
                 if (reservation.getId().equals(reservationId)) {
-                   continue;
+                    continue;
                 }
             }
 
