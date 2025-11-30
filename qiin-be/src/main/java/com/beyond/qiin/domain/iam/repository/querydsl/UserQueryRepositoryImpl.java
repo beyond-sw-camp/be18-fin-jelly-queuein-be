@@ -43,9 +43,6 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 
         final List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(pageable);
 
-        // -----------------------------
-        // SELECT QUERY
-        // -----------------------------
         JPAQuery<RawUserListResponseDto> selectQuery = jpaQueryFactory
                 .select(Projections.constructor(
                         RawUserListResponseDto.class,
@@ -73,9 +70,6 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
 
         List<RawUserListResponseDto> results = selectQuery.fetch();
 
-        // -----------------------------
-        // COUNT QUERY (JOIN 제거 + 필요시 서브쿼리)
-        // -----------------------------
         JPAQuery<Long> countQuery = jpaQueryFactory
                 .select(user.count())
                 .from(user)
@@ -119,8 +113,9 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
     }
 
     // -----------------------------
-    // BooleanExpression helpers
+    // 헬퍼 메서드
     // -----------------------------
+
     private BooleanExpression userNameContains(final String userName) {
         return (userName != null && !userName.isBlank()) ? user.userName.containsIgnoreCase(userName) : null;
     }
@@ -156,7 +151,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
     }
 
     // -----------------------------
-    // Sorting
+    // 정렬 메서드
     // -----------------------------
     private List<OrderSpecifier<?>> getOrderSpecifiers(final Pageable pageable) {
 
