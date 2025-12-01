@@ -268,38 +268,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return AssetTimeResponseDto.create(assetId, timeSlotDtos);
     }
 
-    // status 자체는 null x이므로 int
-    public static String statusToString(final int status) {
-        if (status == 0) {
-            return "PENDING";
-        } else if (status == 1) {
-            return "APPROVED";
-        } else if (status == 2) {
-            return "USING";
-        } else if (status == 3) {
-            return "REJECTED";
-        } else if (status == 4) {
-            return "CANCELED";
-        } else if (status == 5) {
-            return "COMPLETED";
-        }
-        return "INVALID";
-    }
-
-    public static Integer statusToInt(final String status) {
-        if (status == null || status.isBlank()) return null;
-
-        return switch (status.toUpperCase()) {
-            case "PENDING" -> 0;
-            case "APPROVED" -> 1;
-            case "USING" -> 2;
-            case "REJECTED" -> 3;
-            case "CANCELED" -> 4;
-            case "COMPLETED" -> 5;
-            default -> -1;
-        };
-    }
-
     public DateRange dayToInstant(final String timezone, final LocalDate date) {
         ZoneId zone = ZoneId.of(timezone); // Asia/Seoul
         Instant startOfDay = date.atStartOfDay().atZone(zone).toInstant();
@@ -340,24 +308,33 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             return true;
         }
 
-        reservations = reservations.stream()
+        List<Reservation> sorted = reservations.stream()
                 .sorted(Comparator.comparing(Reservation::getStartAt))
                 .toList();
 
-        if (reservations.get(0).getStartAt().isAfter(dayStart)) {
-            return true;
-        }
+        Instant coveredStart = sorted.get(0).getStartAt();
+        Instant coveredEnd = sorted.get(0).getEndAt();
 
-        for (int i = 0; i < reservations.size() - 1; i++) {
-            Instant currentEnd = reservations.get(i).getEndAt();
-            Instant nextStart = reservations.get(i + 1).getStartAt();
+        if (coveredStart.isBefore(dayStart)) coveredStart = dayStart;
+        if (coveredEnd.isAfter(dayEnd)) coveredEnd = dayEnd;
 
-            if (currentEnd.isBefore(nextStart)) {
-                return true;
+        for (int i = 1; i < sorted.size(); i++) {
+            Instant s = sorted.get(i).getStartAt();
+            Instant e = sorted.get(i).getEndAt();
+
+            if (s.isAfter(coveredEnd)) {
+                return true; // gap 존재 → 하루 전체를 덮지 못함
+            }
+
+            if (e.isAfter(coveredEnd)) {
+                coveredEnd = e;
+                if (coveredEnd.isAfter(dayEnd)) {
+                    coveredEnd = dayEnd;
+                }
             }
         }
 
-        Instant lastEnd = reservations.get(reservations.size() - 1).getEndAt();
-        return lastEnd.isBefore(dayEnd);
+        // 하루 전체를 덮었는지 확인
+        return !(coveredStart.equals(dayStart) && coveredEnd.equals(dayEnd));
     }
 }
