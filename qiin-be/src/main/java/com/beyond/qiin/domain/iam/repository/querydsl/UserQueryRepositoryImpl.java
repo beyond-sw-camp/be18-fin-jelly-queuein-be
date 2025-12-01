@@ -1,11 +1,12 @@
 package com.beyond.qiin.domain.iam.repository.querydsl;
 
+import static com.beyond.qiin.domain.iam.entity.QRole.role;
+import static com.beyond.qiin.domain.iam.entity.QUser.user;
+import static com.beyond.qiin.domain.iam.entity.QUserRole.userRole;
+
 import com.beyond.qiin.domain.iam.dto.user.request.search_condition.GetUsersSearchCondition;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserLookupDto;
-import com.beyond.qiin.domain.iam.entity.QRole;
-import com.beyond.qiin.domain.iam.entity.QUser;
-import com.beyond.qiin.domain.iam.entity.QUserRole;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -29,10 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserQueryRepositoryImpl implements UserQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
-
-    private static final QUser user = QUser.user;
-    private static final QUserRole userRole = QUserRole.userRole;
-    private static final QRole role = QRole.role;
 
     @Override
     @Transactional(readOnly = true)
