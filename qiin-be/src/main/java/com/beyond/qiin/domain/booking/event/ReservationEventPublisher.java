@@ -9,32 +9,35 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+
+
 @Service
 @RequiredArgsConstructor
 public class ReservationEventPublisher {
-    private final OutboxEventWriter outboxEventWriter;
-    private final ObjectMapper objectMapper; // 객체 -> string용
+  private final OutboxEventWriter outboxEventWriter;
+  private final ObjectMapper objectMapper; // 객체 -> string용
 
-    public void publishCreated(Reservation reservation) {
-        ReservationCreatedPayload payload = ReservationCreatedPayload.from(reservation);
-        publish("reservation-created", payload, reservation.getId()); // topic의 key
+  public void publishCreated(Reservation reservation) {
+    ReservationCreatedPayload payload = ReservationCreatedPayload.from(reservation);
+    publish("reservation-created", payload, reservation.getId()); // topic의 key
+  }
+
+  public void publishUpdated(Reservation reservation) {
+    ReservationUpdatedPayload payload = ReservationUpdatedPayload.from(reservation);
+    publish("reservation-updated", payload, reservation.getId());
+  }
+
+  private void publish(String eventType, Object payload, Long aggregateId) {
+    try {
+      String payloadJson = objectMapper.writeValueAsString(payload);
+
+      OutboxEvent event = OutboxEvent.create(eventType, payloadJson, aggregateId, "reservation");
+
+      outboxEventWriter.save(event);
+
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to serialize payload for eventType=" + eventType, e);
     }
-
-    public void publishUpdated(Reservation reservation) {
-        ReservationUpdatedPayload payload = ReservationUpdatedPayload.from(reservation);
-        publish("reservation-updated", payload, reservation.getId());
-    }
-
-    private void publish(String eventType, Object payload, Long aggregateId) {
-        try {
-            String payloadJson = objectMapper.writeValueAsString(payload);
-
-            OutboxEvent event = OutboxEvent.create(eventType, payloadJson, aggregateId, "reservation");
-
-            outboxEventWriter.save(event);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize payload for eventType=" + eventType, e);
-        }
-    }
+  }
 }
+

@@ -13,25 +13,18 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReservationCreatedPayload {
 
-    @NotNull
     private Long reservationId; // 예약 ID
 
-    @NotNull
     private Long assetId; // 자원 ID
 
-    @NotNull
     private Long applicantId; // 신청자 ID
 
-    @NotNull
     private String startAt; // 예약 시작 시간 - json에서 instant x(string으로 변경)
 
-    @NotNull
     private String endAt; // 예약 종료 시간
 
-    @NotNull
     private Boolean isApproved; // 승인 여부
 
-    @NotNull
     private String status; // 예약 상태
 
     // Reservation 생성 엔티티 -> Payload 변환
