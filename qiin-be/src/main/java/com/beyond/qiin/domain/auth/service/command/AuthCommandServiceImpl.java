@@ -48,6 +48,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
         user.validateTempPasswordUsage();
         if (user.isTempPassword() && user.isFirstLogin()) {
+            user.updateLastLoginAt(Instant.now());
             return TempPwLoginResponseDto.fromEntity(user, tokens.getAccess());
         }
 
