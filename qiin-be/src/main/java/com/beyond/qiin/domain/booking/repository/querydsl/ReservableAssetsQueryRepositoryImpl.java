@@ -2,7 +2,6 @@ package com.beyond.qiin.domain.booking.repository.querydsl;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
-import com.beyond.qiin.domain.booking.entity.QReservation;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
@@ -13,8 +12,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-// TODO : is reservable을 어떻게 포함해줄지에 대해 고려
-
 @Repository
 @RequiredArgsConstructor
 public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQueryRepository {
@@ -22,7 +19,6 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
     private final JPAQueryFactory query;
 
     private static final QAsset asset = QAsset.asset;
-    private static final QReservation reservation = QReservation.reservation;
     private static final QAssetClosure closure = QAssetClosure.assetClosure;
     private static final QCategory category = QCategory.category;
 

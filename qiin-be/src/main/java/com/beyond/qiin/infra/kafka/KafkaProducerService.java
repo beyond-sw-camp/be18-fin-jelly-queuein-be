@@ -11,13 +11,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KafkaProducerService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTopicProperties kafkaTopicProperties;
 
-    // message
-    public void sendMessage(String topic, Object message) {
-        if (topic == null) {
-            log.error("Kafka ERROR: topic is null. message={}", message);
+    // message를 kafka 서버로 전송
+    public void sendMessage(String topicKey, Object message) { // event type == topic key - outbox processor에서 전달
+        if (topicKey == null) {
+            log.error("Kafka ERROR: topic key is null. message={}", message);
         }
-        kafkaTemplate.send(topic, message);
+        String topic = kafkaTopicProperties.get(topicKey); // topic value 가져옴
+        kafkaTemplate.send(topic, message); // 실제 topic value로 메시지를 전달
     }
 
     // topic key, message

@@ -8,6 +8,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationRespon
 import com.beyond.qiin.domain.booking.entity.Attendant;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
+import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
@@ -19,13 +20,13 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +40,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final ReservationWriter reservationWriter;
     private final AttendantWriter attendantWriter;
     private final AssetCommandService assetCommandService;
-    private final RedissonClient redissonClient;
+    private final ReservationEventPublisher reservationEventPublisher;
     private final AttendantJpaRepository attendantJpaRepository;
+
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     // TODO : 선착순, 승인 예약 중복 처리
     // TODO : entity 생성은 entity 안에서
@@ -56,7 +59,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
         assetCommandService.isAvailable(assetId); // 자원 자체가 지금 사용 가능한가에 대한 확인
 
-        Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.PENDING);
+        Reservation reservation =
+                Reservation.create(createReservationRequestDto, applicant, asset, ReservationStatus.PENDING);
 
         List<Attendant> attendants = attendantUsers.stream()
                 .map(user -> Attendant.create(user, reservation))
@@ -65,6 +69,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.addAttendants(attendants);
 
         reservationWriter.save(reservation);
+
+        attendantWriter.saveAll(attendants);
+
+        reservationEventPublisher.publishCreated(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -88,7 +96,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 null, asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
 
         // 선착순 자원은 자동 승인
-        Reservation reservation = createReservationRequestDto.toEntity(asset, applicant, ReservationStatus.APPROVED);
+        Reservation reservation =
+                Reservation.create(createReservationRequestDto, applicant, asset, ReservationStatus.APPROVED);
         reservation.setIsApproved(true); // 승인됨
 
         List<Attendant> attendants = attendantUsers.stream()
@@ -98,6 +107,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.addAttendants(attendants);
 
         reservationWriter.save(reservation);
+
+        attendantWriter.saveAll(attendants);
+        reservationEventPublisher.publishCreated(reservation);
+
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -116,6 +129,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
         reservationWriter.save(reservation);
+        reservationEventPublisher.publishUpdated(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -130,6 +144,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Reservation reservation = reservationReader.getReservationById(reservationId);
         reservation.reject(respondent, confirmReservationRequestDto.getReason()); // status rejected
         reservationWriter.save(reservation);
+
+        reservationEventPublisher.publishUpdated(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -233,6 +249,26 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         }
         reservation.softDeleteAll(userId); // 예약, 참여자 둘다 soft delete 처리
         reservationWriter.save(reservation);
+    }
+
+    // 자원 상태 변경 시 예약 상태 변경
+    @Override
+    @Transactional
+    public void updateReservationsForAsset(Long assetId, int assetStatus) {
+        // 1 = UNAVAILABLE, 2 = MAINTENANCE
+        if (assetStatus != 1 && assetStatus != 2) return;
+
+        // pending, approved, using 대상(0, 1, 2)
+        List<Reservation> reservations = reservationWriter.findFutureUsableReservations(assetId);
+
+        for (Reservation reservation : reservations) {
+            reservation.markUnavailable("자원 사용 불가 상태에 따른 자동 취소");
+        }
+    }
+
+    // 하드 딜리트
+    public void hardDeleteReservation(final Long reservationId) {
+        reservationWriter.hardDelete(reservationId);
     }
 
     // api x 비즈니스 메서드
