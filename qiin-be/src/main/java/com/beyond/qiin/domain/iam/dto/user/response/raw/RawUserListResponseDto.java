@@ -14,4 +14,6 @@ public class RawUserListResponseDto {
     private final Long dptId;
     private final String roleName;
     private final Instant createdAt;
+    private final String phone;
+    private final Instant lastLoginAt;
 }

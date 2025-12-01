@@ -48,7 +48,9 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                         user.email,
                         user.dptId,
                         role.roleName,
-                        user.createdAt))
+                        user.createdAt,
+                        user.phone,
+                        user.lastLoginAt))
                 .from(user);
 
         selectQuery.leftJoin(user.userRoles, userRole).leftJoin(userRole.role, role);
@@ -74,6 +76,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                         userNameContains(condition.getUserName()),
                         emailContains(condition.getEmail()),
                         dptIdEq(condition.getDptId()),
+                        phoneContains(condition.getPhone()),
                         hireDateBetween(condition.getHireDateStart(), condition.getHireDateEnd()));
 
         if (requireRoleJoin) {
@@ -145,6 +148,10 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
         }
 
         return user.hireDate.loe(end.plusDays(1).atStartOfDay(zone).toInstant());
+    }
+
+    private BooleanExpression phoneContains(final String phone) {
+        return (phone != null && !phone.isBlank()) ? user.phone.containsIgnoreCase(phone) : null;
     }
 
     // -----------------------------

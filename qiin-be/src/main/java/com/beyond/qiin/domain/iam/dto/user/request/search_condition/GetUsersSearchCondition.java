@@ -15,4 +15,6 @@ public class GetUsersSearchCondition {
 
     private LocalDate hireDateStart;
     private LocalDate hireDateEnd;
+
+    private String phone;
 }
