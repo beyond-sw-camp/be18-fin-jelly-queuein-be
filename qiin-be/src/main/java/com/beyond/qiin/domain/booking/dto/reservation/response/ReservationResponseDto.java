@@ -57,9 +57,7 @@ public class ReservationResponseDto {
     private final Instant updatedAt;
     private final Long updatedBy;
 
-    // 삭제 정보
-    private final Instant deletedAt;
-    private final Long deletedBy;
+
 
     // 참여자 목록
     @Builder.Default
@@ -87,8 +85,6 @@ public class ReservationResponseDto {
                 .createdBy(reservation.getCreatedBy())
                 .updatedAt(reservation.getUpdatedAt())
                 .updatedBy(reservation.getUpdatedBy())
-                .deletedAt(reservation.getDeletedAt())
-                .deletedBy(reservation.getDeletedBy())
                 .build();
     }
 }
