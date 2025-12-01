@@ -41,7 +41,7 @@ public class JwtTokenProvider {
     public String generateAccessToken(
             final Long userId, final String role, final String email, final List<String> permissions) {
         return generateAccessTokenInternal(
-                userId, role, email, permissions, accessTokenExpiration, JwtConstants.ACCESS);
+                userId, role, email, permissions, accessTokenExpiration, JwtTokenType.ACCESS.name());
     }
 
     /** Refresh Token 생성 */
@@ -80,7 +80,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .claim(JwtConstants.CLAIM_ROLE, role)
-                .claim(JwtConstants.CLAIM_TOKEN_TYPE, JwtConstants.REFRESH)
+                .claim(JwtConstants.CLAIM_TOKEN_TYPE, JwtTokenType.REFRESH.name())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -89,12 +89,12 @@ public class JwtTokenProvider {
 
     // Access Token 검증
     public boolean validateAccessToken(final String token) {
-        return validateTokenInternal(token, JwtConstants.ACCESS);
+        return validateTokenInternal(token, JwtTokenType.ACCESS.name());
     }
 
     // Refresh Token 검증
     public boolean validateRefreshToken(final String token) {
-        return validateTokenInternal(token, JwtConstants.REFRESH);
+        return validateTokenInternal(token, JwtTokenType.REFRESH.name());
     }
 
     // 공통 검증 로직

@@ -15,10 +15,4 @@ public final class JwtConstants {
     public static final String CLAIM_EMAIL = "email";
     public static final String CLAIM_PERMISSIONS = "permissions";
     public static final String CLAIM_TOKEN_TYPE = "token_type";
-
-    // ------------------------
-    // Token Types
-    // ------------------------
-    public static final String ACCESS = "ACCESS";
-    public static final String REFRESH = "REFRESH";
 }

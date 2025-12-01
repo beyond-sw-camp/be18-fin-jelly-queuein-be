@@ -43,7 +43,7 @@ public class JwtTokenProviderTest {
 
         assertThat(userId).isEqualTo(1L);
         assertThat(role).isEqualTo("ADMIN");
-        assertThat(type).isEqualTo(JwtConstants.ACCESS);
+        assertThat(type).isEqualTo(JwtTokenType.ACCESS.name());
     }
 
     @Test
@@ -56,7 +56,7 @@ public class JwtTokenProviderTest {
         assertThat(isValid).isTrue();
 
         String type = jwtTokenProvider.getTokenType(refreshToken);
-        assertThat(type).isEqualTo(JwtConstants.REFRESH);
+        assertThat(type).isEqualTo(JwtTokenType.REFRESH.name());
     }
 
     @Test
