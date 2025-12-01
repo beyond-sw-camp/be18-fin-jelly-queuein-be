@@ -27,7 +27,15 @@ public class CreateUserRequestDto {
     @NotBlank
     private String email;
 
+    //  @Pattern(
+    //      regexp = "^010-?\\d{4}-?\\d{4}$",
+    //      message = "연락처는 010-0000-0000 형식이어야 합니다."
+    //  )
     private String phone;
 
+    //  @Pattern(
+    //      regexp = "^\\d{4}-\\d{2}-\\d{2}$",
+    //      message = "생년월일은 yyyy-MM-dd 형식이어야 합니다."
+    //  )
     private String birth;
 }
