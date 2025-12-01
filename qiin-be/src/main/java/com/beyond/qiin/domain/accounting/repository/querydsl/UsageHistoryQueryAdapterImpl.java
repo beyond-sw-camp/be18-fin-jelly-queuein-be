@@ -42,14 +42,14 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
         ================================ */
         if (req.getStartDate() != null) {
             Instant startInstant = req.getStartDate()
-                    .atStartOfDay(ZONE)   // 2025-09-25 00:00 KST
-                    .toInstant();         // UTC 로 변환
+                    .atStartOfDay(ZONE) // 2025-09-25 00:00 KST
+                    .toInstant(); // UTC 로 변환
             builder.and(usageHistory.startAt.goe(startInstant));
         }
 
         if (req.getEndDate() != null) {
             Instant endInstant = req.getEndDate()
-                    .plusDays(1)          // 다음날 00:00 (해당일 전부 포함)
+                    .plusDays(1) // 다음날 00:00 (해당일 전부 포함)
                     .atStartOfDay(ZONE)
                     .toInstant();
             builder.and(usageHistory.endAt.lt(endInstant));
@@ -60,10 +60,7 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
         ================================ */
         if (req.getKeyword() != null && !req.getKeyword().isBlank()) {
             String keyword = req.getKeyword();
-            builder.and(
-                    asset.name.containsIgnoreCase(keyword)
-                            .or(user.userName.containsIgnoreCase(keyword))
-            );
+            builder.and(asset.name.containsIgnoreCase(keyword).or(user.userName.containsIgnoreCase(keyword)));
         }
 
         /* ================================
@@ -80,12 +77,12 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                         usageHistory.actualStartAt,
                         usageHistory.actualEndAt,
                         usageHistory.actualUsageTime,
-                        usageHistory.usageRatio
-                ))
+                        usageHistory.usageRatio))
                 .from(usageHistory)
                 .join(usageHistory.asset, asset)
                 .leftJoin(usageHistory.reservation, reservation)
-                .leftJoin(userHistory).on(userHistory.usageHistory.eq(usageHistory))
+                .leftJoin(userHistory)
+                .on(userHistory.usageHistory.eq(usageHistory))
                 .leftJoin(userHistory.user, user)
                 .where(builder)
                 .orderBy(usageHistory.id.desc())
@@ -101,7 +98,8 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                 .from(usageHistory)
                 .join(usageHistory.asset, asset)
                 .leftJoin(usageHistory.reservation, reservation)
-                .leftJoin(userHistory).on(userHistory.usageHistory.eq(usageHistory))
+                .leftJoin(userHistory)
+                .on(userHistory.usageHistory.eq(usageHistory))
                 .leftJoin(userHistory.user, user)
                 .where(builder)
                 .fetchOne();
@@ -120,11 +118,11 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                         Expressions.nullExpression(String.class),
                         Expressions.nullExpression(List.class),
                         settlement.totalUsageCost,
-                        settlement.actualUsageCost
-                ))
+                        settlement.actualUsageCost))
                 .from(usageHistory)
                 .join(usageHistory.asset, asset)
-                .leftJoin(settlement).on(settlement.usageHistory.eq(usageHistory))
+                .leftJoin(settlement)
+                .on(settlement.usageHistory.eq(usageHistory))
                 .where(usageHistory.id.eq(usageHistoryId))
                 .fetchOne();
 
