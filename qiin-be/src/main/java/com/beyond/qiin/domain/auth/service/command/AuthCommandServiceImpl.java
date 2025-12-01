@@ -4,11 +4,13 @@ import com.beyond.qiin.domain.auth.dto.request.LoginRequestDto;
 import com.beyond.qiin.domain.auth.dto.response.LoginResponseDto;
 import com.beyond.qiin.domain.auth.dto.response.LoginResult;
 import com.beyond.qiin.domain.auth.dto.response.TempPwLoginResponseDto;
+import com.beyond.qiin.domain.auth.dto.response.TokenPairResponseDto;
 import com.beyond.qiin.domain.auth.exception.AuthException;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleReader;
+import com.beyond.qiin.internal.auth.dto.UserRoleContextDto;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.jwt.RedisTokenRepository;
 import java.time.Duration;
@@ -39,19 +41,19 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         validatePassword(request.getPassword(), user.getPassword());
         final Long userId = user.getId();
 
-        final UserRoleContext ctx = getUserRoleContext(userId);
+        final UserRoleContextDto ctx = getUserRoleContext(userId);
 
         // access + refresh = 하나의 헬퍼에서 발급
-        TokenPair tokens = issueTokenPair(userId, ctx.role(), user.getEmail(), ctx.permissions());
+        TokenPairResponseDto tokens = issueTokenPair(userId, ctx.getRole(), user.getEmail(), ctx.getPermissions());
 
         user.validateTempPasswordUsage();
         if (user.isTempPassword() && user.isFirstLogin()) {
-            return TempPwLoginResponseDto.fromEntity(user, tokens.access());
+            return TempPwLoginResponseDto.fromEntity(user, tokens.getAccess());
         }
 
         user.updateLastLoginAt(Instant.now());
 
-        return LoginResponseDto.of(user, ctx.role(), tokens.access(), tokens.refresh());
+        return LoginResponseDto.of(user, ctx.getRole(), tokens.getAccess(), tokens.getRefresh());
     }
 
     @Override
@@ -76,11 +78,12 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         final Long userId = jwtTokenProvider.getUserId(refreshToken);
         final User user = userReader.findById(userId);
 
-        final UserRoleContext ctx = getUserRoleContext(userId);
+        final UserRoleContextDto ctx = getUserRoleContext(userId);
 
-        TokenPair newTokens = issueTokenPair(userId, ctx.role(), user.getEmail(), ctx.permissions());
+        final TokenPairResponseDto newTokens =
+                issueTokenPair(userId, ctx.getRole(), user.getEmail(), ctx.getPermissions());
 
-        return LoginResponseDto.of(user, ctx.role(), newTokens.access(), newTokens.refresh());
+        return LoginResponseDto.of(user, ctx.getRole(), newTokens.getAccess(), newTokens.getRefresh());
     }
 
     // -----------------------
@@ -114,14 +117,14 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     }
 
     // 사용자 역할 및 권한 조회
-    private UserRoleContext getUserRoleContext(final Long userId) {
+    private UserRoleContextDto getUserRoleContext(final Long userId) {
         String role = userRoleReader.findRoleNameByUserId(userId);
         List<String> permissions = userRoleReader.findPermissionsByUserId(userId);
-        return new UserRoleContext(role, permissions);
+        return UserRoleContextDto.of(role, permissions);
     }
 
     // AccessToken + RefreshToken 동시 발급
-    private TokenPair issueTokenPair(
+    private TokenPairResponseDto issueTokenPair(
             final Long userId, final String role, final String email, final List<String> permissions) {
         final String access = jwtTokenProvider.generateAccessToken(userId, role, email, permissions);
         final String refresh = jwtTokenProvider.generateRefreshToken(userId, role);
@@ -129,12 +132,6 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         redisTokenRepository.saveRefreshToken(
                 userId, refresh, Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidityMillis()));
 
-        return new TokenPair(access, refresh);
+        return TokenPairResponseDto.of(access, refresh);
     }
-
-    // JWT 2종 반환 DTO
-    private record TokenPair(String access, String refresh) {}
-
-    // 역할 + 권한 조회값 묶음
-    private record UserRoleContext(String role, List<String> permissions) {}
 }
