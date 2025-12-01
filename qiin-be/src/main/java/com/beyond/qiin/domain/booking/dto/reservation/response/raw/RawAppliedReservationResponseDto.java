@@ -15,4 +15,5 @@ public class RawAppliedReservationResponseDto {
     private final int reservationStatus;
     private final Boolean isApproved;
     private final String reason;
+    private final Long version;
 }

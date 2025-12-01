@@ -20,7 +20,6 @@ import com.beyond.qiin.domain.booking.service.query.ReservationQueryService;
 import com.beyond.qiin.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import lombok.RequiredArgsConstructor;
@@ -107,11 +106,9 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PatchMapping("/{reservationId}/check-in")
     public ResponseEntity<ReservationResponseDto> startUsingReservation(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable("reservationId") Long reservationId,
-            @RequestParam Instant startAt) {
+            @AuthenticationPrincipal CustomUserDetails user, @PathVariable("reservationId") Long reservationId) {
         ReservationResponseDto reservationResponseDto =
-                reservationCommandService.startUsingReservation(user.getUserId(), reservationId, startAt);
+                reservationCommandService.startUsingReservation(user.getUserId(), reservationId);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -123,10 +120,9 @@ public class ReservationController {
     @PatchMapping("/{reservationId}/check-out")
     public ResponseEntity<ReservationResponseDto> endUsingReservation(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable("reservationId") Long reservationId,
-            @RequestParam Instant endAt) {
+            @PathVariable("reservationId") Long reservationId) { // 실제 서버로 요청 온 시각으로 시작, 종료 관리
         ReservationResponseDto reservationResponseDto =
-                reservationCommandService.endUsingReservation(user.getUserId(), reservationId, endAt);
+                reservationCommandService.endUsingReservation(user.getUserId(), reservationId);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 

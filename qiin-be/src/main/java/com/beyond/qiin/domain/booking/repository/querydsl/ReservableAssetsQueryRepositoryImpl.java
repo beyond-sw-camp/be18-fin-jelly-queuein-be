@@ -33,26 +33,24 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
         }
 
         // 자원 유형
-        //        if (condition.getAssetType() != null) {
-        //            try {
-        //                builder.and(asset.type.eq(condition.getAssetType()));
-        //            } catch (NumberFormatException ignored) {
-        //            }
-        //        }
+        if (condition.getAssetType() != null) {
+            try {
+                builder.and(asset.type.eq(Integer.parseInt(condition.getAssetType())));
+            } catch (NumberFormatException ignored) {
+            }
+        }
 
         // 카테고리
         if (condition.getCategoryName() != null) {
             builder.and(category.name.eq(condition.getCategoryName()));
         }
 
-        // 상태(사용가능 / 점검중 / 예약불가 등)
-        //        if (condition.getAssetStatus() != null) {
-        //            try {
-        //                builder.and(asset.status.eq(assetStatus));
-        //            } catch (NumberFormatException ignored) {
-        //            }
-        //        }
-
+        if (condition.getAssetStatus() != null) {
+            try {
+                builder.and(asset.status.eq(Integer.parseInt(condition.getAssetStatus())));
+            } catch (NumberFormatException ignored) {
+            }
+        }
         BooleanBuilder closureOn = new BooleanBuilder();
         closureOn.and(closure.assetClosureId.descendantId.eq(asset.id));
 
