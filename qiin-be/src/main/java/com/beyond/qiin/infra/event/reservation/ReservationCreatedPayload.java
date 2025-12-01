@@ -1,7 +1,6 @@
 package com.beyond.qiin.infra.event.reservation;
 
 import com.beyond.qiin.domain.booking.entity.Reservation;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
