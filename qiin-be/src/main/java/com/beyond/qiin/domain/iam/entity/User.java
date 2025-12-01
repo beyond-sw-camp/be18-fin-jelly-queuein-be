@@ -54,6 +54,12 @@ public class User extends BaseEntity {
     @Column(name = "password", length = 255, nullable = false)
     private String password;
 
+    @Column(name = "phone", length = 20)
+    private String phone;
+
+    @Column(name = "birth", length = 10)
+    private String birth;
+
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<UserRole> userRoles = new ArrayList<>();
@@ -83,6 +89,8 @@ public class User extends BaseEntity {
                 .userName(request.getUserName())
                 .email(request.getEmail())
                 .password(encryptedPassword)
+                .phone(request.getPhone())
+                .birth(request.getBirth())
                 .passwordExpired(true)
                 .hireDate(hireInstant)
                 .build();
@@ -105,6 +113,8 @@ public class User extends BaseEntity {
         if (dto.getUserName() != null) this.userName = dto.getUserName();
         if (dto.getEmail() != null) this.email = dto.getEmail();
         if (dto.getRetireDate() != null) this.retireDate = dto.getRetireDate();
+        if (dto.getPhone() != null) this.phone = dto.getPhone();
+        if (dto.getBirth() != null) this.birth = dto.getBirth();
     }
 
     // 사용자 삭제하면 자식 데이터도 삭제

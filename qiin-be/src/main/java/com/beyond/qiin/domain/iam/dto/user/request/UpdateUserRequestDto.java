@@ -18,4 +18,8 @@ public class UpdateUserRequestDto {
     private String email;
 
     private Instant retireDate;
+
+    private String phone;
+
+    private String birth;
 }
