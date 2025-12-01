@@ -4,7 +4,6 @@ import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservation
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
-import java.time.Instant;
 
 public interface ReservationCommandService {
 
@@ -24,9 +23,9 @@ public interface ReservationCommandService {
             final Long reservationId,
             final ConfirmReservationRequestDto confirmReservationRequestDto);
 
-    ReservationResponseDto startUsingReservation(final Long userId, final Long reservationId, final Instant startAt);
+    ReservationResponseDto startUsingReservation(final Long userId, final Long reservationId);
 
-    ReservationResponseDto endUsingReservation(final Long userId, final Long reservationId, final Instant endAt);
+    ReservationResponseDto endUsingReservation(final Long userId, final Long reservationId);
 
     ReservationResponseDto cancelReservation(final Long userId, final Long reservationId);
 

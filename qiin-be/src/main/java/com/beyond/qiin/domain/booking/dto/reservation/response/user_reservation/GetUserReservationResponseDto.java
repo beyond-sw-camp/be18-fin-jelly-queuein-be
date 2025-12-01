@@ -26,13 +26,15 @@ public class GetUserReservationResponseDto {
 
     private final String assetStatus;
 
-    private final boolean isApproved;
+    private final Boolean isApproved;
 
     private final Instant startAt;
 
     private final Instant endAt;
 
     private final String reservationStatus;
+
+    private final Long version;
 
     // 응답 시 필수 x
     private final Instant actualStartAt;
@@ -51,6 +53,7 @@ public class GetUserReservationResponseDto {
                 .endAt(raw.getEndAt())
                 .reservationStatus(
                         ReservationStatus.from(raw.getReservationStatus()).name())
+                .version(raw.getVersion())
                 .actualStartAt(raw.getActualStartAt())
                 .actualEndAt(raw.getActualEndAt())
                 .build();

@@ -124,6 +124,7 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                         reservation.isApproved,
                         reservation.actualStartAt,
                         reservation.actualEndAt,
+                        reservation.version,
                         asset.id,
                         asset.name,
                         category.name.as("categoryName"),

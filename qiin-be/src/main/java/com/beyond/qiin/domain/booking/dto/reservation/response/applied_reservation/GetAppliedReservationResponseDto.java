@@ -37,6 +37,8 @@ public class GetAppliedReservationResponseDto {
     // 사유
     private final String reason;
 
+    private final Long version;
+
     public static GetAppliedReservationResponseDto fromRaw(
             final RawAppliedReservationResponseDto raw, final boolean isReservable) {
         return GetAppliedReservationResponseDto.builder()
@@ -48,6 +50,7 @@ public class GetAppliedReservationResponseDto {
                         ReservationStatus.from(raw.getReservationStatus()).name())
                 .isApproved(raw.getIsApproved())
                 .isReservable(isReservable)
+                .version(raw.getVersion())
                 .reason(raw.getReason())
                 .build();
     }
