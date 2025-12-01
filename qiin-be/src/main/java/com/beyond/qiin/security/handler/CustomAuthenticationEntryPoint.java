@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -12,7 +13,10 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    private final ObjectMapper objectMapper;
 
     @Override
     public void commence(
@@ -32,7 +36,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                     "code", "UNAUTHORIZED",
                     "message", "인증이 필요합니다.");
 
-            new ObjectMapper().writeValue(response.getWriter(), body);
+            objectMapper.writeValue(response.getWriter(), body);
         }
     }
 }
