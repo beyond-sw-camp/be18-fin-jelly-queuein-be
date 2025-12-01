@@ -15,6 +15,7 @@ public class RawUserReservationResponseDto {
     private final boolean isApproved;
     private final Instant actualStartAt;
     private final Instant actualEndAt;
+    private final Long version;
     private final Long assetId;
     private final String assetName;
     private final String categoryName;

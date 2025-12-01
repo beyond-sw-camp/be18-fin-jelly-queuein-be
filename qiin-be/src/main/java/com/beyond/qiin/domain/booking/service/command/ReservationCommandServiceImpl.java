@@ -8,6 +8,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationRespon
 import com.beyond.qiin.domain.booking.entity.Attendant;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
+import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
@@ -19,7 +20,6 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +40,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final ReservationWriter reservationWriter;
     private final AttendantWriter attendantWriter;
     private final AssetCommandService assetCommandService;
-    private final RedissonClient redissonClient;
+    private final ReservationEventPublisher reservationEventPublisher;
     private final AttendantJpaRepository attendantJpaRepository;
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
@@ -73,6 +72,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         attendantWriter.saveAll(attendants);
 
+        reservationEventPublisher.publishCreated(reservation);
+
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -92,7 +93,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         assetCommandService.isAvailable(assetId);
         // 해당 시간에 사용 가능한 자원인지 확인
         validateReservationAvailability(
-                asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt(), null);
+                null, asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
 
         // 선착순 자원은 자동 승인
         Reservation reservation =
@@ -108,6 +109,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservationWriter.save(reservation);
 
         attendantWriter.saveAll(attendants);
+        reservationEventPublisher.publishCreated(reservation);
+
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -122,10 +125,11 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Reservation reservation = reservationReader.getReservationById(reservationId);
         Asset asset = reservation.getAsset();
         validateReservationAvailability(
-                asset.getId(), reservation.getStartAt(), reservation.getEndAt(), reservation.getId());
+                reservation.getId(), asset.getId(), reservation.getStartAt(), reservation.getEndAt());
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
         reservationWriter.save(reservation);
+        reservationEventPublisher.publishUpdated(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -140,13 +144,14 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Reservation reservation = reservationReader.getReservationById(reservationId);
         reservation.reject(respondent, confirmReservationRequestDto.getReason()); // status rejected
         reservationWriter.save(reservation);
+
+        reservationEventPublisher.publishUpdated(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
     @Override
     @Transactional
-    public ReservationResponseDto startUsingReservation(
-            final Long userId, final Long reservationId, final Instant actualStartAt) {
+    public ReservationResponseDto startUsingReservation(final Long userId, final Long reservationId) {
 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
@@ -159,8 +164,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     // 실제 종료 시간 추가
     @Override
     @Transactional
-    public ReservationResponseDto endUsingReservation(
-            final Long userId, final Long reservationId, final Instant actualEndAt) {
+    public ReservationResponseDto endUsingReservation(final Long userId, final Long reservationId) {
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
@@ -265,8 +269,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
     // api x 비즈니스 메서드
     private void validateReservationAvailability(
-            final Long assetId, final Instant startAt, final Instant endAt, final Long reservationId) {
-        if (!isReservationTimeAvailable(assetId, startAt, endAt, reservationId))
+            final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
+        if (!isReservationTimeAvailable(reservationId, assetId, startAt, endAt))
             throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
     }
 
@@ -276,29 +280,35 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             throw new ReservationException(ReservationErrorCode.RESERVATION_CANCEL_NOT_ALLOWED);
     }
 
+    // todo : 날짜 기반으로 추가
     // 자원에 대한 예약 가능의 유무 -  비즈니스 책임이므로 command service로
     private boolean isReservationTimeAvailable(
-            final Long assetId, final Instant startAt, final Instant endAt, final Long reservationId) {
+            final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
 
-        LocalDate startDate = startAt.atZone(KST).toLocalDate();
         List<Reservation> reservations = reservationReader.getReservationsByAssetId(assetId);
 
-        // 2-6인 경우 1-7, 2-4, 4-6, 3-4 모두 불가해야함
-        // 자기 자신 제외
         for (Reservation reservation : reservations) {
 
-            if (reservationId != null && reservation.getId().equals(reservationId)) continue;
-
-            // reservation 날짜가 다르면 고려 대상 x
-            LocalDate existingDate = reservation.getStartAt().atZone(KST).toLocalDate();
-            if (!startDate.equals(existingDate)) continue;
-
-            // 둘 중 하나라도 달성되지 않으면 불가
-            boolean overlaps = startAt.isBefore(reservation.getEndAt()) && endAt.isAfter(reservation.getStartAt());
-            if (overlaps) {
-                return false;
+            if (reservationId != null) { // 생성시는 null
+                if (reservation.getId().equals(reservationId)) {
+                    continue;
+                }
             }
+
+            Instant existingStart = reservation.getStartAt();
+            Instant existingEnd = reservation.getEndAt();
+
+            // 딱 맞닿는 경우는 허용
+            if (startAt.equals(existingEnd) || endAt.equals(existingStart)) {
+                continue;
+            }
+
+            // 겹침 체크
+            boolean overlaps = startAt.isBefore(existingEnd) && endAt.isAfter(existingStart);
+
+            if (overlaps) return false;
         }
+
         return true;
     }
 
