@@ -15,6 +15,8 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Repository;
 public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
 
     private final JPAQueryFactory queryFactory;
+    private static final ZoneId ZONE = ZoneId.of("Asia/Seoul");
 
     @Override
     public Page<UsageHistoryListResponseDto> searchUsageHistory(
@@ -34,40 +37,55 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        // 날짜 검색
+        /* ================================
+           날짜 검색 (LocalDate → Instant 변환)
+        ================================ */
         if (req.getStartDate() != null) {
-            builder.and(usageHistory.startAt.goe(req.getStartDate()));
+            Instant startInstant = req.getStartDate()
+                    .atStartOfDay(ZONE)   // 2025-09-25 00:00 KST
+                    .toInstant();         // UTC 로 변환
+            builder.and(usageHistory.startAt.goe(startInstant));
         }
 
         if (req.getEndDate() != null) {
-            builder.and(usageHistory.endAt.loe(req.getEndDate()));
+            Instant endInstant = req.getEndDate()
+                    .plusDays(1)          // 다음날 00:00 (해당일 전부 포함)
+                    .atStartOfDay(ZONE)
+                    .toInstant();
+            builder.and(usageHistory.endAt.lt(endInstant));
         }
 
-        // 키워드 검색 (자원명, 예약자명)
+        /* ================================
+           키워드 검색 (자원명 or 예약자명)
+        ================================ */
         if (req.getKeyword() != null && !req.getKeyword().isBlank()) {
             String keyword = req.getKeyword();
-
-            builder.and(asset.name.containsIgnoreCase(keyword).or(user.userName.containsIgnoreCase(keyword)));
+            builder.and(
+                    asset.name.containsIgnoreCase(keyword)
+                            .or(user.userName.containsIgnoreCase(keyword))
+            );
         }
 
+        /* ================================
+           메인 조회
+        ================================ */
         List<UsageHistoryListResponseDto> result = queryFactory
                 .select(Projections.constructor(
                         UsageHistoryListResponseDto.class,
-                        usageHistory.id, // usageHistoryId
-                        asset.name, // assetName
-                        usageHistory.startAt, // reservationStartAt
-                        usageHistory.endAt, // reservationEndAt
-                        usageHistory.usageTime, // reservationMinutes
-                        usageHistory.actualStartAt, // actualStartAt
-                        usageHistory.actualEndAt, // actualEndAt
-                        usageHistory.actualUsageTime, // actualMinutes
-                        usageHistory.usageRatio // usageRatio
-                        ))
+                        usageHistory.id,
+                        asset.name,
+                        usageHistory.startAt,
+                        usageHistory.endAt,
+                        usageHistory.usageTime,
+                        usageHistory.actualStartAt,
+                        usageHistory.actualEndAt,
+                        usageHistory.actualUsageTime,
+                        usageHistory.usageRatio
+                ))
                 .from(usageHistory)
                 .join(usageHistory.asset, asset)
                 .leftJoin(usageHistory.reservation, reservation)
-                .leftJoin(userHistory)
-                .on(userHistory.usageHistory.eq(usageHistory))
+                .leftJoin(userHistory).on(userHistory.usageHistory.eq(usageHistory))
                 .leftJoin(userHistory.user, user)
                 .where(builder)
                 .orderBy(usageHistory.id.desc())
@@ -75,18 +93,20 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        /* ================================
+           Count 조회
+        ================================ */
         Long count = queryFactory
                 .select(usageHistory.count())
                 .from(usageHistory)
                 .join(usageHistory.asset, asset)
                 .leftJoin(usageHistory.reservation, reservation)
-                .leftJoin(userHistory)
-                .on(userHistory.usageHistory.eq(usageHistory))
+                .leftJoin(userHistory).on(userHistory.usageHistory.eq(usageHistory))
                 .leftJoin(userHistory.user, user)
                 .where(builder)
                 .fetchOne();
 
-        return new PageImpl<>(result, pageable, count == null ? 0L : count);
+        return new PageImpl<>(result, pageable, count == null ? 0 : count);
     }
 
     @Override
@@ -100,11 +120,11 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                         Expressions.nullExpression(String.class),
                         Expressions.nullExpression(List.class),
                         settlement.totalUsageCost,
-                        settlement.actualUsageCost))
+                        settlement.actualUsageCost
+                ))
                 .from(usageHistory)
-                .join(usageHistory.asset, asset) //  변경됨
-                .leftJoin(settlement)
-                .on(settlement.usageHistory.eq(usageHistory)) // FK 기반 조인
+                .join(usageHistory.asset, asset)
+                .leftJoin(settlement).on(settlement.usageHistory.eq(usageHistory))
                 .where(usageHistory.id.eq(usageHistoryId))
                 .fetchOne();
 
@@ -116,7 +136,7 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
         List<String> names = queryFactory
                 .select(user.userName)
                 .from(userHistory)
-                .join(userHistory.user, user) // 변경됨
+                .join(userHistory.user, user)
                 .where(userHistory.usageHistory.id.eq(usageHistoryId))
                 .fetch();
 
