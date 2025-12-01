@@ -12,6 +12,7 @@ import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
+import com.beyond.qiin.infra.mail.MailService;
 import com.beyond.qiin.security.PasswordGenerator;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -34,12 +35,14 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserRoleWriter userRoleWriter;
 
     private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
 
     // 사용자 생성
     @Override
     @Transactional
     public CreateUserResponseDto createUser(final CreateUserRequestDto request) {
 
+        // 임시 비밀번호 생성
         final String tempPassword = PasswordGenerator.generate();
         final String encrypted = passwordEncoder.encode(tempPassword);
 
@@ -53,7 +56,9 @@ public class UserCommandServiceImpl implements UserCommandService {
         UserRole userRole = UserRole.create(saved, defaultRole);
         userRoleWriter.save(userRole);
 
-        return CreateUserResponseDto.fromEntity(saved, tempPassword);
+        mailService.sendTempPassword(saved.getEmail(), tempPassword);
+
+        return CreateUserResponseDto.fromEntity(saved);
     }
 
     // 사용자 정보 수정
