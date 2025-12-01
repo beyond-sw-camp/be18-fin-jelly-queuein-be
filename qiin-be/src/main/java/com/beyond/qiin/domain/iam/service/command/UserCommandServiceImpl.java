@@ -83,6 +83,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         }
 
         user.updatePassword(passwordEncoder.encode(newPassword));
+        user.updateLastLoginAt(Instant.now());
         userWriter.save(user);
     }
 
