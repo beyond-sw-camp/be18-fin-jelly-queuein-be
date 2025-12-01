@@ -28,7 +28,7 @@ public class JwtTokenProviderTest {
     }
 
     @Test
-    @DisplayName("ACCESS 토큰 생성 및 검증에 성공했습니다.")
+    @DisplayName("ACCESS 토큰 생성 및 검증테스트")
     void testGenerateAndValidateAccessToken() {
         String accessToken = jwtTokenProvider.generateAccessToken(
                 1L, "ADMIN", "test@example.com", List.of("perm.read", "perm.write"));
@@ -43,11 +43,11 @@ public class JwtTokenProviderTest {
 
         assertThat(userId).isEqualTo(1L);
         assertThat(role).isEqualTo("ADMIN");
-        assertThat(type).isEqualTo("ACCESS");
+        assertThat(type).isEqualTo(JwtConstants.ACCESS);
     }
 
     @Test
-    @DisplayName("REFRESH 토큰 생성 및 검증에 성공했습니다.")
+    @DisplayName("REFRESH 토큰 생성 및 검증테스트")
     void testGenerateAndValidateRefreshToken() {
         String refreshToken = jwtTokenProvider.generateRefreshToken(1L, "ADMIN");
         assertThat(refreshToken).isNotNull();
@@ -56,11 +56,11 @@ public class JwtTokenProviderTest {
         assertThat(isValid).isTrue();
 
         String type = jwtTokenProvider.getTokenType(refreshToken);
-        assertThat(type).isEqualTo("REFRESH");
+        assertThat(type).isEqualTo(JwtConstants.REFRESH);
     }
 
     @Test
-    @DisplayName("유효하지 않은 토큰은 검증에 실패합니다.")
+    @DisplayName("유효하지 않은 토큰은 검증에 실패하는지 테스트")
     void testInvalidTokenShouldFail() {
         String invalidToken = "invalid.token.value";
         boolean result = jwtTokenProvider.validateAccessToken(invalidToken);

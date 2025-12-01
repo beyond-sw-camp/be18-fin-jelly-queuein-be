@@ -40,7 +40,8 @@ public class JwtTokenProvider {
     /** Access Token 생성 */
     public String generateAccessToken(
             final Long userId, final String role, final String email, final List<String> permissions) {
-        return generateAccessTokenInternal(userId, role, email, permissions, accessTokenExpiration, "ACCESS");
+        return generateAccessTokenInternal(
+                userId, role, email, permissions, accessTokenExpiration, JwtConstants.ACCESS);
     }
 
     /** Refresh Token 생성 */
@@ -61,10 +62,10 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
-                .claim("role", role)
-                .claim("email", email)
-                .claim("permissions", permissions)
-                .claim("token_type", tokenType)
+                .claim(JwtConstants.CLAIM_ROLE, role)
+                .claim(JwtConstants.CLAIM_EMAIL, email)
+                .claim(JwtConstants.CLAIM_PERMISSIONS, permissions)
+                .claim(JwtConstants.CLAIM_TOKEN_TYPE, tokenType)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -78,8 +79,8 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
-                .claim("role", role)
-                .claim("token_type", "REFRESH")
+                .claim(JwtConstants.CLAIM_ROLE, role)
+                .claim(JwtConstants.CLAIM_TOKEN_TYPE, JwtConstants.REFRESH)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -88,12 +89,12 @@ public class JwtTokenProvider {
 
     // Access Token 검증
     public boolean validateAccessToken(final String token) {
-        return validateTokenInternal(token, "ACCESS");
+        return validateTokenInternal(token, JwtConstants.ACCESS);
     }
 
     // Refresh Token 검증
     public boolean validateRefreshToken(final String token) {
-        return validateTokenInternal(token, "REFRESH");
+        return validateTokenInternal(token, JwtConstants.REFRESH);
     }
 
     // 공통 검증 로직
@@ -105,7 +106,7 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token)
                     .getBody();
 
-            final String tokenType = claims.get("token_type", String.class);
+            final String tokenType = claims.get(JwtConstants.CLAIM_TOKEN_TYPE, String.class);
             return expectedType.equals(tokenType);
 
         } catch (Exception e) { // 전체 예외 처리
@@ -121,12 +122,12 @@ public class JwtTokenProvider {
 
     // 토큰에서 역할(Role) 추출
     public String getUserRole(final String token) {
-        return getClaims(token).get("role", String.class);
+        return getClaims(token).get(JwtConstants.CLAIM_ROLE, String.class);
     }
 
     // 어떤 토큰인지 타입 추출
     public String getTokenType(final String token) {
-        return getClaims(token).get("token_type", String.class);
+        return getClaims(token).get(JwtConstants.CLAIM_TOKEN_TYPE, String.class);
     }
 
     // Claims 공통 조회
