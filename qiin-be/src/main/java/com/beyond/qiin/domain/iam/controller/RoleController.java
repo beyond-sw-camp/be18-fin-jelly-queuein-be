@@ -12,7 +12,6 @@ import com.beyond.qiin.domain.iam.service.command.RolePermissionCommandService;
 import com.beyond.qiin.domain.iam.service.query.RoleQueryService;
 import com.beyond.qiin.security.resolver.CurrentUserId;
 import jakarta.validation.Valid;
-import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -91,9 +90,7 @@ public class RoleController {
         RolePermissionListResponseDto updated =
                 rolePermissionCommandService.replacePermissions(roleId, request.getPermissionIds(), userId);
 
-        URI redirectUri = URI.create("/api/v1/roles/" + roleId + "/permissions");
-
-        return ResponseEntity.status(200).location(redirectUri).body(updated);
+        return ResponseEntity.ok(updated);
     }
 
     // 역할-권한 삭제
