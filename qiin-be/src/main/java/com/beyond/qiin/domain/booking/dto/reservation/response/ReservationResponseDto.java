@@ -57,8 +57,6 @@ public class ReservationResponseDto {
     private final Instant updatedAt;
     private final Long updatedBy;
 
-
-
     // 참여자 목록
     @Builder.Default
     private final List<AttendantResponseDto> attendants = new ArrayList<>();
