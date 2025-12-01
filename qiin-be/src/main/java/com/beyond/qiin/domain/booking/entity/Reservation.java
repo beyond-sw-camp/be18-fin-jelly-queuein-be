@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
@@ -102,43 +103,41 @@ public class Reservation extends BaseEntity {
     @Column(name = "reason", length = 255, nullable = true) // 255 기본
     private String reason;
 
-    // TODO : 생성 메서드 엔티티 안으로
+    // TODO : 엔티티의 생성 메서드
     // 인자가 많아서 dto로 두는 게 나아보임
-    //    public static Reservation create(
-    //        User applicant,
-    //        Asset asset,
-    //        Instant startAt,
-    //        Instant endAt,
-    //        String description,
-    //
-    //    ){
-    //        return Reservation.builder()
-    //            .applicant(applicant)
-    //            .respondent(null)
-    //            .asset(asset)
-    //            .startAt(startAt)
-    //            .endAt(endAt)
-    //            .description(description)
-    //            .status(ReservationStatus.PENDING.getCode())
-    //            .build();
-    //    }
-    //
+    // dto에 의존적이게 되면 다른 상황별 생성 메서드 여러개 필요
+    // 빌더를 우선적으로 활요하기로 했으므로 그 장점을 살릴 수 있도록 dto에 우선적으로 맞춤
+    public static Reservation create(
+            final CreateReservationRequestDto createReservationRequestDto,
+            final User applicant,
+            final Asset asset,
+            final ReservationStatus reservationStatus) {
+        return Reservation.builder()
+                .applicant(applicant)
+                .respondent(null)
+                .asset(asset)
+                .startAt(createReservationRequestDto.getStartAt())
+                .endAt(createReservationRequestDto.getEndAt())
+                .description(createReservationRequestDto.getDescription())
+                .status(reservationStatus.getCode())
+                .build();
+    }
 
     // 연관관계 편의 메서드
 
-    public void setApplicant(User user) {
+    public void setApplicant(final User user) {
         this.applicant = user;
     }
 
-    public void setRespondent(User user) {
+    public void setRespondent(final User user) {
         this.respondent = user;
     }
 
-    public void setAsset(Asset asset) {
+    public void setAsset(final Asset asset) {
         this.asset = asset;
     }
 
-    public void setIsApproved(boolean isApproved) {
+    public void setIsApproved(final boolean isApproved) {
         this.isApproved = isApproved;
     }
 
@@ -147,12 +146,12 @@ public class Reservation extends BaseEntity {
         return ReservationStatus.from(this.status);
     }
 
-    public void setStatus(ReservationStatus reservationStatus) {
+    public void setStatus(final ReservationStatus reservationStatus) {
         this.reservationStatus = reservationStatus;
         this.status = reservationStatus.getCode();
     }
 
-    public void addAttendant(Attendant attendant) {
+    public void addAttendant(final Attendant attendant) {
         if (this.attendants == null) {
             this.attendants = new ArrayList<>();
         }
@@ -160,7 +159,7 @@ public class Reservation extends BaseEntity {
         attendant.setReservation(this);
     }
 
-    public void addAttendants(List<Attendant> list) {
+    public void addAttendants(final List<Attendant> list) {
         if (list == null || list.isEmpty()) return;
 
         if (this.attendants == null) {
@@ -170,24 +169,24 @@ public class Reservation extends BaseEntity {
         list.forEach(this::addAttendant);
     }
 
-    public void removeAttendant(Attendant attendant) {
+    public void removeAttendant(final Attendant attendant) {
         attendants.remove(attendant);
         attendant.setReservation(null);
     }
 
     // 예약, 참여자들 모두 soft delete
-    public void softDeleteAll(Long userId) {
+    public void softDeleteAll(final Long userId) {
         this.delete(userId); // 예약 soft delete
 
         attendants.forEach(a -> a.delete(userId)); // 참여자들 soft delete
     }
 
-    public void clear(Attendant attendant) {
+    public void clear(final Attendant attendant) {
         attendants.remove(attendant);
         attendant.setReservation(null);
     }
 
-    public void changeDescription(String description) {
+    public void changeDescription(final String description) {
         this.description = description;
     }
 
@@ -197,6 +196,20 @@ public class Reservation extends BaseEntity {
             throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.startAt = startAt;
         this.endAt = endAt;
+    }
+
+    public void markUnavailable(String reason) {
+        ReservationStatus currentStatus = this.getStatus();
+
+        // 미래에 사용 불가능한 경우
+        if (currentStatus == ReservationStatus.CANCELED
+                || currentStatus == ReservationStatus.COMPLETED
+                || currentStatus == ReservationStatus.REJECTED) {
+            return;
+        }
+
+        this.setStatus(ReservationStatus.UNAVAILABLE);
+        this.reason = reason;
     }
 
     public List<Attendant> changeAttendants(List<User> users) {
@@ -229,7 +242,7 @@ public class Reservation extends BaseEntity {
     //    }
 
     // 예약 승인
-    public void approve(User respondent, String reason) {
+    public void approve(final User respondent, final String reason) {
         if (this.getStatus() != ReservationStatus.PENDING) // (this.status != 0)
         throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.APPROVED); // this.status = 1;
@@ -239,7 +252,7 @@ public class Reservation extends BaseEntity {
     }
 
     // 예약 거절
-    public void reject(User respondent, String reason) {
+    public void reject(final User respondent, final String reason) {
         if (this.getStatus() != ReservationStatus.PENDING) // (this.status != 0)
         throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.REJECTED); // this.status = 3;
