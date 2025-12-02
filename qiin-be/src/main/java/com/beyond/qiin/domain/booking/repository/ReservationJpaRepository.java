@@ -1,8 +1,11 @@
 package com.beyond.qiin.domain.booking.repository;
 
 import com.beyond.qiin.domain.booking.entity.Reservation;
+import com.beyond.qiin.domain.booking.enums.ReservationStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import java.time.Instant;
 import java.util.List;
+import org.antlr.v4.runtime.atn.SemanticContext.AND;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -72,4 +75,15 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
       AND r.status IN (0, 1, 2)
 """)
     List<Reservation> findFutureUsableReservationsByAsset(Long assetId);
+
+    @Query(
+          """
+    SELECT r FROM Reservation r
+    WHERE r.asset.id = :assetId
+    AND r.status IN (1, 2, 5)
+        
+""")
+    List<Reservation> findActiveReservationsByAssetId(
+        Long assetId);
+
 }

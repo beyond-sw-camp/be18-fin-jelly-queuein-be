@@ -289,7 +289,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private boolean isReservationTimeAvailable(
             final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
 
-        List<Reservation> reservations = reservationReader.getReservationsByAssetId(assetId);
+        List<Reservation> reservations = reservationReader.getActiveReservationsByAssetId(assetId);
 
         for (Reservation reservation : reservations) {
 
