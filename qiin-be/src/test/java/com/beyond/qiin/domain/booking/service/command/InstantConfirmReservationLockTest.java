@@ -1,8 +1,8 @@
 package com.beyond.qiin.domain.booking.service.command;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+
 import com.beyond.qiin.config.TestRedisConfig;
-import com.beyond.qiin.domain.booking.service.command.DistributedLockTestService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +20,6 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-
 @SpringBootTest
 @ActiveProfiles("test")
 @Testcontainers
@@ -28,8 +27,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class InstantConfirmReservationLockTest {
 
     @Container
-    static GenericContainer<?> redis =
-        new GenericContainer<>("redis:7.0.5").withExposedPorts(6379);
+    static GenericContainer<?> redis = new GenericContainer<>("redis:7.0.5").withExposedPorts(6379);
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
@@ -63,14 +61,14 @@ public class InstantConfirmReservationLockTest {
         executor.awaitTermination(10, TimeUnit.SECONDS);
 
         long successCount = results.stream()
-            .filter(f -> {
-                try {
-                    return f.get();
-                } catch (Exception e) {
-                    return false;
-                }
-            })
-            .count();
+                .filter(f -> {
+                    try {
+                        return f.get();
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .count();
 
         System.out.println("성공 횟수 = " + successCount);
         System.out.println("counter 값 = " + lockTestService.getCounter());
