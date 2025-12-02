@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -64,7 +65,7 @@ public class UserCommandServiceImplTest {
 
     @Test
     @DisplayName("사용자 등록 테스트")
-    void createUser_success() {
+    void createUser() {
         // given
         CreateUserRequestDto request = new CreateUserRequestDto(
                 1L, LocalDate.of(2025, 1, 15), "홍길동", "hong@example.com", "01012341234", "1999-02-10");
@@ -95,5 +96,36 @@ public class UserCommandServiceImplTest {
 
         assertThat(dto.getUserId()).isEqualTo(10L);
         assertThat(dto.getEmail()).isEqualTo("hong@example.com");
+    }
+
+    @Test
+    @DisplayName("사용자 수정 단위 테스트")
+    void updateUser() {
+        UpdateUserRequestDto req = mock(UpdateUserRequestDto.class);
+        User user = mock(User.class);
+
+        when(userReader.findById(1L)).thenReturn(user);
+
+        userCommandService.updateUser(1L, req);
+
+        verify(user).updateUser(req);
+        verify(userWriter).save(user);
+    }
+
+    @Test
+    @DisplayName("임시 비밀번호 수정 단위 테스트")
+    void changeTempPassword() {
+        User user = mock(User.class);
+        when(userReader.findById(1L)).thenReturn(user);
+        when(user.getPasswordExpired()).thenReturn(true);
+        when(passwordEncoder.encode("NEWPASS")).thenReturn("ENC_NEWPASS");
+
+        userCommandService.changeTempPassword(1L, "NEWPASS");
+
+        verify(entityManager).flush();
+        verify(entityManager).clear();
+
+        verify(user).updatePassword("ENC_NEWPASS");
+        verify(userWriter).save(user);
     }
 }
