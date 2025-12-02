@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.inventory.enums;
 
 import com.beyond.qiin.common.enums.EnumCode;
+import com.beyond.qiin.domain.inventory.exception.AssetException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,11 +19,34 @@ public enum AssetType implements EnumCode {
     public static final Map<Integer, AssetType> CODE_MAP =
             Arrays.stream(values()).collect(Collectors.toMap(AssetType::getCode, t -> t));
 
-    public static AssetType from(int code) {
+    private static final Map<String, AssetType> NAME_MAP =
+            Arrays.stream(values()).collect(Collectors.toMap(Enum::name, t -> t));
+
+    // int → enum
+    public static AssetType fromCode(int code) {
         AssetType assetType = CODE_MAP.get(code);
         if (assetType == null) {
-            throw new IllegalArgumentException("Invalid AssetType code: " + code);
+            throw AssetException.invalidType();
         }
         return assetType;
+    }
+
+    // String → enum
+    public static AssetType fromName(String name) {
+        AssetType type = NAME_MAP.get(name);
+        if (type == null) {
+            throw AssetException.invalidType();
+        }
+        return type;
+    }
+
+    // enum → int
+    public int toCode() {
+        return this.code;
+    }
+
+    // enum → String
+    public String toName() {
+        return this.name();
     }
 }
