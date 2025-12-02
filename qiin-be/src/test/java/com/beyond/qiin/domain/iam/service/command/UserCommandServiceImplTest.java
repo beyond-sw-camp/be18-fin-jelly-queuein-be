@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.iam.service.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -14,6 +15,7 @@ import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.entity.UserRole;
+import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
@@ -29,6 +31,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
+;
 ;
 
 @DisplayName("UserCommandServiceImpl 단위 테스트")
@@ -64,8 +67,8 @@ public class UserCommandServiceImplTest {
     }
 
     @Test
-    @DisplayName("사용자 등록 테스트")
-    void createUser() {
+    @DisplayName("사용자 등록 성공 단위 테스트")
+    void createUser_success() {
         // given
         CreateUserRequestDto request = new CreateUserRequestDto(
                 1L, LocalDate.of(2025, 1, 15), "홍길동", "hong@example.com", "01012341234", "1999-02-10");
@@ -100,7 +103,7 @@ public class UserCommandServiceImplTest {
 
     @Test
     @DisplayName("사용자 수정 단위 테스트")
-    void updateUser() {
+    void updateUser_success() {
         UpdateUserRequestDto req = mock(UpdateUserRequestDto.class);
         User user = mock(User.class);
 
@@ -114,7 +117,7 @@ public class UserCommandServiceImplTest {
 
     @Test
     @DisplayName("임시 비밀번호 수정 단위 테스트")
-    void changeTempPassword() {
+    void changeTempPassword_success() {
         User user = mock(User.class);
         when(userReader.findById(1L)).thenReturn(user);
         when(user.getPasswordExpired()).thenReturn(true);
@@ -126,6 +129,29 @@ public class UserCommandServiceImplTest {
         verify(entityManager).clear();
 
         verify(user).updatePassword("ENC_NEWPASS");
+        verify(userWriter).save(user);
+    }
+
+    @Test
+    @DisplayName("임시 비밀번호 수정실패 단위 테스트")
+    void changeTempPassword_fail_notExpired() {
+        User user = mock(User.class);
+        when(userReader.findById(1L)).thenReturn(user);
+        when(user.getPasswordExpired()).thenReturn(false);
+
+        assertThatThrownBy(() -> userCommandService.changeTempPassword(1L, "NEWPASS"))
+                .isInstanceOf(UserException.class);
+    }
+
+    @Test
+    @DisplayName("사용자 삭제 성공 단위 테스트")
+    void deleteUser_success() {
+        User user = mock(User.class);
+        when(userReader.findById(1L)).thenReturn(user);
+
+        userCommandService.deleteUser(1L, 9L);
+
+        verify(user).softDelete(9L);
         verify(userWriter).save(user);
     }
 }
