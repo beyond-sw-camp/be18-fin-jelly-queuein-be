@@ -275,20 +275,5 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         return false;
     }
 
-    private String statusToString(final Integer status) {
-        if (status == 0) {
-            return "PENDING";
-        } else if (status == 1) {
-            return "APPROVED";
-        } else if (status == 2) {
-            return "USING";
-        } else if (status == 3) {
-            return "REJECTED";
-        } else if (status == 4) {
-            return "CANCELED";
-        } else if (status == 5) {
-            return "COMPLETED";
-        }
-        return "INVALID";
-    }
+
 }

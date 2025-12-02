@@ -268,37 +268,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return AssetTimeResponseDto.create(assetId, timeSlotDtos);
     }
 
-    // status 자체는 null x이므로 int
-    public static String statusToString(final int status) {
-        if (status == 0) {
-            return "PENDING";
-        } else if (status == 1) {
-            return "APPROVED";
-        } else if (status == 2) {
-            return "USING";
-        } else if (status == 3) {
-            return "REJECTED";
-        } else if (status == 4) {
-            return "CANCELED";
-        } else if (status == 5) {
-            return "COMPLETED";
-        }
-        return "INVALID";
-    }
 
-    public static Integer statusToInt(final String status) {
-        if (status == null || status.isBlank()) return null;
 
-        return switch (status.toUpperCase()) {
-            case "PENDING" -> 0;
-            case "APPROVED" -> 1;
-            case "USING" -> 2;
-            case "REJECTED" -> 3;
-            case "CANCELED" -> 4;
-            case "COMPLETED" -> 5;
-            default -> -1;
-        };
-    }
 
     public DateRange dayToInstant(final String timezone, final LocalDate date) {
         ZoneId zone = ZoneId.of(timezone); // Asia/Seoul
