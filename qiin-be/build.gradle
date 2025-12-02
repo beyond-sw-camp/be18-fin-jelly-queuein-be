@@ -110,9 +110,9 @@ dependencies {
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation platform("org.testcontainers:testcontainers-bom:1.19.7")
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation "org.testcontainers:testcontainers"
-    testImplementation "org.testcontainers:redis"
 
     // Excel (Apache POI)
     implementation 'org.apache.poi:poi:5.2.5'
