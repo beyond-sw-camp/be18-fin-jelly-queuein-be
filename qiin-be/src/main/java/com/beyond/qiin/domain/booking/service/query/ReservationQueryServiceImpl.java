@@ -28,6 +28,7 @@ import com.beyond.qiin.domain.booking.util.AvailableTimeSlotCalculator;
 import com.beyond.qiin.domain.booking.vo.DateRange;
 import com.beyond.qiin.domain.booking.vo.TimeSlot;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
+import com.beyond.qiin.domain.inventory.exception.AssetException;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -143,7 +144,14 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         for (RawReservableAssetResponseDto raw : rawList) {
 
             boolean isReservable = isAssetReservableOnDate(raw.getAssetId(), date);
-            boolean isAssetAvailable = assetQueryService.isAvailable(raw.getAssetId());
+            boolean isAssetAvailable = false;
+            try {
+                isAssetAvailable = assetQueryService.isAvailable(raw.getAssetId());
+            } catch (AssetException e) {
+                // 조회 목적이므로 단순히 사용 불가 처리
+                isAssetAvailable = false;
+            }
+
             if (isReservable && isAssetAvailable) {
                 reservableAssets.add(ReservableAssetResponseDto.fromRaw(raw)); // 생성 조건이 true이므로 인자로 받지 않음
             }
