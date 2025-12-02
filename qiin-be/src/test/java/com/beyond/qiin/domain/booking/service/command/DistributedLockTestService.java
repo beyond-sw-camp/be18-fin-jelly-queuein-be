@@ -9,9 +9,9 @@ public class DistributedLockTestService {
 
     @DistributedLock(key = "'test:' + #id")
     public void doLockingWork(Long id) {
-        counter++;
+        counter++; // 락 획득한 스레드 (요청) 개수
         try {
-            Thread.sleep(100);
+            Thread.sleep(100); // 자원 획득 후 소요 시간(진입 타임 겹치는 용도)
         } catch (Exception ignored) {
         }
     }
