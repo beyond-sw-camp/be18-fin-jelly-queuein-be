@@ -284,9 +284,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             throw new ReservationException(ReservationErrorCode.RESERVATION_CANCEL_NOT_ALLOWED);
     }
 
-    // todo : 날짜 기반으로 추가
+    // test 가능하도록 package private 허용
     // 자원에 대한 예약 가능의 유무 -  비즈니스 책임이므로 command service로
-    private boolean isReservationTimeAvailable(
+    boolean isReservationTimeAvailable(
             final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
 
         List<Reservation> reservations = reservationReader.getActiveReservationsByAssetId(assetId);
