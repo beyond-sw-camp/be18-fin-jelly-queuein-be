@@ -1,10 +1,8 @@
 package com.beyond.qiin.domain.booking.service.command;
-
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.mockito.Mockito.when;
 import com.beyond.qiin.config.TestRedisConfig;
-import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
-import java.time.Instant;
+import com.beyond.qiin.domain.booking.service.command.DistributedLockTestService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -22,6 +20,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+
 @SpringBootTest
 @ActiveProfiles("test")
 @Testcontainers
@@ -29,7 +28,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class InstantConfirmReservationLockTest {
 
     @Container
-    static GenericContainer<?> redis = new GenericContainer<>("redis:7.0.5").withExposedPorts(6379);
+    static GenericContainer<?> redis =
+        new GenericContainer<>("redis:7.0.5").withExposedPorts(6379);
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
@@ -38,34 +38,23 @@ public class InstantConfirmReservationLockTest {
     }
 
     @Autowired
-    ReservationCommandServiceImpl reservationCommandService;
+    DistributedLockTestService lockTestService;
 
     @Test
-    void 동시_요청시_예약_1명_성공() throws Exception {
+    void 동시에_실행해도_1번만_실행된다() throws Exception {
 
-        // given
-        Long userId = 1L;
-        Long assetId = 1L;
-
-        CreateReservationRequestDto req = CreateReservationRequestDto.builder()
-                .startAt(Instant.parse("2025-01-03T10:00:00Z"))
-                .endAt(Instant.parse("2025-01-03T11:00:00Z"))
-                .applicantId(1L)
-                .build();
-
-        int THREADS = 5; // 5 스레드가 동시에 해당 메서드 호출
+        int THREADS = 10;
         ExecutorService executor = Executors.newFixedThreadPool(THREADS);
 
         List<Future<Boolean>> results = new ArrayList<>();
 
-        // when: 동시에 선착순 예약 실행
         for (int i = 0; i < THREADS; i++) {
             results.add(executor.submit(() -> {
                 try {
-                    reservationCommandService.instantConfirmReservation(userId, assetId, req);
-                    return true; // 성공
+                    lockTestService.doLockingWork(1L);
+                    return true;
                 } catch (Exception e) {
-                    return false; // 실패해야 함
+                    return false;
                 }
             }));
         }
@@ -73,20 +62,19 @@ public class InstantConfirmReservationLockTest {
         executor.shutdown();
         executor.awaitTermination(10, TimeUnit.SECONDS);
 
-        // then
         long successCount = results.stream()
-                .filter(f -> {
-                    try {
-                        return f.get();
-                    } catch (Exception e) {
-                        return false;
-                    }
-                })
-                .count();
+            .filter(f -> {
+                try {
+                    return f.get();
+                } catch (Exception e) {
+                    return false;
+                }
+            })
+            .count();
 
         System.out.println("성공 횟수 = " + successCount);
+        System.out.println("counter 값 = " + lockTestService.getCounter());
 
-        // 성공 1건이어야함
-        assertThat(successCount).isEqualTo(1);
+        assertThat(lockTestService.getCounter()).isEqualTo(1);
     }
 }

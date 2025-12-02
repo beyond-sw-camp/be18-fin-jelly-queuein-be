@@ -55,3 +55,8 @@ spring:
 
 mail:
   from: "QueueIn Test <no-reply@test.com>"
+
+jwt:
+  secret-key: 1
+  access-token-expiration: 1
+  refresh-token-expiration: 1
