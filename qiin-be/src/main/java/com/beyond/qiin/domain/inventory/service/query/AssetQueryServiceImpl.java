@@ -147,4 +147,15 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     public Asset getAssetById(final Long assetId) {
         return assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
     }
+
+    // 자원 사용 가능 여부
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isAvailable(final Long assetId) {
+        Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
+        if (asset.getStatus() == 1 || asset.getStatus() == 2) {
+            throw AssetException.assetNotAvailable();
+        }
+        return true;
+    }
 }

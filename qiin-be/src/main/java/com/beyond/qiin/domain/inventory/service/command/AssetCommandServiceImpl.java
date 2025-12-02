@@ -247,7 +247,6 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     public boolean isAvailable(final Long assetId) {
         Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
         if (asset.getStatus() == 1 || asset.getStatus() == 2) {
-            //            throw new AssetException(AssetErrorCode.ASSET_NOT_AVAILABLE);
             throw AssetException.assetNotAvailable();
         }
         return true;

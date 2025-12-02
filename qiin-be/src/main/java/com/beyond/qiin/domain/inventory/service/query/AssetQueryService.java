@@ -29,4 +29,6 @@ public interface AssetQueryService {
     AssetDetailResponseDto getAssetDetail(final Long assetId);
 
     Asset getAssetById(final Long assetId);
+
+    boolean isAvailable(final Long assetId);
 }
