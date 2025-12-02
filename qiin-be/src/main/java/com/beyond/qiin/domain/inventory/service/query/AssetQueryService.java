@@ -31,7 +31,7 @@ public interface AssetQueryService {
     AssetDetailResponseDto getAssetDetail(final Long assetId);
 
     //
-    Asset getAssetById(final Long assetId) ;
+    Asset getAssetById(final Long assetId);
 
     // 자원 상태에 따른 사용 가능 여부 반환
     boolean isAvailable(final Long assetId);
