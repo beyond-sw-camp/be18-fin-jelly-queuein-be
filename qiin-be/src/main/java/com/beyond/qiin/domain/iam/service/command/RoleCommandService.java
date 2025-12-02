@@ -13,5 +13,5 @@ public interface RoleCommandService {
     RoleResponseDto updateRole(final Long roleId, final UpdateRoleRequestDto request);
 
     // 역할 삭제
-    void deleteRole(final Long roleId);
+    void deleteRole(final Long roleId, final Long deleterId);
 }

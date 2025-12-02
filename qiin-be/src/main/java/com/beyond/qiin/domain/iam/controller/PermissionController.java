@@ -6,6 +6,7 @@ import com.beyond.qiin.domain.iam.dto.permission.response.PermissionListResponse
 import com.beyond.qiin.domain.iam.dto.permission.response.PermissionResponseDto;
 import com.beyond.qiin.domain.iam.service.command.PermissionCommandService;
 import com.beyond.qiin.domain.iam.service.query.PermissionQueryService;
+import com.beyond.qiin.security.resolver.CurrentUserId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -49,8 +50,9 @@ public class PermissionController {
     // 권한 삭제
     @DeleteMapping("/{permissionId}")
     @PreAuthorize("hasAuthority('MASTER')")
-    public ResponseEntity<Void> deletePermission(@PathVariable final Long permissionId) {
-        permissionCommandService.deletePermission(permissionId);
+    public ResponseEntity<Void> deletePermission(
+            @PathVariable final Long permissionId, @CurrentUserId final Long deleterId) {
+        permissionCommandService.deletePermission(permissionId, deleterId);
         return ResponseEntity.noContent().build();
     }
 

@@ -12,6 +12,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -53,6 +54,12 @@ public class User extends BaseEntity {
     @Column(name = "password", length = 255, nullable = false)
     private String password;
 
+    @Column(name = "phone", length = 20)
+    private String phone;
+
+    @Column(name = "birth", length = 10)
+    private String birth;
+
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<UserRole> userRoles = new ArrayList<>();
@@ -70,14 +77,22 @@ public class User extends BaseEntity {
     @Column(name = "retire_date", columnDefinition = "TIMESTAMP(6)")
     private Instant retireDate;
 
-    public static User create(final CreateUserRequestDto request, final String encryptedPassword) {
+    public static User create(
+            final CreateUserRequestDto request, final String generatedUserNo, final String encryptedPassword) {
+
+        final Instant hireInstant =
+                request.getHireDate().atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+
         return User.builder()
                 .dptId(request.getDptId())
-                .userNo(request.getUserNo())
+                .userNo(generatedUserNo)
                 .userName(request.getUserName())
                 .email(request.getEmail())
                 .password(encryptedPassword)
+                .phone(request.getPhone())
+                .birth(request.getBirth())
                 .passwordExpired(true)
+                .hireDate(hireInstant)
                 .build();
     }
 
@@ -98,6 +113,8 @@ public class User extends BaseEntity {
         if (dto.getUserName() != null) this.userName = dto.getUserName();
         if (dto.getEmail() != null) this.email = dto.getEmail();
         if (dto.getRetireDate() != null) this.retireDate = dto.getRetireDate();
+        if (dto.getPhone() != null) this.phone = dto.getPhone();
+        if (dto.getBirth() != null) this.birth = dto.getBirth();
     }
 
     // 사용자 삭제하면 자식 데이터도 삭제

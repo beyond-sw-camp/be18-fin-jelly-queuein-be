@@ -11,10 +11,10 @@ import org.springframework.stereotype.Repository;
 public interface RolePermissionJpaRepository extends JpaRepository<RolePermission, Long> {
 
     // 역할 기준 관련권한들
-    List<RolePermission> findByRole(Role role);
+    List<RolePermission> findAllByRole(final Role role);
 
     // 복합키 검증
-    boolean existsByRoleAndPermission(final Role role, Permission permission);
+    boolean existsByRoleAndPermission(final Role role, final Permission permission);
 
     // 권한 검색
     List<RolePermission> findByPermission(final Permission permission);

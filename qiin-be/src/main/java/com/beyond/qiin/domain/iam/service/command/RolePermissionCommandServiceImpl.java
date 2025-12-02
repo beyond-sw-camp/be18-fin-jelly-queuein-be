@@ -10,7 +10,6 @@ import com.beyond.qiin.domain.iam.support.permission.PermissionReader;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.rolepermission.RolePermissionReader;
 import com.beyond.qiin.domain.iam.support.rolepermission.RolePermissionWriter;
-import com.beyond.qiin.security.SecurityUtils;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -70,13 +69,14 @@ public class RolePermissionCommandServiceImpl implements RolePermissionCommandSe
 
     @Override
     @Transactional
-    public RolePermissionListResponseDto replacePermissions(final Long roleId, final List<Long> permissionIds) {
+    public RolePermissionListResponseDto replacePermissions(
+            final Long roleId, final List<Long> permissionIds, final Long userId) {
 
         Role role = roleReader.findById(roleId);
 
         // soft delete 기존 항목들
-        List<RolePermission> existed = rolePermissionReader.findByRole(role);
-        existed.forEach(rp -> rp.softDelete(SecurityUtils.getCurrentUserId()));
+        List<RolePermission> existed = rolePermissionReader.findAllByRole(role);
+        existed.forEach(rp -> rp.softDelete(userId));
         rolePermissionWriter.saveAll(existed);
 
         // 새로운 매핑 생성 후 반환
@@ -85,12 +85,12 @@ public class RolePermissionCommandServiceImpl implements RolePermissionCommandSe
 
     @Override
     @Transactional
-    public RolePermissionListResponseDto removePermission(final Long roleId, final Long permissionId) {
+    public RolePermissionListResponseDto removePermission(
+            final Long roleId, final Long permissionId, final Long deleterId) {
 
         Role role = roleReader.findById(roleId);
-        Permission permission = permissionReader.findById(permissionId);
 
-        List<RolePermission> list = rolePermissionReader.findByRole(role).stream()
+        List<RolePermission> list = rolePermissionReader.findAllByRole(role).stream()
                 .filter(rp -> rp.getPermission().getId().equals(permissionId))
                 .toList();
 
@@ -98,11 +98,11 @@ public class RolePermissionCommandServiceImpl implements RolePermissionCommandSe
             throw PermissionException.permissionNotFound();
         }
 
-        list.forEach(rp -> rp.softDelete(SecurityUtils.getCurrentUserId()));
+        list.forEach(rp -> rp.softDelete(deleterId));
         rolePermissionWriter.saveAll(list);
 
         // 최신 상태 반환
-        List<RolePermission> remained = rolePermissionReader.findByRole(role);
+        List<RolePermission> remained = rolePermissionReader.findAllByRole(role);
 
         return RolePermissionListResponseDto.fromEntities(roleId, remained);
     }
