@@ -164,12 +164,12 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         List<AssetClosure> subtree = assetClosureQueryAdapter.findDescendants(assetId);
 
-//        boolean isCycle = subtree.stream()
-//                .anyMatch(c -> c.getAssetClosureId().getDescendantId().equals(newParentId));
-//
-//        if (isCycle) {
-//            throw AssetException.cannotMoveToChild();
-//        }
+        //        boolean isCycle = subtree.stream()
+        //                .anyMatch(c -> c.getAssetClosureId().getDescendantId().equals(newParentId));
+        //
+        //        if (isCycle) {
+        //            throw AssetException.cannotMoveToChild();
+        //        }
 
         List<Long> subtreeIds = subtree.stream()
                 .map(c -> c.getAssetClosureId().getDescendantId())
@@ -180,11 +180,11 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             throw AssetException.cannotMoveToChild();
         }
 
-//        for (Long id : subtreeIds) {
-//            System.out.println("subtree id 삭제: " + id);
-//            assetClosureQueryAdapter.deleteAllByAncestorId(id);
-//            assetClosureQueryAdapter.deleteAllByDescendantId(id);
-//        }
+        //        for (Long id : subtreeIds) {
+        //            System.out.println("subtree id 삭제: " + id);
+        //            assetClosureQueryAdapter.deleteAllByAncestorId(id);
+        //            assetClosureQueryAdapter.deleteAllByDescendantId(id);
+        //        }
 
         // 6) 기존 부모 계층과 subtree 연결된 링크 삭제
         assetClosureQueryAdapter.deleteOldAncestorLinks(subtreeIds);
@@ -206,11 +206,11 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             }
         }
 
-//        for (Long id : subtreeIds) {
-//            System.out.println("subtree id 생성: " + id);
-//            // if문 써서 값이 없으면 넣기
-//            assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
-//        }
+        //        for (Long id : subtreeIds) {
+        //            System.out.println("subtree id 생성: " + id);
+        //            // if문 써서 값이 없으면 넣기
+        //            assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
+        //        }
     }
 
     @Transactional
@@ -222,14 +222,14 @@ public class AssetCommandServiceImpl implements AssetCommandService {
                 .map(c -> c.getAssetClosureId().getDescendantId())
                 .toList();
 
-//        for (Long id : subtreeIds) {
-//            assetClosureQueryAdapter.deleteAllByAncestorId(id);
-//            assetClosureQueryAdapter.deleteAllByDescendantId(id);
-//        }
-//
-//        for (Long id : subtreeIds) {
-//            assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
-//        }
+        //        for (Long id : subtreeIds) {
+        //            assetClosureQueryAdapter.deleteAllByAncestorId(id);
+        //            assetClosureQueryAdapter.deleteAllByDescendantId(id);
+        //        }
+        //
+        //        for (Long id : subtreeIds) {
+        //            assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
+        //        }
 
         // 2) 기존 부모 계층과 subtree 연결된 링크 삭제
         assetClosureQueryAdapter.deleteOldAncestorLinks(subtreeIds);

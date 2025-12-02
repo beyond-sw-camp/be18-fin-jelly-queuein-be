@@ -83,10 +83,11 @@ public class AssetClosureQueryAdapterImpl implements AssetClosureQueryAdapter {
     public void deleteOldAncestorLinks(List<Long> subtreeIds) {
         queryFactory
                 .delete(assetClosure)
-                .where(
-                        assetClosure.assetClosureId.descendantId.in(subtreeIds)
-                        .and(assetClosure.assetClosureId.ancestorId.notIn(subtreeIds))
-                )
+                .where(assetClosure
+                        .assetClosureId
+                        .descendantId
+                        .in(subtreeIds)
+                        .and(assetClosure.assetClosureId.ancestorId.notIn(subtreeIds)))
                 .execute();
     }
 
@@ -98,5 +99,4 @@ public class AssetClosureQueryAdapterImpl implements AssetClosureQueryAdapter {
                 .where(assetClosure.depth.eq(1))
                 .fetch();
     }
-
 }

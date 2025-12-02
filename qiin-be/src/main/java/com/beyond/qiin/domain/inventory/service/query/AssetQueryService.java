@@ -20,9 +20,9 @@ public interface AssetQueryService {
     // 자식 자원들 조회
     PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(final int page, final int size);
 
-//    부분 트리 방식임
-//    TreeAssetResponseDto getAssetTree(final Long assetId);
-//    List<TreeAssetResponseDto> getFullAssetTree();
+    //    부분 트리 방식임
+    //    TreeAssetResponseDto getAssetTree(final Long assetId);
+    //    List<TreeAssetResponseDto> getFullAssetTree();
 
     // 전체 트리 조회
     List<TreeAssetResponseDto> getFullAssetTree();

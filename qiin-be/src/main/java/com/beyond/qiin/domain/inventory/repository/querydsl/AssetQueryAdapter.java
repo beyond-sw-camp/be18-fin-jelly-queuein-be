@@ -33,5 +33,4 @@ public interface AssetQueryAdapter {
 
     // 모든 자원 조회
     List<Asset> findAll();
-
 }

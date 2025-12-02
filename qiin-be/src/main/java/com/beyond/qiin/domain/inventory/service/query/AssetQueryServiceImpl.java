@@ -14,7 +14,6 @@ import com.beyond.qiin.domain.inventory.exception.AssetException;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
-import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,60 +78,60 @@ public class AssetQueryServiceImpl implements AssetQueryService {
         return PageResponseDto.from(descendantAssetResponseDtoPage);
     }
 
-//    부분 트리 방식임
-//    @Override
-//    @Transactional(readOnly = true)
-//    public TreeAssetResponseDto getAssetTree(final Long assetId) {
-//
-//        Asset rootAsset = assetQueryAdapter.findById(assetId).orElseThrow(AssetException::notFound);
-//
-//        List<AssetClosure> closures = assetQueryAdapter.findSubtree(assetId);
-//
-//        List<Long> descendantIds = closures.stream()
-//                .map(c -> c.getAssetClosureId().getDescendantId())
-//                .distinct()
-//                .toList();
-//
-//        List<Asset> assets = assetQueryAdapter.findByIds(descendantIds);
-//
-//        Map<Long, Asset> assetMap = assets.stream().collect(Collectors.toMap(Asset::getId, a -> a));
-//
-//        Map<Long, List<Long>> childrenMap = new HashMap<>();
-//
-//        for (AssetClosure c : closures) {
-//            if (c.getDepth() == 1) {
-//                Long parentId = c.getAssetClosureId().getAncestorId();
-//                Long childId = c.getAssetClosureId().getDescendantId();
-//
-//                childrenMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(childId);
-//            }
-//        }
-//
-//        return buildTreeFromMap(assetId, assetMap, childrenMap);
-//    }
-//
-//    @Override
-//    @Transactional(readOnly = true)
-//    public List<TreeAssetResponseDto> getFullAssetTree() {
-//
-//        List<Long> rootIds = assetQueryAdapter.findRootAssetIds();
-//
-//        return rootIds.stream().map(this::getAssetTree).toList();
-//    }
-//
-//    private TreeAssetResponseDto buildTreeFromMap(
-//            Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
-//
-//        Asset asset = assetMap.get(assetId);
-//
-//        List<Long> childIds = childrenMap.getOrDefault(assetId, List.of());
-//
-//        List<TreeAssetResponseDto> children = childIds.stream()
-//                .map(childId -> buildTreeFromMap(childId, assetMap, childrenMap))
-//                .toList();
-//
-//        return TreeAssetResponseDto.of(asset.getId(), asset.getName(), children);
-//    }
+    //    부분 트리 방식임
+    //    @Override
+    //    @Transactional(readOnly = true)
+    //    public TreeAssetResponseDto getAssetTree(final Long assetId) {
+    //
+    //        Asset rootAsset = assetQueryAdapter.findById(assetId).orElseThrow(AssetException::notFound);
+    //
+    //        List<AssetClosure> closures = assetQueryAdapter.findSubtree(assetId);
+    //
+    //        List<Long> descendantIds = closures.stream()
+    //                .map(c -> c.getAssetClosureId().getDescendantId())
+    //                .distinct()
+    //                .toList();
+    //
+    //        List<Asset> assets = assetQueryAdapter.findByIds(descendantIds);
+    //
+    //        Map<Long, Asset> assetMap = assets.stream().collect(Collectors.toMap(Asset::getId, a -> a));
+    //
+    //        Map<Long, List<Long>> childrenMap = new HashMap<>();
+    //
+    //        for (AssetClosure c : closures) {
+    //            if (c.getDepth() == 1) {
+    //                Long parentId = c.getAssetClosureId().getAncestorId();
+    //                Long childId = c.getAssetClosureId().getDescendantId();
+    //
+    //                childrenMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(childId);
+    //            }
+    //        }
+    //
+    //        return buildTreeFromMap(assetId, assetMap, childrenMap);
+    //    }
+    //
+    //    @Override
+    //    @Transactional(readOnly = true)
+    //    public List<TreeAssetResponseDto> getFullAssetTree() {
+    //
+    //        List<Long> rootIds = assetQueryAdapter.findRootAssetIds();
+    //
+    //        return rootIds.stream().map(this::getAssetTree).toList();
+    //    }
+    //
+    //    private TreeAssetResponseDto buildTreeFromMap(
+    //            Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
+    //
+    //        Asset asset = assetMap.get(assetId);
+    //
+    //        List<Long> childIds = childrenMap.getOrDefault(assetId, List.of());
+    //
+    //        List<TreeAssetResponseDto> children = childIds.stream()
+    //                .map(childId -> buildTreeFromMap(childId, assetMap, childrenMap))
+    //                .toList();
+    //
+    //        return TreeAssetResponseDto.of(asset.getId(), asset.getName(), children);
+    //    }
 
     @Override
     @Transactional(readOnly = true)
@@ -153,39 +152,32 @@ public class AssetQueryServiceImpl implements AssetQueryService {
         }
 
         // 4) 전체 자원 ID 수집
-        Map<Long, Asset> assetMap = allAssets.stream()
-                                             .collect(Collectors.toMap(Asset::getId, a -> a));
+        Map<Long, Asset> assetMap = allAssets.stream().collect(Collectors.toMap(Asset::getId, a -> a));
 
         // 5) root 찾기: 전체 ID - childIds
         Set<Long> childIds = depthOneRelations.stream()
-                                              .map(c -> c.getAssetClosureId().getDescendantId())
-                                              .collect(Collectors.toSet());
+                .map(c -> c.getAssetClosureId().getDescendantId())
+                .collect(Collectors.toSet());
 
-        List<Long> rootIds = assetMap.keySet().stream()
-                                     .filter(id -> !childIds.contains(id))
-                                     .toList();
+        List<Long> rootIds =
+                assetMap.keySet().stream().filter(id -> !childIds.contains(id)).toList();
 
         // 6) DFS로 트리 생성
         return rootIds.stream()
-                      .map(rootId -> buildTree(rootId, assetMap, childrenMap))
-                      .toList();
+                .map(rootId -> buildTree(rootId, assetMap, childrenMap))
+                .toList();
     }
 
-    private TreeAssetResponseDto buildTree(Long assetId,
-                                           Map<Long, Asset> assetMap,
-                                           Map<Long, List<Long>> childrenMap) {
+    private TreeAssetResponseDto buildTree(Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
 
         Asset asset = assetMap.get(assetId);
 
-        List<TreeAssetResponseDto> children = childrenMap
-                .getOrDefault(assetId, List.of())
-                .stream()
+        List<TreeAssetResponseDto> children = childrenMap.getOrDefault(assetId, List.of()).stream()
                 .map(childId -> buildTree(childId, assetMap, childrenMap))
                 .toList();
 
         return TreeAssetResponseDto.of(asset.getId(), asset.getName(), children);
     }
-
 
     @Override
     @Transactional(readOnly = true)
