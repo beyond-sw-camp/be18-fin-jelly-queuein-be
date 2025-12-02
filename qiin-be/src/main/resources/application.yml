@@ -11,7 +11,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          time_zone: UTC
 
+  jackson:
+    time-zone: UTC
   # ----------------------------------------
   # AWS SES SMTP (이메일 발송) 설정 추가
   # ----------------------------------------

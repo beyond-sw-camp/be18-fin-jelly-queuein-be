@@ -44,10 +44,10 @@ public class GetUserReservationResponseDto {
     public static GetUserReservationResponseDto fromRaw(final RawUserReservationResponseDto raw) {
         return GetUserReservationResponseDto.builder()
                 .reservationId(raw.getReservationId())
-                .assetType(AssetType.from(raw.getAssetType()).name())
+                .assetType(AssetType.fromCode(raw.getAssetType()).name())
                 .assetName(raw.getAssetName())
                 .categoryName(raw.getCategoryName())
-                .assetStatus(AssetStatus.from(raw.getAssetStatus()).name())
+                .assetStatus(AssetStatus.fromCode(raw.getAssetStatus()).name())
                 .isApproved(raw.isApproved())
                 .startAt(raw.getStartAt())
                 .endAt(raw.getEndAt())

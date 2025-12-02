@@ -38,8 +38,8 @@ public class ReservationReader {
     }
 
     // 자원 목록 (예외처리 포함)
-    public List<Reservation> getReservationsByAssetId(final Long assetId) {
-        List<Reservation> reservations = reservationJpaRepository.findByAssetId(assetId);
+    public List<Reservation> getActiveReservationsByAssetId(final Long assetId) {
+        List<Reservation> reservations = reservationJpaRepository.findActiveReservationsByAssetId(assetId);
         return reservations;
     }
 
