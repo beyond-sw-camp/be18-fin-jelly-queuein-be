@@ -8,8 +8,9 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDt
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.entity.Category;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
-import com.beyond.qiin.domain.inventory.exception.AssetException.AssetErrorCode;
 import com.beyond.qiin.domain.inventory.exception.CategoryException;
 import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
@@ -53,7 +54,10 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         Category category =
                 categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
 
-        Asset asset = requestDto.toEntity(category);
+        int statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
+        int typeCode = AssetType.fromName(requestDto.getType()).toCode();
+
+        Asset asset = Asset.create(category, requestDto, statusCode, typeCode);
 
         assetJpaRepository.save(asset);
 
@@ -104,12 +108,16 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         if (requestDto.getCategoryId() != null) {
             categoryCommandService.validateCategoryId(requestDto.getCategoryId());
         }
+
+        int statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
+        int typeCode = AssetType.fromName(requestDto.getType()).toCode();
+
         Category category =
                 categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
 
         Asset asset = getAssetById(assetId);
 
-        asset.apply(category, requestDto);
+        asset.apply(category, requestDto, statusCode, typeCode);
 
         return UpdateAssetResponseDto.fromEntity(asset);
     }
@@ -118,13 +126,18 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     @Transactional
     public void softDeleteAsset(final Long assetId, final Long userId) {
 
-        // 나중에 권한 검증 추가
-
         // 삭제하는 유저 찾기
         userReader.findById(userId);
 
         // 삭제할 자원 찾기
         Asset asset = getAssetById(assetId);
+
+        // 자식 자원 있으면 삭제 안됨 예외 처리
+        if (assetClosureQueryAdapter.existsChildren(assetId)) {
+            throw AssetException.hasChildren();
+        }
+
+        // 예약 중인 자원을 다 디나이 처리
 
         // softDelete로 삭제 처리
         asset.softDelete(userId);
@@ -188,6 +201,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         for (Long id : subtreeIds) {
             System.out.println("subtree id 생성: " + id);
+            // if문 써서 값이 없으면 넣기
             assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
         }
     }
@@ -233,29 +247,8 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     public boolean isAvailable(final Long assetId) {
         Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
         if (asset.getStatus() == 1 || asset.getStatus() == 2) {
-            throw new AssetException(AssetErrorCode.ASSET_NOT_AVAILABLE);
+            throw AssetException.assetNotAvailable();
         }
         return true;
-    }
-
-    // 자원 상태 변환 // 읽기용으로 옮길 예정
-    @Override
-    public String assetStatusToString(final Integer status) {
-        if (status == 0) {
-            return "AVAILABLE";
-        } else if (status == 1) {
-            return "UNAVAILABLE";
-        } else {
-            return "MAINTENANCE";
-        }
-    }
-
-    @Override
-    public String assetTypeToString(final Integer type) {
-        if (type == 1) {
-            return "STATIC";
-        } else {
-            return "DYNAMIC";
-        }
     }
 }

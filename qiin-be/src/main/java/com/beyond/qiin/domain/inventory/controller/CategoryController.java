@@ -9,6 +9,7 @@ import com.beyond.qiin.domain.inventory.dto.category.response.ManageCategoryResp
 import com.beyond.qiin.domain.inventory.dto.category.response.UpdateCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.service.command.CategoryCommandService;
 import com.beyond.qiin.domain.inventory.service.query.CategoryQueryService;
+import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.resolver.AccessToken;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -34,6 +35,8 @@ public class CategoryController {
     private final CategoryCommandService categoryCommandService;
 
     private final CategoryQueryService categoryQueryService;
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     // 카테고리 생성
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
@@ -63,9 +66,11 @@ public class CategoryController {
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId, @AccessToken final String accessToken) {
 
-        //        categoryCommandService.deleteCategory(categoryId, user.getUserId());
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
 
-        return ResponseEntity.noContent().build();
+        categoryCommandService.softDeleteCategory(categoryId, userId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
     // 카테고리 드롭다운 메뉴 조회
@@ -82,7 +87,7 @@ public class CategoryController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/management")
     public ResponseEntity<PageResponseDto<ManageCategoryResponseDto>> getManageCategory(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "010") int size) {
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
 
         PageResponseDto<ManageCategoryResponseDto> categories = categoryQueryService.getManageList(page, size);
 

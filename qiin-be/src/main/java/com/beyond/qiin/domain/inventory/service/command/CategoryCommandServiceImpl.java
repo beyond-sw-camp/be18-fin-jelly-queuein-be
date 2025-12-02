@@ -7,6 +7,7 @@ import com.beyond.qiin.domain.inventory.dto.category.response.CreateCategoryResp
 import com.beyond.qiin.domain.inventory.dto.category.response.UpdateCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Category;
 import com.beyond.qiin.domain.inventory.exception.CategoryException;
+import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.CategoryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,14 +19,14 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
 
     private final CategoryJpaRepository categoryJpaRepository;
 
+    private final AssetJpaRepository assetJpaRepository;
+
     private final UserReader userReader;
 
     // 생성
     @Override
     @Transactional
     public CreateCategoryResponseDto createCategory(final CreateCategoryRequestDto requestDto) {
-
-        // 나중에 권한 검증 추가
 
         // 이름 중복이면 예외 처리
         if (categoryJpaRepository.existsByName(requestDto.getName())) {
@@ -44,8 +45,6 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
     @Transactional
     public UpdateCategoryResponseDto updateCategory(final UpdateCategoryRequestDto requestDto, final Long categoryId) {
 
-        // 나중에 권한 검증 추가
-
         // 이름 중복이면 예외 처리
         if (categoryJpaRepository.existsByName(requestDto.getName())) {
             throw CategoryException.duplicateName();
@@ -63,13 +62,16 @@ public class CategoryCommandServiceImpl implements CategoryCommandService {
     @Transactional
     public void softDeleteCategory(final Long categoryId, final Long userId) {
 
-        // 나중에 권한 검증 추가
-
         // 삭제하는 유저 찾기
         userReader.findById(userId);
 
         // 삭제할 카테고리 찾기
         Category category = categoryJpaRepository.findById(categoryId).orElseThrow(CategoryException::notFound);
+
+        // 카테고리에 속한 자원이 있으면 예외 처리
+        if (assetJpaRepository.existsByCategoryId(categoryId)) {
+            throw CategoryException.hasAssets();
+        }
 
         // softDelete로 삭제 처리
         category.softDelete(userId);

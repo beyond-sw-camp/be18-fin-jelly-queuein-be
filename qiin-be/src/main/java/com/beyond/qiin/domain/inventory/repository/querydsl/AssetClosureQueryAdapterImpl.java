@@ -62,4 +62,19 @@ public class AssetClosureQueryAdapterImpl implements AssetClosureQueryAdapter {
                 .where(assetClosure.assetClosureId.descendantId.eq(descendantId))
                 .execute();
     }
+
+    // 아이디 기준으로 자식이 있는지
+    @Override
+    @Transactional
+    public boolean existsChildren(final Long assetId) {
+
+        Integer result = queryFactory
+                .selectOne()
+                .from(assetClosure)
+                .where(assetClosure.assetClosureId.ancestorId.eq(assetId).and(assetClosure.depth.gt(0)))
+                .fetchFirst();
+
+        // 있으면 true 반환 함
+        return result != null;
+    }
 }

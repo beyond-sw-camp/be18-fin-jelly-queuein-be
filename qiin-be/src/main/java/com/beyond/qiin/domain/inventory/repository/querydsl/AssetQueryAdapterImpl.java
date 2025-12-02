@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
-import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
@@ -81,14 +82,14 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
                 .fetch();
     }
 
-    public Page<DescendantAssetResponseDto> findAllForDescendant(Pageable pageable) {
+    public Page<RawDescendantAssetResponseDto> findAllForDescendant(Pageable pageable) {
 
-        List<DescendantAssetResponseDto> contnet = jpaQueryFactory
+        List<RawDescendantAssetResponseDto> contnet = jpaQueryFactory
                 .select(Projections.constructor(
-                        DescendantAssetResponseDto.class,
+                        RawDescendantAssetResponseDto.class,
                         asset.id,
                         asset.name,
-                        asset.category.id,
+                        asset.category.name,
                         asset.status,
                         asset.type,
                         asset.needsApproval,
@@ -106,10 +107,43 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
     }
 
     @Override
-    public Optional<Asset> findByAssetId(Long assetId) {
-        Asset result =
-                jpaQueryFactory.selectFrom(asset).where(asset.id.eq(assetId)).fetchOne();
+    public Optional<RawAssetDetailResponseDto> findByAssetId(Long assetId) {
 
-        return Optional.ofNullable(result);
+        RawAssetDetailResponseDto dto = jpaQueryFactory
+                .select(Projections.constructor(
+                        RawAssetDetailResponseDto.class,
+                        asset.id,
+                        asset.category.id,
+                        asset.category.name,
+                        asset.name,
+                        asset.description,
+                        asset.image,
+                        asset.status,
+                        asset.type,
+                        asset.accessLevel,
+                        asset.needsApproval,
+                        asset.costPerHour,
+                        asset.periodCost,
+                        asset.createdAt,
+                        asset.createdBy))
+                .from(asset)
+                .where(asset.id.eq(assetId))
+                .fetchOne();
+
+        return Optional.ofNullable(dto);
+    }
+
+    @Override
+    public String findParentName(Long assetId) {
+
+        QAsset parent = new QAsset("parent");
+
+        return jpaQueryFactory
+                .select(parent.name)
+                .from(assetClosure)
+                .leftJoin(parent)
+                .on(parent.id.eq(assetClosure.assetClosureId.ancestorId))
+                .where(assetClosure.assetClosureId.descendantId.eq(assetId), assetClosure.depth.eq(1))
+                .fetchOne();
     }
 }
