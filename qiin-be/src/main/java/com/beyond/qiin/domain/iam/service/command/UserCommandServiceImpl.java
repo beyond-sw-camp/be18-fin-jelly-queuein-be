@@ -14,6 +14,7 @@ import com.beyond.qiin.domain.iam.support.user.UserWriter;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
 import com.beyond.qiin.infra.mail.MailService;
 import com.beyond.qiin.security.PasswordGenerator;
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -36,6 +37,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
+    private final EntityManager entityManager;
 
     // 사용자 생성
     @Override
@@ -74,6 +76,9 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Override
     @Transactional
     public void changeTempPassword(final Long userId, final String newPassword) {
+
+        entityManager.flush();
+        entityManager.clear();
 
         final User user = userReader.findById(userId);
 
