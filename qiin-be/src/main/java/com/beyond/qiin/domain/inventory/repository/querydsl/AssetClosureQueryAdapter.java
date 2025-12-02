@@ -21,4 +21,11 @@ public interface AssetClosureQueryAdapter {
     void deleteAllByDescendantId(final Long descendantId);
 
     boolean existsChildren(final Long assetId);
+
+    // 이동에서 씀
+    // 나를 부모로 가지지 않는 노드들 중에서 나를 자식으로 갖는 노드들 삭제
+    void deleteOldAncestorLinks(final List<Long> subtreeIds);
+
+    // 직계자식 관계만 조회
+    List<AssetClosure> findDepthOneRelations();
 }

@@ -20,15 +20,19 @@ public interface AssetQueryService {
     // 자식 자원들 조회
     PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(final int page, final int size);
 
-    // 전체 트리 구조 조회
-    TreeAssetResponseDto getAssetTree(final Long assetId);
+//    부분 트리 방식임
+//    TreeAssetResponseDto getAssetTree(final Long assetId);
+//    List<TreeAssetResponseDto> getFullAssetTree();
 
+    // 전체 트리 조회
     List<TreeAssetResponseDto> getFullAssetTree();
 
     // 자원 상세 조회
     AssetDetailResponseDto getAssetDetail(final Long assetId);
 
+    //
     Asset getAssetById(final Long assetId);
 
+    // 자원 상태에 따른 사용 가능 여부 반환
     boolean isAvailable(final Long assetId);
 }
