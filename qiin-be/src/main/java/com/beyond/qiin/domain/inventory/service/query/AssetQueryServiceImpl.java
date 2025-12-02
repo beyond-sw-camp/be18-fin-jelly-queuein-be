@@ -6,10 +6,11 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetRespon
 import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.RootAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.TreeAssetResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
-import com.beyond.qiin.domain.inventory.exception.CategoryException;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
 import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryAdapter;
@@ -69,8 +70,9 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
         Pageable pageable = PageRequest.of(page, size);
 
+        Page<RawDescendantAssetResponseDto> rawPage = assetQueryAdapter.findAllForDescendant(pageable);
         Page<DescendantAssetResponseDto> descendantAssetResponseDtoPage =
-                assetQueryAdapter.findAllForDescendant(pageable);
+                rawPage.map(DescendantAssetResponseDto::fromEntity);
 
         return PageResponseDto.from(descendantAssetResponseDtoPage);
     }
@@ -133,12 +135,11 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     @Transactional(readOnly = true)
     public AssetDetailResponseDto getAssetDetail(final Long assetId) {
 
-        Asset asset = assetQueryAdapter.findByAssetId(assetId).orElseThrow(AssetException::notFound);
+        RawAssetDetailResponseDto raw = assetQueryAdapter.findByAssetId(assetId).orElseThrow(AssetException::notFound);
 
-        String categoryName =
-                categoryQueryAdapter.findNameById(asset.getCategory().getId()).orElseThrow(CategoryException::notFound);
+        String parentName = assetQueryAdapter.findParentName(assetId);
 
-        return AssetDetailResponseDto.fromEntity(asset, categoryName);
+        return AssetDetailResponseDto.fromRaw(raw, parentName);
     }
 
     @Override
@@ -147,51 +148,14 @@ public class AssetQueryServiceImpl implements AssetQueryService {
         return assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
     }
 
+    // 자원 사용 가능 여부
     @Override
-    public String assetStatusToString(final Integer status) {
-        if (status == 0) {
-            return "AVAILABLE";
-        } else if (status == 1) {
-            return "UNAVAILABLE";
-        } else {
-            return "MAINTENANCE";
+    @Transactional(readOnly = true)
+    public boolean isAvailable(final Long assetId) {
+        Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
+        if (asset.getStatus() == 1 || asset.getStatus() == 2) {
+            throw AssetException.assetNotAvailable();
         }
-    }
-
-    @Override
-    public String assetTypeToString(final Integer type) {
-        if (type == 0) {
-            return "STATIC";
-        } else {
-            return "DYNAMIC";
-        }
-    }
-
-    @Override
-    public int assetStatusToInt(final String status) {
-
-        switch (status.toUpperCase()) {
-            case "AVAILABLE":
-                return 0;
-            case "UNAVAILABLE":
-                return 1;
-            case "MAINTENANCE":
-                return 2;
-            default:
-                return -1;
-        }
-    }
-
-    @Override
-    public int assetTypeToInt(final String type) {
-
-        switch (type.toUpperCase()) {
-            case "STATIC":
-                return 0;
-            case "DYNAMIC":
-                return 1;
-            default:
-                return -1;
-        }
+        return true;
     }
 }

@@ -27,6 +27,10 @@ public class CategoryException extends BaseException {
         return new CategoryException(CategoryErrorCode.CATEGORY_DUPLICATE_NAME);
     }
 
+    public static CategoryException hasAssets() {
+        return new CategoryException(CategoryErrorCode.CATEGORY_HAS_ASSETS);
+    }
+
     // ErrorCode 내부 정의
     @Getter
     public enum CategoryErrorCode implements ErrorCode {

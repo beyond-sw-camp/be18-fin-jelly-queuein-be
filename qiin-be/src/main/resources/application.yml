@@ -11,7 +11,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          time_zone: UTC
 
+  jackson:
+    time-zone: UTC
 # JWT 설정
 jwt:
   secret-key: ${JWT_SECRET_KEY}

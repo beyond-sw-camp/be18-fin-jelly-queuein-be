@@ -28,10 +28,4 @@ public interface AssetCommandService {
 
     // 자원 사용 가능 여부
     boolean isAvailable(Long assetId);
-
-    // 자원 상태 변환 // 읽기용으로 옮길 예정
-    String assetStatusToString(Integer status);
-
-    // 자원 타입 변환 // 읽기용으로 옮길 예정
-    String assetTypeToString(Integer type);
 }

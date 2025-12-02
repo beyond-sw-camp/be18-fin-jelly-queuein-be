@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.inventory.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
@@ -80,13 +81,13 @@ public class Asset extends BaseEntity {
     @Column(name = "version", nullable = false)
     private Long version;
 
-    public void apply(Category category, UpdateAssetRequestDto requestDto) {
+    public void apply(Category category, UpdateAssetRequestDto requestDto, int statusCode, int typeCode) {
         if (category != null) this.category = category;
         if (requestDto.getName() != null) this.name = requestDto.getName();
         if (requestDto.getDescription() != null) this.description = requestDto.getDescription();
         if (requestDto.getImage() != null) this.image = requestDto.getImage();
-        if (requestDto.getStatus() != null) this.status = requestDto.getStatus();
-        if (requestDto.getType() != null) this.type = requestDto.getType();
+        if (requestDto.getStatus() != null) this.status = statusCode;
+        if (requestDto.getType() != null) this.type = typeCode;
         if (requestDto.getAccessLevel() != null) this.accessLevel = requestDto.getAccessLevel();
         if (requestDto.getApprovalStatus() != null) this.needsApproval = requestDto.getApprovalStatus();
         if (requestDto.getCostPerHour() != null) this.costPerHour = requestDto.getCostPerHour();
@@ -94,15 +95,30 @@ public class Asset extends BaseEntity {
     }
 
     public AssetStatus getAssetStatus() {
-        return AssetStatus.from(this.status);
+        return AssetStatus.fromCode(this.status);
     }
 
     public AssetType getAssetType() {
-        return AssetType.from(this.type);
+        return AssetType.fromCode(this.type);
     }
 
     // softDelete
     public void softDelete(Long assetId) {
         this.delete(assetId);
+    }
+
+    public static Asset create(Category category, CreateAssetRequestDto requestDto, int statusCode, int typeCode) {
+        return Asset.builder()
+                .category(category)
+                .name(requestDto.getName())
+                .description(requestDto.getDescription())
+                .image(requestDto.getImage())
+                .status(statusCode)
+                .type(typeCode)
+                .accessLevel(requestDto.getAccessLevel())
+                .needsApproval(requestDto.getApprovalStatus())
+                .costPerHour(requestDto.getCostPerHour())
+                .periodCost(requestDto.getPeriodCost())
+                .build();
     }
 }
