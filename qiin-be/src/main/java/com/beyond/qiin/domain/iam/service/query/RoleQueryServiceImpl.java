@@ -28,7 +28,7 @@ public class RoleQueryServiceImpl implements RoleQueryService {
         RoleReadModel read = redisAdapter.findById(roleId);
         if (read != null) {
             log.info("[RoleQuery] Redis HIT for roleId={}", roleId);
-            return new RoleResponseDto(read.getRoleId(), read.getRoleDescription(), read.getRoleName());
+            return RoleResponseDto.fromReadModel(read);
         }
 
         log.info("[RoleQuery] Redis MISS for roleId={}, loading from DB", roleId);

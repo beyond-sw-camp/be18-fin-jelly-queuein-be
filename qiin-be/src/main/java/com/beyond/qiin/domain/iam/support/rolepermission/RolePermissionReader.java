@@ -32,8 +32,8 @@ public class RolePermissionReader {
     }
 
     // Role의 Permission 전체 조회
-    public List<RolePermission> findByRole(final Role role) {
-        return rolePermissionJpaRepository.findByRole(role);
+    public List<RolePermission> findAllByRole(final Role role) {
+        return rolePermissionJpaRepository.findAllByRole(role);
     }
 
     // Permission을 기준으로 RolePermission 조회
