@@ -28,7 +28,7 @@ public class ReservableAssetResponseDto {
         return ReservableAssetResponseDto.builder()
                 .assetId(raw.getAssetId())
                 .assetName(raw.getAssetName())
-                .assetType(AssetType.from(raw.getAssetType()).name())
+                .assetType(AssetType.fromCode(raw.getAssetType()).name())
                 .categoryName(raw.getCategoryName())
                 .needsApproval(raw.isNeedsApproval())
                 .isReservable(true)
