@@ -19,9 +19,8 @@ public class CreateUserResponseDto {
     private final Instant lastLoginAt;
     private final Instant hireDate;
     private final Instant retireDate;
-    private final String tempPassword;
 
-    public static CreateUserResponseDto fromEntity(final User user, final String tempPassword) {
+    public static CreateUserResponseDto fromEntity(final User user) {
         return CreateUserResponseDto.builder()
                 .userId(user.getId())
                 .dptId(user.getDptId())
@@ -32,7 +31,6 @@ public class CreateUserResponseDto {
                 .lastLoginAt(user.getLastLoginAt())
                 .hireDate(user.getHireDate())
                 .retireDate(user.getRetireDate())
-                .tempPassword(tempPassword)
                 .build();
     }
 }

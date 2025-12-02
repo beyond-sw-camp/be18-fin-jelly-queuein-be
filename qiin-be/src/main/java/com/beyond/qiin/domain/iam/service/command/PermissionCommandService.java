@@ -10,5 +10,5 @@ public interface PermissionCommandService {
 
     PermissionResponseDto updatePermission(final Long permissionId, final UpdatePermissionRequestDto request);
 
-    void deletePermission(final Long permissionId);
+    void deletePermission(final Long permissionId, final Long deleterId);
 }
