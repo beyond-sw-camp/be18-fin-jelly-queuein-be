@@ -144,13 +144,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         for (RawReservableAssetResponseDto raw : rawList) {
 
             boolean isReservable = isAssetReservableOnDate(raw.getAssetId(), date);
-            boolean isAssetAvailable = false;
-            try {
-                isAssetAvailable = assetQueryService.isAvailable(raw.getAssetId());
-            } catch (AssetException e) {
-                // 조회 목적이므로 단순히 사용 불가 처리
-                isAssetAvailable = false;
-            }
+            boolean isAssetAvailable = assetQueryService.isAvailable(raw.getAssetId());
 
             if (isReservable && isAssetAvailable) {
                 reservableAssets.add(ReservableAssetResponseDto.fromRaw(raw)); // 생성 조건이 true이므로 인자로 받지 않음
