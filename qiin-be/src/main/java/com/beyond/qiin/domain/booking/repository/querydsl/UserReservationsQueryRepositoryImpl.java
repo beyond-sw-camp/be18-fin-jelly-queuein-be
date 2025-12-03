@@ -93,7 +93,6 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
             }
         }
 
-
         // 카테고리 이름 기반 검색 → Category 조인
         if (condition.getCategoryName() != null) {
             builder.and(category.name.eq(condition.getCategoryName()));
