@@ -28,7 +28,6 @@ import com.beyond.qiin.domain.booking.util.AvailableTimeSlotCalculator;
 import com.beyond.qiin.domain.booking.vo.DateRange;
 import com.beyond.qiin.domain.booking.vo.TimeSlot;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
-import com.beyond.qiin.domain.inventory.exception.AssetException;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
 import java.time.DayOfWeek;
 import java.time.Instant;
