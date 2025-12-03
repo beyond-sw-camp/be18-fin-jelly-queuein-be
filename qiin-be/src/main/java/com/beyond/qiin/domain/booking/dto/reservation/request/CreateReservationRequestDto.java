@@ -22,10 +22,6 @@ public class CreateReservationRequestDto {
     @NotNull
     private Long applicantId;
 
-    // 자원명
-    @NotNull
-    private String assetName;
-
     // 예약 시작 시간
     @NotNull
     private Instant startAt;

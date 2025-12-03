@@ -15,5 +15,5 @@ public interface UserCommandService {
 
     void changePassword(final Long userId, final ChangePwRequestDto request);
 
-    void deleteUser(final Long userId);
+    void deleteUser(final Long userId, final Long deleterId);
 }

@@ -8,7 +8,6 @@ import com.beyond.qiin.domain.iam.exception.PermissionException;
 import com.beyond.qiin.domain.iam.support.permission.PermissionReader;
 import com.beyond.qiin.domain.iam.support.permission.PermissionWriter;
 import com.beyond.qiin.domain.iam.support.rolepermission.RolePermissionReader;
-import com.beyond.qiin.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,13 +47,13 @@ public class PermissionCommandServiceImpl implements PermissionCommandService {
 
     @Override
     @Transactional
-    public void deletePermission(final Long permissionId) {
+    public void deletePermission(final Long permissionId, final Long deleterId) {
 
         Permission permission = permissionReader.findById(permissionId);
 
         validateDeletable(permission);
 
-        permission.delete(SecurityUtils.getCurrentUserId());
+        permission.delete(deleterId);
         permissionWriter.save(permission);
     }
 
