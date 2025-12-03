@@ -155,7 +155,11 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
+
         Reservation reservation = reservationReader.getReservationById(reservationId);
+        // 지금 사용 불가한 자원이면 제외
+        assetCommandService.isAvailable(reservation.getAsset().getId());
+
         reservation.start(); // status using, 실제 시작 시간 추가
         reservationWriter.save(reservation);
         return ReservationResponseDto.fromEntity(reservation);
@@ -285,7 +289,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private boolean isReservationTimeAvailable(
             final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
 
-        List<Reservation> reservations = reservationReader.getReservationsByAssetId(assetId);
+        List<Reservation> reservations = reservationReader.getActiveReservationsByAssetId(assetId);
 
         for (Reservation reservation : reservations) {
 

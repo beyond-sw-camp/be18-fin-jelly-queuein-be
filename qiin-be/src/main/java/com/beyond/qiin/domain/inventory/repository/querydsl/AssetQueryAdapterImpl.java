@@ -146,4 +146,9 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
                 .where(assetClosure.assetClosureId.descendantId.eq(assetId), assetClosure.depth.eq(1))
                 .fetchOne();
     }
+
+    @Override
+    public List<Asset> findAll() {
+        return jpaQueryFactory.selectFrom(asset).fetch();
+    }
 }

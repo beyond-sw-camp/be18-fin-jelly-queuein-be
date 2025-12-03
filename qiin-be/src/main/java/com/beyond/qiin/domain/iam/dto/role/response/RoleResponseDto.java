@@ -1,6 +1,9 @@
 package com.beyond.qiin.domain.iam.dto.role.response;
 
+import com.beyond.qiin.domain.iam.dto.role_permission.response.RolePermissionResponseDto;
 import com.beyond.qiin.domain.iam.entity.Role;
+import com.beyond.qiin.infra.redis.iam.role.RoleReadModel;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,11 +21,26 @@ public class RoleResponseDto {
     //    private final int userCount;
     //    private final List<String> permissions;
 
+    private final List<RolePermissionResponseDto> permissions;
+
     public static RoleResponseDto fromEntity(final Role role) {
         return RoleResponseDto.builder()
                 .roleId(role.getId())
                 .roleName(role.getRoleName())
                 .roleDescription(role.getRoleDescription())
+                .permissions(role.getRolePermissions().stream()
+                        .map(RolePermissionResponseDto::fromEntity)
+                        .toList())
+                .build();
+    }
+
+    // redis
+    public static RoleResponseDto fromReadModel(final RoleReadModel model) {
+        return RoleResponseDto.builder()
+                .roleId(model.getRoleId())
+                .roleName(model.getRoleName())
+                .roleDescription(model.getRoleDescription())
+                .permissions(List.of()) // Redis에는 권한 없음
                 .build();
     }
 }
