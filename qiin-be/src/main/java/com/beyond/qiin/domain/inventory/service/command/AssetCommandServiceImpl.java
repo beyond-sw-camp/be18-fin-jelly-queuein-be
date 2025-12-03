@@ -99,9 +99,13 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         // 나중에 권한 검증 추가
 
-        // 이름 중복이면 예외처리
-        if (assetJpaRepository.existsByName(requestDto.getName())) {
-            throw AssetException.duplicateName();
+        Asset asset = getAssetById(assetId);
+
+        // 이름이 실제로 변경될 때만 중복 체크
+        if (!asset.getName().equals(requestDto.getName())) {
+            if (assetJpaRepository.existsByName(requestDto.getName())) {
+                throw AssetException.duplicateName();
+            }
         }
 
         // categoryId 존재 여부 검증
@@ -114,8 +118,6 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         Category category =
                 categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
-
-        Asset asset = getAssetById(assetId);
 
         asset.apply(category, requestDto, statusCode, typeCode);
 
