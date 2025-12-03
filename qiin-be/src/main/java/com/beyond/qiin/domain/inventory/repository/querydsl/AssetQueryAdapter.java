@@ -30,4 +30,7 @@ public interface AssetQueryAdapter {
 
     // 자기 부모 이름 찾기
     String findParentName(final Long assetId);
+
+    // 모든 자원 조회
+    List<Asset> findAll();
 }
