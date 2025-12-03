@@ -72,4 +72,12 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
       AND r.status IN (0, 1, 2)
 """)
     List<Reservation> findFutureUsableReservationsByAsset(Long assetId);
+
+    @Query("""
+    SELECT r FROM Reservation r
+    WHERE r.asset.id = :assetId
+    AND r.status IN (1, 2, 5)
+
+""")
+    List<Reservation> findActiveReservationsByAssetId(Long assetId);
 }

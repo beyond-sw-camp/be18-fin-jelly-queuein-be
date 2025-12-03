@@ -1,14 +1,16 @@
 package com.beyond.qiin.security.jwt;
 
+import com.beyond.qiin.domain.auth.exception.AuthException;
 import com.beyond.qiin.domain.iam.entity.User;
-import com.beyond.qiin.domain.iam.repository.UserJpaRepository;
 import com.beyond.qiin.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,60 +28,84 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserJpaRepository userJpaRepository;
     private final RedisTokenRepository redisTokenRepository;
     private final AuthenticationEntryPoint authenticationEntryPoint;
 
+    // TTL 추후 사용
+    // private static final Duration PERMISSION_TTL = Duration.ofMinutes(10);
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(
+            final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain)
             throws ServletException, IOException {
 
-        log.info(
-                "[JwtFilter] 요청 URI: {}, Authorization: {}",
-                request.getRequestURI(),
-                request.getHeader("Authorization"));
-
         final String header = request.getHeader("Authorization");
+        final boolean hasHeader = header != null;
+        final boolean isBearer = hasHeader && header.startsWith("Bearer ");
 
-        if (header != null && header.startsWith("Bearer ")) {
+        log.debug(
+                "[JwtFilter] 요청 URI: {}, hasAuthorization={}, authPrefix={}",
+                request.getRequestURI(),
+                hasHeader,
+                isBearer ? "Bearer" : "none");
 
-            final String token = header.substring(7);
+        // Authorization 헤더 없거나 Bearer 아니면 바로 패스
+        if (!isBearer) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            if (redisTokenRepository.isBlacklisted(token)) {
-                log.warn("[JwtFilter] 블랙리스트 토큰으로 요청 차단");
-                filterChain.doFilter(request, response);
-                return;
-            }
+        final String token = header.substring(7);
 
-            // RefreshToken은 인증에 사용하면 안 됨
-            if (jwtTokenProvider.validateAccessToken(token)) {
-                try {
-                    Claims claims = jwtTokenProvider.getClaims(token);
-                    Long userId = Long.valueOf(claims.getSubject());
+        // 블랙리스트 토큰이면 인증 없이 다음 필터로 넘김
+        if (redisTokenRepository.isBlacklisted(token)) {
+            authenticationEntryPoint.commence(
+                    request, response, new InsufficientAuthenticationException("블랙리스트 처리된 토큰입니다."));
+            return;
+        }
 
-                    User user = userJpaRepository.findById(userId).orElse(null);
+        try {
+            Claims claims = jwtTokenProvider.getClaims(token);
+            Long userId = Long.valueOf(claims.getSubject());
+            String role = claims.get("role", String.class);
+            final String email = claims.get("email", String.class);
+            List<String> permissions = claims.get("permissions", List.class);
 
-                    String role = (String) claims.get("role");
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority(role));
+            permissions.forEach(p -> authorities.add(new SimpleGrantedAuthority(p)));
 
-                    if (user != null) {
-                        CustomUserDetails userDetails = new CustomUserDetails(
-                                userId, user.getEmail(), List.of(new SimpleGrantedAuthority(role)));
+            CustomUserDetails userDetails = new CustomUserDetails(userId, email, authorities);
 
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
+            // 인증 객체 설정
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
 
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
+            // AccessToken 저장
+            authentication.setDetails(token);
 
-                } catch (Exception e) {
-                    log.warn("[JwtFilter] Token processing failed: {}", e.getMessage());
-                    authenticationEntryPoint.commence(
-                            request, response, new InsufficientAuthenticationException("유효하지 않은 토큰입니다."));
-                    return;
-                }
-            }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        } catch (final ExpiredJwtException e) { // Access Token 만료 시
+            log.warn("[JwtFilter] AccessToken expired: {}", e.getMessage());
+            throw AuthException.tokenExpired();
+
+        } catch (final AuthException e) {
+            log.warn("[JwtFilter] Token processing failed: {}", e.getMessage());
+            throw e;
+        } catch (final Exception e) {
+            log.warn("[JwtFilter] Token processing failed: {}", e.getMessage());
+            throw AuthException.unauthorized();
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private static UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(
+            final Long userId, final User user, final String role) {
+        CustomUserDetails userDetails =
+                new CustomUserDetails(userId, user.getEmail(), List.of(new SimpleGrantedAuthority(role)));
+
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }

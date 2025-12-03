@@ -62,4 +62,41 @@ public class AssetClosureQueryAdapterImpl implements AssetClosureQueryAdapter {
                 .where(assetClosure.assetClosureId.descendantId.eq(descendantId))
                 .execute();
     }
+
+    // 아이디 기준으로 자식이 있는지
+    @Override
+    @Transactional
+    public boolean existsChildren(final Long assetId) {
+
+        Integer result = queryFactory
+                .selectOne()
+                .from(assetClosure)
+                .where(assetClosure.assetClosureId.ancestorId.eq(assetId).and(assetClosure.depth.gt(0)))
+                .fetchFirst();
+
+        // 있으면 true 반환 함
+        return result != null;
+    }
+
+    @Override
+    @Transactional
+    public void deleteOldAncestorLinks(List<Long> subtreeIds) {
+        queryFactory
+                .delete(assetClosure)
+                .where(assetClosure
+                        .assetClosureId
+                        .descendantId
+                        .in(subtreeIds)
+                        .and(assetClosure.assetClosureId.ancestorId.notIn(subtreeIds)))
+                .execute();
+    }
+
+    @Override
+    @Transactional
+    public List<AssetClosure> findDepthOneRelations() {
+        return queryFactory
+                .selectFrom(assetClosure)
+                .where(assetClosure.depth.eq(1))
+                .fetch();
+    }
 }

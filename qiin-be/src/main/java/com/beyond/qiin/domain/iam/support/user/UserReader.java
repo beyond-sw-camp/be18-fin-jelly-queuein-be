@@ -5,6 +5,7 @@ import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.repository.UserJpaRepository;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,11 @@ public class UserReader {
     // 사번 기반 유저 조회
     public User findByUserNo(final String userNo) {
         return userJpaRepository.findByUserNo(userNo).orElseThrow(UserException::userNotFound);
+    }
+
+    // 입력받은 달 마지막 사번 조회
+    public Optional<String> findLastUserNoByPrefix(final String prefix) {
+        return userJpaRepository.findLastUserNoByPrefix(prefix);
     }
 
     // ------------------------------------------------
