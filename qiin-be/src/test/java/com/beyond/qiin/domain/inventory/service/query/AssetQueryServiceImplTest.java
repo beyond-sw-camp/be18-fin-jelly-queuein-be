@@ -1,5 +1,10 @@
 package com.beyond.qiin.domain.inventory.service.query;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.AssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
@@ -10,9 +15,11 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailRes
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
-import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
-import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryAdapter;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,16 +30,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AssetQueryServiceImplTest {
@@ -55,8 +52,7 @@ class AssetQueryServiceImplTest {
         Asset a1 = AssetFactory.asset(1L, "A");
         Asset a2 = AssetFactory.asset(2L, "B");
 
-        when(assetQueryAdapter.findByIds(List.of(1L, 2L)))
-                .thenReturn(List.of(a1, a2));
+        when(assetQueryAdapter.findByIds(List.of(1L, 2L))).thenReturn(List.of(a1, a2));
 
         List<RootAssetResponseDto> result = service.getRootAssetIds();
 
@@ -77,8 +73,7 @@ class AssetQueryServiceImplTest {
         Asset c1 = AssetFactory.asset(20L, "child1");
         Asset c2 = AssetFactory.asset(30L, "child2");
 
-        when(assetQueryAdapter.findByIds(List.of(20L, 30L)))
-                .thenReturn(List.of(c1, c2));
+        when(assetQueryAdapter.findByIds(List.of(20L, 30L))).thenReturn(List.of(c1, c2));
 
         List<OneDepthAssetResponseDto> result = service.getOneDepthAssetList(10L);
 
@@ -96,35 +91,32 @@ class AssetQueryServiceImplTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         RawDescendantAssetResponseDto r1 = RawDescendantAssetResponseDto.builder()
-                                                                        .assetId(1L)
-                                                                        .name("AA")
-                                                                        .categoryName("카테고리1")
-                                                                        .status(0)
-                                                                        .type(0)
-                                                                        .needApproval(false)
-                                                                        .reservable(true)
-                                                                        .version(0L)
-                                                                        .build();
+                .assetId(1L)
+                .name("AA")
+                .categoryName("카테고리1")
+                .status(0)
+                .type(0)
+                .needApproval(false)
+                .reservable(true)
+                .version(0L)
+                .build();
 
         RawDescendantAssetResponseDto r2 = RawDescendantAssetResponseDto.builder()
-                                                                        .assetId(2L)
-                                                                        .name("BB")
-                                                                        .categoryName("카테고리1")
-                                                                        .status(0)
-                                                                        .type(0)
-                                                                        .needApproval(false)
-                                                                        .reservable(true)
-                                                                        .version(0L)
-                                                                        .build();
+                .assetId(2L)
+                .name("BB")
+                .categoryName("카테고리1")
+                .status(0)
+                .type(0)
+                .needApproval(false)
+                .reservable(true)
+                .version(0L)
+                .build();
 
-        Page<RawDescendantAssetResponseDto> rawPage =
-                new PageImpl<>(List.of(r1, r2), pageable, 2);
+        Page<RawDescendantAssetResponseDto> rawPage = new PageImpl<>(List.of(r1, r2), pageable, 2);
 
-        when(assetQueryAdapter.findAllForDescendant(any(Pageable.class)))
-                .thenReturn(rawPage);
+        when(assetQueryAdapter.findAllForDescendant(any(Pageable.class))).thenReturn(rawPage);
 
-        PageResponseDto<DescendantAssetResponseDto> result =
-                service.getDescendantAssetList(0, 10);
+        PageResponseDto<DescendantAssetResponseDto> result = service.getDescendantAssetList(0, 10);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getTotalElements()).isEqualTo(2);
@@ -149,12 +141,10 @@ class AssetQueryServiceImplTest {
                 .thenReturn(List.of(
                         AssetFactory.closure(1L, 1L, 0),
                         AssetFactory.closure(1L, 2L, 1),
-                        AssetFactory.closure(1L, 3L, 1)
-                ));
+                        AssetFactory.closure(1L, 3L, 1)));
 
         // 자손 자원 조회
-        when(assetQueryAdapter.findByIds(List.of(1L, 2L, 3L)))
-                .thenReturn(List.of(root, child1, child2));
+        when(assetQueryAdapter.findByIds(List.of(1L, 2L, 3L))).thenReturn(List.of(root, child1, child2));
 
         TreeAssetResponseDto tree = service.getAssetTree(1L);
 
@@ -174,11 +164,9 @@ class AssetQueryServiceImplTest {
         Asset root = AssetFactory.asset(1L, "Root");
         when(assetQueryAdapter.findById(1L)).thenReturn(Optional.of(root));
 
-        when(assetQueryAdapter.findSubtree(1L))
-                .thenReturn(List.of(AssetFactory.closure(1L, 1L, 0)));
+        when(assetQueryAdapter.findSubtree(1L)).thenReturn(List.of(AssetFactory.closure(1L, 1L, 0)));
 
-        when(assetQueryAdapter.findByIds(List.of(1L)))
-                .thenReturn(List.of(root));
+        when(assetQueryAdapter.findByIds(List.of(1L))).thenReturn(List.of(root));
 
         List<TreeAssetResponseDto> result = service.getFullAssetTree();
 
@@ -193,21 +181,21 @@ class AssetQueryServiceImplTest {
     void getAssetDetail_success() {
 
         RawAssetDetailResponseDto raw = RawAssetDetailResponseDto.builder()
-                                                                 .assetId(10L)
-                                                                 .name("A")
-                                                                 .description("desc")
-                                                                 .image(null)
-                                                                 .categoryId(1L)
-                                                                 .categoryName("카테고리A")
-                                                                 .status(1)
-                                                                 .type(1)
-                                                                 .accessLevel(1)
-                                                                 .approvalStatus(true)
-                                                                 .costPerHour(BigDecimal.valueOf(5000))
-                                                                 .periodCost(BigDecimal.TEN)
-                                                                 .createdAt(Instant.now())
-                                                                 .createdBy(100L)
-                                                                 .build();
+                .assetId(10L)
+                .name("A")
+                .description("desc")
+                .image(null)
+                .categoryId(1L)
+                .categoryName("카테고리A")
+                .status(1)
+                .type(1)
+                .accessLevel(1)
+                .approvalStatus(true)
+                .costPerHour(BigDecimal.valueOf(5000))
+                .periodCost(BigDecimal.TEN)
+                .createdAt(Instant.now())
+                .createdBy(100L)
+                .build();
 
         when(assetQueryAdapter.findByAssetId(10L)).thenReturn(Optional.of(raw));
         when(assetQueryAdapter.findParentName(10L)).thenReturn("Parent");

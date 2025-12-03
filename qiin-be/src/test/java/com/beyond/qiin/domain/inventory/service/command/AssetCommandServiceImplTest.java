@@ -1,5 +1,16 @@
 package com.beyond.qiin.domain.inventory.service.command;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
@@ -15,6 +26,9 @@ import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.CategoryJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,21 +36,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.argThat;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AssetCommandServiceImplTest {
@@ -70,23 +69,22 @@ class AssetCommandServiceImplTest {
     void createAsset_duplicateName() {
 
         CreateAssetRequestDto dto = new CreateAssetRequestDto(
-                "",              // parentName
-                1L,              // categoryId
-                "프린터",         // name
-                "설명",           // description
-                null,            // image
-                "AVAILABLE",     // status
-                "STATIC",        // type
-                1,               // accessLevel
-                true,            // approvalStatus
-                BigDecimal.TEN,  // costPerHour
-                BigDecimal.ONE   // periodCost
-        );
+                "", // parentName
+                1L, // categoryId
+                "프린터", // name
+                "설명", // description
+                null, // image
+                "AVAILABLE", // status
+                "STATIC", // type
+                1, // accessLevel
+                true, // approvalStatus
+                BigDecimal.TEN, // costPerHour
+                BigDecimal.ONE // periodCost
+                );
 
         when(assetJpaRepository.existsByName("프린터")).thenReturn(true);
 
-        assertThatThrownBy(() -> service.createAsset(dto))
-                .isInstanceOf(AssetException.class);
+        assertThatThrownBy(() -> service.createAsset(dto)).isInstanceOf(AssetException.class);
     }
 
     @Test
@@ -94,26 +92,19 @@ class AssetCommandServiceImplTest {
     void createAsset_root_success() {
 
         CreateAssetRequestDto dto = new CreateAssetRequestDto(
-                "", 1L, "프린터", "설명", null,
-                "AVAILABLE", "STATIC",
-                1, true, BigDecimal.TEN, BigDecimal.ONE
-        );
+                "", 1L, "프린터", "설명", null, "AVAILABLE", "STATIC", 1, true, BigDecimal.TEN, BigDecimal.ONE);
 
-        Category category = Category.builder()
-                                    .name("카테고리")
-                                    .description("desc")
-                                    .build();
+        Category category = Category.builder().name("카테고리").description("desc").build();
         ReflectionTestUtils.setField(category, "id", 1L);
 
         when(assetJpaRepository.existsByName("프린터")).thenReturn(false);
         when(categoryJpaRepository.findById(1L)).thenReturn(Optional.of(category));
 
-        when(assetJpaRepository.save(any(Asset.class)))
-                .thenAnswer(invocation -> {
-                    Asset a = invocation.getArgument(0);
-                    ReflectionTestUtils.setField(a, "id", 100L);
-                    return a;
-                });
+        when(assetJpaRepository.save(any(Asset.class))).thenAnswer(invocation -> {
+            Asset a = invocation.getArgument(0);
+            ReflectionTestUtils.setField(a, "id", 100L);
+            return a;
+        });
 
         CreateAssetResponseDto result = service.createAsset(dto);
 
@@ -131,15 +122,9 @@ class AssetCommandServiceImplTest {
     void createAsset_withParent_success() {
 
         CreateAssetRequestDto dto = new CreateAssetRequestDto(
-                "프린터", 1L, "노트북", "설명", null,
-                "AVAILABLE", "STATIC",
-                1, true, BigDecimal.TEN, BigDecimal.ONE
-        );
+                "프린터", 1L, "노트북", "설명", null, "AVAILABLE", "STATIC", 1, true, BigDecimal.TEN, BigDecimal.ONE);
 
-        Category category = Category.builder()
-                                    .name("카테고리")
-                                    .description("desc")
-                                    .build();
+        Category category = Category.builder().name("카테고리").description("desc").build();
         ReflectionTestUtils.setField(category, "id", 1L);
 
         // 이름 중복 아님
@@ -147,12 +132,11 @@ class AssetCommandServiceImplTest {
         when(categoryJpaRepository.findById(1L)).thenReturn(Optional.of(category));
 
         // 자식 asset 저장
-        when(assetJpaRepository.save(any(Asset.class)))
-                .thenAnswer(invocation -> {
-                    Asset a = invocation.getArgument(0);
-                    ReflectionTestUtils.setField(a, "id", 200L);
-                    return a;
-                });
+        when(assetJpaRepository.save(any(Asset.class))).thenAnswer(invocation -> {
+            Asset a = invocation.getArgument(0);
+            ReflectionTestUtils.setField(a, "id", 200L);
+            return a;
+        });
 
         // parent asset
         Asset parent = mock(Asset.class);
@@ -161,8 +145,7 @@ class AssetCommandServiceImplTest {
 
         // parent 조상들
         AssetClosure rootClosure = AssetClosure.of(1L, 50L, 0);
-        when(assetClosureQueryAdapter.findAncestors(50L))
-                .thenReturn(List.of(rootClosure));
+        when(assetClosureQueryAdapter.findAncestors(50L)).thenReturn(List.of(rootClosure));
 
         CreateAssetResponseDto result = service.createAsset(dto);
 
@@ -170,7 +153,6 @@ class AssetCommandServiceImplTest {
 
         verify(assetClosureJpaRepository, atLeastOnce()).save(any(AssetClosure.class));
     }
-
 
     // -------------------------------------------------------
     // UPDATE ASSET
@@ -180,15 +162,11 @@ class AssetCommandServiceImplTest {
     void updateAsset_duplicateName() {
 
         UpdateAssetRequestDto dto = new UpdateAssetRequestDto(
-                1L, "프린터", "desc", null,
-                "AVAILABLE", "STATIC",
-                1, true, BigDecimal.TEN, BigDecimal.ONE, 0L
-        );
+                1L, "프린터", "desc", null, "AVAILABLE", "STATIC", 1, true, BigDecimal.TEN, BigDecimal.ONE, 0L);
 
         when(assetJpaRepository.existsByName("프린터")).thenReturn(true);
 
-        assertThatThrownBy(() -> service.updateAsset(dto, 10L))
-                .isInstanceOf(AssetException.class);
+        assertThatThrownBy(() -> service.updateAsset(dto, 10L)).isInstanceOf(AssetException.class);
     }
 
     @Test
@@ -196,35 +174,29 @@ class AssetCommandServiceImplTest {
     void updateAsset_success() {
 
         UpdateAssetRequestDto dto = new UpdateAssetRequestDto(
-                1L, "새이름", "설명변경", null,
-                "AVAILABLE", "STATIC",
-                1, true, BigDecimal.TEN, BigDecimal.ONE, 0L
-        );
+                1L, "새이름", "설명변경", null, "AVAILABLE", "STATIC", 1, true, BigDecimal.TEN, BigDecimal.ONE, 0L);
 
         when(assetJpaRepository.existsByName("새이름")).thenReturn(false);
 
         doNothing().when(categoryCommandService).validateCategoryId(1L);
 
-        Category category = Category.builder()
-                                    .name("카테고리")
-                                    .description("desc")
-                                    .build();
+        Category category = Category.builder().name("카테고리").description("desc").build();
         ReflectionTestUtils.setField(category, "id", 1L);
 
         when(categoryJpaRepository.findById(1L)).thenReturn(Optional.of(category));
 
         Asset asset = Asset.builder()
-                           .category(category)
-                           .name("원래이름")
-                           .description("oldDesc")
-                           .image(null)
-                           .status(AssetStatus.fromName("AVAILABLE").toCode())
-                           .type(AssetType.fromName("STATIC").toCode())
-                           .accessLevel(1)
-                           .needsApproval(true)
-                           .costPerHour(BigDecimal.TEN)
-                           .periodCost(BigDecimal.ONE)
-                           .build();
+                .category(category)
+                .name("원래이름")
+                .description("oldDesc")
+                .image(null)
+                .status(AssetStatus.fromName("AVAILABLE").toCode())
+                .type(AssetType.fromName("STATIC").toCode())
+                .accessLevel(1)
+                .needsApproval(true)
+                .costPerHour(BigDecimal.TEN)
+                .periodCost(BigDecimal.ONE)
+                .build();
         when(assetJpaRepository.findById(10L)).thenReturn(Optional.of(asset));
 
         UpdateAssetResponseDto result = service.updateAsset(dto, 10L);
@@ -249,8 +221,7 @@ class AssetCommandServiceImplTest {
 
         when(userReader.findById(99L)).thenReturn(null);
 
-        assertThatThrownBy(() -> service.softDeleteAsset(10L, 99L))
-                .isInstanceOf(AssetException.class);
+        assertThatThrownBy(() -> service.softDeleteAsset(10L, 99L)).isInstanceOf(AssetException.class);
     }
 
     @Test
