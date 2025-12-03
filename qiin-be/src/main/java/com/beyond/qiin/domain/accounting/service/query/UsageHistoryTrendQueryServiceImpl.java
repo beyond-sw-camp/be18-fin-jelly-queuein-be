@@ -1,4 +1,3 @@
-// file: src/main/java/com/beyond/qiin/domain/accounting/service/query/UsageHistoryTrendQueryServiceImpl.java
 package com.beyond.qiin.domain.accounting.service.query;
 
 import com.beyond.qiin.domain.accounting.dto.common.ReportingComparisonRequestDto;
@@ -82,7 +81,7 @@ public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQuery
     private UsageIncreaseSummary calculateIncrease(
             Map<Integer, UsageAggregate> base, Map<Integer, UsageAggregate> compare, int assetCount, int currentMonth) {
 
-        // ✔ 월별로 base와 compare 둘 다 reservedUsage>0인 월만 선택
+        // 월별로 base와 compare 둘 다 reservedUsage>0인 월만 선택
         List<Integer> validMonths = IntStream.rangeClosed(1, 12)
                 .filter(m -> m < currentMonth) // 현재 월 제외
                 .filter(m -> base.get(m).getReservedUsage() > 0)
@@ -90,7 +89,7 @@ public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQuery
                 .boxed()
                 .collect(Collectors.toList());
 
-        // ✔ 유효 월 없음 → summary = 0
+        // 유효 월 없음 → summary = 0
         if (validMonths.isEmpty()) {
             return UsageIncreaseSummary.builder()
                     .usageRateIncrease(0.0)
@@ -113,7 +112,7 @@ public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQuery
                 .mapToInt(m -> compare.get(m).getReservedUsage())
                 .sum();
 
-        // ✔ 비교년도 데이터가 없어도 summary=0
+        // 비교년도 데이터가 없어도 summary=0
         if (baseReserved == 0 || compareReserved == 0) {
             return UsageIncreaseSummary.builder()
                     .usageRateIncrease(0.0)

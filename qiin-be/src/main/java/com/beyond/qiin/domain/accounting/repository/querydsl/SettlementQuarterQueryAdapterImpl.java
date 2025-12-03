@@ -33,7 +33,7 @@ public class SettlementQuarterQueryAdapterImpl implements SettlementQuarterQuery
                 .map(t -> toRawDto(t, year, quarter))
                 .toList();
 
-        // 🔥 자원 + 분기 기준으로 그룹핑
+        // 자원 + 분기 기준으로 그룹핑
         Map<String, List<SettlementQuarterRowDto>> grouped =
                 monthlyRows.stream().collect(Collectors.groupingBy(r -> r.getAssetId() + "-" + r.getQuarter()));
 
@@ -70,7 +70,7 @@ public class SettlementQuarterQueryAdapterImpl implements SettlementQuarterQuery
             mergedRows.add(merged);
         }
 
-        // 🔥 최종 정렬: 분기 → 자원명
+        // 최종 정렬: 분기 → 자원명
         mergedRows.sort(Comparator.comparing(SettlementQuarterRowDto::getQuarter)
                 .thenComparing(SettlementQuarterRowDto::getAssetName));
 

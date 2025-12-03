@@ -21,22 +21,17 @@ public class SettlementPerformanceQueryServiceImpl implements SettlementPerforma
     @Override
     public SettlementPerformanceResponseDto getPerformance(ReportingComparisonRequestDto req) {
 
-        // 1) 기본값 처리 (UsageHistoryTrend와 동일 기준)
         int currentYear = LocalDate.now().getYear();
 
-        int baseYear = (req.getBaseYear() != null) ? req.getBaseYear() : currentYear - 1;
-        int compareYear = (req.getCompareYear() != null) ? req.getCompareYear() : currentYear;
+        int baseYear = req.getBaseYear() != null ? req.getBaseYear() : currentYear - 1;
+        int compareYear = req.getCompareYear() != null ? req.getCompareYear() : currentYear;
 
-        Long assetId = req.getAssetId();
-        String assetName = req.getAssetName();
-
-        // 2) Raw 데이터 조회
-        SettlementPerformanceRawDto raw = queryAdapter.getMonthlyPerformance(baseYear, compareYear, assetId, assetName);
+        SettlementPerformanceRawDto raw =
+                queryAdapter.getMonthlyPerformance(baseYear, compareYear, req.getAssetId(), req.getAssetName());
 
         Map<Integer, BigDecimal> baseMap = raw.getBaseYearData();
         Map<Integer, BigDecimal> compareMap = raw.getCompareYearData();
 
-        // 3) Monthly 데이터 생성
         List<SettlementPerformanceResponseDto.MonthlyPerformance> monthlyList = new ArrayList<>();
         for (int m = 1; m <= 12; m++) {
             monthlyList.add(SettlementPerformanceResponseDto.MonthlyPerformance.builder()
@@ -46,12 +41,12 @@ public class SettlementPerformanceQueryServiceImpl implements SettlementPerforma
                     .build());
         }
 
-        // 4) Summary 계산
         BigDecimal baseYearTotal = sum(baseMap);
         BigDecimal compareYearTotal = sum(compareMap);
-        BigDecimal accumulated = baseYearTotal.add(compareYearTotal);
 
-        // 5) Response 생성
+        // 전체 누적 절감 금액
+        BigDecimal accumulated = queryAdapter.getTotalSavingAllTime();
+
         return SettlementPerformanceResponseDto.builder()
                 .asset(new SettlementPerformanceResponseDto.AssetInfo(raw.getAssetId(), raw.getAssetName()))
                 .yearRange(new SettlementPerformanceResponseDto.YearRangeInfo(baseYear, compareYear, 12))
