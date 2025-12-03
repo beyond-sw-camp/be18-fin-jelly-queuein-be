@@ -7,6 +7,8 @@ import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -52,7 +54,6 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
             builder.and(reservation.startAt.between(start, end));
         }
 
-        // TODO 예약 상태 (int)
         if (condition.getReservationStatus() != null) {
             String raw = condition.getReservationStatus().trim();
 
@@ -79,26 +80,38 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
             builder.and(asset.name.containsIgnoreCase(condition.getAssetName()));
         }
 
-        // 자원 유형(int)
+        // 자원 유형(int) - 변환된 값 사용
         if (condition.getAssetType() != null) {
+            String raw = condition.getAssetType().trim();
+
             try {
-                builder.and(asset.type.eq(Integer.parseInt(condition.getAssetType())));
-            } catch (NumberFormatException ignored) {
+                AssetType statusEnum = AssetType.valueOf(raw.toUpperCase());
+
+                builder.and(asset.type.eq(statusEnum.getCode()));
+
+            } catch (IllegalArgumentException ignored) {
             }
         }
+
 
         // 카테고리 이름 기반 검색 → Category 조인
         if (condition.getCategoryName() != null) {
             builder.and(category.name.eq(condition.getCategoryName()));
         }
 
-        // 자원 상태(int)
+        // 자원 상태 (assetStatus) 필터링
         if (condition.getAssetStatus() != null) {
+            String raw = condition.getAssetStatus().trim();
+
             try {
-                builder.and(asset.status.eq(Integer.parseInt(condition.getAssetStatus())));
-            } catch (NumberFormatException ignored) {
+                AssetStatus statusEnum = AssetStatus.valueOf(raw.toUpperCase());
+
+                builder.and(asset.status.eq(statusEnum.getCode()));
+
+            } catch (IllegalArgumentException ignored) {
             }
         }
+
         BooleanBuilder closureOn = new BooleanBuilder();
         closureOn.and(closure.assetClosureId.descendantId.eq(asset.id));
 

@@ -5,6 +5,8 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservable
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -34,9 +36,27 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
 
         // 자원 유형
         if (condition.getAssetType() != null) {
+            String raw = condition.getAssetType().trim();
+
             try {
-                builder.and(asset.type.eq(Integer.parseInt(condition.getAssetType())));
-            } catch (NumberFormatException ignored) {
+                AssetType statusEnum = AssetType.valueOf(raw.toUpperCase());
+
+                builder.and(asset.type.eq(statusEnum.getCode()));
+
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        // 자원 상태 (assetStatus) 필터링
+        if (condition.getAssetStatus() != null) {
+            String raw = condition.getAssetStatus().trim();
+
+            try {
+                AssetStatus statusEnum = AssetStatus.valueOf(raw.toUpperCase());
+
+                builder.and(asset.status.eq(statusEnum.getCode()));
+
+            } catch (IllegalArgumentException ignored) {
             }
         }
 

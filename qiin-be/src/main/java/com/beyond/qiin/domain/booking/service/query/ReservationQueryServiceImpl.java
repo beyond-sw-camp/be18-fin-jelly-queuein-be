@@ -113,8 +113,12 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         for (RawAppliedReservationResponseDto raw : rawList) {
 
             boolean isReservable = isAssetReservableOnDate(raw.getAssetId(), date);
+            boolean isAssetAvailable = assetQueryService.isAvailable(raw.getAssetId());
 
-            appliedReservations.add(GetAppliedReservationResponseDto.fromRaw(raw, isReservable));
+
+            if (isReservable && isAssetAvailable) {
+                appliedReservations.add(GetAppliedReservationResponseDto.fromRaw(raw, isReservable)); // 생성 조건이 true이므로 인자로 받지 않음
+            }
         }
 
         int startIdx = (int) pageable.getOffset();
