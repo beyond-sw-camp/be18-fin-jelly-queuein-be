@@ -2,7 +2,6 @@ package com.beyond.qiin.domain.inventory.service.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.atLeastOnce;
@@ -171,27 +170,25 @@ class AssetCommandServiceImplTest {
 
         // dto: 변경할 이름이 "프린터"라서 이름이 변경됨
         UpdateAssetRequestDto dto = UpdateAssetRequestDto.builder()
-                                                         .categoryId(1L)
-                                                         .name("프린터") // 변경된 이름
-                                                         .description("desc")
-                                                         .image(null)
-                                                         .status("AVAILABLE")
-                                                         .type("DEVICE")
-                                                         .accessLevel(1)
-                                                         .approvalStatus(true)
-                                                         .costPerHour(BigDecimal.TEN)
-                                                         .periodCost(BigDecimal.ONE)
-                                                         .version(0L)
-                                                         .build();
+                .categoryId(1L)
+                .name("프린터") // 변경된 이름
+                .description("desc")
+                .image(null)
+                .status("AVAILABLE")
+                .type("DEVICE")
+                .accessLevel(1)
+                .approvalStatus(true)
+                .costPerHour(BigDecimal.TEN)
+                .periodCost(BigDecimal.ONE)
+                .version(0L)
+                .build();
 
         // 중복되는 이름이라는 Mock 세팅
         when(assetJpaRepository.existsByName("프린터")).thenReturn(true);
 
         // 실행 & 검증
-        assertThatThrownBy(() -> service.updateAsset(dto, 10L))
-                .isInstanceOf(AssetException.class);
+        assertThatThrownBy(() -> service.updateAsset(dto, 10L)).isInstanceOf(AssetException.class);
     }
-
 
     @Test
     @DisplayName("자원 수정 - 정상 수정 + category 검증 호출")
@@ -266,5 +263,4 @@ class AssetCommandServiceImplTest {
         // 현재 서비스는 descendant 삭제만 수행함
         verify(assetClosureQueryAdapter).deleteAllByDescendantId(10L);
     }
-
 }

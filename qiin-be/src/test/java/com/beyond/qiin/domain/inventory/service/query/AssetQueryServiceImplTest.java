@@ -138,15 +138,11 @@ class AssetQueryServiceImplTest {
         Asset a2 = AssetFactory.asset(2L, "Child1");
         Asset a3 = AssetFactory.asset(3L, "Child2");
 
-        when(assetQueryAdapter.findAll())
-                .thenReturn(List.of(a1, a2, a3));
+        when(assetQueryAdapter.findAll()).thenReturn(List.of(a1, a2, a3));
 
         // depth=1 관계 Mock (root -> children)
         when(assetClosureQueryAdapter.findDepthOneRelations())
-                .thenReturn(List.of(
-                        AssetFactory.closure(1L, 2L, 1),
-                        AssetFactory.closure(1L, 3L, 1)
-                ));
+                .thenReturn(List.of(AssetFactory.closure(1L, 2L, 1), AssetFactory.closure(1L, 3L, 1)));
 
         // 실행
         List<TreeAssetResponseDto> result = service.getFullAssetTree();
