@@ -14,4 +14,6 @@ public interface AssetJpaRepository extends JpaRepository<Asset, Long> {
 
     // 카테고리를 가지는 자원이 있는지 없는지 여부
     boolean existsByCategoryId(Long categoryId);
+
+    boolean existsByNameAndIdNot(String name, Long id);
 }
