@@ -2,6 +2,7 @@ package com.beyond.qiin.security.jwt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.jsonwebtoken.Claims;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,5 +66,34 @@ public class JwtTokenProviderTest {
         String invalidToken = "invalid.token.value";
         boolean result = jwtTokenProvider.validateAccessToken(invalidToken);
         assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("token_type mismatch 단위 테스트")
+    void token_type_mismatch_access_as_refresh() {
+        String accessToken = jwtTokenProvider.generateAccessToken(1L, "ADMIN", "test@example.com", List.of("p1"));
+
+        assertThat(jwtTokenProvider.validateRefreshToken(accessToken)).isFalse();
+    }
+
+    @Test
+    @DisplayName("token_type mismatch 단위 테스트")
+    void token_type_mismatch_refresh_as_access() {
+        String refreshToken = jwtTokenProvider.generateRefreshToken(1L, "ADMIN");
+
+        assertThat(jwtTokenProvider.validateAccessToken(refreshToken)).isFalse();
+    }
+
+    @Test
+    @DisplayName("permissions Claim 파싱 단위 테스트")
+    void permissions_claim_parsing() {
+        List<String> expectedPermissions = List.of("p.read", "p.update", "p.export");
+
+        String token = jwtTokenProvider.generateAccessToken(10L, "ADMIN", "admin@test.com", expectedPermissions);
+
+        Claims claims = jwtTokenProvider.getClaims(token);
+        List<String> permissionsFromToken = claims.get("permissions", List.class);
+
+        assertThat(permissionsFromToken).isNotNull().containsExactlyElementsOf(expectedPermissions);
     }
 }
