@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
-
 @DisplayName("PermissionControllerTest 단위 테스트")
 class PermissionControllerTest {
 
@@ -101,19 +100,19 @@ class PermissionControllerTest {
     void getPermissions_success() {
 
         PermissionResponseDto p1 = PermissionResponseDto.builder()
-            .permissionId(1L)
-            .permissionName("P1")
-            .permissionDescription("D1")
-            .build();
+                .permissionId(1L)
+                .permissionName("P1")
+                .permissionDescription("D1")
+                .build();
 
         PermissionResponseDto p2 = PermissionResponseDto.builder()
-            .permissionId(2L)
-            .permissionName("P2")
-            .permissionDescription("D2")
-            .build();
+                .permissionId(2L)
+                .permissionName("P2")
+                .permissionDescription("D2")
+                .build();
 
         PermissionListResponseDto dto =
-            PermissionListResponseDto.builder().permissions(List.of(p1, p2)).build();
+                PermissionListResponseDto.builder().permissions(List.of(p1, p2)).build();
 
         when(queryService.getPermissions()).thenReturn(dto);
 
@@ -139,5 +138,4 @@ class PermissionControllerTest {
         assertThat(result.getBody().getPermissionId()).isEqualTo(2L);
         verify(queryService).getPermission(2L);
     }
-
 }
