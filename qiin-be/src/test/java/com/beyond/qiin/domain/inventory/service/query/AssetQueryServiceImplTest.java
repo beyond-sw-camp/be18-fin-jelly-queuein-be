@@ -15,6 +15,7 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailRes
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
+import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -36,6 +37,9 @@ class AssetQueryServiceImplTest {
 
     @Mock
     private AssetQueryAdapter assetQueryAdapter;
+
+    @Mock
+    private AssetClosureQueryAdapter assetClosureQueryAdapter;
 
     @InjectMocks
     private AssetQueryServiceImpl service;
@@ -126,51 +130,36 @@ class AssetQueryServiceImplTest {
     // 트리 조회
     // -------------------------------------------------------
     @Test
-    @DisplayName("자원 트리 조회 - 정상")
-    void getAssetTree_success() {
-
-        Asset root = AssetFactory.asset(1L, "Root");
-        Asset child1 = AssetFactory.asset(2L, "Child1");
-        Asset child2 = AssetFactory.asset(3L, "Child2");
-
-        // root 조회
-        when(assetQueryAdapter.findById(1L)).thenReturn(Optional.of(root));
-
-        // subtree 가져오기
-        when(assetQueryAdapter.findSubtree(1L))
-                .thenReturn(List.of(
-                        AssetFactory.closure(1L, 1L, 0),
-                        AssetFactory.closure(1L, 2L, 1),
-                        AssetFactory.closure(1L, 3L, 1)));
-
-        // 자손 자원 조회
-        when(assetQueryAdapter.findByIds(List.of(1L, 2L, 3L))).thenReturn(List.of(root, child1, child2));
-
-        TreeAssetResponseDto tree = service.getAssetTree(1L);
-
-        assertThat(tree.getAssetId()).isEqualTo(1L);
-        assertThat(tree.getChildren()).hasSize(2);
-    }
-
-    // -------------------------------------------------------
-    // 전체 트리 조회
-    // -------------------------------------------------------
-    @Test
-    @DisplayName("전체 트리 조회 - 정상")
+    @DisplayName("전체 트리 조회 - 정상 흐름")
     void getFullAssetTree_success() {
 
-        when(assetQueryAdapter.findRootAssetIds()).thenReturn(List.of(1L));
+        // 전체 자원 Mock
+        Asset a1 = AssetFactory.asset(1L, "Root");
+        Asset a2 = AssetFactory.asset(2L, "Child1");
+        Asset a3 = AssetFactory.asset(3L, "Child2");
 
-        Asset root = AssetFactory.asset(1L, "Root");
-        when(assetQueryAdapter.findById(1L)).thenReturn(Optional.of(root));
+        when(assetQueryAdapter.findAll())
+                .thenReturn(List.of(a1, a2, a3));
 
-        when(assetQueryAdapter.findSubtree(1L)).thenReturn(List.of(AssetFactory.closure(1L, 1L, 0)));
+        // depth=1 관계 Mock (root -> children)
+        when(assetClosureQueryAdapter.findDepthOneRelations())
+                .thenReturn(List.of(
+                        AssetFactory.closure(1L, 2L, 1),
+                        AssetFactory.closure(1L, 3L, 1)
+                ));
 
-        when(assetQueryAdapter.findByIds(List.of(1L))).thenReturn(List.of(root));
-
+        // 실행
         List<TreeAssetResponseDto> result = service.getFullAssetTree();
 
+        // root는 1개: ID=1
         assertThat(result).hasSize(1);
+
+        TreeAssetResponseDto rootTree = result.get(0);
+
+        assertThat(rootTree.getAssetId()).isEqualTo(1L);
+        assertThat(rootTree.getChildren()).hasSize(2);
+        assertThat(rootTree.getChildren().get(0).getAssetId()).isEqualTo(2L);
+        assertThat(rootTree.getChildren().get(1).getAssetId()).isEqualTo(3L);
     }
 
     // -------------------------------------------------------
