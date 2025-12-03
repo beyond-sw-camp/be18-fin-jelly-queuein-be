@@ -24,8 +24,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
-;
 
+@DisplayName("RoleCommandServiceImplTest 단위 테스트")
 public class RoleCommandServiceImplTest {
 
     @Mock

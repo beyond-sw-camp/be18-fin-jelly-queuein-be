@@ -30,8 +30,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-;
 
+@DisplayName("UserQueryServiceImplTest 단위 테스트")
 public class UserQueryServiceImplTest {
 
     @Mock
