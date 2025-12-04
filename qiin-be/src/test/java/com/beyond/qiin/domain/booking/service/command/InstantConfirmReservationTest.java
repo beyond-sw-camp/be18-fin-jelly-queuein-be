@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.service.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -24,11 +25,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class InstantConfirmReservationLockTest {
+public class InstantConfirmReservationTest {
 
     private ReservationCommandServiceImpl reservationCommandService;
 
@@ -60,7 +60,6 @@ public class InstantConfirmReservationLockTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
 
         reservationCommandService = new ReservationCommandServiceImpl(
                 userReader,
@@ -79,7 +78,7 @@ public class InstantConfirmReservationLockTest {
 
     @Test
     void instantConfirmReservation_basicMockTest() {
-        // Arrange
+        // 요청 dto
         CreateReservationRequestDto requestDto = CreateReservationRequestDto.builder()
                 .startAt(startAt)
                 .endAt(endAt)
@@ -92,27 +91,23 @@ public class InstantConfirmReservationLockTest {
                 User.builder().userName("참석자1").build(),
                 User.builder().userName("참석자2").build());
 
-        // Mock 동작 정의
+
+        when(assetCommandService.getAssetById(assetId)).thenReturn(asset);
         when(userReader.findById(userId)).thenReturn(applicant);
         doNothing().when(userReader).validateAllExist(requestDto.getAttendantIds());
-        when(userReader.findAllByIds(requestDto.getAttendantIds())).thenReturn(attendants);
-        when(assetCommandService.getAssetById(assetId)).thenReturn(asset);
-        doNothing().when(assetCommandService).isAvailable(assetId);
-        doNothing().when(reservationWriter).save(any());
-        doNothing().when(attendantWriter).saveAll(any());
-        doNothing().when(reservationEventPublisher).publishCreated(any());
+        when(userReader.findAllByIds(requestDto.getAttendantIds()))
+            .thenReturn(attendants);
+        when(assetCommandService.isAvailable(assetId)).thenReturn(true);
 
-        // Act
+        //
         ReservationResponseDto result =
                 reservationCommandService.instantConfirmReservation(userId, assetId, requestDto);
 
-        // Assert
         assertThat(result).isNotNull();
         assertThat(result.getAssetName()).isEqualTo(asset.getName());
-        assertThat(result.getStatus()).isEqualTo(ReservationStatus.APPROVED);
+        assertEquals("APPROVED", result.getStatus());
         assertThat(result.getIsApproved()).isTrue();
 
-        // Verify 호출 확인
         verify(userReader).findById(userId);
         verify(userReader).validateAllExist(requestDto.getAttendantIds());
         verify(userReader).findAllByIds(requestDto.getAttendantIds());
