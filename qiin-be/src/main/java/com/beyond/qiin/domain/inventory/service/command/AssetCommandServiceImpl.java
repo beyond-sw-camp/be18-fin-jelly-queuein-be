@@ -15,7 +15,7 @@ import com.beyond.qiin.domain.inventory.exception.CategoryException;
 import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.CategoryJpaRepository;
-import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
+import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
     private final AssetClosureJpaRepository assetClosureJpaRepository;
 
-    private final AssetClosureQueryAdapter assetClosureQueryAdapter;
+    private final AssetClosureQueryRepository assetClosureQueryRepository;
 
     private final CategoryCommandService categoryCommandService;
 
@@ -80,7 +80,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         }
 
         // 부모의 조상들 조회
-        List<AssetClosure> parentAncestors = assetClosureQueryAdapter.findAncestors(parentId);
+        List<AssetClosure> parentAncestors = assetClosureQueryRepository.findAncestors(parentId);
 
         // 조상들에 대해 depth+1 계산 후 insert
         for (AssetClosure ancestor : parentAncestors) {
@@ -135,7 +135,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         Asset asset = getAssetById(assetId);
 
         // 자식 자원 있으면 삭제 안됨 예외 처리
-        if (assetClosureQueryAdapter.existsChildren(assetId)) {
+        if (assetClosureQueryRepository.existsChildren(assetId)) {
             throw AssetException.hasChildren();
         }
 
@@ -146,7 +146,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         assetJpaRepository.save(asset);
 
         // 계층 구조 삭제
-        assetClosureQueryAdapter.deleteAllByDescendantId(assetId);
+        assetClosureQueryRepository.deleteAllByDescendantId(assetId);
     }
 
     @Override
@@ -164,7 +164,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         Long newParentId = newParentAsset.getId();
 
-        List<AssetClosure> subtree = assetClosureQueryAdapter.findDescendants(assetId);
+        List<AssetClosure> subtree = assetClosureQueryRepository.findDescendants(assetId);
 
         //        boolean isCycle = subtree.stream()
         //                .anyMatch(c -> c.getAssetClosureId().getDescendantId().equals(newParentId));
@@ -189,9 +189,9 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         //        }
 
         // 6) 기존 부모 계층과 subtree 연결된 링크 삭제
-        assetClosureQueryAdapter.deleteOldAncestorLinks(subtreeIds);
+        assetClosureQueryRepository.deleteOldAncestorLinks(subtreeIds);
 
-        List<AssetClosure> newParentAncestors = assetClosureQueryAdapter.findAncestors(newParentId);
+        List<AssetClosure> newParentAncestors = assetClosureQueryRepository.findAncestors(newParentId);
 
         for (AssetClosure parentAncestor : newParentAncestors) {
             Long ancestorId = parentAncestor.getAssetClosureId().getAncestorId();
@@ -218,7 +218,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     @Transactional
     public void moveToRoot(final Long assetId) {
 
-        List<AssetClosure> subtree = assetClosureQueryAdapter.findDescendants(assetId);
+        List<AssetClosure> subtree = assetClosureQueryRepository.findDescendants(assetId);
 
         List<Long> subtreeIds = subtree.stream()
                 .map(c -> c.getAssetClosureId().getDescendantId())
@@ -234,7 +234,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         //        }
 
         // 2) 기존 부모 계층과 subtree 연결된 링크 삭제
-        assetClosureQueryAdapter.deleteOldAncestorLinks(subtreeIds);
+        assetClosureQueryRepository.deleteOldAncestorLinks(subtreeIds);
     }
 
     //// 일반 메소드들 모음
