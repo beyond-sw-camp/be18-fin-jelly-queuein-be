@@ -2,12 +2,12 @@ package com.beyond.qiin.domain.iam.service.command;
 
 import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
-import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateMyInfoRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserByAdminRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.entity.UserRole;
-import com.beyond.qiin.domain.iam.exception.RoleException;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
@@ -64,16 +64,6 @@ public class UserCommandServiceImpl implements UserCommandService {
         return CreateUserResponseDto.fromEntity(saved);
     }
 
-    // 사용자 정보 수정
-    @Override
-    @Transactional
-    public void updateUser(final Long userId, final UpdateUserRequestDto request) {
-        User user = userReader.findById(userId);
-        boolean isSelf = false;
-        user.updateUser(request, isSelf);
-        userWriter.save(user);
-    }
-
     @Override
     @Transactional
     public void updateUserRole(final Long userId, final Long roleId, final Long updaterId) {
@@ -82,7 +72,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         Role newRole = roleReader.findById(roleId);
 
         // MASTER 보호
-        validateRoleChangeAllowed(user);
+        validateAdminCannotModifyMaster(user);
 
         // 기존 역할 soft delete
         user.getUserRoles().forEach(ur -> ur.softDelete(updaterId));
@@ -94,14 +84,28 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     @Transactional
-    public void updateMyInfo(final Long userId, final UpdateUserRequestDto request) {
+    public void updateUser(final Long userId, final UpdateUserByAdminRequestDto request) {
 
-        User user = userReader.findById(userId);
+        User target = userReader.findById(userId);
 
-        boolean isSelf = true;
+        // 1) MASTER 보호 — 대상이 MASTER면 ADMIN은 수정 불가
+        validateAdminCannotModifyMaster(target);
 
-        user.updateUser(request, isSelf);
-        userWriter.save(user);
+        // 2) 수정 수행
+        target.updateUser(request);
+        userWriter.save(target);
+    }
+
+    @Override
+    @Transactional
+    public void updateMyInfo(final Long userId, final UpdateMyInfoRequestDto request) {
+
+        User me = userReader.findById(userId);
+
+        // MASTER 자신 정보 수정은 허용
+        me.updateMyInfo(request);
+
+        userWriter.save(me);
     }
 
     // 임시 비밀번호 수정
@@ -173,14 +177,17 @@ public class UserCommandServiceImpl implements UserCommandService {
         return prefix + seq;
     }
 
-    private void validateRoleChangeAllowed(final User user) {
-        String currentRole = user.getUserRoles().stream()
+    private void validateAdminCannotModifyMaster(final User targetUser) {
+
+        // 대상의 역할 조회
+        String targetRole = targetUser.getUserRoles().stream()
                 .findFirst()
                 .map(ur -> ur.getRole().getRoleName())
-                .orElseThrow(RoleException::roleNotFound);
+                .orElseThrow(UserException::userNotFound);
 
-        if ("MASTER".equals(currentRole)) {
-            throw RoleException.roleCannotDeleteMaster();
+        // MASTER는 보호됨
+        if ("MASTER".equals(targetRole)) {
+            throw UserException.passwordChangeNotAllowed();
         }
     }
 }

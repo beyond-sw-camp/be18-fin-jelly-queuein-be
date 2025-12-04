@@ -1,12 +1,22 @@
 package com.beyond.qiin.domain.iam.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
-import com.beyond.qiin.domain.iam.dto.user.request.*;
+import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.ChangeTempPwRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateMyInfoRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserByAdminRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.search_condition.GetUsersSearchCondition;
-import com.beyond.qiin.domain.iam.dto.user.response.*;
+import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
+import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
+import com.beyond.qiin.domain.iam.dto.user.response.UserLookupResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
@@ -169,14 +179,31 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("updateUser - 성공")
+    @DisplayName("updateUser (관리자) 단위 테스트")
     void updateUser_success() {
-        UpdateUserRequestDto req = createInstance(UpdateUserRequestDto.class);
-        ReflectionTestUtils.setField(req, "userName", "수정됨");
+
+        UpdateUserByAdminRequestDto req = createInstance(UpdateUserByAdminRequestDto.class);
+        ReflectionTestUtils.setField(req, "dptId", 10L);
+        ReflectionTestUtils.setField(
+                req, "retireDate", LocalDate.of(2025, 1, 1).atStartOfDay().toInstant(java.time.ZoneOffset.UTC));
 
         ResponseEntity<Void> result = controller.updateUser(5L, req);
 
         verify(commandService).updateUser(5L, req);
+        assertThat(result.getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
+    @DisplayName("updateMyInfo (본인) - 성공")
+    void updateMyInfo_success() {
+
+        UpdateMyInfoRequestDto req = createInstance(UpdateMyInfoRequestDto.class);
+        ReflectionTestUtils.setField(req, "userName", "변경된이름");
+        ReflectionTestUtils.setField(req, "phone", "01022223333");
+
+        ResponseEntity<Void> result = controller.updateMe(req, 7L);
+
+        verify(commandService).updateMyInfo(7L, req);
         assertThat(result.getStatusCode().value()).isEqualTo(200);
     }
 

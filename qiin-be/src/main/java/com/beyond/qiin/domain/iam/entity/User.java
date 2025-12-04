@@ -2,7 +2,8 @@ package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
-import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateMyInfoRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserByAdminRequestDto;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -107,18 +108,33 @@ public class User extends BaseEntity {
         this.lastLoginAt = now;
     }
 
-    // 사용자 정보 수정
-    public void updateUser(final UpdateUserRequestDto dto, final boolean isSelf) {
+    public void updateUser(final UpdateUserByAdminRequestDto request) {
 
-        if (isSelf) {
-            // 본인은 email, dptId, retireDate 변경 불가
-            if (dto.getUserName() != null) this.userName = dto.getUserName();
-            if (dto.getPhone() != null) this.phone = dto.getPhone();
-            if (dto.getBirth() != null) this.birth = dto.getBirth();
-        } else {
-            // 타인이 타인을 수정할 때는 dptId, retireDate만 가능
-            if (dto.getDptId() != null) this.dptId = dto.getDptId();
-            if (dto.getRetireDate() != null) this.retireDate = dto.getRetireDate();
+        // 관리자: 본인 이름/이메일/전화/생일 변경 금지
+        if (request.getDptId() != null) {
+            this.dptId = request.getDptId();
+        }
+
+        if (request.getRetireDate() != null) {
+            this.retireDate = request.getRetireDate();
+        }
+    }
+
+    public void updateMyInfo(final UpdateMyInfoRequestDto request) {
+
+        // 본인: dptId, retireDate, email 변경 금지
+        if (request.getEmail() != null) {
+            throw UserException.passwordChangeNotAllowed();
+        }
+
+        if (request.getUserName() != null) {
+            this.userName = request.getUserName();
+        }
+        if (request.getPhone() != null) {
+            this.phone = request.getPhone();
+        }
+        if (request.getBirth() != null) {
+            this.birth = request.getBirth();
         }
     }
 

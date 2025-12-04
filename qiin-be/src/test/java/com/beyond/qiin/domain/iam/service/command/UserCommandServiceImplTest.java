@@ -10,7 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
-import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateMyInfoRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserByAdminRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -102,17 +103,33 @@ public class UserCommandServiceImplTest {
     }
 
     @Test
-    @DisplayName("사용자 수정 단위 테스트")
+    @DisplayName("관리자가 사용자 정보 수정")
     void updateUser_success() {
-        UpdateUserRequestDto req = mock(UpdateUserRequestDto.class);
+
+        UpdateUserByAdminRequestDto req = mock(UpdateUserByAdminRequestDto.class);
         User user = mock(User.class);
 
         when(userReader.findById(1L)).thenReturn(user);
 
         userCommandService.updateUser(1L, req);
 
-        verify(user).updateUser(req, false);
+        verify(user).updateUser(req);
         verify(userWriter).save(user);
+    }
+
+    @Test
+    @DisplayName("본인 정보 수정")
+    void updateMyInfo_success() {
+
+        UpdateMyInfoRequestDto req = mock(UpdateMyInfoRequestDto.class);
+        User me = mock(User.class);
+
+        when(userReader.findById(1L)).thenReturn(me);
+
+        userCommandService.updateMyInfo(1L, req);
+
+        verify(me).updateMyInfo(req);
+        verify(userWriter).save(me);
     }
 
     @Test

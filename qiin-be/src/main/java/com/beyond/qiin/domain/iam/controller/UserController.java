@@ -4,7 +4,8 @@ import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.ChangeTempPwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
-import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateMyInfoRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserByAdminRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.search_condition.GetUsersSearchCondition;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
@@ -50,15 +51,6 @@ public class UserController {
         return ResponseEntity.ok(userCommandService.createUser(request));
     }
 
-    // 사용자 수정
-    @PatchMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
-    public ResponseEntity<Void> updateUser(
-            @PathVariable final Long userId, @Valid @RequestBody final UpdateUserRequestDto request) {
-        userCommandService.updateUser(userId, request);
-        return ResponseEntity.ok().build();
-    }
-
     // 사용자 역할 수정
     @PatchMapping("/{userId}/role")
     @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
@@ -70,10 +62,20 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/{userId}")
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    public ResponseEntity<Void> updateUser(
+            @PathVariable final Long userId, @Valid @RequestBody final UpdateUserByAdminRequestDto request) {
+
+        userCommandService.updateUser(userId, request);
+        return ResponseEntity.ok().build();
+    }
+
     // 본인정보 수정
     @PatchMapping("/me")
     public ResponseEntity<Void> updateMe(
-            @Valid @RequestBody final UpdateUserRequestDto request, @CurrentUserId final Long userId) {
+            @Valid @RequestBody final UpdateMyInfoRequestDto request, @CurrentUserId final Long userId) {
+
         userCommandService.updateMyInfo(userId, request);
         return ResponseEntity.ok().build();
     }
