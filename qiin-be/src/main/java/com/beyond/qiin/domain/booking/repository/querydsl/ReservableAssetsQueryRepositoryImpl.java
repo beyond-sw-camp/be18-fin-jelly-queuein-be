@@ -2,21 +2,16 @@ package com.beyond.qiin.domain.booking.repository.querydsl;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
-import com.beyond.qiin.domain.booking.entity.QReservation;
 import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -111,6 +106,4 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
                 .orderBy(asset.id.desc())
                 .fetch();
     }
-
-
 }

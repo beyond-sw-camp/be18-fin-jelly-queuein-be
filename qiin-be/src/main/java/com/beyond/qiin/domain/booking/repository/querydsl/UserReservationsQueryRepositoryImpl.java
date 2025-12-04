@@ -10,10 +10,7 @@ import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -166,5 +163,4 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
 
         return new PageImpl<>(content, pageable, total);
     }
-
 }
