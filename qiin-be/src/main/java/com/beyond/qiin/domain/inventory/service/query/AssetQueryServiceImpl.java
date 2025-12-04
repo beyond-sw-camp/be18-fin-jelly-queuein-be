@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.inventory.service.query;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.request.search_condition.AssetSearchCondition;
 import com.beyond.qiin.domain.inventory.dto.asset.response.AssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponseDto;
@@ -12,16 +13,16 @@ import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
-import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
-import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryAdapter;
+import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRepository;
+import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AssetQueryServiceImpl implements AssetQueryService {
 
-    private final AssetQueryAdapter assetQueryAdapter;
+    private final AssetQueryRepository assetQueryRepository;
 
-    private final CategoryQueryAdapter categoryQueryAdapter;
+    private final AssetClosureQueryRepository assetClosureQueryRepository;
 
     private final AssetJpaRepository assetJpaRepository;
 
@@ -40,12 +41,12 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     @Transactional(readOnly = true)
     public List<RootAssetResponseDto> getRootAssetIds() {
 
-        List<Long> rootIds = assetQueryAdapter.findRootAssetIds();
+        List<Long> rootIds = assetQueryRepository.findRootAssetIds();
         if (rootIds.isEmpty()) {
             return List.of();
         }
 
-        List<Asset> rootAssets = assetQueryAdapter.findByIds(rootIds);
+        List<Asset> rootAssets = assetQueryRepository.findByIds(rootIds);
 
         return rootAssets.stream().map(RootAssetResponseDto::fromEntity).toList();
     }
@@ -54,78 +55,123 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     @Transactional(readOnly = true)
     public List<OneDepthAssetResponseDto> getOneDepthAssetList(final Long rootAssetId) {
 
-        List<Long> childIds = assetQueryAdapter.findChildrenIds(rootAssetId);
+        List<Long> childIds = assetQueryRepository.findChildrenIds(rootAssetId);
         if (childIds.isEmpty()) {
             return List.of();
         }
 
-        List<Asset> children = assetQueryAdapter.findByIds(childIds);
+        List<Asset> children = assetQueryRepository.findByIds(childIds);
 
         return children.stream().map(OneDepthAssetResponseDto::fromEntity).toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(final int page, final int size) {
+    public PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(
+            final AssetSearchCondition condition, final Pageable pageable) {
+        Page<RawDescendantAssetResponseDto> rawPage = assetQueryRepository.searchDescendants(condition, pageable);
 
-        Pageable pageable = PageRequest.of(page, size);
+        Page<DescendantAssetResponseDto> dtoPage = rawPage.map(DescendantAssetResponseDto::fromEntity);
 
-        Page<RawDescendantAssetResponseDto> rawPage = assetQueryAdapter.findAllForDescendant(pageable);
-        Page<DescendantAssetResponseDto> descendantAssetResponseDtoPage =
-                rawPage.map(DescendantAssetResponseDto::fromEntity);
-
-        return PageResponseDto.from(descendantAssetResponseDtoPage);
+        return PageResponseDto.from(dtoPage);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public TreeAssetResponseDto getAssetTree(final Long assetId) {
-
-        Asset rootAsset = assetQueryAdapter.findById(assetId).orElseThrow(AssetException::notFound);
-
-        List<AssetClosure> closures = assetQueryAdapter.findSubtree(assetId);
-
-        List<Long> descendantIds = closures.stream()
-                .map(c -> c.getAssetClosureId().getDescendantId())
-                .distinct()
-                .toList();
-
-        List<Asset> assets = assetQueryAdapter.findByIds(descendantIds);
-
-        Map<Long, Asset> assetMap = assets.stream().collect(Collectors.toMap(Asset::getId, a -> a));
-
-        Map<Long, List<Long>> childrenMap = new HashMap<>();
-
-        for (AssetClosure c : closures) {
-            if (c.getDepth() == 1) {
-                Long parentId = c.getAssetClosureId().getAncestorId();
-                Long childId = c.getAssetClosureId().getDescendantId();
-
-                childrenMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(childId);
-            }
-        }
-
-        return buildTreeFromMap(assetId, assetMap, childrenMap);
-    }
+    //    부분 트리 방식임
+    //    @Override
+    //    @Transactional(readOnly = true)
+    //    public TreeAssetResponseDto getAssetTree(final Long assetId) {
+    //
+    //        Asset rootAsset = assetQueryAdapter.findById(assetId).orElseThrow(AssetException::notFound);
+    //
+    //        List<AssetClosure> closures = assetQueryAdapter.findSubtree(assetId);
+    //
+    //        List<Long> descendantIds = closures.stream()
+    //                .map(c -> c.getAssetClosureId().getDescendantId())
+    //                .distinct()
+    //                .toList();
+    //
+    //        List<Asset> assets = assetQueryAdapter.findByIds(descendantIds);
+    //
+    //        Map<Long, Asset> assetMap = assets.stream().collect(Collectors.toMap(Asset::getId, a -> a));
+    //
+    //        Map<Long, List<Long>> childrenMap = new HashMap<>();
+    //
+    //        for (AssetClosure c : closures) {
+    //            if (c.getDepth() == 1) {
+    //                Long parentId = c.getAssetClosureId().getAncestorId();
+    //                Long childId = c.getAssetClosureId().getDescendantId();
+    //
+    //                childrenMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(childId);
+    //            }
+    //        }
+    //
+    //        return buildTreeFromMap(assetId, assetMap, childrenMap);
+    //    }
+    //
+    //    @Override
+    //    @Transactional(readOnly = true)
+    //    public List<TreeAssetResponseDto> getFullAssetTree() {
+    //
+    //        List<Long> rootIds = assetQueryAdapter.findRootAssetIds();
+    //
+    //        return rootIds.stream().map(this::getAssetTree).toList();
+    //    }
+    //
+    //    private TreeAssetResponseDto buildTreeFromMap(
+    //            Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
+    //
+    //        Asset asset = assetMap.get(assetId);
+    //
+    //        List<Long> childIds = childrenMap.getOrDefault(assetId, List.of());
+    //
+    //        List<TreeAssetResponseDto> children = childIds.stream()
+    //                .map(childId -> buildTreeFromMap(childId, assetMap, childrenMap))
+    //                .toList();
+    //
+    //        return TreeAssetResponseDto.of(asset.getId(), asset.getName(), children);
+    //    }
 
     @Override
     @Transactional(readOnly = true)
     public List<TreeAssetResponseDto> getFullAssetTree() {
 
-        List<Long> rootIds = assetQueryAdapter.findRootAssetIds();
+        // 1) 전체 자원 조회
+        List<Asset> allAssets = assetQueryRepository.findAll();
 
-        return rootIds.stream().map(this::getAssetTree).toList();
+        // 2) 전체 depth=1 관계 조회 (parent → child)
+        List<AssetClosure> depthOneRelations = assetClosureQueryRepository.findDepthOneRelations();
+
+        // 3) parent → children map 생성
+        Map<Long, List<Long>> childrenMap = new HashMap<>();
+        for (AssetClosure c : depthOneRelations) {
+            Long parent = c.getAssetClosureId().getAncestorId();
+            Long child = c.getAssetClosureId().getDescendantId();
+            childrenMap.computeIfAbsent(parent, k -> new ArrayList<>()).add(child);
+        }
+
+        // 4) 전체 자원 ID 수집
+        Map<Long, Asset> assetMap = allAssets.stream().collect(Collectors.toMap(Asset::getId, a -> a));
+
+        // 5) root 찾기: 전체 ID - childIds
+        Set<Long> childIds = depthOneRelations.stream()
+                .map(c -> c.getAssetClosureId().getDescendantId())
+                .collect(Collectors.toSet());
+
+        List<Long> rootIds =
+                assetMap.keySet().stream().filter(id -> !childIds.contains(id)).toList();
+
+        // 6) DFS로 트리 생성
+        return rootIds.stream()
+                .map(rootId -> buildTree(rootId, assetMap, childrenMap))
+                .toList();
     }
 
-    private TreeAssetResponseDto buildTreeFromMap(
-            Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
+    private TreeAssetResponseDto buildTree(Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
 
         Asset asset = assetMap.get(assetId);
 
-        List<Long> childIds = childrenMap.getOrDefault(assetId, List.of());
-
-        List<TreeAssetResponseDto> children = childIds.stream()
-                .map(childId -> buildTreeFromMap(childId, assetMap, childrenMap))
+        List<TreeAssetResponseDto> children = childrenMap.getOrDefault(assetId, List.of()).stream()
+                .map(childId -> buildTree(childId, assetMap, childrenMap))
                 .toList();
 
         return TreeAssetResponseDto.of(asset.getId(), asset.getName(), children);
@@ -135,9 +181,10 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     @Transactional(readOnly = true)
     public AssetDetailResponseDto getAssetDetail(final Long assetId) {
 
-        RawAssetDetailResponseDto raw = assetQueryAdapter.findByAssetId(assetId).orElseThrow(AssetException::notFound);
+        RawAssetDetailResponseDto raw =
+                assetQueryRepository.findByAssetId(assetId).orElseThrow(AssetException::notFound);
 
-        String parentName = assetQueryAdapter.findParentName(assetId);
+        String parentName = assetQueryRepository.findParentName(assetId);
 
         return AssetDetailResponseDto.fromRaw(raw, parentName);
     }

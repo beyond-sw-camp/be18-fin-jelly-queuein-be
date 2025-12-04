@@ -1,5 +1,6 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
+import com.beyond.qiin.domain.inventory.dto.asset.request.search_condition.AssetSearchCondition;
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
@@ -9,7 +10,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface AssetQueryAdapter {
+public interface AssetQueryRepository {
 
     Optional<Asset> findById(final Long assetId);
 
@@ -30,4 +31,10 @@ public interface AssetQueryAdapter {
 
     // 자기 부모 이름 찾기
     String findParentName(final Long assetId);
+
+    // 모든 자원 조회
+    List<Asset> findAll();
+
+    // 검색 필터용
+    Page<RawDescendantAssetResponseDto> searchDescendants(AssetSearchCondition condition, Pageable pageable);
 }

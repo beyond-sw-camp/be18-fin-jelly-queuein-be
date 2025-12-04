@@ -1,7 +1,8 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
+import static com.beyond.qiin.domain.inventory.entity.QAssetClosure.assetClosure;
+
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
-import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
-public class AssetClosureQueryAdapterImpl implements AssetClosureQueryAdapter {
+public class AssetClosureQueryRepositoryImpl implements AssetClosureQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-
-    private static final QAssetClosure assetClosure = QAssetClosure.assetClosure;
 
     @Override
     public List<AssetClosure> findAncestors(Long descendantId) {
@@ -76,5 +75,27 @@ public class AssetClosureQueryAdapterImpl implements AssetClosureQueryAdapter {
 
         // 있으면 true 반환 함
         return result != null;
+    }
+
+    @Override
+    @Transactional
+    public void deleteOldAncestorLinks(List<Long> subtreeIds) {
+        queryFactory
+                .delete(assetClosure)
+                .where(assetClosure
+                        .assetClosureId
+                        .descendantId
+                        .in(subtreeIds)
+                        .and(assetClosure.assetClosureId.ancestorId.notIn(subtreeIds)))
+                .execute();
+    }
+
+    @Override
+    @Transactional
+    public List<AssetClosure> findDepthOneRelations() {
+        return queryFactory
+                .selectFrom(assetClosure)
+                .where(assetClosure.depth.eq(1))
+                .fetch();
     }
 }
