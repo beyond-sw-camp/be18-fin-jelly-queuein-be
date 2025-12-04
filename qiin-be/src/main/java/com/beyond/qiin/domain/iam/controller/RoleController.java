@@ -81,7 +81,7 @@ public class RoleController {
 
     // 역할-권한 매핑 수정
     @PutMapping("/{roleId}/permissions")
-    // @PreAuthorize("hasAuthority('IAM_ROLE_PERMISSION_REPLACE')")
+    @PreAuthorize("hasAuthority('IAM_ROLE_PERMISSION_REPLACE')")
     public ResponseEntity<RolePermissionListResponseDto> replacePermissions(
             @PathVariable final Long roleId,
             @RequestBody final ReplaceRolePermissionsRequestDto request,

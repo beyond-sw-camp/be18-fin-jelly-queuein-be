@@ -46,14 +46,14 @@ public class UserController {
 
     // 사용자 생성
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    @PreAuthorize("hasAuthority('IAM_USER_CREATE')")
     public ResponseEntity<CreateUserResponseDto> createUser(@Valid @RequestBody final CreateUserRequestDto request) {
         return ResponseEntity.ok(userCommandService.createUser(request));
     }
 
     // 사용자 역할 수정
     @PatchMapping("/{userId}/role")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    @PreAuthorize("hasAuthority('IAM_USER_UPDATE')")
     public ResponseEntity<Void> updateUserRole(
             @PathVariable final Long userId,
             @RequestBody @Valid final UpdateUserRoleRequestDto request,
@@ -100,7 +100,7 @@ public class UserController {
 
     // 사용자 삭제
     @DeleteMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    @PreAuthorize("hasAuthority('IAM_USER_DELETE')")
     public ResponseEntity<Void> deleteUser(@PathVariable final Long userId, @CurrentUserId final Long deleterId) {
         userCommandService.deleteUser(userId, deleterId);
         return ResponseEntity.noContent().build();
