@@ -35,7 +35,7 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
         // 비교연도 월별 SUM
         Map<Integer, BigDecimal> compare = getMonthlySum(compareYear, assetId, assetName);
 
-        // 화면용 asset 이름 결정
+        // 화면용 Asset Name
         String resolvedName = resolveAssetName(assetId, assetName);
 
         return SettlementPerformanceRawDto.builder()
@@ -46,7 +46,18 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
                 .build();
     }
 
-    // 월별 usage_gap_cost SUM
+    //  누적 절감 금액 조회 (전체)
+    @Override
+    public BigDecimal getTotalSavingAllTime() {
+        BigDecimal sum = queryFactory
+                .select(settlement.usageGapCost.sumBigDecimal())
+                .from(settlement)
+                .fetchOne();
+
+        return sum == null ? BigDecimal.ZERO : sum;
+    }
+
+    // 월별 SUM
     private Map<Integer, BigDecimal> getMonthlySum(int year, Long assetId, String assetName) {
 
         BooleanBuilder builder = new BooleanBuilder();
@@ -54,7 +65,6 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
 
         if (assetId != null) {
             builder.and(settlement.asset.id.eq(assetId));
-
         } else if (assetName != null && !assetName.isBlank()) {
             builder.and(settlement.asset.name.containsIgnoreCase(assetName));
         }
@@ -75,11 +85,10 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
         for (Tuple t : rows) {
             Integer m = t.get(monthExpr);
             BigDecimal sum = t.get(sumExpr);
-
             result.put(m, sum == null ? BigDecimal.ZERO : sum);
         }
 
-        // 1~12월 누락된 달을 0으로 채움
+        // 1~12월 값 보정
         for (int m = 1; m <= 12; m++) {
             result.putIfAbsent(m, BigDecimal.ZERO);
         }
@@ -87,9 +96,7 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
         return result;
     }
 
-    // asset 이름 검증 (없는 자원명 검색 금지)
     private void validateAssetNameOrThrow(String assetName) {
-
         Long count = queryFactory
                 .select(asset.id.count())
                 .from(asset)
@@ -101,7 +108,6 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
         }
     }
 
-    // asset 이름 결정 로직 (전체 / 단일 / 이름 검색)
     private String resolveAssetName(Long assetId, String assetName) {
 
         if (assetId != null) {
@@ -113,13 +119,12 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
         }
 
         if (assetName != null && !assetName.isBlank()) {
-
             return queryFactory
                     .select(asset.name)
                     .from(asset)
                     .where(asset.name.containsIgnoreCase(assetName))
                     .limit(1)
-                    .fetchOne(); // 실제 존재하는 이름만 반환
+                    .fetchOne();
         }
 
         return "전체";

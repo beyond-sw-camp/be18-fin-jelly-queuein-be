@@ -1,4 +1,3 @@
-// file: src/main/java/com/beyond/qiin/domain/accounting/service/query/SettlementQuarterQueryServiceImpl.java
 package com.beyond.qiin.domain.accounting.service.query;
 
 import com.beyond.qiin.domain.accounting.dto.settlement.request.SettlementQuarterRequestDto;
