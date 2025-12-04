@@ -1,5 +1,6 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
+import com.beyond.qiin.domain.inventory.dto.asset.request.search_condition.AssetSearchCondition;
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
@@ -33,4 +34,10 @@ public interface AssetQueryAdapter {
 
     // 모든 자원 조회
     List<Asset> findAll();
+
+    // 검색 필터용
+    Page<RawDescendantAssetResponseDto> searchDescendants(
+            AssetSearchCondition condition,
+            Pageable pageable
+    );
 }

@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.inventory.service.query;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.request.search_condition.AssetSearchCondition;
 import com.beyond.qiin.domain.inventory.dto.asset.response.AssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponseDto;
@@ -67,15 +68,17 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(final int page, final int size) {
+    public PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(
+            final AssetSearchCondition condition,
+            final Pageable pageable
+    ) {
+        Page<RawDescendantAssetResponseDto> rawPage =
+                assetQueryAdapter.searchDescendants(condition, pageable);
 
-        Pageable pageable = PageRequest.of(page, size);
-
-        Page<RawDescendantAssetResponseDto> rawPage = assetQueryAdapter.findAllForDescendant(pageable);
-        Page<DescendantAssetResponseDto> descendantAssetResponseDtoPage =
+        Page<DescendantAssetResponseDto> dtoPage =
                 rawPage.map(DescendantAssetResponseDto::fromEntity);
 
-        return PageResponseDto.from(descendantAssetResponseDtoPage);
+        return PageResponseDto.from(dtoPage);
     }
 
     //    부분 트리 방식임

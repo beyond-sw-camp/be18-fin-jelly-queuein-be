@@ -4,6 +4,7 @@ import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.request.MoveAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
+import com.beyond.qiin.domain.inventory.dto.asset.request.search_condition.AssetSearchCondition;
 import com.beyond.qiin.domain.inventory.dto.asset.response.AssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.CreateAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
@@ -18,11 +19,13 @@ import com.beyond.qiin.security.resolver.AccessToken;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -111,16 +114,11 @@ public class AssetController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping("/descendants")
     public ResponseEntity<PageResponseDto<DescendantAssetResponseDto>> getDescendantAssets(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) Long rootId,
-            @RequestParam(required = false) Long oneDepthId,
-            @RequestParam(required = false) Long categoryId,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String status) {
-
+            @Valid @ModelAttribute AssetSearchCondition condition,
+            Pageable pageable
+    ) {
         PageResponseDto<DescendantAssetResponseDto> descendantAssetList =
-                assetQueryService.getDescendantAssetList(page, size);
+                assetQueryService.getDescendantAssetList(condition, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(descendantAssetList);
     }

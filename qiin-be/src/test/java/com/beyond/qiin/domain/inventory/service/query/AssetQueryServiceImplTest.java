@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.request.search_condition.AssetSearchCondition;
 import com.beyond.qiin.domain.inventory.dto.asset.response.AssetDetailResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponseDto;
@@ -93,6 +94,7 @@ class AssetQueryServiceImplTest {
     void getDescendantAssetList_success() {
 
         Pageable pageable = PageRequest.of(0, 10);
+        AssetSearchCondition condition = new AssetSearchCondition();
 
         RawDescendantAssetResponseDto r1 = RawDescendantAssetResponseDto.builder()
                 .assetId(1L)
@@ -118,9 +120,10 @@ class AssetQueryServiceImplTest {
 
         Page<RawDescendantAssetResponseDto> rawPage = new PageImpl<>(List.of(r1, r2), pageable, 2);
 
-        when(assetQueryAdapter.findAllForDescendant(any(Pageable.class))).thenReturn(rawPage);
+        when(assetQueryAdapter.searchDescendants(any(AssetSearchCondition.class), any(Pageable.class)))
+                .thenReturn(rawPage);
 
-        PageResponseDto<DescendantAssetResponseDto> result = service.getDescendantAssetList(0, 10);
+        PageResponseDto<DescendantAssetResponseDto> result = service.getDescendantAssetList(condition, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getTotalElements()).isEqualTo(2);
