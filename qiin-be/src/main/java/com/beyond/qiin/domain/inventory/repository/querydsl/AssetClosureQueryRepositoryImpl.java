@@ -1,7 +1,8 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
+import static com.beyond.qiin.domain.inventory.entity.QAssetClosure.assetClosure;
+
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
-import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
-public class AssetClosureQueryAdapterImpl implements AssetClosureQueryAdapter {
+public class AssetClosureQueryRepositoryImpl implements AssetClosureQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-
-    private static final QAssetClosure assetClosure = QAssetClosure.assetClosure;
 
     @Override
     public List<AssetClosure> findAncestors(Long descendantId) {

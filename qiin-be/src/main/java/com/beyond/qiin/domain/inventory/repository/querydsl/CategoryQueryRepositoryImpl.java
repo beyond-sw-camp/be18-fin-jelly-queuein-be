@@ -1,10 +1,11 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
+import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
+import static com.beyond.qiin.domain.inventory.entity.QCategory.category;
+
 import com.beyond.qiin.domain.inventory.dto.category.response.DropdownCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.ManageCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Category;
-import com.beyond.qiin.domain.inventory.entity.QAsset;
-import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -19,12 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
-public class CategoryQueryAdapterImpl implements CategoryQueryAdapter {
+public class CategoryQueryRepositoryImpl implements CategoryQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
-
-    private static final QCategory category = QCategory.category;
-    private static final QAsset asset = QAsset.asset;
 
     @Override
     @Transactional(readOnly = true)
