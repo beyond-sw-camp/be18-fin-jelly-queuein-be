@@ -30,29 +30,29 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class ApproveReservationTest {
-  @InjectMocks
-  private ReservationCommandServiceImpl reservationCommandService;
+    @InjectMocks
+    private ReservationCommandServiceImpl reservationCommandService;
 
-  @Mock
-  private UserReader userReader;
+    @Mock
+    private UserReader userReader;
 
-  @Mock
-  private ReservationReader reservationReader;
+    @Mock
+    private ReservationReader reservationReader;
 
-  @Mock
-  private ReservationWriter reservationWriter;
+    @Mock
+    private ReservationWriter reservationWriter;
 
-  @Mock
-  private AttendantWriter attendantWriter;
+    @Mock
+    private AttendantWriter attendantWriter;
 
-  @Mock
-  private AssetCommandService assetCommandService;
+    @Mock
+    private AssetCommandService assetCommandService;
 
-  @Mock
-  private ReservationEventPublisher reservationEventPublisher;
+    @Mock
+    private ReservationEventPublisher reservationEventPublisher;
 
-  @Mock
-  private AttendantJpaRepository attendantJpaRepository;
+    @Mock
+    private AttendantJpaRepository attendantJpaRepository;
 
     @Test
     void approveReservation_success() {
