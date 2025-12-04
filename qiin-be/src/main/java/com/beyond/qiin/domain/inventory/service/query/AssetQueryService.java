@@ -8,9 +8,8 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponse
 import com.beyond.qiin.domain.inventory.dto.asset.response.RootAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.TreeAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
-import org.springframework.data.domain.Pageable;
-
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface AssetQueryService {
 
@@ -21,7 +20,8 @@ public interface AssetQueryService {
     List<OneDepthAssetResponseDto> getOneDepthAssetList(final Long rootAssetId);
 
     // 자식 자원들 조회
-    PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(final AssetSearchCondition condition, final Pageable pageable);
+    PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(
+            final AssetSearchCondition condition, final Pageable pageable);
 
     //    부분 트리 방식임
     //    TreeAssetResponseDto getAssetTree(final Long assetId);

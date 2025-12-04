@@ -36,8 +36,5 @@ public interface AssetQueryAdapter {
     List<Asset> findAll();
 
     // 검색 필터용
-    Page<RawDescendantAssetResponseDto> searchDescendants(
-            AssetSearchCondition condition,
-            Pageable pageable
-    );
+    Page<RawDescendantAssetResponseDto> searchDescendants(AssetSearchCondition condition, Pageable pageable);
 }

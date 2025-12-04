@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,14 +68,10 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(
-            final AssetSearchCondition condition,
-            final Pageable pageable
-    ) {
-        Page<RawDescendantAssetResponseDto> rawPage =
-                assetQueryAdapter.searchDescendants(condition, pageable);
+            final AssetSearchCondition condition, final Pageable pageable) {
+        Page<RawDescendantAssetResponseDto> rawPage = assetQueryAdapter.searchDescendants(condition, pageable);
 
-        Page<DescendantAssetResponseDto> dtoPage =
-                rawPage.map(DescendantAssetResponseDto::fromEntity);
+        Page<DescendantAssetResponseDto> dtoPage = rawPage.map(DescendantAssetResponseDto::fromEntity);
 
         return PageResponseDto.from(dtoPage);
     }

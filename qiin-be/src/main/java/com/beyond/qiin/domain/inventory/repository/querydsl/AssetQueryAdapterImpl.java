@@ -161,10 +161,7 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
     }
 
     @Override
-    public Page<RawDescendantAssetResponseDto> searchDescendants(
-            AssetSearchCondition condition,
-            Pageable pageable
-    ) {
+    public Page<RawDescendantAssetResponseDto> searchDescendants(AssetSearchCondition condition, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
         // 🔹 root(0 depth) 조건이 들어오면 join 필요
@@ -174,13 +171,13 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
         if (condition.getOneDepth() != null) {
             needsClosureJoin = true;
             builder.and(assetClosure.assetClosureId.ancestorId.eq(Long.valueOf(condition.getOneDepth())))
-                   .and(assetClosure.depth.gt(0));   // 자기 자신 제외
+                    .and(assetClosure.depth.gt(0)); // 자기 자신 제외
         }
         // 🔹 그 외 root가 있는 경우
         else if (condition.getRoot() != null) {
             needsClosureJoin = true;
             builder.and(assetClosure.assetClosureId.ancestorId.eq(Long.valueOf(condition.getRoot())))
-                   .and(assetClosure.depth.gt(0));  // depth > 0 로 자기 자신 제외
+                    .and(assetClosure.depth.gt(0)); // depth > 0 로 자기 자신 제외
         }
 
         if (condition.getCategoryId() != null) {
@@ -192,14 +189,14 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
         }
 
         if (condition.getStatus() != null) {
-            builder.and(asset.status.eq(AssetStatus.fromName(condition.getStatus()).getCode()));
+            builder.and(
+                    asset.status.eq(AssetStatus.fromName(condition.getStatus()).getCode()));
         }
 
         if (condition.getKeyword() != null && !condition.getKeyword().isEmpty()) {
-            builder.and(
-                    asset.name.containsIgnoreCase(condition.getKeyword())
-                              .or(asset.description.containsIgnoreCase(condition.getKeyword()))
-            );
+            builder.and(asset.name
+                    .containsIgnoreCase(condition.getKeyword())
+                    .or(asset.description.containsIgnoreCase(condition.getKeyword())));
         }
         // 🔥 여기에서 join 조건을 동적으로 적용함
         var query = jpaQueryFactory
@@ -212,18 +209,16 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
                         asset.type,
                         asset.needsApproval,
                         asset.status.eq(0),
-                        asset.version
-                ))
+                        asset.version))
                 .from(asset)
-                .leftJoin(category).on(category.id.eq(asset.category.id));
+                .leftJoin(category)
+                .on(category.id.eq(asset.category.id));
 
         if (needsClosureJoin) {
-            query.leftJoin(assetClosure)
-                 .on(assetClosure.assetClosureId.descendantId.eq(asset.id));
+            query.leftJoin(assetClosure).on(assetClosure.assetClosureId.descendantId.eq(asset.id));
         }
 
-        List<RawDescendantAssetResponseDto> content = query
-                .where(builder)
+        List<RawDescendantAssetResponseDto> content = query.where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -232,18 +227,15 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
         var countQuery = jpaQueryFactory
                 .select(asset.count())
                 .from(asset)
-                .leftJoin(category).on(category.id.eq(asset.category.id));
+                .leftJoin(category)
+                .on(category.id.eq(asset.category.id));
 
         if (needsClosureJoin) {
-            countQuery.leftJoin(assetClosure)
-                      .on(assetClosure.assetClosureId.descendantId.eq(asset.id));
+            countQuery.leftJoin(assetClosure).on(assetClosure.assetClosureId.descendantId.eq(asset.id));
         }
 
-        long total = countQuery
-                .where(builder)
-                .fetchOne();
+        long total = countQuery.where(builder).fetchOne();
 
         return new PageImpl<>(content, pageable, total);
     }
-
 }
