@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
-import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
@@ -91,12 +90,10 @@ public class InstantConfirmReservationTest {
                 User.builder().userName("참석자1").build(),
                 User.builder().userName("참석자2").build());
 
-
         when(assetCommandService.getAssetById(assetId)).thenReturn(asset);
         when(userReader.findById(userId)).thenReturn(applicant);
         doNothing().when(userReader).validateAllExist(requestDto.getAttendantIds());
-        when(userReader.findAllByIds(requestDto.getAttendantIds()))
-            .thenReturn(attendants);
+        when(userReader.findAllByIds(requestDto.getAttendantIds())).thenReturn(attendants);
         when(assetCommandService.isAvailable(assetId)).thenReturn(true);
 
         //
