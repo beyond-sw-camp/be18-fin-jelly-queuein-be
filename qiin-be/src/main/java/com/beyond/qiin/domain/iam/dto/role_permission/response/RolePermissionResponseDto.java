@@ -15,6 +15,7 @@ public class RolePermissionResponseDto {
     private final Long roleId;
     private final Long permissionId;
     private final String permissionName;
+    private final String permissionDescription;
 
     public static RolePermissionResponseDto fromEntity(final RolePermission entity) {
         return RolePermissionResponseDto.builder()
@@ -22,6 +23,7 @@ public class RolePermissionResponseDto {
                 .roleId(entity.getRole().getId())
                 .permissionId(entity.getPermission().getId())
                 .permissionName(entity.getPermission().getPermissionName())
+                .permissionDescription(entity.getPermission().getPermissionDescription())
                 .build();
     }
 
@@ -31,6 +33,7 @@ public class RolePermissionResponseDto {
                 .roleId(null)
                 .permissionId(p.getPermissionId())
                 .permissionName(p.getPermissionName())
+                .permissionDescription(p.getPermissionDescription())
                 .build();
     }
 }

@@ -134,7 +134,7 @@ class RolePermissionCommandServiceImplTest {
 
         assertThat(dto.getPermissions()).hasSize(1);
         verify(rolePermissionWriter, times(2)).saveAll(any());
-        verify(roleProjectionHandler).onRolePermissionsChanged(role);
+        verify(roleProjectionHandler, times(2)).onRolePermissionsChanged(role);
     }
 
     @Test

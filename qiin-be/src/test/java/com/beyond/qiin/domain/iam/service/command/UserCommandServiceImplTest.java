@@ -24,6 +24,7 @@ import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
 import com.beyond.qiin.infra.mail.MailService;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,8 +33,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
-;
-;
 
 @DisplayName("UserCommandServiceImpl 단위 테스트")
 public class UserCommandServiceImplTest {
@@ -103,12 +102,21 @@ public class UserCommandServiceImplTest {
     }
 
     @Test
-    @DisplayName("관리자가 사용자 정보 수정")
+    @DisplayName("관리자가 사용자 정보 수정 단위 테스트")
     void updateUser_success() {
 
         UpdateUserByAdminRequestDto req = mock(UpdateUserByAdminRequestDto.class);
-        User user = mock(User.class);
 
+        User user = mock(User.class);
+        Role generalRole = mock(Role.class);
+        UserRole userRole = mock(UserRole.class);
+
+        // 역할명 설정
+        when(generalRole.getRoleName()).thenReturn("GENERAL");
+        when(userRole.getRole()).thenReturn(generalRole);
+        when(user.getUserRoles()).thenReturn(List.of(userRole));
+
+        // UserReader mocking
         when(userReader.findById(1L)).thenReturn(user);
 
         userCommandService.updateUser(1L, req);

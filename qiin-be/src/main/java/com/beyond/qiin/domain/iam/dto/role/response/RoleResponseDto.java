@@ -40,16 +40,17 @@ public class RoleResponseDto {
     // redis
     public static RoleResponseDto fromReadModel(final RoleReadModel model) {
 
-        List<RolePermissionResponseDto> perms = model.getPermissions().stream()
-                .map(RolePermissionResponseDto::fromRedisItem)
-                .toList();
+        List<RoleReadModel.PermissionItem> items = model.getPermissions() == null ? List.of() : model.getPermissions();
+
+        List<RolePermissionResponseDto> perms =
+                items.stream().map(RolePermissionResponseDto::fromRedisItem).toList();
 
         return RoleResponseDto.builder()
                 .roleId(model.getRoleId())
                 .roleName(model.getRoleName())
                 .roleDescription(model.getRoleDescription())
                 .permissions(perms)
-                .userCount(model.getUserCount())
+                .userCount(model.getUserCount() == null ? 0 : model.getUserCount())
                 .build();
     }
 }
