@@ -1,9 +1,7 @@
 package com.beyond.qiin.domain.booking.service.query;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
