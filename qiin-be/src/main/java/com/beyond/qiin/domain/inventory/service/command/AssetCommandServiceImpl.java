@@ -1,16 +1,21 @@
 package com.beyond.qiin.domain.inventory.service.command;
 
+import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.CreateAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
+import com.beyond.qiin.domain.inventory.entity.Category;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.beyond.qiin.domain.inventory.exception.AssetException;
-import com.beyond.qiin.domain.inventory.exception.AssetException.AssetErrorCode;
+import com.beyond.qiin.domain.inventory.exception.CategoryException;
 import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
-import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
+import com.beyond.qiin.domain.inventory.repository.CategoryJpaRepository;
+import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,9 +29,13 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
     private final AssetClosureJpaRepository assetClosureJpaRepository;
 
-    private final AssetClosureQueryAdapter assetClosureQueryAdapter;
+    private final AssetClosureQueryRepository assetClosureQueryRepository;
 
     private final CategoryCommandService categoryCommandService;
+
+    private final CategoryJpaRepository categoryJpaRepository;
+
+    private final UserReader userReader;
 
     // 생성
     @Override
@@ -40,10 +49,15 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             throw AssetException.duplicateName();
         }
 
+        //        categoryCommandService.validateCategoryId(requestDto.getCategoryId());
         // categoryId 존재 여부 검증
-        categoryCommandService.validateCategoryId(requestDto.getCategoryId());
+        Category category =
+                categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
 
-        Asset asset = requestDto.toEntity();
+        int statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
+        int typeCode = AssetType.fromName(requestDto.getType()).toCode();
+
+        Asset asset = Asset.create(category, requestDto, statusCode, typeCode);
 
         assetJpaRepository.save(asset);
 
@@ -66,7 +80,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         }
 
         // 부모의 조상들 조회
-        List<AssetClosure> parentAncestors = assetClosureQueryAdapter.findAncestors(parentId);
+        List<AssetClosure> parentAncestors = assetClosureQueryRepository.findAncestors(parentId);
 
         // 조상들에 대해 depth+1 계산 후 insert
         for (AssetClosure ancestor : parentAncestors) {
@@ -85,34 +99,54 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         // 나중에 권한 검증 추가
 
-        // 이름 중복이면 예외처리
-        if (assetJpaRepository.existsByName(requestDto.getName())) {
-            throw AssetException.duplicateName();
+        Asset asset = getAssetById(assetId);
+
+        // 이름이 실제로 변경될 때만 중복 체크
+        if (!asset.getName().equals(requestDto.getName())) {
+            if (assetJpaRepository.existsByName(requestDto.getName())) {
+                throw AssetException.duplicateName();
+            }
         }
 
         // categoryId 존재 여부 검증
         if (requestDto.getCategoryId() != null) {
             categoryCommandService.validateCategoryId(requestDto.getCategoryId());
         }
-        Asset asset = getAssetById(assetId);
 
-        asset.apply(requestDto);
+        int statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
+        int typeCode = AssetType.fromName(requestDto.getType()).toCode();
+
+        Category category =
+                categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
+
+        asset.apply(category, requestDto, statusCode, typeCode);
 
         return UpdateAssetResponseDto.fromEntity(asset);
     }
 
     @Override
     @Transactional
-    public void deleteAsset(final Long assetId, final Long userId) {
+    public void softDeleteAsset(final Long assetId, final Long userId) {
 
-        // 나중에 권한 검증 추가
+        // 삭제하는 유저 찾기
+        userReader.findById(userId);
 
+        // 삭제할 자원 찾기
         Asset asset = getAssetById(assetId);
 
-        asset.delete(userId);
+        // 자식 자원 있으면 삭제 안됨 예외 처리
+        if (assetClosureQueryRepository.existsChildren(assetId)) {
+            throw AssetException.hasChildren();
+        }
 
-        assetClosureQueryAdapter.deleteAllByAncestorId(assetId);
-        assetClosureQueryAdapter.deleteAllByDescendantId(assetId);
+        // 예약 중인 자원을 다 디나이 처리
+
+        // softDelete로 삭제 처리
+        asset.softDelete(userId);
+        assetJpaRepository.save(asset);
+
+        // 계층 구조 삭제
+        assetClosureQueryRepository.deleteAllByDescendantId(assetId);
     }
 
     @Override
@@ -130,26 +164,34 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         Long newParentId = newParentAsset.getId();
 
-        List<AssetClosure> subtree = assetClosureQueryAdapter.findDescendants(assetId);
+        List<AssetClosure> subtree = assetClosureQueryRepository.findDescendants(assetId);
 
-        boolean isCycle = subtree.stream()
-                .anyMatch(c -> c.getAssetClosureId().getDescendantId().equals(newParentId));
-
-        if (isCycle) {
-            throw AssetException.cannotMoveToChild();
-        }
+        //        boolean isCycle = subtree.stream()
+        //                .anyMatch(c -> c.getAssetClosureId().getDescendantId().equals(newParentId));
+        //
+        //        if (isCycle) {
+        //            throw AssetException.cannotMoveToChild();
+        //        }
 
         List<Long> subtreeIds = subtree.stream()
                 .map(c -> c.getAssetClosureId().getDescendantId())
                 .toList();
 
-        for (Long id : subtreeIds) {
-            System.out.println("subtree id 삭제: " + id);
-            assetClosureQueryAdapter.deleteAllByAncestorId(id);
-            assetClosureQueryAdapter.deleteAllByDescendantId(id);
+        // 5) 사이클 검증 (자식에게 이동 할 수 없음)
+        if (subtreeIds.contains(newParentId)) {
+            throw AssetException.cannotMoveToChild();
         }
 
-        List<AssetClosure> newParentAncestors = assetClosureQueryAdapter.findAncestors(newParentId);
+        //        for (Long id : subtreeIds) {
+        //            System.out.println("subtree id 삭제: " + id);
+        //            assetClosureQueryAdapter.deleteAllByAncestorId(id);
+        //            assetClosureQueryAdapter.deleteAllByDescendantId(id);
+        //        }
+
+        // 6) 기존 부모 계층과 subtree 연결된 링크 삭제
+        assetClosureQueryRepository.deleteOldAncestorLinks(subtreeIds);
+
+        List<AssetClosure> newParentAncestors = assetClosureQueryRepository.findAncestors(newParentId);
 
         for (AssetClosure parentAncestor : newParentAncestors) {
             Long ancestorId = parentAncestor.getAssetClosureId().getAncestorId();
@@ -166,34 +208,39 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             }
         }
 
-        for (Long id : subtreeIds) {
-            System.out.println("subtree id 생성: " + id);
-            assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
-        }
+        //        for (Long id : subtreeIds) {
+        //            System.out.println("subtree id 생성: " + id);
+        //            // if문 써서 값이 없으면 넣기
+        //            assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
+        //        }
     }
 
     @Transactional
     public void moveToRoot(final Long assetId) {
 
-        List<AssetClosure> subtree = assetClosureQueryAdapter.findDescendants(assetId);
+        List<AssetClosure> subtree = assetClosureQueryRepository.findDescendants(assetId);
 
         List<Long> subtreeIds = subtree.stream()
                 .map(c -> c.getAssetClosureId().getDescendantId())
                 .toList();
 
-        for (Long id : subtreeIds) {
-            assetClosureQueryAdapter.deleteAllByAncestorId(id);
-            assetClosureQueryAdapter.deleteAllByDescendantId(id);
-        }
+        //        for (Long id : subtreeIds) {
+        //            assetClosureQueryAdapter.deleteAllByAncestorId(id);
+        //            assetClosureQueryAdapter.deleteAllByDescendantId(id);
+        //        }
+        //
+        //        for (Long id : subtreeIds) {
+        //            assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
+        //        }
 
-        for (Long id : subtreeIds) {
-            assetClosureJpaRepository.save(AssetClosure.of(id, id, 0));
-        }
+        // 2) 기존 부모 계층과 subtree 연결된 링크 삭제
+        assetClosureQueryRepository.deleteOldAncestorLinks(subtreeIds);
     }
 
     //// 일반 메소드들 모음
 
     // 이름으로 자원 가져오기
+    @Override
     @Transactional(readOnly = true)
     public Asset getAssetByName(final String assetName) {
         return assetJpaRepository.findByName(assetName).orElseThrow(AssetException::notFound);
@@ -212,29 +259,8 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     public boolean isAvailable(final Long assetId) {
         Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
         if (asset.getStatus() == 1 || asset.getStatus() == 2) {
-            throw new AssetException(AssetErrorCode.ASSET_NOT_AVAILABLE);
+            throw AssetException.assetNotAvailable();
         }
         return true;
-    }
-
-    // 자원 상태 변환 // 읽기용으로 옮길 예정
-    @Override
-    public String assetStatusToString(final Integer status) {
-        if (status == 0) {
-            return "AVAILABLE";
-        } else if (status == 1) {
-            return "UNAVAILABLE";
-        } else {
-            return "MAINTENANCE";
-        }
-    }
-
-    @Override
-    public String assetTypeToString(final Integer type) {
-        if (type == 1) {
-            return "STATIC";
-        } else {
-            return "DYNAMIC";
-        }
     }
 }

@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.iam.dto.role.request.CreateRoleRequestDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,9 +25,10 @@ import org.hibernate.annotations.SQLRestriction;
 @Table(name = "role")
 @AttributeOverride(name = "id", column = @Column(name = "role_id"))
 @SQLRestriction("deleted_at IS NULL")
+// @SoftDelete(columnName = "deleted_at", strategy = SoftDeleteType.DELETED)
 public class Role extends BaseEntity {
 
-    @Column(name = "role_name", nullable = false, length = 50, unique = true)
+    @Column(name = "role_name", nullable = false, length = 50) // UNIQUE
     private String roleName; // MASTER, ADMIN, MANAGER, USER
 
     @Column(name = "role_description", length = 255)
@@ -39,4 +41,22 @@ public class Role extends BaseEntity {
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     @Builder.Default
     private List<RolePermission> rolePermissions = new ArrayList<>();
+
+    public static Role create(final CreateRoleRequestDto request) {
+        return Role.builder()
+                .roleName(request.getRoleName())
+                .roleDescription(request.getRoleDescription())
+                .build();
+    }
+
+    // 역할 수정
+    public void update(final String roleName, final String roleDescription) {
+        this.roleName = roleName;
+        this.roleDescription = roleDescription;
+    }
+
+    // 소프트딜리트
+    public void softDelete(final Long deleterId) {
+        this.delete(deleterId);
+    }
 }

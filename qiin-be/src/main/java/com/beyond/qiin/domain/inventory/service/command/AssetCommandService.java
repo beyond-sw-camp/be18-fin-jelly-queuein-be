@@ -15,16 +15,17 @@ public interface AssetCommandService {
     UpdateAssetResponseDto updateAsset(final UpdateAssetRequestDto requestDto, final Long assetId);
 
     // delete
-    void deleteAsset(final Long assetId, final Long userId);
+    void softDeleteAsset(final Long assetId, final Long userId);
 
     // move
     void moveAsset(final Long assetId, final String newParentName);
 
-    Asset getAssetById(final Long assetId);
+    // 이름으로 자원 가져오기
+    Asset getAssetByName(String assetName);
 
-    boolean isAvailable(final Long assetId);
+    // id로 자원 가져오기
+    Asset getAssetById(Long assetId);
 
-    String assetStatusToString(final Integer status);
-
-    String assetTypeToString(final Integer type);
+    // 자원 사용 가능 여부
+    boolean isAvailable(Long assetId);
 }

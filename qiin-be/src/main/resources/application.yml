@@ -11,6 +11,30 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          time_zone: UTC
+
+
+  # ----------------------------------------
+  # AWS SES SMTP (이메일 발송) 설정 추가
+  # ----------------------------------------
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# ----------------------------------------
+# 발신자 정보 설정 (MailService에서 사용) 추가
+# ----------------------------------------
+mail:
+  from: ${MAIL_FROM}
 
 
 # JWT 설정

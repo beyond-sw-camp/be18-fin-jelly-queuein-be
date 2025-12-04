@@ -1,15 +1,17 @@
 package com.beyond.qiin.security.jwt;
 
+import com.beyond.qiin.domain.auth.exception.AuthException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -31,30 +33,54 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         log.info("JWT SecretKey 초기화 완료");
     }
 
     /** Access Token 생성 */
-    public String generateAccessToken(final Long userId, final String role) {
-        return generateToken(userId, role, accessTokenExpiration, "ACCESS");
+    public String generateAccessToken(
+            final Long userId, final String role, final String email, final List<String> permissions) {
+        return generateAccessTokenInternal(
+                userId, role, email, permissions, accessTokenExpiration, JwtTokenType.ACCESS.name());
     }
 
     /** Refresh Token 생성 */
     public String generateRefreshToken(final Long userId, final String role) {
-        return generateToken(userId, role, refreshTokenExpiration, "REFRESH");
+        return generateRefreshTokenInternal(userId, role, refreshTokenExpiration);
     }
 
     /** 공통 토큰 생성 로직 */
-    private String generateToken(
-            final Long userId, final String role, final long expirationMillis, final String tokenType) {
+    private String generateAccessTokenInternal(
+            final Long userId,
+            final String role,
+            final String email,
+            final List<String> permissions,
+            final long expirationMillis,
+            final String tokenType) {
         final Date now = new Date();
         final Date expiry = new Date(now.getTime() + expirationMillis);
 
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
-                .claim("role", role)
-                .claim("token_type", tokenType)
+                .claim(JwtConstants.CLAIM_ROLE, role)
+                .claim(JwtConstants.CLAIM_EMAIL, email)
+                .claim(JwtConstants.CLAIM_PERMISSIONS, permissions)
+                .claim(JwtConstants.CLAIM_TOKEN_TYPE, tokenType)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    // 내부용 Refresh 생성
+    private String generateRefreshTokenInternal(final Long userId, final String role, final long expirationMillis) {
+        final Date now = new Date();
+        final Date expiry = new Date(now.getTime() + expirationMillis);
+
+        return Jwts.builder()
+                .setSubject(String.valueOf(userId))
+                .claim(JwtConstants.CLAIM_ROLE, role)
+                .claim(JwtConstants.CLAIM_TOKEN_TYPE, JwtTokenType.REFRESH.name())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -63,12 +89,12 @@ public class JwtTokenProvider {
 
     // Access Token 검증
     public boolean validateAccessToken(final String token) {
-        return validateTokenInternal(token, "ACCESS");
+        return validateTokenInternal(token, JwtTokenType.ACCESS.name());
     }
 
     // Refresh Token 검증
     public boolean validateRefreshToken(final String token) {
-        return validateTokenInternal(token, "REFRESH");
+        return validateTokenInternal(token, JwtTokenType.REFRESH.name());
     }
 
     // 공통 검증 로직
@@ -80,19 +106,13 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token)
                     .getBody();
 
-            final String tokenType = claims.get("token_type", String.class);
-            if (tokenType == null || !tokenType.equals(expectedType)) {
-                log.warn("JWT 타입 불일치 — 기대: {}, 실제: {}", expectedType, tokenType);
-                return false;
-            }
+            final String tokenType = claims.get(JwtConstants.CLAIM_TOKEN_TYPE, String.class);
+            return expectedType.equals(tokenType);
 
-            return true;
-        } catch (ExpiredJwtException e) {
-            log.warn("[Validation] {} 토큰 만료: {}", expectedType, e.getMessage());
-        } catch (JwtException | IllegalArgumentException e) {
-            log.warn("[Validation] {} 토큰 유효하지 않음: {}", expectedType, e.getMessage());
+        } catch (Exception e) { // 전체 예외 처리
+            log.debug("[Validation] {} 토큰 유효하지 않음", expectedType);
+            return false;
         }
-        return false;
     }
 
     // 토큰에서 사용자 ID 추출
@@ -102,21 +122,29 @@ public class JwtTokenProvider {
 
     // 토큰에서 역할(Role) 추출
     public String getUserRole(final String token) {
-        return getClaims(token).get("role", String.class);
+        return getClaims(token).get(JwtConstants.CLAIM_ROLE, String.class);
     }
 
     // 어떤 토큰인지 타입 추출
     public String getTokenType(final String token) {
-        return getClaims(token).get("token_type", String.class);
+        return getClaims(token).get(JwtConstants.CLAIM_TOKEN_TYPE, String.class);
     }
 
     // Claims 공통 조회
     Claims getClaims(final String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            log.warn("[JWT] Claims 파싱 실패 - 만료된 토큰: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.warn("[JWT] Claims 파싱 실패 - 유효하지 않은 토큰: {}", e.getMessage());
+            throw AuthException.unauthorized(); // 401 로 변환
+        }
     }
 
     // Refresh Token TTL 조회

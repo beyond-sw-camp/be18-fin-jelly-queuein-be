@@ -1,6 +1,8 @@
 package com.beyond.qiin.domain.iam.entity;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.iam.dto.permission.request.CreatePermissionRequestDto;
+import com.beyond.qiin.domain.iam.dto.permission.request.UpdatePermissionRequestDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,10 +26,10 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @SQLRestriction("deleted_at IS NULL")
-// @SQLRestriction("deleted_at = null")
+// @SoftDelete(columnName = "deleted_at", strategy = SoftDeleteType.DELETED)
 public class Permission extends BaseEntity {
 
-    @Column(name = "permission_name", nullable = false, length = 100, unique = true)
+    @Column(name = "permission_name", nullable = false, length = 100) // UNIQUE
     private String permissionName;
 
     @Column(name = "permission_description", length = 255)
@@ -36,4 +38,22 @@ public class Permission extends BaseEntity {
     @OneToMany(mappedBy = "permission", fetch = FetchType.LAZY)
     @Builder.Default
     private List<RolePermission> rolePermissions = new ArrayList<>();
+
+    // 생성 메서드
+    public static Permission create(final CreatePermissionRequestDto request) {
+        return Permission.builder()
+                .permissionName(request.getPermissionName())
+                .permissionDescription(request.getPermissionDescription())
+                .build();
+    }
+
+    public void update(final UpdatePermissionRequestDto request) {
+        this.permissionName = request.getPermissionName();
+        this.permissionDescription = request.getPermissionDescription();
+    }
+
+    // 소프트딜리트
+    public void softDelete(final Long deleterId) {
+        this.delete(deleterId);
+    }
 }

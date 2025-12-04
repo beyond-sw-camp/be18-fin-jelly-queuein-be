@@ -1,0 +1,13 @@
+package com.beyond.qiin.domain.iam.dto.user.response.raw;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class RawUserLookupDto {
+
+    private final Long userId;
+    private final String userName;
+    private final String email;
+}

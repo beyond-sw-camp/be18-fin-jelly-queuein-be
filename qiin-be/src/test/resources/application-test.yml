@@ -1,8 +1,22 @@
 # Doppler에서 주입 받는게 아닌 테스트용 API-KEY
-INTERNAL_MASTER_KEY: "aj39sdfkjasd93jkflasjf93jkflasj93"
-INTERNAL_API_KEY: "8Gf21f93jsla81fj29ff3kssl29s8fa1"
+INTERNAL_MASTER_KEY: "TEST_INTERNAL_MASTER_KEY_123456"
+INTERNAL_API_KEY: "TEST_INTERNAL_API_KEY_ABCDEF"
 
 spring:
+  mail:
+    host: mock-smtp.test.com
+    port: 587
+    username: mock-user
+    password: mock-password
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+  autoconfigure:
+    exclude: org.redisson.spring.starter.RedissonAutoConfiguration
   config:
     activate:
       on-profile: test
@@ -23,13 +37,19 @@ spring:
     listener:
       auto-startup: false
     topic:
-      reservation: reservation-topic-dev
-      notification: notification-topic-dev
+      topics:
+        reservation-created: reservation-created-topic
+        reservation-updated: reservation-updated-topic
 
   data:
     redis:
       host: 0
       port: 0
+      repositories:
+        enabled: false
 
   flyway:
     enabled: false
+
+mail:
+  from: "QueueIn Test <no-reply@test.com>"

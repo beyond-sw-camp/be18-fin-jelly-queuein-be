@@ -44,7 +44,7 @@ public class CreateAssetResponseDto {
         return CreateAssetResponseDto.builder()
                 .assetId(asset.getId())
                 .parentId(parentId)
-                .categoryId(asset.getCategoryId())
+                .categoryId(asset.getCategory().getId())
                 .name(asset.getName())
                 .description(asset.getDescription())
                 .image(asset.getImage())

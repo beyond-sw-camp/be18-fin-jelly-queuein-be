@@ -1,5 +1,7 @@
 package com.beyond.qiin.security.config;
 
+import static com.beyond.qiin.security.constants.SecurityWhitelist.*;
+
 import com.beyond.qiin.security.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -32,9 +34,9 @@ public class SecurityConfig {
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/v1/auth/**")
+                .authorizeHttpRequests(auth -> auth.requestMatchers(AUTH)
                         .permitAll()
-                        .requestMatchers("/internal/**")
+                        .requestMatchers(INTERNAL)
                         .permitAll()
                         .anyRequest()
                         .authenticated())

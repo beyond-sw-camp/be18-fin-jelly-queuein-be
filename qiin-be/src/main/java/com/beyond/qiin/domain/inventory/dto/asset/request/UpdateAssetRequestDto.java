@@ -18,9 +18,9 @@ public class UpdateAssetRequestDto {
 
     private String image;
 
-    private Integer status;
+    private String status;
 
-    private Integer type;
+    private String type;
 
     private Integer accessLevel;
 
@@ -29,4 +29,6 @@ public class UpdateAssetRequestDto {
     private BigDecimal costPerHour;
 
     private BigDecimal periodCost;
+
+    private Long version;
 }

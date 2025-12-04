@@ -12,8 +12,14 @@ import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
+import com.beyond.qiin.infra.mail.MailService;
 import com.beyond.qiin.security.PasswordGenerator;
-import com.beyond.qiin.security.SecurityUtils;
+import jakarta.persistence.EntityManager;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,34 +36,31 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserRoleWriter userRoleWriter;
 
     private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
+    private final EntityManager entityManager;
 
     // 사용자 생성
     @Override
     @Transactional
     public CreateUserResponseDto createUser(final CreateUserRequestDto request) {
 
+        // 임시 비밀번호 생성
         final String tempPassword = PasswordGenerator.generate();
         final String encrypted = passwordEncoder.encode(tempPassword);
 
-        final User user = User.builder()
-                .dptId(request.getDptId())
-                .userNo(request.getUserNo())
-                .userName(request.getUserName())
-                .email(request.getEmail())
-                .password(encrypted)
-                .passwordExpired(true)
-                .build();
+        String userNo = generateUserNo(request.getHireDate());
 
-        final User saved = userWriter.save(user);
+        User user = User.create(request, userNo, encrypted);
+        User saved = userWriter.save(user);
 
-        final Role defaultRole = roleReader.findByRoleName("GENERAL");
+        Role defaultRole = roleReader.findByRoleName("GENERAL");
 
-        final UserRole userRole =
-                UserRole.builder().user(saved).role(defaultRole).build();
-
+        UserRole userRole = UserRole.create(saved, defaultRole);
         userRoleWriter.save(userRole);
 
-        return CreateUserResponseDto.fromEntity(saved, tempPassword);
+        mailService.sendTempPassword(saved.getEmail(), tempPassword);
+
+        return CreateUserResponseDto.fromEntity(saved);
     }
 
     // 사용자 정보 수정
@@ -74,6 +77,9 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     public void changeTempPassword(final Long userId, final String newPassword) {
 
+        entityManager.flush();
+        entityManager.clear();
+
         final User user = userReader.findById(userId);
 
         // 임시 비밀번호 사용자만 허용
@@ -82,7 +88,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         }
 
         user.updatePassword(passwordEncoder.encode(newPassword));
-
+        user.updateLastLoginAt(Instant.now());
         userWriter.save(user);
     }
 
@@ -100,19 +106,38 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         // 새 비밀번호 저장
         user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
-
         userWriter.save(user);
     }
 
     // 사용자 삭제
     @Override
     @Transactional
-    public void deleteUser(final Long userId) {
+    public void deleteUser(final Long userId, final Long deleterId) {
         User user = userReader.findById(userId);
 
-        Long currentUserId = SecurityUtils.getCurrentUserId();
-
-        user.softDelete(currentUserId);
+        user.softDelete(deleterId);
         userWriter.save(user);
+    }
+
+    // --------------------------------------
+    // 헬퍼 메서드
+    // --------------------------------------
+
+    // 사번 생성 로직
+    private String generateUserNo(final LocalDate hireDate) {
+        Instant hireInstant = hireDate.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+
+        String prefix = hireDate.format(DateTimeFormatter.ofPattern("yyyyMM"));
+
+        Optional<String> lastUserNoOpt = userReader.findLastUserNoByPrefix(prefix);
+
+        int nextSeq = lastUserNoOpt
+                .map(last -> Integer.parseInt(last.substring(prefix.length())))
+                .map(num -> num + 1)
+                .orElse(1);
+
+        String seq = String.format("%03d", nextSeq);
+
+        return prefix + seq;
     }
 }

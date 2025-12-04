@@ -11,5 +11,9 @@ public interface CategoryQueryService {
     List<DropdownCategoryResponseDto> getDropdownList();
 
     // 관리자용 목록 조회
-    PageResponseDto<ManageCategoryResponseDto> getManageList(int page, int size);
+    PageResponseDto<ManageCategoryResponseDto> getManageList(final int page, final int size);
+
+    // id로 카테고리 가져오기
+    //    Category getCategoryById(final Long categoryId);
+
 }
