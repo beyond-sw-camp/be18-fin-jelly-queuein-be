@@ -55,19 +55,19 @@ public class ApproveReservationTest {
     void approveReservation_success() {
         Long userId = 1L;
         Long reservationId = 10L;
-        ConfirmReservationRequestDto dto = ConfirmReservationRequestDto.builder().reason("승인 이유").build();
+        ConfirmReservationRequestDto dto =
+                ConfirmReservationRequestDto.builder().reason("승인 이유").build();
 
         User user = User.builder().userName("tester").build();
         User applicant = User.builder().userName("신청자").build();
         Asset asset = Asset.builder().name("회의실").build();
-        Reservation reservation = Mockito.spy(Reservation.builder().asset(asset).applicant(applicant).build());
-
+        Reservation reservation = Mockito.spy(
+                Reservation.builder().asset(asset).applicant(applicant).build());
 
         Mockito.when(userReader.findById(userId)).thenReturn(user);
         Mockito.when(reservationReader.getReservationById(reservationId)).thenReturn(reservation);
 
-        ReservationResponseDto response = reservationCommandService.approveReservation(
-            userId, reservationId, dto);
+        ReservationResponseDto response = reservationCommandService.approveReservation(userId, reservationId, dto);
 
         Mockito.verify(reservation).approve(user, "승인 이유");
         Mockito.verify(reservationWriter).save(reservation);
@@ -75,6 +75,5 @@ public class ApproveReservationTest {
 
         assertNotNull(response); // DTO가 반환되는지
         assertEquals(ReservationStatus.APPROVED, reservation.getStatus());
-
     }
 }
