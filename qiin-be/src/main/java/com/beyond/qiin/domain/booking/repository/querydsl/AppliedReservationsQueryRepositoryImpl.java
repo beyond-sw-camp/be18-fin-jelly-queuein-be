@@ -125,7 +125,9 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                         reservation.status,
                         reservation.isApproved,
                         reservation.reason,
-                        reservation.version))
+                        reservation.version,
+                        reservation.startAt,
+                        reservation.endAt))
                 .from(reservation)
                 .join(reservation.asset, asset)
                 .leftJoin(asset.category, category)
