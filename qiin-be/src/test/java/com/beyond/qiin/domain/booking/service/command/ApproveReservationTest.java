@@ -2,10 +2,6 @@ package com.beyond.qiin.domain.booking.service.command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
@@ -20,11 +16,11 @@ import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
-import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -57,41 +53,28 @@ public class ApproveReservationTest {
 
     @Test
     void approveReservation_success() {
-        // given
         Long userId = 1L;
         Long reservationId = 10L;
-        ConfirmReservationRequestDto requestDto =
-                ConfirmReservationRequestDto.builder().reason("승인 사유").build();
+        ConfirmReservationRequestDto dto = ConfirmReservationRequestDto.builder().reason("승인 이유").build();
 
-        User respondent = User.builder().userName("A").build();
-        User applicant = User.builder().userName("B").build();
-        Asset asset = Asset.builder().name("회의실 A").build();
-        Reservation reservation = Reservation.builder()
-                .asset(asset)
-                .applicant(applicant)
-                .startAt(Instant.parse("2025-12-04T10:00:00Z"))
-                .endAt(Instant.parse("2025-12-04T11:00:00Z"))
-                .status(ReservationStatus.PENDING.getCode())
-                .build();
+        User user = User.builder().userName("tester").build();
+        User applicant = User.builder().userName("신청자").build();
+        Asset asset = Asset.builder().name("회의실").build();
+        Reservation reservation = Mockito.spy(Reservation.builder().asset(asset).applicant(applicant).build());
 
-        reservation.setApplicant(applicant);
-        reservation.setRespondent(respondent);
 
-        when(userReader.findById(userId)).thenReturn(respondent);
-        when(reservationReader.getReservationById(reservationId)).thenReturn(reservation);
+        Mockito.when(userReader.findById(userId)).thenReturn(user);
+        Mockito.when(reservationReader.getReservationById(reservationId)).thenReturn(reservation);
 
-        doNothing().when(reservationWriter).save(any());
-        doNothing().when(reservationEventPublisher).publishUpdated(any());
+        ReservationResponseDto response = reservationCommandService.approveReservation(
+            userId, reservationId, dto);
 
-        // when
-        ReservationResponseDto reservationResponseDto =
-                reservationCommandService.approveReservation(userId, reservationId, requestDto);
+        Mockito.verify(reservation).approve(user, "승인 이유");
+        Mockito.verify(reservationWriter).save(reservation);
+        Mockito.verify(reservationEventPublisher).publishUpdated(reservation);
 
-        assertNotNull(reservationResponseDto);
-        assertEquals("APPROVED", reservationResponseDto.getStatus());
-        assertEquals("회의실 A", reservationResponseDto.getAssetName());
+        assertNotNull(response); // DTO가 반환되는지
+        assertEquals(ReservationStatus.APPROVED, reservation.getStatus());
 
-        verify(reservationWriter).save(reservation);
-        verify(reservationEventPublisher).publishUpdated(reservation);
     }
 }
