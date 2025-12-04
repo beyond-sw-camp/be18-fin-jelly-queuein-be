@@ -21,18 +21,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import static com.beyond.qiin.domain.inventory.entity.QAssetClosure.assetClosure;
+import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
+import static com.beyond.qiin.domain.inventory.entity.QCategory.category;
 
 @Repository
 @RequiredArgsConstructor
-public class AssetQueryAdapterImpl implements AssetQueryAdapter {
+public class AssetQueryRepositoryImpl implements AssetQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
-
-    private static final QAssetClosure assetClosure = QAssetClosure.assetClosure;
-
-    private static final QAsset asset = QAsset.asset;
-
-    private static final QCategory category = QCategory.category;
 
     @Override
     public Optional<Asset> findById(Long assetId) {
@@ -198,7 +195,7 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
                     .containsIgnoreCase(condition.getKeyword())
                     .or(asset.description.containsIgnoreCase(condition.getKeyword())));
         }
-        // 🔥 여기에서 join 조건을 동적으로 적용함
+        // 여기에서 join 조건을 동적으로 적용함
         var query = jpaQueryFactory
                 .select(Projections.constructor(
                         RawDescendantAssetResponseDto.class,
@@ -223,7 +220,7 @@ public class AssetQueryAdapterImpl implements AssetQueryAdapter {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        // 🔥 count 쿼리도 동일하게 closure join 반영!
+        // count 쿼리도 동일하게 closure join 반영!
         var countQuery = jpaQueryFactory
                 .select(asset.count())
                 .from(asset)

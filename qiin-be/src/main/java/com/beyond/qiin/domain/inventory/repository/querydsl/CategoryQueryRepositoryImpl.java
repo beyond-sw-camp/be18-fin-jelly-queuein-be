@@ -16,15 +16,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import static com.beyond.qiin.domain.inventory.entity.QCategory.category;
+import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
 
 @Repository
 @RequiredArgsConstructor
-public class CategoryQueryAdapterImpl implements CategoryQueryAdapter {
+public class CategoryQueryRepositoryImpl implements CategoryQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
-
-    private static final QCategory category = QCategory.category;
-    private static final QAsset asset = QAsset.asset;
 
     @Override
     @Transactional(readOnly = true)

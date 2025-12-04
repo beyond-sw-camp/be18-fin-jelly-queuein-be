@@ -7,14 +7,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import static com.beyond.qiin.domain.inventory.entity.QAssetClosure.assetClosure;
 
 @Repository
 @RequiredArgsConstructor
-public class AssetClosureQueryAdapterImpl implements AssetClosureQueryAdapter {
+public class AssetClosureQueryRepositoryImpl implements AssetClosureQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-
-    private static final QAssetClosure assetClosure = QAssetClosure.assetClosure;
 
     @Override
     public List<AssetClosure> findAncestors(Long descendantId) {

@@ -16,8 +16,8 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawAssetDetailRes
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
-import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
-import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryAdapter;
+import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRepository;
+import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryRepository;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -37,10 +37,10 @@ import org.springframework.data.domain.Pageable;
 class AssetQueryServiceImplTest {
 
     @Mock
-    private AssetQueryAdapter assetQueryAdapter;
+    private AssetQueryRepository assetQueryRepository;
 
     @Mock
-    private AssetClosureQueryAdapter assetClosureQueryAdapter;
+    private AssetClosureQueryRepository assetClosureQueryRepository;
 
     @InjectMocks
     private AssetQueryServiceImpl service;
@@ -52,12 +52,12 @@ class AssetQueryServiceImplTest {
     @DisplayName("루트 자원 조회 - 정상 흐름")
     void getRootAssetIds_success() {
 
-        when(assetQueryAdapter.findRootAssetIds()).thenReturn(List.of(1L, 2L));
+        when(assetQueryRepository.findRootAssetIds()).thenReturn(List.of(1L, 2L));
 
         Asset a1 = AssetFactory.asset(1L, "A");
         Asset a2 = AssetFactory.asset(2L, "B");
 
-        when(assetQueryAdapter.findByIds(List.of(1L, 2L))).thenReturn(List.of(a1, a2));
+        when(assetQueryRepository.findByIds(List.of(1L, 2L))).thenReturn(List.of(a1, a2));
 
         List<RootAssetResponseDto> result = service.getRootAssetIds();
 
@@ -73,12 +73,12 @@ class AssetQueryServiceImplTest {
     @DisplayName("1 Depth 자원 조회 - 정상 흐름")
     void getOneDepthAssetList_success() {
 
-        when(assetQueryAdapter.findChildrenIds(10L)).thenReturn(List.of(20L, 30L));
+        when(assetQueryRepository.findChildrenIds(10L)).thenReturn(List.of(20L, 30L));
 
         Asset c1 = AssetFactory.asset(20L, "child1");
         Asset c2 = AssetFactory.asset(30L, "child2");
 
-        when(assetQueryAdapter.findByIds(List.of(20L, 30L))).thenReturn(List.of(c1, c2));
+        when(assetQueryRepository.findByIds(List.of(20L, 30L))).thenReturn(List.of(c1, c2));
 
         List<OneDepthAssetResponseDto> result = service.getOneDepthAssetList(10L);
 
@@ -120,7 +120,7 @@ class AssetQueryServiceImplTest {
 
         Page<RawDescendantAssetResponseDto> rawPage = new PageImpl<>(List.of(r1, r2), pageable, 2);
 
-        when(assetQueryAdapter.searchDescendants(any(AssetSearchCondition.class), any(Pageable.class)))
+        when(assetQueryRepository.searchDescendants(any(AssetSearchCondition.class), any(Pageable.class)))
                 .thenReturn(rawPage);
 
         PageResponseDto<DescendantAssetResponseDto> result = service.getDescendantAssetList(condition, pageable);
@@ -141,10 +141,10 @@ class AssetQueryServiceImplTest {
         Asset a2 = AssetFactory.asset(2L, "Child1");
         Asset a3 = AssetFactory.asset(3L, "Child2");
 
-        when(assetQueryAdapter.findAll()).thenReturn(List.of(a1, a2, a3));
+        when(assetQueryRepository.findAll()).thenReturn(List.of(a1, a2, a3));
 
         // depth=1 관계 Mock (root -> children)
-        when(assetClosureQueryAdapter.findDepthOneRelations())
+        when(assetClosureQueryRepository.findDepthOneRelations())
                 .thenReturn(List.of(AssetFactory.closure(1L, 2L, 1), AssetFactory.closure(1L, 3L, 1)));
 
         // 실행
@@ -185,8 +185,8 @@ class AssetQueryServiceImplTest {
                 .createdBy(100L)
                 .build();
 
-        when(assetQueryAdapter.findByAssetId(10L)).thenReturn(Optional.of(raw));
-        when(assetQueryAdapter.findParentName(10L)).thenReturn("Parent");
+        when(assetQueryRepository.findByAssetId(10L)).thenReturn(Optional.of(raw));
+        when(assetQueryRepository.findParentName(10L)).thenReturn("Parent");
 
         AssetDetailResponseDto result = service.getAssetDetail(10L);
 
