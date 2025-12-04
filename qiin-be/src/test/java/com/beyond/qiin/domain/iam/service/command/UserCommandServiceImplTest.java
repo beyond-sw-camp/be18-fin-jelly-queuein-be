@@ -111,7 +111,7 @@ public class UserCommandServiceImplTest {
 
         userCommandService.updateUser(1L, req);
 
-        verify(user).updateUser(req);
+        verify(user).updateUser(req, false);
         verify(userWriter).save(user);
     }
 

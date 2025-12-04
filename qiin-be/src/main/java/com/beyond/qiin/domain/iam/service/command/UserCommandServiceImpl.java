@@ -7,6 +7,7 @@ import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.entity.UserRole;
+import com.beyond.qiin.domain.iam.exception.RoleException;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
@@ -68,7 +69,38 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     public void updateUser(final Long userId, final UpdateUserRequestDto request) {
         User user = userReader.findById(userId);
-        user.updateUser(request);
+        boolean isSelf = false;
+        user.updateUser(request, isSelf);
+        userWriter.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void updateUserRole(final Long userId, final Long roleId, final Long updaterId) {
+
+        User user = userReader.findById(userId);
+        Role newRole = roleReader.findById(roleId);
+
+        // MASTER 보호
+        validateRoleChangeAllowed(user);
+
+        // 기존 역할 soft delete
+        user.getUserRoles().forEach(ur -> ur.softDelete(updaterId));
+
+        // 새 역할 부여
+        UserRole newUserRole = UserRole.create(user, newRole);
+        userRoleWriter.save(newUserRole);
+    }
+
+    @Override
+    @Transactional
+    public void updateMyInfo(final Long userId, final UpdateUserRequestDto request) {
+
+        User user = userReader.findById(userId);
+
+        boolean isSelf = true;
+
+        user.updateUser(request, isSelf);
         userWriter.save(user);
     }
 
@@ -139,5 +171,16 @@ public class UserCommandServiceImpl implements UserCommandService {
         String seq = String.format("%03d", nextSeq);
 
         return prefix + seq;
+    }
+
+    private void validateRoleChangeAllowed(final User user) {
+        String currentRole = user.getUserRoles().stream()
+                .findFirst()
+                .map(ur -> ur.getRole().getRoleName())
+                .orElseThrow(RoleException::roleNotFound);
+
+        if ("MASTER".equals(currentRole)) {
+            throw RoleException.roleCannotDeleteMaster();
+        }
     }
 }

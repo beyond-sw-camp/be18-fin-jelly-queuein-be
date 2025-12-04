@@ -108,13 +108,18 @@ public class User extends BaseEntity {
     }
 
     // 사용자 정보 수정
-    public void updateUser(final UpdateUserRequestDto dto) {
-        if (dto.getDptId() != null) this.dptId = dto.getDptId();
-        if (dto.getUserName() != null) this.userName = dto.getUserName();
-        if (dto.getEmail() != null) this.email = dto.getEmail();
-        if (dto.getRetireDate() != null) this.retireDate = dto.getRetireDate();
-        if (dto.getPhone() != null) this.phone = dto.getPhone();
-        if (dto.getBirth() != null) this.birth = dto.getBirth();
+    public void updateUser(final UpdateUserRequestDto dto, final boolean isSelf) {
+
+        if (isSelf) {
+            // 본인은 email, dptId, retireDate 변경 불가
+            if (dto.getUserName() != null) this.userName = dto.getUserName();
+            if (dto.getPhone() != null) this.phone = dto.getPhone();
+            if (dto.getBirth() != null) this.birth = dto.getBirth();
+        } else {
+            // 타인이 타인을 수정할 때는 dptId, retireDate만 가능
+            if (dto.getDptId() != null) this.dptId = dto.getDptId();
+            if (dto.getRetireDate() != null) this.retireDate = dto.getRetireDate();
+        }
     }
 
     // 사용자 삭제하면 자식 데이터도 삭제

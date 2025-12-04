@@ -11,6 +11,10 @@ public interface UserCommandService {
 
     void updateUser(final Long userId, final UpdateUserRequestDto request);
 
+    void updateUserRole(final Long userId, final Long roleId, final Long updaterId);
+
+    void updateMyInfo(final Long userId, final UpdateUserRequestDto request);
+
     void changeTempPassword(final Long userId, final String newPassword);
 
     void changePassword(final Long userId, final ChangePwRequestDto request);

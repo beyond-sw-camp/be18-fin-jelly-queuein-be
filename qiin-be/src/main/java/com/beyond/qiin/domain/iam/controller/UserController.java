@@ -10,6 +10,7 @@ import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.UserLookupResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
+import com.beyond.qiin.domain.iam.dto.user_role.request.UpdateUserRoleRequestDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
 import com.beyond.qiin.security.resolver.CurrentUserId;
@@ -55,6 +56,25 @@ public class UserController {
     public ResponseEntity<Void> updateUser(
             @PathVariable final Long userId, @Valid @RequestBody final UpdateUserRequestDto request) {
         userCommandService.updateUser(userId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 사용자 역할 수정
+    @PatchMapping("/{userId}/role")
+    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    public ResponseEntity<Void> updateUserRole(
+            @PathVariable final Long userId,
+            @RequestBody @Valid final UpdateUserRoleRequestDto request,
+            @CurrentUserId final Long updaterId) {
+        userCommandService.updateUserRole(userId, request.getRoleId(), updaterId);
+        return ResponseEntity.ok().build();
+    }
+
+    // 본인정보 수정
+    @PatchMapping("/me")
+    public ResponseEntity<Void> updateMe(
+            @Valid @RequestBody final UpdateUserRequestDto request, @CurrentUserId final Long userId) {
+        userCommandService.updateMyInfo(userId, request);
         return ResponseEntity.ok().build();
     }
 
