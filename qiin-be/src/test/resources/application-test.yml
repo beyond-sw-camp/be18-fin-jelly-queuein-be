@@ -3,8 +3,6 @@ INTERNAL_MASTER_KEY: "TEST_INTERNAL_MASTER_KEY_123456"
 INTERNAL_API_KEY: "TEST_INTERNAL_API_KEY_ABCDEF"
 
 spring:
-#  autoconfigure:
-#    exclude: org.redisson.spring.starter.RedissonAutoConfiguration
   mail:
     host: mock-smtp.test.com
     port: 587
@@ -55,8 +53,3 @@ spring:
 
 mail:
   from: "QueueIn Test <no-reply@test.com>"
-
-jwt:
-  secret-key: 1
-  access-token-expiration: 1
-  refresh-token-expiration: 1
