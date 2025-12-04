@@ -25,89 +25,87 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
 @ExtendWith(MockitoExtension.class)
 public class UserReservationsTest {
-  @InjectMocks
-  private ReservationQueryServiceImpl reservationQueryService;
+    @InjectMocks
+    private ReservationQueryServiceImpl reservationQueryService;
 
-  @Mock
-  private UserReader userReader;
+    @Mock
+    private UserReader userReader;
 
-  @Mock
-  private UserReservationsQueryRepository userReservationsQueryRepository;
+    @Mock
+    private UserReservationsQueryRepository userReservationsQueryRepository;
 
-  @Mock
-  private ReservationReader reservationReader;
+    @Mock
+    private ReservationReader reservationReader;
 
-  @Mock
-  private AssetQueryService assetQueryService;
+    @Mock
+    private AssetQueryService assetQueryService;
 
-  @Mock
-  private ReservableAssetsQueryRepository reservableAssetsQueryRepository;
+    @Mock
+    private ReservableAssetsQueryRepository reservableAssetsQueryRepository;
 
-  @Test
-  void getReservationsByUserId_returnsPagedDto() {
-    Long userId = 1L;
-    LocalDate date = LocalDate.of(2025, 12, 4);
-    GetUserReservationSearchCondition condition = new GetUserReservationSearchCondition();
-    condition.setDate(date);
+    @Test
+    void getReservationsByUserId_returnsPagedDto() {
+        Long userId = 1L;
+        LocalDate date = LocalDate.of(2025, 12, 4);
+        GetUserReservationSearchCondition condition = new GetUserReservationSearchCondition();
+        condition.setDate(date);
 
-    User user = User.builder()
-        .userName("A")
-        .email("A@gmail.com")
-        .build();
+        User user = User.builder().userName("A").email("A@gmail.com").build();
 
-    when(userReader.findById(userId)).thenReturn(user);
+        when(userReader.findById(userId)).thenReturn(user);
 
-    ZoneId zone = ZoneId.of("Asia/Seoul");
+        ZoneId zone = ZoneId.of("Asia/Seoul");
 
-    RawUserReservationResponseDto raw1 = new RawUserReservationResponseDto(
-        1L,                                  // reservationId
-        date.atTime(9, 0).atZone(zone).toInstant(),   // startAt
-        date.atTime(10, 0).atZone(zone).toInstant(),  // endAt
-        1,                                   // reservationStatus
-        true,                                // isApproved
-        null,                                // actualStartAt
-        null,                                // actualEndAt
-        100L,                                // version
-        10L,                                 // assetId
-        "Projector",                         // assetName
-        "Electronics",                       // categoryName
-        0,                                   // assetType
-        1                                    // assetStatus
-    );
+        RawUserReservationResponseDto raw1 = new RawUserReservationResponseDto(
+                1L, // reservationId
+                date.atTime(9, 0).atZone(zone).toInstant(), // startAt
+                date.atTime(10, 0).atZone(zone).toInstant(), // endAt
+                1, // reservationStatus
+                true, // isApproved
+                null, // actualStartAt
+                null, // actualEndAt
+                100L, // version
+                10L, // assetId
+                "Projector", // assetName
+                "Electronics", // categoryName
+                0, // assetType
+                1 // assetStatus
+                );
 
-    RawUserReservationResponseDto raw2 = new RawUserReservationResponseDto(
-        2L,                                  // reservationId
-        date.atTime(14, 0).atZone(zone).toInstant(),  // startAt
-        date.atTime(15, 0).atZone(zone).toInstant(),  // endAt
-        0,                                   // reservationStatus
-        false,                               // isApproved
-        null,                                // actualStartAt
-        null,                                // actualEndAt
-        101L,                                // version
-        20L,                                 // assetId
-        "Laptop",                            // assetName
-        "Electronics",                       // categoryName
-        1,                                   // assetType
-        1                                    // assetStatus
-    );
+        RawUserReservationResponseDto raw2 = new RawUserReservationResponseDto(
+                2L, // reservationId
+                date.atTime(14, 0).atZone(zone).toInstant(), // startAt
+                date.atTime(15, 0).atZone(zone).toInstant(), // endAt
+                0, // reservationStatus
+                false, // isApproved
+                null, // actualStartAt
+                null, // actualEndAt
+                101L, // version
+                20L, // assetId
+                "Laptop", // assetName
+                "Electronics", // categoryName
+                1, // assetType
+                1 // assetStatus
+                );
 
-    List<RawUserReservationResponseDto> rawList = List.of(raw1, raw2);
+        List<RawUserReservationResponseDto> rawList = List.of(raw1, raw2);
 
-    Pageable pageable = PageRequest.of(0, 10);
-    Page<RawUserReservationResponseDto> rawPage = new PageImpl<>(rawList, pageable, rawList.size());
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<RawUserReservationResponseDto> rawPage = new PageImpl<>(rawList, pageable, rawList.size());
 
-    when(userReservationsQueryRepository.search(userId, condition, pageable))
-        .thenReturn(rawPage);
+        when(userReservationsQueryRepository.search(userId, condition, pageable))
+                .thenReturn(rawPage);
 
-    PageResponseDto<GetUserReservationResponseDto> result =
-        reservationQueryService.getReservationsByUserId(userId, condition, pageable);
+        PageResponseDto<GetUserReservationResponseDto> result =
+                reservationQueryService.getReservationsByUserId(userId, condition, pageable);
 
-    // 검증
-    assertEquals(2, result.getContent().size());
-    assertEquals(1L, result.getContent().get(0).getReservationId());
-    assertEquals("Laptop", result.getContent().get(1).getAssetName());
-    assertEquals(2, result.getTotalElements());
-  }
+        // 검증
+        assertEquals(2, result.getContent().size());
+        assertEquals(1L, result.getContent().get(0).getReservationId());
+        assertEquals("Laptop", result.getContent().get(1).getAssetName());
+        assertEquals(2, result.getTotalElements());
+    }
 }

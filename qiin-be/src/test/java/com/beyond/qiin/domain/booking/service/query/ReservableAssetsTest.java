@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.booking.service.query;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
@@ -20,72 +19,72 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 public class ReservableAssetsTest {
-  @InjectMocks
-  private ReservationQueryServiceImpl reservationQueryService;
+    @InjectMocks
+    private ReservationQueryServiceImpl reservationQueryService;
 
-  @Mock
-  private UserReader userReader;
+    @Mock
+    private UserReader userReader;
 
-  @Mock
-  private UserReservationsQueryRepository userReservationsQueryRepository;
+    @Mock
+    private UserReservationsQueryRepository userReservationsQueryRepository;
 
-  @Mock
-  private ReservationReader reservationReader;
+    @Mock
+    private ReservationReader reservationReader;
 
-  @Mock
-  private AssetQueryService assetQueryService;
+    @Mock
+    private AssetQueryService assetQueryService;
 
-  @Mock
-  private ReservableAssetsQueryRepository reservableAssetsQueryRepository;
+    @Mock
+    private ReservableAssetsQueryRepository reservableAssetsQueryRepository;
 
-  @Test
-  void getReservableAssets_filtersCorrectlyAndPages() {
-    Long userId = 1L;
-    LocalDate date = LocalDate.of(2025, 12, 4);
-    ReservableAssetSearchCondition condition = new ReservableAssetSearchCondition();
-    condition.setDate(date);
+    @Test
+    void getReservableAssets_filtersCorrectlyAndPages() {
+        Long userId = 1L;
+        LocalDate date = LocalDate.of(2025, 12, 4);
+        ReservableAssetSearchCondition condition = new ReservableAssetSearchCondition();
+        condition.setDate(date);
 
-    Pageable pageable = PageRequest.of(0, 10);
+        Pageable pageable = PageRequest.of(0, 10);
 
-    // Mock user 존재 확인
-    when(userReader.findById(userId)).thenReturn(User.builder().userName("A").email("a@gmail.com").build());
+        // Mock user 존재 확인
+        when(userReader.findById(userId))
+                .thenReturn(User.builder().userName("A").email("a@gmail.com").build());
 
-    // Mock raw 데이터
-    RawReservableAssetResponseDto raw1 = new RawReservableAssetResponseDto(
-        10L,                // assetId
-        "Projector",        // assetName
-        1,                  // assetType
-        "Electronics",      // categoryName
-        true                // needsApproval
-    );
+        // Mock raw 데이터
+        RawReservableAssetResponseDto raw1 = new RawReservableAssetResponseDto(
+                10L, // assetId
+                "Projector", // assetName
+                1, // assetType
+                "Electronics", // categoryName
+                true // needsApproval
+                );
 
-    RawReservableAssetResponseDto raw2 = new RawReservableAssetResponseDto(
-        20L,                // assetId
-        "Laptop",           // assetName
-        1,                  // assetType
-        "Electronics",      // categoryName
-        false               // needsApproval
-    );
-    List<RawReservableAssetResponseDto> rawList = List.of(raw1, raw2);
-    when(reservableAssetsQueryRepository.search(condition)).thenReturn(rawList);
+        RawReservableAssetResponseDto raw2 = new RawReservableAssetResponseDto(
+                20L, // assetId
+                "Laptop", // assetName
+                1, // assetType
+                "Electronics", // categoryName
+                false // needsApproval
+                );
+        List<RawReservableAssetResponseDto> rawList = List.of(raw1, raw2);
+        when(reservableAssetsQueryRepository.search(condition)).thenReturn(rawList);
 
-    // assetQueryService.isAvailable 제어
-    when(assetQueryService.isAvailable(10L)).thenReturn(true);
-    when(assetQueryService.isAvailable(20L)).thenReturn(true);
+        // assetQueryService.isAvailable 제어
+        when(assetQueryService.isAvailable(10L)).thenReturn(true);
+        when(assetQueryService.isAvailable(20L)).thenReturn(true);
 
-    // 실행
-    PageResponseDto<ReservableAssetResponseDto> result =
-        reservationQueryService.getReservableAssets(userId, condition, pageable);
+        // 실행
+        PageResponseDto<ReservableAssetResponseDto> result =
+                reservationQueryService.getReservableAssets(userId, condition, pageable);
 
-    // 검증
-    assertEquals(2, result.getContent().size());
-    assertEquals(2, result.getTotalElements());
-  }
+        // 검증
+        assertEquals(2, result.getContent().size());
+        assertEquals(2, result.getTotalElements());
+    }
 }

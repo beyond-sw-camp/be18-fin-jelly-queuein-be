@@ -20,84 +20,83 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class IsReservableForDayTest {
-  @InjectMocks
-  private ReservationQueryServiceImpl reservationQueryService;
+    @InjectMocks
+    private ReservationQueryServiceImpl reservationQueryService;
 
-  @Mock
-  private UserReader userReader;
+    @Mock
+    private UserReader userReader;
 
-  @Mock
-  private ReservationReader reservationReader;
+    @Mock
+    private ReservationReader reservationReader;
 
-  @Mock
-  private ReservationWriter reservationWriter;
+    @Mock
+    private ReservationWriter reservationWriter;
 
-  @Mock
-  private AssetCommandService assetCommandService;
+    @Mock
+    private AssetCommandService assetCommandService;
 
-  @Test
-  void noReservations_returnsTrue() {
-    LocalDate date = LocalDate.of(2025, 12, 4);
-    boolean result = reservationQueryService.isReservableForDay(date, List.of());
-    assertTrue(result);
-  }
+    @Test
+    void noReservations_returnsTrue() {
+        LocalDate date = LocalDate.of(2025, 12, 4);
+        boolean result = reservationQueryService.isReservableForDay(date, List.of());
+        assertTrue(result);
+    }
 
-  @Test
-  void fullDayCovered_returnsFalse() {
-    LocalDate date = LocalDate.of(2025, 12, 4);
-    ZoneId zone = ZoneId.of("Asia/Seoul");
+    @Test
+    void fullDayCovered_returnsFalse() {
+        LocalDate date = LocalDate.of(2025, 12, 4);
+        ZoneId zone = ZoneId.of("Asia/Seoul");
 
-    Instant start = date.atStartOfDay(zone).toInstant();
-    Instant end = date.plusDays(1).atStartOfDay(zone).toInstant();
+        Instant start = date.atStartOfDay(zone).toInstant();
+        Instant end = date.plusDays(1).atStartOfDay(zone).toInstant();
 
-    Reservation r = Reservation.builder().startAt(start).endAt(end).build();
-    boolean result = reservationQueryService.isReservableForDay(date, List.of(r));
-    assertFalse(result);
-  }
+        Reservation r = Reservation.builder().startAt(start).endAt(end).build();
+        boolean result = reservationQueryService.isReservableForDay(date, List.of(r));
+        assertFalse(result);
+    }
 
-  @Test
-  void partialDayCovered_returnsTrue() {
-    LocalDate date = LocalDate.of(2025, 12, 4);
-    ZoneId zone = ZoneId.of("Asia/Seoul");
+    @Test
+    void partialDayCovered_returnsTrue() {
+        LocalDate date = LocalDate.of(2025, 12, 4);
+        ZoneId zone = ZoneId.of("Asia/Seoul");
 
-    Instant start = date.atTime(9, 0).atZone(zone).toInstant();
-    Instant end = date.atTime(17, 0).atZone(zone).toInstant();
+        Instant start = date.atTime(9, 0).atZone(zone).toInstant();
+        Instant end = date.atTime(17, 0).atZone(zone).toInstant();
 
-    Reservation r = Reservation.builder().startAt(start).endAt(end).build();
-    boolean result = reservationQueryService.isReservableForDay(date, List.of(r));
-    assertTrue(result);
-  }
+        Reservation r = Reservation.builder().startAt(start).endAt(end).build();
+        boolean result = reservationQueryService.isReservableForDay(date, List.of(r));
+        assertTrue(result);
+    }
 
-  @Test
-  void multipleReservationsWithGap_returnsTrue() {
-    LocalDate date = LocalDate.of(2025, 12, 4);
-    ZoneId zone = ZoneId.of("Asia/Seoul");
+    @Test
+    void multipleReservationsWithGap_returnsTrue() {
+        LocalDate date = LocalDate.of(2025, 12, 4);
+        ZoneId zone = ZoneId.of("Asia/Seoul");
 
-    Reservation r1 = Reservation.builder()
-        .startAt(date.atTime(0, 0).atZone(zone).toInstant())
-        .endAt(date.atTime(8, 0).atZone(zone).toInstant())
-        .build();
+        Reservation r1 = Reservation.builder()
+                .startAt(date.atTime(0, 0).atZone(zone).toInstant())
+                .endAt(date.atTime(8, 0).atZone(zone).toInstant())
+                .build();
 
-    Reservation r2 = Reservation.builder()
-        .startAt(date.atTime(10, 0).atZone(zone).toInstant())
-        .endAt(date.atTime(20, 0).atZone(zone).toInstant())
-        .build();
+        Reservation r2 = Reservation.builder()
+                .startAt(date.atTime(10, 0).atZone(zone).toInstant())
+                .endAt(date.atTime(20, 0).atZone(zone).toInstant())
+                .build();
 
-    boolean result = reservationQueryService.isReservableForDay(date, List.of(r1, r2));
-    assertTrue(result); // 8~10시 gap 존재
-  }
+        boolean result = reservationQueryService.isReservableForDay(date, List.of(r1, r2));
+        assertTrue(result); // 8~10시 gap 존재
+    }
 
-  @Test
-  void reservationsCoveringBeyondDayBoundaries_returnsFalse() {
-    LocalDate date = LocalDate.of(2025, 12, 4);
-    ZoneId zone = ZoneId.of("Asia/Seoul");
+    @Test
+    void reservationsCoveringBeyondDayBoundaries_returnsFalse() {
+        LocalDate date = LocalDate.of(2025, 12, 4);
+        ZoneId zone = ZoneId.of("Asia/Seoul");
 
-    Instant start = date.minusDays(1).atTime(22, 0).atZone(zone).toInstant();
-    Instant end = date.plusDays(1).atTime(2, 0).atZone(zone).toInstant();
+        Instant start = date.minusDays(1).atTime(22, 0).atZone(zone).toInstant();
+        Instant end = date.plusDays(1).atTime(2, 0).atZone(zone).toInstant();
 
-    Reservation r = Reservation.builder().startAt(start).endAt(end).build();
-    boolean result = reservationQueryService.isReservableForDay(date, List.of(r));
-    assertFalse(result);
-  }
+        Reservation r = Reservation.builder().startAt(start).endAt(end).build();
+        boolean result = reservationQueryService.isReservableForDay(date, List.of(r));
+        assertFalse(result);
+    }
 }
-
