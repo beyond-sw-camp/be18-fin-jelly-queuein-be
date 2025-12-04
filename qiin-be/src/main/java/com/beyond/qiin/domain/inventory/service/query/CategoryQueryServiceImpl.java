@@ -29,7 +29,8 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
     public PageResponseDto<ManageCategoryResponseDto> getManageList(final int page, final int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<ManageCategoryResponseDto> categoryManageResponseDtoPage = categoryQueryRepository.findAllForManage(pageable);
+        Page<ManageCategoryResponseDto> categoryManageResponseDtoPage =
+                categoryQueryRepository.findAllForManage(pageable);
 
         return PageResponseDto.from(categoryManageResponseDtoPage);
     }

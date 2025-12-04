@@ -181,7 +181,8 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     @Transactional(readOnly = true)
     public AssetDetailResponseDto getAssetDetail(final Long assetId) {
 
-        RawAssetDetailResponseDto raw = assetQueryRepository.findByAssetId(assetId).orElseThrow(AssetException::notFound);
+        RawAssetDetailResponseDto raw =
+                assetQueryRepository.findByAssetId(assetId).orElseThrow(AssetException::notFound);
 
         String parentName = assetQueryRepository.findParentName(assetId);
 

@@ -1,13 +1,13 @@
 package com.beyond.qiin.domain.inventory.repository.querydsl;
 
+import static com.beyond.qiin.domain.inventory.entity.QAssetClosure.assetClosure;
+
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
-import com.beyond.qiin.domain.inventory.entity.QAssetClosure;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import static com.beyond.qiin.domain.inventory.entity.QAssetClosure.assetClosure;
 
 @Repository
 @RequiredArgsConstructor
