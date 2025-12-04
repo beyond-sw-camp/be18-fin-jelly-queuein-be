@@ -10,13 +10,17 @@ import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -134,6 +138,8 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                 .leftJoin(reservation.applicant, applicant)
                 .leftJoin(reservation.respondent, respondent)
                 .where(builder)
+                .orderBy(reservation.id.desc())
                 .fetch();
     }
+
 }

@@ -150,7 +150,7 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                 .leftJoin(closure)
                 .on(closureOn)
                 .where(builder)
-                .orderBy(getOrderSpecifiers(pageable))
+                .orderBy(reservation.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -167,17 +167,4 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
         return new PageImpl<>(content, pageable, total);
     }
 
-    private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
-        return pageable.getSort().stream()
-                .map(order -> {
-                    String property = order.getProperty(); // "startAt", "status" ...
-
-                    Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-
-                    PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
-
-                    return new OrderSpecifier(direction, path.get(property));
-                })
-                .toArray(OrderSpecifier[]::new);
-    }
 }
