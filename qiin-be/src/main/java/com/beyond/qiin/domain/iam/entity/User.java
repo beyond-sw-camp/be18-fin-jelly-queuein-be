@@ -1,0 +1,153 @@
+package com.beyond.qiin.domain.iam.entity;
+
+import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.exception.UserException;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
+
+@Entity
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(
+        name = "user",
+        indexes = {@Index(name = "idx_user_dpt_id", columnList = "dpt_id")})
+@AttributeOverride(name = "id", column = @Column(name = "user_id"))
+@SQLRestriction("deleted_at IS NULL")
+// @SoftDelete(columnName = "deleted_at", strategy = SoftDeleteType.DELETED)
+public class User extends BaseEntity {
+
+    //      @ManyToOne(fetch = FetchType.LAZY)
+    //      @JoinColumn(name = "dpt_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    //      private Department department;
+
+    @Column(name = "dpt_id", nullable = false)
+    private Long dptId;
+
+    @Column(name = "user_no", length = 50, nullable = false) // UNIQUE
+    private String userNo;
+
+    @Column(name = "user_name", length = 100, nullable = false)
+    private String userName;
+
+    @Column(name = "email", length = 100, nullable = false) // UNIQUE
+    private String email;
+
+    @Column(name = "password", length = 255, nullable = false)
+    private String password;
+
+    @Column(name = "phone", length = 20)
+    private String phone;
+
+    @Column(name = "birth", length = 10)
+    private String birth;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserRole> userRoles = new ArrayList<>();
+
+    @Builder.Default
+    @Column(name = "password_expired", nullable = false)
+    private Boolean passwordExpired = true;
+
+    @Column(name = "last_login_at", columnDefinition = "TIMESTAMP(6)")
+    private Instant lastLoginAt;
+
+    @Column(name = "hire_date", columnDefinition = "TIMESTAMP(6)", nullable = false)
+    private Instant hireDate;
+
+    @Column(name = "retire_date", columnDefinition = "TIMESTAMP(6)")
+    private Instant retireDate;
+
+    public static User create(
+            final CreateUserRequestDto request, final String generatedUserNo, final String encryptedPassword) {
+
+        final Instant hireInstant =
+                request.getHireDate().atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+
+        return User.builder()
+                .dptId(request.getDptId())
+                .userNo(generatedUserNo)
+                .userName(request.getUserName())
+                .email(request.getEmail())
+                .password(encryptedPassword)
+                .phone(request.getPhone())
+                .birth(request.getBirth())
+                .passwordExpired(true)
+                .hireDate(hireInstant)
+                .build();
+    }
+
+    // 비밀번호 수정
+    public void updatePassword(final String encrypted) {
+        this.password = encrypted;
+        this.passwordExpired = false;
+    }
+
+    // 로그인 시 시간 기록
+    public void updateLastLoginAt(final Instant now) {
+        this.lastLoginAt = now;
+    }
+
+    // 사용자 정보 수정
+    public void updateUser(final UpdateUserRequestDto dto) {
+        if (dto.getDptId() != null) this.dptId = dto.getDptId();
+        if (dto.getUserName() != null) this.userName = dto.getUserName();
+        if (dto.getEmail() != null) this.email = dto.getEmail();
+        if (dto.getRetireDate() != null) this.retireDate = dto.getRetireDate();
+        if (dto.getPhone() != null) this.phone = dto.getPhone();
+        if (dto.getBirth() != null) this.birth = dto.getBirth();
+    }
+
+    // 사용자 삭제하면 자식 데이터도 삭제
+    public void softDelete(final Long deleterId) {
+        // 사용자 삭제
+        this.delete(deleterId);
+
+        // 연관된 UserRole 전체 삭제
+        this.userRoles.forEach(ur -> ur.delete(deleterId));
+    }
+
+    // 임시 비밀번호 인지
+    public boolean isTempPassword() {
+        return Boolean.TRUE.equals(this.passwordExpired);
+    }
+
+    // 처음 로그인 인지
+    public boolean isFirstLogin() {
+        return this.lastLoginAt == null;
+    }
+
+    // 임시 비밀번호 쓰는지 검증
+    public void validateTempPasswordUsage() {
+        if (!isTempPassword()) {
+            return; // 일반 비밀번호라면 제약 없음
+        }
+
+        // 임시 비밀번호 && 최초 로그인 == 허용
+        if (isTempPassword() && isFirstLogin()) {
+            return;
+        }
+
+        // 최초 로그인이 아닌데도 passwordExpired=true → 차단
+        throw UserException.passwordExpired();
+    }
+}

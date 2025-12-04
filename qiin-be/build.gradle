@@ -1,0 +1,194 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.flywaydb:flyway-core:10.17.0'
+        classpath 'org.flywaydb:flyway-mysql:10.17.0'
+        classpath 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.4'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.diffplug.spotless' version '6.24.0'
+    id 'org.flywaydb.flyway' version '10.17.0'
+}
+
+flyway {
+    url = 'jdbc:mariadb://localhost:3309/qiin'
+//    url = System.getenv("SPRING_DATASOURCE_URL")
+    user = System.getenv("SPRING_DATASOURCE_USERNAME")
+    password = System.getenv("SPRING_DATASOURCE_PASSWORD")
+    driver = 'org.mariadb.jdbc.Driver'
+    locations = ['classpath:db/migration', 'classpath:db/seed/dev']
+}
+
+
+group = 'com.beyond'
+version = '0.0.1-SNAPSHOT'
+description = 'qiin-be'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springAiVersion', "1.0.3")
+}
+
+dependencies {
+    // Spring Boot Starter Dependencies
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // email
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    //redisson
+    implementation 'org.redisson:redisson-spring-boot-starter:3.20.0'
+
+    //key value 로그용
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+
+    // QueryDsl
+    // Open Feign QueryDSL (latest security patched version)
+    implementation("io.github.openfeign.querydsl:querydsl-core:7.0")
+    implementation("io.github.openfeign.querydsl:querydsl-jpa:7.0")
+
+    // mysql
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // flyway
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+    // QueryDSL annotation processor
+    annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:7.0:jpa")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+
+    // Utility & Annotation Processing
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Development & Hot-Reload
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Runtime Database Drivers
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'com.h2database:h2'   // 여기로 이동
+
+    // Testing Dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Excel (Apache POI)
+    implementation 'org.apache.poi:poi:5.2.5'
+    implementation 'org.apache.poi:poi-ooxml:5.2.5'
+
+}
+
+spotless {
+    java {
+        importOrder()         // import문 순서 정리
+        removeUnusedImports() // 안 쓰는 import문 자동 삭제
+        palantirJavaFormat()  // 구글포매터로 코드 변환
+        targetExclude("src/main/generated/**/*.java") // querydsl 파일들 대상 제외
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    systemProperty "spring.profiles.active", "test"
+
+    // DB (H2로 격리)
+    environment "SPRING_DATASOURCE_URL", "jdbc:h2:mem:testdb;MODE=MariaDB;DB_CLOSE_DELAY=-1"
+    environment "SPRING_DATASOURCE_USERNAME", "sa"
+    environment "SPRING_DATASOURCE_PASSWORD", ""
+    environment "SPRING_DATASOURCE_DRIVER_CLASS_NAME", "org.h2.Driver"
+
+    // Redis, Kafka
+    environment "REDIS_HOST", "localhost"
+    environment "REDIS_PORT", "6379"
+    environment "KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"
+
+    // JWT
+    environment "JWT_SECRET_KEY", "test-secret-key-for-jwt-signing-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    environment "JWT_ACCESS_TOKEN_EXPIRATION", "60000"
+    environment "JWT_REFRESH_TOKEN_EXPIRATION", "120000"
+}
+
+// Querydsl 설정
+def querydslSrcDir = 'src/main/generated'
+
+// querydsl QClass 파일 생성 위치 지정
+tasks.withType(JavaCompile).configureEach {
+    options.getGeneratedSourceOutputDirectory().set(file(querydslSrcDir))
+}
+
+// java source set 에 querydsl QClass 위치 추가
+sourceSets {
+    main.java.srcDirs += [querydslSrcDir]
+    test.java.srcDirs += [querydslSrcDir]
+}
+
+// gradle clean 시에 QClass 디렉토리 삭제
+clean {
+    delete file(querydslSrcDir)
+}
+
+tasks.register('updateGitHooks', Copy) {
+    from 'scripts/pre-commit'        // 현재 폴더의 scripts 디렉터리
+    into '../.git/hooks'              // 실제 git hooks 폴더 위치
+}
+
+tasks.register('makeGitHooksExecutable') {
+    dependsOn updateGitHooks
+    doLast {
+        def osName = System.getProperty("os.name").toLowerCase()
+        if (osName.contains("windows")) {
+            println "Skipping chmod (Windows detected) — Git hooks assumed already executable."
+        } else {
+            def execOps = getServices().get(org.gradle.process.ExecOperations.class)
+            execOps.exec {
+                commandLine 'chmod', '+x', '../.git/hooks/pre-commit'
+            }
+        }
+    }
+}
+
+if (!System.getenv().containsKey('DOCKER_BUILD')) {
+    compileJava.dependsOn makeGitHooksExecutable
+}

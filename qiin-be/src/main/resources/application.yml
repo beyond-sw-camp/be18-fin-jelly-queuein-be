@@ -1,0 +1,48 @@
+server:
+  port: ${SERVER_PORT:8080} # 환경 변수가 없으면 기본값 8080 사용
+
+spring:
+  profiles:
+    default: dev
+
+  # JPA 공통 설정
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+
+
+  # ----------------------------------------
+  # AWS SES SMTP (이메일 발송) 설정 추가
+  # ----------------------------------------
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# ----------------------------------------
+# 발신자 정보 설정 (MailService에서 사용) 추가
+# ----------------------------------------
+mail:
+  from: ${MAIL_FROM}
+
+
+# JWT 설정
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+
+logging:
+  level:
+    org.springframework: INFO

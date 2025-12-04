@@ -1,0 +1,143 @@
+package com.beyond.qiin.domain.iam.service.command;
+
+import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
+import com.beyond.qiin.domain.iam.entity.Role;
+import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.iam.entity.UserRole;
+import com.beyond.qiin.domain.iam.exception.UserException;
+import com.beyond.qiin.domain.iam.support.role.RoleReader;
+import com.beyond.qiin.domain.iam.support.user.UserReader;
+import com.beyond.qiin.domain.iam.support.user.UserWriter;
+import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
+import com.beyond.qiin.infra.mail.MailService;
+import com.beyond.qiin.security.PasswordGenerator;
+import jakarta.persistence.EntityManager;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class UserCommandServiceImpl implements UserCommandService {
+
+    private final UserReader userReader;
+    private final RoleReader roleReader;
+
+    private final UserWriter userWriter;
+    private final UserRoleWriter userRoleWriter;
+
+    private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
+    private final EntityManager entityManager;
+
+    // 사용자 생성
+    @Override
+    @Transactional
+    public CreateUserResponseDto createUser(final CreateUserRequestDto request) {
+
+        // 임시 비밀번호 생성
+        final String tempPassword = PasswordGenerator.generate();
+        final String encrypted = passwordEncoder.encode(tempPassword);
+
+        String userNo = generateUserNo(request.getHireDate());
+
+        User user = User.create(request, userNo, encrypted);
+        User saved = userWriter.save(user);
+
+        Role defaultRole = roleReader.findByRoleName("GENERAL");
+
+        UserRole userRole = UserRole.create(saved, defaultRole);
+        userRoleWriter.save(userRole);
+
+        mailService.sendTempPassword(saved.getEmail(), tempPassword);
+
+        return CreateUserResponseDto.fromEntity(saved);
+    }
+
+    // 사용자 정보 수정
+    @Override
+    @Transactional
+    public void updateUser(final Long userId, final UpdateUserRequestDto request) {
+        User user = userReader.findById(userId);
+        user.updateUser(request);
+        userWriter.save(user);
+    }
+
+    // 임시 비밀번호 수정
+    @Override
+    @Transactional
+    public void changeTempPassword(final Long userId, final String newPassword) {
+
+        entityManager.flush();
+        entityManager.clear();
+
+        final User user = userReader.findById(userId);
+
+        // 임시 비밀번호 사용자만 허용
+        if (!Boolean.TRUE.equals(user.getPasswordExpired())) {
+            throw UserException.passwordChangeNotAllowed();
+        }
+
+        user.updatePassword(passwordEncoder.encode(newPassword));
+        user.updateLastLoginAt(Instant.now());
+        userWriter.save(user);
+    }
+
+    // 평상시 비밀번호 수정
+    @Override
+    @Transactional
+    public void changePassword(final Long userId, final ChangePwRequestDto request) {
+
+        final User user = userReader.findById(userId);
+
+        // 기존 비밀번호 검증
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw UserException.invalidPassword();
+        }
+
+        // 새 비밀번호 저장
+        user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+        userWriter.save(user);
+    }
+
+    // 사용자 삭제
+    @Override
+    @Transactional
+    public void deleteUser(final Long userId, final Long deleterId) {
+        User user = userReader.findById(userId);
+
+        user.softDelete(deleterId);
+        userWriter.save(user);
+    }
+
+    // --------------------------------------
+    // 헬퍼 메서드
+    // --------------------------------------
+
+    // 사번 생성 로직
+    private String generateUserNo(final LocalDate hireDate) {
+        Instant hireInstant = hireDate.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
+
+        String prefix = hireDate.format(DateTimeFormatter.ofPattern("yyyyMM"));
+
+        Optional<String> lastUserNoOpt = userReader.findLastUserNoByPrefix(prefix);
+
+        int nextSeq = lastUserNoOpt
+                .map(last -> Integer.parseInt(last.substring(prefix.length())))
+                .map(num -> num + 1)
+                .orElse(1);
+
+        String seq = String.format("%03d", nextSeq);
+
+        return prefix + seq;
+    }
+}

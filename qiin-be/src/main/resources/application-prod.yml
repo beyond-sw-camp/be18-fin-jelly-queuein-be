@@ -1,0 +1,61 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+    # Kafka 설정
+#  kafka:
+#    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}                                      # Kafka 접속 정보 지정
+#    producer:
+#      #직렬화
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#    topic:
+#      topics:
+#        reservation-created: reservation-created-topic
+#        reservation-updated: reservation-updated-topic
+#
+#    consumer:
+#      auto-offset-reset: earliest
+#      #역직렬화
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#      properties:
+#        spring.json.trusted.packages: "*"
+
+  # DB 설정: Spring 표준 키 사용 (Doppler에 있는 키와 매칭)
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  # Flyway 완전 비활성화
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: "0"
+    locations:
+      - classpath:db/migration  # 마이그레이션 파일 경로 설정
+
+  # Redis 캐시 완전 비활성화
+  cache:
+    type: none
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+
+logging:
+  level:
+    root: WARN
+    com.beyond.qiin: INFO

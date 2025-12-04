@@ -1,0 +1,7 @@
+ALTER TABLE `user_role`
+    ADD COLUMN `created_by` BIGINT(20) NOT NULL DEFAULT 0,
+    ADD COLUMN `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    ADD COLUMN `updated_by` BIGINT(20) NULL,
+    ADD COLUMN `updated_at` TIMESTAMP(6) NULL,
+    ADD COLUMN `deleted_by` BIGINT(20) NULL,
+    ADD COLUMN `deleted_at` TIMESTAMP(6) NULL;

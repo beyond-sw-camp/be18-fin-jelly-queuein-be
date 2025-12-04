@@ -1,0 +1,55 @@
+# Doppler에서 주입 받는게 아닌 테스트용 API-KEY
+INTERNAL_MASTER_KEY: "TEST_INTERNAL_MASTER_KEY_123456"
+INTERNAL_API_KEY: "TEST_INTERNAL_API_KEY_ABCDEF"
+
+spring:
+  mail:
+    host: mock-smtp.test.com
+    port: 587
+    username: mock-user
+    password: mock-password
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+  autoconfigure:
+    exclude: org.redisson.spring.starter.RedissonAutoConfiguration
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MariaDB;DB_CLOSE_DELAY=-1;
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect   # 변경
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  kafka:
+    listener:
+      auto-startup: false
+    topic:
+      topics:
+        reservation-created: reservation-created-topic
+        reservation-updated: reservation-updated-topic
+
+  data:
+    redis:
+      host: 0
+      port: 0
+      repositories:
+        enabled: false
+
+  flyway:
+    enabled: false
+
+mail:
+  from: "QueueIn Test <no-reply@test.com>"

@@ -1,0 +1,175 @@
+package com.beyond.qiin.security.jwt;
+
+import com.beyond.qiin.domain.auth.exception.AuthException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import java.security.Key;
+import java.util.Date;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+public class JwtTokenProvider {
+
+    @Value("${JWT_SECRET_KEY}")
+    private String secretKey;
+
+    @Value("${JWT_ACCESS_TOKEN_EXPIRATION}")
+    private long accessTokenExpiration;
+
+    @Value("${JWT_REFRESH_TOKEN_EXPIRATION}")
+    private long refreshTokenExpiration;
+
+    private Key key;
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+        log.info("JWT SecretKey 초기화 완료");
+    }
+
+    /** Access Token 생성 */
+    public String generateAccessToken(
+            final Long userId, final String role, final String email, final List<String> permissions) {
+        return generateAccessTokenInternal(
+                userId, role, email, permissions, accessTokenExpiration, JwtTokenType.ACCESS.name());
+    }
+
+    /** Refresh Token 생성 */
+    public String generateRefreshToken(final Long userId, final String role) {
+        return generateRefreshTokenInternal(userId, role, refreshTokenExpiration);
+    }
+
+    /** 공통 토큰 생성 로직 */
+    private String generateAccessTokenInternal(
+            final Long userId,
+            final String role,
+            final String email,
+            final List<String> permissions,
+            final long expirationMillis,
+            final String tokenType) {
+        final Date now = new Date();
+        final Date expiry = new Date(now.getTime() + expirationMillis);
+
+        return Jwts.builder()
+                .setSubject(String.valueOf(userId))
+                .claim(JwtConstants.CLAIM_ROLE, role)
+                .claim(JwtConstants.CLAIM_EMAIL, email)
+                .claim(JwtConstants.CLAIM_PERMISSIONS, permissions)
+                .claim(JwtConstants.CLAIM_TOKEN_TYPE, tokenType)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    // 내부용 Refresh 생성
+    private String generateRefreshTokenInternal(final Long userId, final String role, final long expirationMillis) {
+        final Date now = new Date();
+        final Date expiry = new Date(now.getTime() + expirationMillis);
+
+        return Jwts.builder()
+                .setSubject(String.valueOf(userId))
+                .claim(JwtConstants.CLAIM_ROLE, role)
+                .claim(JwtConstants.CLAIM_TOKEN_TYPE, JwtTokenType.REFRESH.name())
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    // Access Token 검증
+    public boolean validateAccessToken(final String token) {
+        return validateTokenInternal(token, JwtTokenType.ACCESS.name());
+    }
+
+    // Refresh Token 검증
+    public boolean validateRefreshToken(final String token) {
+        return validateTokenInternal(token, JwtTokenType.REFRESH.name());
+    }
+
+    // 공통 검증 로직
+    private boolean validateTokenInternal(final String token, final String expectedType) {
+        try {
+            final Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            final String tokenType = claims.get(JwtConstants.CLAIM_TOKEN_TYPE, String.class);
+            return expectedType.equals(tokenType);
+
+        } catch (Exception e) { // 전체 예외 처리
+            log.debug("[Validation] {} 토큰 유효하지 않음", expectedType);
+            return false;
+        }
+    }
+
+    // 토큰에서 사용자 ID 추출
+    public Long getUserId(final String token) {
+        return Long.parseLong(getClaims(token).getSubject());
+    }
+
+    // 토큰에서 역할(Role) 추출
+    public String getUserRole(final String token) {
+        return getClaims(token).get(JwtConstants.CLAIM_ROLE, String.class);
+    }
+
+    // 어떤 토큰인지 타입 추출
+    public String getTokenType(final String token) {
+        return getClaims(token).get(JwtConstants.CLAIM_TOKEN_TYPE, String.class);
+    }
+
+    // Claims 공통 조회
+    Claims getClaims(final String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            log.warn("[JWT] Claims 파싱 실패 - 만료된 토큰: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.warn("[JWT] Claims 파싱 실패 - 유효하지 않은 토큰: {}", e.getMessage());
+            throw AuthException.unauthorized(); // 401 로 변환
+        }
+    }
+
+    // Refresh Token TTL 조회
+    public long getRefreshTokenValidityMillis() {
+        return refreshTokenExpiration;
+    }
+
+    // Authorization 헤더에서 Access Token 추출
+    public String resolveAccessToken(final HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
+    }
+
+    // Access Token 남은 유효 시간 계산
+    public long getRemainingValidityMillis(final String token) {
+        try {
+            Claims claims = getClaims(token);
+            long expiration = claims.getExpiration().getTime();
+            long now = System.currentTimeMillis();
+            return Math.max(expiration - now, 0);
+        } catch (ExpiredJwtException e) {
+            return 0;
+        }
+    }
+}
