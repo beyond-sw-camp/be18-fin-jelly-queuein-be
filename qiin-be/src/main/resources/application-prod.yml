@@ -3,25 +3,31 @@ spring:
     activate:
       on-profile: prod
 
-    # Kafka 설정
-#  kafka:
-#    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}                                      # Kafka 접속 정보 지정
-#    producer:
-#      #직렬화
-#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-#    topic:
-#      topics:
-#        reservation-created: reservation-created-topic
-#        reservation-updated: reservation-updated-topic
-#
-#    consumer:
-#      auto-offset-reset: earliest
-#      #역직렬화
-#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-#      properties:
-#        spring.json.trusted.packages: "*"
+  # Redis 설정 추가 (Redisson/Spring Data Redis가 읽을 수 있도록 표준 키 사용)
+  data:
+    redis:
+      host: ${REDIS_HOST} # Secrets Manager에 있는 실제 Redis 엔드포인트 주소를 참조
+      port: ${REDIS_PORT} # Secrets Manager에 있는 포트 번호를 참조
+
+  # Kafka 설정
+  #  kafka:
+  #    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}                                      # Kafka 접속 정보 지정
+  #    producer:
+  #      #직렬화
+  #      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+  #      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  #    topic:
+  #      topics:
+  #        reservation-created: reservation-created-topic
+  #        reservation-updated: reservation-updated-topic
+  #
+  #    consumer:
+  #      auto-offset-reset: earliest
+  #      #역직렬화
+  #      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  #      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  #      properties:
+  #        spring.json.trusted.packages: "*"
 
   # DB 설정: Spring 표준 키 사용 (Doppler에 있는 키와 매칭)
   datasource:
@@ -38,7 +44,7 @@ spring:
       hibernate:
         format_sql: false
 
-  # Flyway 완전 비활성화
+  # Flyway 설정
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -46,7 +52,7 @@ spring:
     locations:
       - classpath:db/migration  # 마이그레이션 파일 경로 설정
 
-  # Redis 캐시 완전 비활성화
+  # Redis 캐시 완전 비활성화 (Redis 사용 자체를 막는 것이 아님)
   cache:
     type: none
 
