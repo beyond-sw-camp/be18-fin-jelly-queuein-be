@@ -160,7 +160,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         // 지금 사용 불가한 자원이면 제외
         assetCommandService.isAvailable(reservation.getAsset().getId());
 
-        //시작 시간부터 사용 가능
+        // 시작 시간부터 사용 가능
         Instant now = Instant.now();
         if (now.isBefore(reservation.getStartAt())) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_TIME_NOT_YET);

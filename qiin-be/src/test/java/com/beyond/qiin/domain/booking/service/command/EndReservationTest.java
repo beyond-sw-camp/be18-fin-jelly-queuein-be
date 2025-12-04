@@ -23,47 +23,44 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class EndReservationTest {
-  @InjectMocks
-  private ReservationCommandServiceImpl reservationCommandService;
+    @InjectMocks
+    private ReservationCommandServiceImpl reservationCommandService;
 
-  @Mock
-  private UserReader userReader;
+    @Mock
+    private UserReader userReader;
 
-  @Mock
-  private ReservationReader reservationReader;
+    @Mock
+    private ReservationReader reservationReader;
 
-  @Mock
-  private ReservationWriter reservationWriter;
+    @Mock
+    private ReservationWriter reservationWriter;
 
-  @Mock
-  private AssetCommandService assetCommandService;
+    @Mock
+    private AssetCommandService assetCommandService;
 
-  //사용 시작하지 않은 예약을 사용 종료 불가
-  @Test
-  void endUsingReservation_fail() {
-    Long userId = 1L;
-    Long reservationId = 10L;
+    // 사용 시작하지 않은 예약을 사용 종료 불가
+    @Test
+    void endUsingReservation_fail() {
+        Long userId = 1L;
+        Long reservationId = 10L;
 
-    User user = User.builder().userName("A").build();
-    Asset asset = Asset.builder().name("회의실 A").build();
-    Reservation reservation = Reservation.builder()
-        .asset(asset)
-        .applicant(user)
-        .startAt(Instant.parse("2025-12-04T10:00:00Z"))
-        .endAt(Instant.parse("2025-12-04T11:00:00Z"))
-        .status(ReservationStatus.APPROVED.getCode()) // USING이 아닌 상태
-        .build();
+        User user = User.builder().userName("A").build();
+        Asset asset = Asset.builder().name("회의실 A").build();
+        Reservation reservation = Reservation.builder()
+                .asset(asset)
+                .applicant(user)
+                .startAt(Instant.parse("2025-12-04T10:00:00Z"))
+                .endAt(Instant.parse("2025-12-04T11:00:00Z"))
+                .status(ReservationStatus.APPROVED.getCode()) // USING이 아닌 상태
+                .build();
 
-    when(userReader.findById(userId)).thenReturn(user);
-    when(reservationReader.getReservationById(reservationId)).thenReturn(reservation);
+        when(userReader.findById(userId)).thenReturn(user);
+        when(reservationReader.getReservationById(reservationId)).thenReturn(reservation);
 
-    // when & then
-    ReservationException exception = assertThrows(ReservationException.class, () ->
-        reservationCommandService.endUsingReservation(userId, reservationId)
-    );
+        // when & then
+        ReservationException exception = assertThrows(
+                ReservationException.class, () -> reservationCommandService.endUsingReservation(userId, reservationId));
 
-    assertEquals(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED, exception.getErrorCode());
-
-  }
-  
+        assertEquals(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED, exception.getErrorCode());
+    }
 }
