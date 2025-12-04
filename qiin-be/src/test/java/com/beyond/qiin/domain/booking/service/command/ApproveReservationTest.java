@@ -77,8 +77,7 @@ public class ApproveReservationTest {
 
         reservation.setApplicant(applicant);
         reservation.setRespondent(respondent);
-        when(reservationReader.getReservationsByAssetAndDate(any(), any())).thenReturn(List.of());
-
+        
         when(userReader.findById(userId)).thenReturn(respondent);
         when(reservationReader.getReservationById(reservationId)).thenReturn(reservation);
 
