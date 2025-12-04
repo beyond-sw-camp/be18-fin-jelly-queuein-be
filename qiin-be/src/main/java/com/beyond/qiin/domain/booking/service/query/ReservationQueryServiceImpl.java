@@ -297,7 +297,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return isReservableForDay(date, reservations);
     }
 
-    private boolean isReservableForDay(LocalDate date, List<Reservation> reservations) {
+    boolean isReservableForDay(LocalDate date, List<Reservation> reservations) {
 
         ZoneId zone = ZoneId.of("Asia/Seoul");
 
