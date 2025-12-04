@@ -14,8 +14,8 @@ public enum ReservationErrorCode implements ErrorCode {
     USING_RESERVATION_NOT_DELETED(
             HttpStatus.BAD_REQUEST, "USING_RESERVATION_NOT_DELETED", "사용중인 자원은 삭제 불가합니다. 사용 완료하세요."),
     RESERVATION_REQUEST_DUPLICATED(HttpStatus.CONFLICT, "RESERVATION_REQUEST_DUPLICATED", "자원 예약을 위해 대기중입니다."),
-    RESERVATION_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "RESERVATION_CREATE_FAILED", "자원에 대한 예약을 실패했습니다.");
-
+    RESERVATION_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "RESERVATION_CREATE_FAILED", "자원에 대한 예약을 실패했습니다."),
+    RESERVATION_TIME_NOT_YET(HttpStatus.BAD_REQUEST, "RESERVATION_TIME_NOT_YET", "자원 예약 시간 이전에 사용 불가합니다.");
     private final HttpStatus status;
     private final String error;
     private final String message;
