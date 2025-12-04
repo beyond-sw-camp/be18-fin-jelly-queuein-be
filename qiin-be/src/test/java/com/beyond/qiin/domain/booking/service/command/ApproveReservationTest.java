@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
@@ -62,6 +61,7 @@ public class ApproveReservationTest {
         ConfirmReservationRequestDto requestDto =
                 ConfirmReservationRequestDto.builder().reason("승인 사유").build();
 
+        User respondent = User.builder().userName("").build();
         User applicant = User.builder().userName("").build();
         Asset asset = Asset.builder().name("회의실 A").build();
         Reservation reservation = Reservation.builder()
@@ -74,14 +74,14 @@ public class ApproveReservationTest {
 
         when(reservationReader.getReservationsByAssetAndDate(any(), any())).thenReturn(List.of());
 
-        when(userReader.findById(userId)).thenReturn(respondent);
+        when(userReader.findById(userId)).thenReturn(applicant);
         when(reservationReader.getReservationById(reservationId)).thenReturn(reservation);
 
         doNothing().when(reservationWriter).save(any());
         doNothing().when(reservationEventPublisher).publishUpdated(any());
 
         // when
-        ReservationResponseDto result = reservationCommandService.approveReservation(userId, reservationId, requestDto);
+        reservationCommandService.approveReservation(userId, reservationId, requestDto);
 
         assertNotNull(result);
         assertEquals(ReservationStatus.APPROVED, result.getStatus());
