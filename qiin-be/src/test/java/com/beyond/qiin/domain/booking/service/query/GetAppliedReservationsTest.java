@@ -30,15 +30,14 @@ import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 public class GetAppliedReservationsTest {
+    @InjectMocks
+    private ReservationQueryServiceImpl reservationQueryService;
 
     @Mock
     private UserReader userReader;
 
     @Mock
     private AppliedReservationsQueryRepository appliedReservationsQueryRepository;
-
-    @InjectMocks
-    private ReservationQueryServiceImpl reservationQueryService;
 
     @Mock
     private ReservationReader reservationReader;
@@ -92,8 +91,6 @@ public class GetAppliedReservationsTest {
 
         List<RawAppliedReservationResponseDto> rawList = List.of(raw1, raw2);
         when(appliedReservationsQueryRepository.search(condition)).thenReturn(rawList);
-
-        doReturn(true).when(reservationQueryService).isReservationTimeAvailable(anyLong(), anyLong(), any(), any());
 
         // Mock asset availability
         when(assetQueryService.isAvailable(anyLong())).thenReturn(true);
