@@ -20,37 +20,66 @@ public class SettlementQuarterQueryAdapterImpl implements SettlementQuarterQuery
     private final JPAQueryFactory queryFactory;
 
     /**
-     * 화면 조회용 분기 정산
+     * 분기 정산 - 월별 raw → 자원별로 분기 합산하여 1줄로 합치기
      */
     @Override
     public List<SettlementQuarterRowDto> getQuarterRows(int year, Integer quarter, String assetName) {
 
-        // 전체 월 범위 계산
         int startMonth = (quarter != null) ? (quarter - 1) * 3 + 1 : 1;
         int endMonth = (quarter != null) ? startMonth + 2 : 12;
 
-        // DB 조회
-        List<SettlementQuarterRowDto> allRows = fetchRawRows(year, startMonth, endMonth, assetName).stream()
+        // 월별 raw rows 조회
+        List<SettlementQuarterRowDto> monthlyRows = fetchRawRows(year, startMonth, endMonth, assetName).stream()
                 .map(t -> toRawDto(t, year, quarter))
                 .toList();
 
-        // 분기별 그룹핑 + 최신 분기부터 정렬
-        Map<Integer, List<SettlementQuarterRowDto>> grouped =
-                allRows.stream().collect(Collectors.groupingBy(SettlementQuarterRowDto::getQuarter));
+        // 자원 + 분기 기준으로 그룹핑
+        Map<String, List<SettlementQuarterRowDto>> grouped =
+                monthlyRows.stream().collect(Collectors.groupingBy(r -> r.getAssetId() + "-" + r.getQuarter()));
 
-        List<SettlementQuarterRowDto> sortedRows = new ArrayList<>();
-        for (int q = 4; q >= 1; q--) {
-            List<SettlementQuarterRowDto> rows = grouped.getOrDefault(q, Collections.emptyList());
-            rows.sort(Comparator.comparing(SettlementQuarterRowDto::getAssetName));
-            sortedRows.addAll(rows);
+        List<SettlementQuarterRowDto> mergedRows = new ArrayList<>();
+
+        for (List<SettlementQuarterRowDto> rows : grouped.values()) {
+
+            SettlementQuarterRowDto merged = SettlementQuarterRowDto.builder()
+                    .assetId(rows.get(0).getAssetId())
+                    .assetName(rows.get(0).getAssetName())
+                    .year(rows.get(0).getYear())
+                    .quarter(rows.get(0).getQuarter())
+                    .reservedHours(rows.stream()
+                            .mapToInt(SettlementQuarterRowDto::getReservedHours)
+                            .sum())
+                    .actualHours(rows.stream()
+                            .mapToInt(SettlementQuarterRowDto::getActualHours)
+                            .sum())
+                    .totalUsageCost(rows.stream()
+                            .map(SettlementQuarterRowDto::getTotalUsageCost)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                    .actualUsageCost(rows.stream()
+                            .map(SettlementQuarterRowDto::getActualUsageCost)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                    .usageGapCost(rows.stream()
+                            .map(SettlementQuarterRowDto::getUsageGapCost)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                    .utilizationRate(null)
+                    .performRate(null)
+                    .utilizationGrade(null)
+                    .performGrade(null)
+                    .build();
+
+            mergedRows.add(merged);
         }
 
-        return sortedRows;
+        // 최종 정렬: 분기 → 자원명
+        mergedRows.sort(Comparator.comparing(SettlementQuarterRowDto::getQuarter)
+                .thenComparing(SettlementQuarterRowDto::getAssetName));
+
+        return mergedRows;
     }
 
-    /**
-     * QueryDSL 공통 조회
-     */
+    /* ============================================================
+      QueryDSL Raw 조회
+    ============================================================ */
     private List<Tuple> fetchRawRows(int year, int startMonth, int endMonth, String assetName) {
         return queryFactory
                 .select(
@@ -75,14 +104,15 @@ public class SettlementQuarterQueryAdapterImpl implements SettlementQuarterQuery
                 .fetch();
     }
 
-    /**
-     * DTO 변환
-     */
+    /* ============================================================
+      Tuple → Raw DTO (월 단위)
+    ============================================================ */
     private SettlementQuarterRowDto toRawDto(Tuple t, int year, Integer quarter) {
         Long reserved = t.get(usageHistory.usageTime.sumLong());
         Long actual = t.get(usageHistory.actualUsageTime.sumLong());
         Integer month = t.get(usageHistory.startAt.month());
-        if (month == null) month = 1; // null이면 기본값 1월
+
+        if (month == null) month = 1; // null 방지
         Integer resolvedQuarter = (quarter != null) ? quarter : quarterOfMonth(month);
 
         return SettlementQuarterRowDto.builder()
@@ -102,9 +132,9 @@ public class SettlementQuarterQueryAdapterImpl implements SettlementQuarterQuery
                 .build();
     }
 
-    /* ====================
+    /* ============================================================
       유틸
-    ==================== */
+    ============================================================ */
     private Integer toInt(Long v) {
         return v == null ? 0 : v.intValue();
     }
