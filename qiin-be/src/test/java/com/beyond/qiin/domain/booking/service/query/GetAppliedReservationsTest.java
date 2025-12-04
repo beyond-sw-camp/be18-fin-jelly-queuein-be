@@ -19,15 +19,12 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -54,6 +51,7 @@ public class GetAppliedReservationsTest {
 
     @Mock
     private ReservableAssetsQueryRepository reservableAssetsQueryRepository;
+
     @Test
     void getReservationApplies_returnsPagedDto() {
         Long userId = 1L;
@@ -67,24 +65,35 @@ public class GetAppliedReservationsTest {
 
         // Mock raw data
         RawAppliedReservationResponseDto raw1 = new RawAppliedReservationResponseDto(
-            10L, "Projector", 1L, "Alice", "Bob", 1, true,
-            "Projector needed", 100L,
-            Instant.parse("2025-12-04T10:00:00Z"),
-            Instant.parse("2025-12-04T12:00:00Z")
-        );
+                10L,
+                "Projector",
+                1L,
+                "Alice",
+                "Bob",
+                1,
+                true,
+                "Projector needed",
+                100L,
+                Instant.parse("2025-12-04T10:00:00Z"),
+                Instant.parse("2025-12-04T12:00:00Z"));
 
         RawAppliedReservationResponseDto raw2 = new RawAppliedReservationResponseDto(
-            20L, "Laptop", 2L, "Charlie", "David", 0, false,
-            "Laptop needed", 101L,
-            Instant.parse("2025-12-04T13:00:00Z"),
-            Instant.parse("2025-12-04T15:00:00Z")
-        );
+                20L,
+                "Laptop",
+                2L,
+                "Charlie",
+                "David",
+                0,
+                false,
+                "Laptop needed",
+                101L,
+                Instant.parse("2025-12-04T13:00:00Z"),
+                Instant.parse("2025-12-04T15:00:00Z"));
 
         List<RawAppliedReservationResponseDto> rawList = List.of(raw1, raw2);
         when(appliedReservationsQueryRepository.search(condition)).thenReturn(rawList);
 
-        doReturn(true).when(reservationQueryService)
-            .isReservationTimeAvailable(anyLong(), anyLong(), any(), any());
+        doReturn(true).when(reservationQueryService).isReservationTimeAvailable(anyLong(), anyLong(), any(), any());
 
         // Mock asset availability
         when(assetQueryService.isAvailable(anyLong())).thenReturn(true);
@@ -93,7 +102,7 @@ public class GetAppliedReservationsTest {
 
         // 실행
         PageResponseDto<GetAppliedReservationResponseDto> result =
-            reservationQueryService.getReservationApplies(userId, condition, pageable);
+                reservationQueryService.getReservationApplies(userId, condition, pageable);
 
         // 검증
         assertEquals(2, result.getContent().size());

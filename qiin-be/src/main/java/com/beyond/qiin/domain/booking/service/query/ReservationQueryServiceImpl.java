@@ -115,8 +115,9 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
             boolean isAssetAvailable = assetQueryService.isAvailable(raw.getAssetId());
 
-            //해당 시간대에 예약 가능 유무 판별
-            boolean isReservable = isReservationTimeAvailable(raw.getReservationId(), raw.getAssetId(), raw.getStartAt(), raw.getEndAt());
+            // 해당 시간대에 예약 가능 유무 판별
+            boolean isReservable = isReservationTimeAvailable(
+                    raw.getReservationId(), raw.getAssetId(), raw.getStartAt(), raw.getEndAt());
             if (isReservable && isAssetAvailable) {
                 appliedReservations.add(
                         GetAppliedReservationResponseDto.fromRaw(raw, isReservable)); // 생성 조건이 true이므로 인자로 받지 않음
@@ -347,7 +348,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     // api x 비즈니스 메서드
     private void validateReservationAvailability(
-        final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
+            final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
         if (!isReservationTimeAvailable(reservationId, assetId, startAt, endAt))
             throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
     }
@@ -355,7 +356,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // test 가능하도록 package private 허용
     // 자원에 대한 예약 가능의 유무 -  비즈니스 책임이므로 command service로
     boolean isReservationTimeAvailable(
-        final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
+            final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
 
         List<Reservation> reservations = reservationReader.getActiveReservationsByAssetId(assetId);
 
