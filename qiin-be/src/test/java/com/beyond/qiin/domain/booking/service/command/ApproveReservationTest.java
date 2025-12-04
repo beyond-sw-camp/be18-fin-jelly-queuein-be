@@ -21,7 +21,6 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -77,7 +76,7 @@ public class ApproveReservationTest {
 
         reservation.setApplicant(applicant);
         reservation.setRespondent(respondent);
-        
+
         when(userReader.findById(userId)).thenReturn(respondent);
         when(reservationReader.getReservationById(reservationId)).thenReturn(reservation);
 
