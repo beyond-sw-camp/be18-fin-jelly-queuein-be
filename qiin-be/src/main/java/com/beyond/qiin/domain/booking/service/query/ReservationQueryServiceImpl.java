@@ -116,12 +116,14 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             boolean isAssetAvailable = assetQueryService.isAvailable(raw.getAssetId());
 
             // 해당 시간대에 예약 가능 유무 판별
-            boolean isReservable = isReservationTimeAvailable(
+            boolean isReservableTime = isReservationTimeAvailable(
                     raw.getReservationId(), raw.getAssetId(), raw.getStartAt(), raw.getEndAt());
-            if (isReservable && isAssetAvailable) {
-                appliedReservations.add(
-                        GetAppliedReservationResponseDto.fromRaw(raw, isReservable)); // 생성 조건이 true이므로 인자로 받지 않음
-            }
+
+            //모든 신청 내역을 보여주되 가능한지에 대해 정보 제공
+            boolean isReservable = isAssetAvailable && isReservableTime;
+            appliedReservations.add(
+                GetAppliedReservationResponseDto.fromRaw(raw, isReservable));
+
         }
 
         int startIdx = (int) pageable.getOffset();
