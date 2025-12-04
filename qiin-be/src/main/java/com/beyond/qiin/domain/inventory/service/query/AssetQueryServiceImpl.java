@@ -201,7 +201,7 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     public boolean isAvailable(final Long assetId) {
         Asset asset = assetJpaRepository.findById(assetId).orElseThrow(AssetException::notFound);
         if (asset.getStatus() == 1 || asset.getStatus() == 2) {
-            throw AssetException.assetNotAvailable();
+            return false;
         }
         return true;
     }
