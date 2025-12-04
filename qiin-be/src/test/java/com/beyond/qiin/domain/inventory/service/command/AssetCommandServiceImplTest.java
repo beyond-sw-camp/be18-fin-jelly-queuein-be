@@ -25,7 +25,7 @@ import com.beyond.qiin.domain.inventory.exception.AssetException;
 import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.CategoryJpaRepository;
-import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryAdapter;
+import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +47,7 @@ class AssetCommandServiceImplTest {
     private AssetClosureJpaRepository assetClosureJpaRepository;
 
     @Mock
-    private AssetClosureQueryAdapter assetClosureQueryAdapter;
+    private AssetClosureQueryRepository assetClosureQueryRepository;
 
     @Mock
     private CategoryCommandService categoryCommandService;
@@ -145,7 +145,7 @@ class AssetCommandServiceImplTest {
 
         // parent 조상들
         AssetClosure rootClosure = AssetClosure.of(1L, 50L, 0);
-        when(assetClosureQueryAdapter.findAncestors(50L)).thenReturn(List.of(rootClosure));
+        when(assetClosureQueryRepository.findAncestors(50L)).thenReturn(List.of(rootClosure));
 
         CreateAssetResponseDto result = service.createAsset(dto);
 
@@ -238,7 +238,7 @@ class AssetCommandServiceImplTest {
 
         Asset asset = mock(Asset.class);
         when(assetJpaRepository.findById(10L)).thenReturn(Optional.of(asset));
-        when(assetClosureQueryAdapter.existsChildren(10L)).thenReturn(true);
+        when(assetClosureQueryRepository.existsChildren(10L)).thenReturn(true);
 
         when(userReader.findById(99L)).thenReturn(null);
 
@@ -252,7 +252,7 @@ class AssetCommandServiceImplTest {
         Asset asset = mock(Asset.class);
 
         when(assetJpaRepository.findById(10L)).thenReturn(Optional.of(asset));
-        when(assetClosureQueryAdapter.existsChildren(10L)).thenReturn(false);
+        when(assetClosureQueryRepository.existsChildren(10L)).thenReturn(false);
         when(userReader.findById(99L)).thenReturn(null);
 
         service.softDeleteAsset(10L, 99L);
@@ -261,6 +261,6 @@ class AssetCommandServiceImplTest {
         verify(assetJpaRepository).save(asset);
 
         // 현재 서비스는 descendant 삭제만 수행함
-        verify(assetClosureQueryAdapter).deleteAllByDescendantId(10L);
+        verify(assetClosureQueryRepository).deleteAllByDescendantId(10L);
     }
 }

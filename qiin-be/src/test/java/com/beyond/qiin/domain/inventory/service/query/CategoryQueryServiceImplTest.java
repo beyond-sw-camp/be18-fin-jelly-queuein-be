@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.DropdownCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.ManageCategoryResponseDto;
-import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryAdapter;
+import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryRepository;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +22,7 @@ import org.springframework.data.domain.*;
 class CategoryQueryServiceImplTest {
 
     @Mock
-    private CategoryQueryAdapter categoryQueryAdapter;
+    private CategoryQueryRepository categoryQueryRepository;
 
     @InjectMocks
     private CategoryQueryServiceImpl service;
@@ -35,7 +35,7 @@ class CategoryQueryServiceImplTest {
         List<DropdownCategoryResponseDto> mockList =
                 List.of(new DropdownCategoryResponseDto(1L, "A"), new DropdownCategoryResponseDto(2L, "B"));
 
-        when(categoryQueryAdapter.findAllForDropdown()).thenReturn(mockList);
+        when(categoryQueryRepository.findAllForDropdown()).thenReturn(mockList);
 
         // when
         List<DropdownCategoryResponseDto> result = service.getDropdownList();
@@ -45,7 +45,7 @@ class CategoryQueryServiceImplTest {
         assertThat(result.get(0).getCategoryId()).isEqualTo(1L);
         assertThat(result.get(1).getName()).isEqualTo("B");
 
-        verify(categoryQueryAdapter, times(1)).findAllForDropdown();
+        verify(categoryQueryRepository, times(1)).findAllForDropdown();
     }
 
     // MANAGE LIST
@@ -75,7 +75,7 @@ class CategoryQueryServiceImplTest {
 
         Page<ManageCategoryResponseDto> page = new PageImpl<>(List.of(dto1, dto2), pageable, 2);
 
-        when(categoryQueryAdapter.findAllForManage(any(Pageable.class))).thenReturn(page);
+        when(categoryQueryRepository.findAllForManage(any(Pageable.class))).thenReturn(page);
 
         // when
         PageResponseDto<ManageCategoryResponseDto> result = service.getManageList(0, 10);
@@ -85,6 +85,6 @@ class CategoryQueryServiceImplTest {
         assertThat(result.getContent().getFirst().getName()).isEqualTo("A");
         assertThat(result.getTotalElements()).isEqualTo(2);
 
-        verify(categoryQueryAdapter, times(1)).findAllForManage(any(Pageable.class));
+        verify(categoryQueryRepository, times(1)).findAllForManage(any(Pageable.class));
     }
 }

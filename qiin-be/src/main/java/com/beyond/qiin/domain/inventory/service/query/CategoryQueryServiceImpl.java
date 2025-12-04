@@ -3,7 +3,7 @@ package com.beyond.qiin.domain.inventory.service.query;
 import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.DropdownCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.ManageCategoryResponseDto;
-import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryAdapter;
+import com.beyond.qiin.domain.inventory.repository.querydsl.CategoryQueryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,12 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CategoryQueryServiceImpl implements CategoryQueryService {
 
-    private final CategoryQueryAdapter categoryQueryAdapter;
+    private final CategoryQueryRepository categoryQueryRepository;
 
     @Override
     @Transactional(readOnly = true)
     public List<DropdownCategoryResponseDto> getDropdownList() {
-        return categoryQueryAdapter.findAllForDropdown();
+        return categoryQueryRepository.findAllForDropdown();
     }
 
     @Override
@@ -29,7 +29,8 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
     public PageResponseDto<ManageCategoryResponseDto> getManageList(final int page, final int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<ManageCategoryResponseDto> categoryManageResponseDtoPage = categoryQueryAdapter.findAllForManage(pageable);
+        Page<ManageCategoryResponseDto> categoryManageResponseDtoPage =
+                categoryQueryRepository.findAllForManage(pageable);
 
         return PageResponseDto.from(categoryManageResponseDtoPage);
     }
