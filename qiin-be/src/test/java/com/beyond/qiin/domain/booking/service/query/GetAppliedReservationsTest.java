@@ -1,6 +1,9 @@
 package com.beyond.qiin.domain.booking.service.query;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
@@ -14,6 +17,7 @@ import com.beyond.qiin.domain.booking.support.ReservationReader;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +26,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -48,59 +54,52 @@ public class GetAppliedReservationsTest {
 
     @Mock
     private ReservableAssetsQueryRepository reservableAssetsQueryRepository;
-
     @Test
     void getReservationApplies_returnsPagedDto() {
         Long userId = 1L;
-        LocalDate date = LocalDate.of(2025, 12, 4);
-        GetAppliedReservationSearchCondition condition = new GetAppliedReservationSearchCondition();
-        condition.setDate(date);
 
-        User user = User.builder().userName("A").email("A@gmail.com").build();
+        GetAppliedReservationSearchCondition condition = new GetAppliedReservationSearchCondition();
+        condition.setDate(LocalDate.of(2025, 12, 4));
+
+        // Mock user
+        User user = User.builder().userName("Alice").build();
+        when(userReader.findById(userId)).thenReturn(user);
+
+        // Mock raw data
+        RawAppliedReservationResponseDto raw1 = new RawAppliedReservationResponseDto(
+            10L, "Projector", 1L, "Alice", "Bob", 1, true,
+            "Projector needed", 100L,
+            Instant.parse("2025-12-04T10:00:00Z"),
+            Instant.parse("2025-12-04T12:00:00Z")
+        );
+
+        RawAppliedReservationResponseDto raw2 = new RawAppliedReservationResponseDto(
+            20L, "Laptop", 2L, "Charlie", "David", 0, false,
+            "Laptop needed", 101L,
+            Instant.parse("2025-12-04T13:00:00Z"),
+            Instant.parse("2025-12-04T15:00:00Z")
+        );
+
+        List<RawAppliedReservationResponseDto> rawList = List.of(raw1, raw2);
+        when(appliedReservationsQueryRepository.search(condition)).thenReturn(rawList);
+
+        doReturn(true).when(reservationQueryService)
+            .isReservationTimeAvailable(anyLong(), anyLong(), any(), any());
+
+        // Mock asset availability
+        when(assetQueryService.isAvailable(anyLong())).thenReturn(true);
 
         Pageable pageable = PageRequest.of(0, 10);
 
-        // Mock userReader
-        when(userReader.findById(userId)).thenReturn(user);
-
-        // Mock repository 검색 결과
-
-        RawAppliedReservationResponseDto raw1 = new RawAppliedReservationResponseDto(
-                10L, // assetId
-                "Projector", // assetName
-                1L, // reservationId
-                "Alice", // applicantName
-                "Bob", // respondentName
-                1, // reservationStatus
-                true, // isApproved
-                "Projector needed for presentation", // reason
-                100L // version
-                );
-
-        RawAppliedReservationResponseDto raw2 = new RawAppliedReservationResponseDto(
-                20L, // assetId
-                "Laptop", // assetName
-                2L, // reservationId
-                "Charlie", // applicantName
-                "David", // respondentName
-                0, // reservationStatus
-                false, // isApproved
-                "Laptop needed for report", // reason
-                101L // version
-                );
-
-        List<RawAppliedReservationResponseDto> rawList = new ArrayList<>();
-        rawList.add(raw1);
-        rawList.add(raw2);
-
-        when(appliedReservationsQueryRepository.search(condition)).thenReturn(rawList);
-
         // 실행
         PageResponseDto<GetAppliedReservationResponseDto> result =
-                reservationQueryService.getReservationApplies(userId, condition, pageable);
+            reservationQueryService.getReservationApplies(userId, condition, pageable);
 
         // 검증
         assertEquals(2, result.getContent().size());
         assertEquals(2, result.getTotalElements());
+
+        assertEquals("Projector", result.getContent().get(0).getAssetName());
+        assertEquals("Laptop", result.getContent().get(1).getAssetName());
     }
 }
