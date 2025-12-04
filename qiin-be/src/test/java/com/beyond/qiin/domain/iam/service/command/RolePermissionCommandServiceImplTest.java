@@ -14,6 +14,7 @@ import com.beyond.qiin.domain.iam.support.permission.PermissionReader;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.rolepermission.RolePermissionReader;
 import com.beyond.qiin.domain.iam.support.rolepermission.RolePermissionWriter;
+import com.beyond.qiin.infra.redis.iam.role.RoleProjectionHandler;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +32,8 @@ class RolePermissionCommandServiceImplTest {
     private RolePermissionReader rolePermissionReader;
     private RolePermissionWriter rolePermissionWriter;
 
+    private RoleProjectionHandler roleProjectionHandler;
+
     private Role role;
     private Permission p1;
     private Permission p2;
@@ -42,10 +45,11 @@ class RolePermissionCommandServiceImplTest {
         permissionReader = mock(PermissionReader.class);
         rolePermissionReader = mock(RolePermissionReader.class);
         rolePermissionWriter = mock(RolePermissionWriter.class);
+        roleProjectionHandler = mock(RoleProjectionHandler.class);
 
         // --- Service 생성 ---
         service = new RolePermissionCommandServiceImpl(
-                roleReader, permissionReader, rolePermissionReader, rolePermissionWriter);
+                roleReader, permissionReader, rolePermissionReader, rolePermissionWriter, roleProjectionHandler);
 
         // --- 실제 엔티티 생성 ---
         role = Role.builder().roleName("DEV").roleDescription("개발자").build();
@@ -77,6 +81,7 @@ class RolePermissionCommandServiceImplTest {
         RolePermissionResponseDto dto = service.addPermission(1L, 10L);
 
         verify(rolePermissionWriter).save(any(RolePermission.class));
+        verify(roleProjectionHandler).onRolePermissionsChanged(role);
         assertThat(dto.getPermissionId()).isEqualTo(10L);
     }
 
@@ -88,6 +93,8 @@ class RolePermissionCommandServiceImplTest {
         when(rolePermissionReader.existsByRoleAndPermission(role, p1)).thenReturn(true);
 
         assertThatThrownBy(() -> service.addPermission(1L, 10L)).isInstanceOf(PermissionException.class);
+
+        verify(roleProjectionHandler, never()).onRolePermissionsChanged(any());
     }
 
     @Test
@@ -127,6 +134,7 @@ class RolePermissionCommandServiceImplTest {
 
         assertThat(dto.getPermissions()).hasSize(1);
         verify(rolePermissionWriter, times(2)).saveAll(any());
+        verify(roleProjectionHandler).onRolePermissionsChanged(role);
     }
 
     @Test
@@ -144,7 +152,7 @@ class RolePermissionCommandServiceImplTest {
         RolePermissionListResponseDto dto = service.removePermission(1L, 10L, 77L);
 
         assertThat(dto.getPermissions()).hasSize(1);
-        assertThat(dto.getPermissions().get(0).getPermissionId()).isEqualTo(20L);
+        assertThat(dto.getPermissions().getFirst().getPermissionId()).isEqualTo(20L);
         verify(rolePermissionWriter).saveAll(any());
     }
 

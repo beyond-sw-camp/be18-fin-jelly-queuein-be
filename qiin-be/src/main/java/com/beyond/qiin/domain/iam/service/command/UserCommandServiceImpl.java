@@ -14,6 +14,7 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
 import com.beyond.qiin.infra.mail.MailService;
+import com.beyond.qiin.infra.redis.iam.role.RoleProjectionHandler;
 import com.beyond.qiin.security.PasswordGenerator;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
@@ -39,6 +40,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final EntityManager entityManager;
+    private final RoleProjectionHandler projectionHandler;
 
     // 사용자 생성
     @Override
@@ -80,6 +82,8 @@ public class UserCommandServiceImpl implements UserCommandService {
         // 새 역할 부여
         UserRole newUserRole = UserRole.create(user, newRole);
         userRoleWriter.save(newUserRole);
+
+        projectionHandler.onUserRoleChanged(newRole);
     }
 
     @Override
