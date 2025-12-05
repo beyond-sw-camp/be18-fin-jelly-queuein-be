@@ -117,7 +117,7 @@
   </details>
   <br>
 
-<a id="requirements"></a>7. 백엔드 단위 테스트
+## <a id="requirements"></a>7. 백엔드 단위 테스트
 <details> <summary><strong>IAM - Auth</strong></summary>
 
 JwtTokenProviderTest 단위 테스트
@@ -472,6 +472,69 @@ SettlementController 단위 테스트
 
 </details>
 
+<details>
+  <summary><strong>booking</strong></summary>
+
+<br>
+
+<details>
+  <summary><strong>예약 화면</strong></summary>
+
+- 예약 화면  
+  <img width="1475" src="docs/reservation/예약.png" />
+  <br>
+
+- 자원별 예약 화면  
+  <img width="1475" src="docs/reservation/자원.png" />
+  <br>
+
+- 사용자별 예약 화면  
+  <img width="1475" src="docs/reservation/사용자.png" />
+  <br>
+
+- 월별 예약 화면  
+  <img width="1475" src="docs/reservation/월별.png" />
+  <br>
+
+- 주별 예약 화면  
+  <img width="1475" src="docs/reservation/주별.png" />
+  <br>
+
+</details>
+
+<br>
+
+<details>
+  <summary><strong>예약 상세</strong></summary>
+
+- 예약 상세 화면  
+  <img width="1475" src="docs/reservation/예약상세.png" />
+  <br>
+
+- 예약 상세 모달/세부 정보  
+  <img width="1475" src="docs/reservation/상세.png" />
+  <br>
+
+</details>
+
+<br>
+
+<details>
+  <summary><strong>예약 생성 및 신청 관리</strong></summary>
+
+- 참여자 추가  
+  <img width="1475" src="docs/reservation/참여자추가.png" />
+  <br>
+
+- 신청 예약 관리  
+  <img width="1475" src="docs/reservation/신청예약관리.png" />
+  <br>
+
+</details>
+
+</details>
+
+
 
 
 <details> <summary><strong>accounting</strong></summary> <br> <details> <summary><strong>목표 사용률</strong></summary>
@@ -515,3 +578,7 @@ SettlementController 단위 테스트
 
 <br>
 </details> </details>
+
+
+## <a id="requirements"></a>9. API 명세서
+[API 명세서](https://ijn7tz4u5x.apidog.io/)
