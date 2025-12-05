@@ -40,7 +40,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final ReservationWriter reservationWriter;
     private final AttendantWriter attendantWriter;
     private final AssetCommandService assetCommandService;
-    private final ReservationEventPublisher reservationEventPublisher;
+//    private final ReservationEventPublisher reservationEventPublisher;
     private final AttendantJpaRepository attendantJpaRepository;
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
@@ -72,7 +72,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         attendantWriter.saveAll(attendants);
 
-        reservationEventPublisher.publishCreated(reservation);
+//        reservationEventPublisher.publishCreated(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -109,7 +109,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservationWriter.save(reservation);
 
         attendantWriter.saveAll(attendants);
-        reservationEventPublisher.publishCreated(reservation);
+//        reservationEventPublisher.publishCreated(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -129,7 +129,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
         reservationWriter.save(reservation);
-        reservationEventPublisher.publishUpdated(reservation);
+//        reservationEventPublisher.publishUpdated(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -145,7 +145,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.reject(respondent, confirmReservationRequestDto.getReason()); // status rejected
         reservationWriter.save(reservation);
 
-        reservationEventPublisher.publishUpdated(reservation);
+//        reservationEventPublisher.publishUpdated(reservation);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
