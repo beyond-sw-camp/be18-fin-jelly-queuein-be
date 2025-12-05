@@ -441,6 +441,10 @@ SettlementController 단위 테스트
 
 <br>
 
+
+
+<br>
+
 <details>
   <summary><strong>자원 관리</strong></summary>
 
@@ -515,3 +519,43 @@ SettlementController 단위 테스트
 
 <br>
 </details> </details>
+
+
+<details>
+  <summary><strong>reservation</strong></summary>
+
+- 사용자 예약 목록 조회  
+  <img width="1475" src="docs/reservation/사용자.png" />
+  <br>
+
+- 예약하기  
+  <img width="1475" src="docs/reservation/카테고리 생성.png" />
+  <br>
+
+- 참여자 추가  
+  <img width="1475" src="docs/reservation/참여자추가.png" />
+  <br>
+
+- 신청 목록 조회  
+  <img width="1475" src="docs/reservation/신청예약관리.png" />
+  <br>
+
+- 예약 가능 자원 조회  
+  <img width="1475" src="docs/reservation/카테고리 삭제.png" />
+  <br>
+
+- 월별 조회  
+  <img width="1475" src="docs/reservation/월별.png" />
+  <br>
+
+- 주별 조회  
+  <img width="1475" src="docs/reservation/주별.png" />
+  <br>
+
+- 상세 조회  
+  <img width="1475" src="docs/reservation/예약상세.png" />
+  <br>
+</details>
+
+## <a id="requirements"></a>9. [API 명세서](https://ijn7tz4u5x.apidog.io/)
+
