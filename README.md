@@ -395,7 +395,7 @@ SettlementController 단위 테스트
 </details>
 
 <details> <summary><strong>inventory</strong></summary>
-▶ 카테고리 드롭다운
+<details> <summary>카테고리 드롭다운
 
 0계층 드롭다운
 <img width="1475" src="docs/inventory/0계층 드롭다운.png" />
@@ -409,7 +409,8 @@ SettlementController 단위 테스트
 
 카테고리 드롭다운
 <img width="1475" src="docs/inventory/카테고리 드롭다운.png" />
-
+</summary>
+</details>
 <br>
 ▶ 카테고리 관리
 
