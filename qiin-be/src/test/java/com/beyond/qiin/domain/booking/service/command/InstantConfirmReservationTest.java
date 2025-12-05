@@ -72,8 +72,7 @@ public class InstantConfirmReservationTest {
                 assetCommandService,
                 reservationEventPublisher,
                 attendantJpaRepository,
-                usageHistoryCommandService
-            );
+                usageHistoryCommandService);
 
         userId = 1L;
         assetId = 100L;
