@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.iam.dto.role.response;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,7 +10,5 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RoleListResponseDto {
-
-    @Builder.Default
-    private final List<RoleResponseDto> roles = new ArrayList<>();
+    private final List<RoleResponseDto> roles;
 }

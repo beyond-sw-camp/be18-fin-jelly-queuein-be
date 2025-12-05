@@ -2,7 +2,8 @@ package com.beyond.qiin.domain.iam.service.command;
 
 import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
-import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateMyInfoRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserByAdminRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -13,6 +14,7 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
 import com.beyond.qiin.infra.mail.MailService;
+import com.beyond.qiin.infra.redis.iam.role.RoleProjectionHandler;
 import com.beyond.qiin.security.PasswordGenerator;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
@@ -38,6 +40,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final EntityManager entityManager;
+    private final RoleProjectionHandler projectionHandler;
 
     // 사용자 생성
     @Override
@@ -63,13 +66,50 @@ public class UserCommandServiceImpl implements UserCommandService {
         return CreateUserResponseDto.fromEntity(saved);
     }
 
-    // 사용자 정보 수정
     @Override
     @Transactional
-    public void updateUser(final Long userId, final UpdateUserRequestDto request) {
+    public void updateUserRole(final Long userId, final Long roleId, final Long updaterId) {
+
         User user = userReader.findById(userId);
-        user.updateUser(request);
-        userWriter.save(user);
+        Role newRole = roleReader.findById(roleId);
+
+        // MASTER 보호
+        validateAdminCannotModifyMaster(user);
+
+        // 기존 역할 soft delete
+        user.getUserRoles().forEach(ur -> ur.softDelete(updaterId));
+
+        // 새 역할 부여
+        UserRole newUserRole = UserRole.create(user, newRole);
+        userRoleWriter.save(newUserRole);
+
+        projectionHandler.onUserRoleChanged(newRole);
+    }
+
+    @Override
+    @Transactional
+    public void updateUser(final Long userId, final UpdateUserByAdminRequestDto request) {
+
+        User target = userReader.findById(userId);
+
+        // 1) MASTER 보호 — 대상이 MASTER면 ADMIN은 수정 불가
+        validateAdminCannotModifyMaster(target);
+
+        // 2) 수정 수행
+        target.updateUser(request);
+        userWriter.save(target);
+    }
+
+    @Override
+    @Transactional
+    public void updateMyInfo(final Long userId, final UpdateMyInfoRequestDto request) {
+
+        User me = userReader.findById(userId);
+
+        // MASTER 자신 정보 수정은 허용
+        me.updateMyInfo(request);
+
+        userWriter.save(me);
     }
 
     // 임시 비밀번호 수정
@@ -139,5 +179,19 @@ public class UserCommandServiceImpl implements UserCommandService {
         String seq = String.format("%03d", nextSeq);
 
         return prefix + seq;
+    }
+
+    private void validateAdminCannotModifyMaster(final User targetUser) {
+
+        // 대상의 역할 조회
+        String targetRole = targetUser.getUserRoles().stream()
+                .findFirst()
+                .map(ur -> ur.getRole().getRoleName())
+                .orElseThrow(UserException::userNotFound);
+
+        // MASTER는 보호됨
+        if ("MASTER".equals(targetRole)) {
+            throw UserException.passwordChangeNotAllowed();
+        }
     }
 }

@@ -17,30 +17,40 @@ public class RoleResponseDto {
     private final String roleDescription;
     private final String roleName;
 
-    // TODO: 해당 역할 몇명, 권한 목록 조회 가능
-    //    private final int userCount;
-    //    private final List<String> permissions;
-
+    private final int userCount;
     private final List<RolePermissionResponseDto> permissions;
 
     public static RoleResponseDto fromEntity(final Role role) {
+
+        List<RolePermissionResponseDto> perms = role.getRolePermissions().stream()
+                .map(RolePermissionResponseDto::fromEntity)
+                .toList();
+
+        int userCount = role.getUserRoles().size();
+
         return RoleResponseDto.builder()
                 .roleId(role.getId())
                 .roleName(role.getRoleName())
                 .roleDescription(role.getRoleDescription())
-                .permissions(role.getRolePermissions().stream()
-                        .map(RolePermissionResponseDto::fromEntity)
-                        .toList())
+                .permissions(perms)
+                .userCount(userCount)
                 .build();
     }
 
     // redis
     public static RoleResponseDto fromReadModel(final RoleReadModel model) {
+
+        List<RoleReadModel.PermissionItem> items = model.getPermissions() == null ? List.of() : model.getPermissions();
+
+        List<RolePermissionResponseDto> perms =
+                items.stream().map(RolePermissionResponseDto::fromRedisItem).toList();
+
         return RoleResponseDto.builder()
                 .roleId(model.getRoleId())
                 .roleName(model.getRoleName())
                 .roleDescription(model.getRoleDescription())
-                .permissions(List.of()) // Redis에는 권한 없음
+                .permissions(perms)
+                .userCount(model.getUserCount() == null ? 0 : model.getUserCount())
                 .build();
     }
 }

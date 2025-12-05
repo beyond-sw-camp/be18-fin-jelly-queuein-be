@@ -1,6 +1,8 @@
 package com.beyond.qiin.infra.redis.iam.role;
 
 import com.beyond.qiin.domain.iam.entity.Role;
+import com.beyond.qiin.infra.redis.iam.role.RoleReadModel.PermissionItem;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -23,14 +25,27 @@ public class RoleRedisAdapter {
     }
 
     public void save(final Role role) {
+
+        List<PermissionItem> permissions = role.getRolePermissions().stream()
+                .map(rp -> RoleReadModel.PermissionItem.builder()
+                        .permissionId(rp.getPermission().getId())
+                        .permissionName(rp.getPermission().getPermissionName())
+                        .permissionDescription(rp.getPermission().getPermissionDescription())
+                        .build())
+                .toList();
+
         log.info("[Redis SAVE] roleId={} roleName={}", role.getId(), role.getRoleName());
+
+        int userCount = role.getUserRoles().size();
 
         RoleReadModel model = RoleReadModel.builder()
                 .roleId(role.getId())
                 .roleName(role.getRoleName())
                 .roleDescription(role.getRoleDescription())
+                .permissions(permissions)
+                .userCount(userCount)
                 .build();
-
+        log.info("[Redis SAVE] roleId={} userCount={}", model.getRoleId(), model.getUserCount());
         repository.save(model);
     }
 

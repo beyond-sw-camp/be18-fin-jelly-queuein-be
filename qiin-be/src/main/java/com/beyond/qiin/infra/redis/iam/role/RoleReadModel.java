@@ -1,6 +1,7 @@
 package com.beyond.qiin.infra.redis.iam.role;
 
 import java.io.Serializable;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
@@ -17,7 +18,14 @@ public class RoleReadModel implements Serializable {
     private final String roleName;
     private final String roleDescription;
 
-    // TODO: ResponseDto 수정 시
-    // private Integer userCount;
-    // private List<String> permissions;
+    private Integer userCount;
+    private List<PermissionItem> permissions;
+
+    @Getter
+    @Builder
+    public static class PermissionItem implements Serializable {
+        private final Long permissionId;
+        private final String permissionName;
+        private final String permissionDescription;
+    }
 }

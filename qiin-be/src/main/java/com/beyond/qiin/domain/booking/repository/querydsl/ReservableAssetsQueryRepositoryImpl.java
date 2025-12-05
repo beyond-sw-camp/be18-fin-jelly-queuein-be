@@ -103,6 +103,7 @@ public class ReservableAssetsQueryRepositoryImpl implements ReservableAssetsQuer
                 .on(closure.assetClosureId.descendantId.eq(asset.id))
                 .where(builder)
                 .distinct()
+                .orderBy(asset.id.desc())
                 .fetch();
     }
 }
