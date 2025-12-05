@@ -44,7 +44,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final ReservationEventPublisher reservationEventPublisher;
     private final AttendantJpaRepository attendantJpaRepository;
     private final UsageHistoryCommandService usageHistoryCommandService;
-    
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
