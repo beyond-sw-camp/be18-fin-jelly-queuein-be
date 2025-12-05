@@ -23,7 +23,7 @@ public class CorsConfig implements WebMvcConfigurer {
                         "http://3.38.201.151:8080"
 
                         // 여기에 최종적으로 사용할 프론트엔드 도메인 주소(예: https://app.qiin.com)를 추가해야 합니다.
-                )
+                        )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 허용할 HTTP 메서드
                 .allowedHeaders("*") // 모든 헤더 허용
                 .allowCredentials(true); // 쿠키/인증 정보(Credentials) 전송 허용
