@@ -1,18 +1,18 @@
-//package com.beyond.qiin.infra.outbox;
+// package com.beyond.qiin.infra.outbox;
 //
-//import com.beyond.qiin.domain.outbox.entity.OutboxEvent;
-//import com.beyond.qiin.domain.outbox.support.OutboxEventWriter;
-//import com.beyond.qiin.infra.kafka.KafkaProducerService;
-//import java.util.List;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.scheduling.annotation.Scheduled;
-//import org.springframework.stereotype.Component;
+// import com.beyond.qiin.domain.outbox.entity.OutboxEvent;
+// import com.beyond.qiin.domain.outbox.support.OutboxEventWriter;
+// import com.beyond.qiin.infra.kafka.KafkaProducerService;
+// import java.util.List;
+// import lombok.RequiredArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
+// import org.springframework.scheduling.annotation.Scheduled;
+// import org.springframework.stereotype.Component;
 //
-//@Slf4j
-//@Component
-//@RequiredArgsConstructor
-//public class OutboxProcessor { // 생성 / 수정으로 인해 outbox 생성 시 payload을 카프카 서버로 송신
+// @Slf4j
+// @Component
+// @RequiredArgsConstructor
+// public class OutboxProcessor { // 생성 / 수정으로 인해 outbox 생성 시 payload을 카프카 서버로 송신
 //
 //    private final OutboxEventWriter outboxEventWriter;
 //    private final KafkaProducerService kafkaProducerService;
@@ -34,4 +34,4 @@
 //            }
 //        }
 //    }
-//}
+// }
