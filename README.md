@@ -158,8 +158,8 @@
 
 <br>
 
-- 사용자 수정 (관리자용)  
-  <img width="1475" src="docs/iam/user/사용자수정_관리자용.png" />
+- UserQueryServiceImplTest 단위 테스트  
+  <img width="1475" src="docs/backend_images/iam/service/query/UserQueryServiceImplTest.png" />
 
 <br>
 
@@ -180,8 +180,12 @@
 
 <br>
 
-- RoleServiceServiceImplTest 단위 테스트
+- RolePermissionServiceServiceImplTest 단위 테스트
   <img width="1475" src="docs/backend_images/iam/service/command/RolePermissionCommandServiceImplTest.png" />
+
+<br>
+- RoleQueryServiceImplTest 단위 테스트
+  <img width="1475" src="docs/backend_images/iam/service/query/RoleQueryServiceImplTest.png" />
 
 <br>
 
@@ -195,8 +199,12 @@
 - PermissionController 단위 테스트
   <img width="1475" src="docs/backend_images/iam/controller/PermissionControllerTest.png" />
 
-- RoleServiceServiceImplTest 단위 테스트
-  <img width="1475" src="docs/backend_images/iam/service/command/RolePermissionCommandServiceImplTest.png" />
+- PermissionCommandServiceImplTest 단위 테스트
+  <img width="1475" src="docs/backend_images/iam/service/command/PermissionCommandServiceImplTest.png" />
+
+
+- PermissionQueryServiceImplTest 단위 테스트
+  <img width="1475" src="docs/backend_images/iam/service/query/PermissionQueryServiceImplTest.png" />
 
 <br>
 
