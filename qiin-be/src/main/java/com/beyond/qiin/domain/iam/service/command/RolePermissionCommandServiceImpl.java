@@ -10,6 +10,7 @@ import com.beyond.qiin.domain.iam.support.permission.PermissionReader;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.rolepermission.RolePermissionReader;
 import com.beyond.qiin.domain.iam.support.rolepermission.RolePermissionWriter;
+import com.beyond.qiin.infra.redis.iam.role.RoleProjectionHandler;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,8 @@ public class RolePermissionCommandServiceImpl implements RolePermissionCommandSe
     private final RolePermissionReader rolePermissionReader;
     private final RolePermissionWriter rolePermissionWriter;
 
+    private final RoleProjectionHandler projectionHandler;
+
     @Override
     @Transactional
     public RolePermissionResponseDto addPermission(final Long roleId, final Long permissionId) {
@@ -39,6 +42,8 @@ public class RolePermissionCommandServiceImpl implements RolePermissionCommandSe
         RolePermission rp = RolePermission.create(role, permission);
 
         RolePermission saved = rolePermissionWriter.save(rp);
+
+        projectionHandler.onRolePermissionsChanged(role);
 
         return RolePermissionResponseDto.fromEntity(saved);
     }
@@ -64,6 +69,8 @@ public class RolePermissionCommandServiceImpl implements RolePermissionCommandSe
 
         List<RolePermission> saved = rolePermissionWriter.saveAll(newList);
 
+        projectionHandler.onRolePermissionsChanged(role);
+
         return RolePermissionListResponseDto.fromEntities(roleId, saved);
     }
 
@@ -80,7 +87,12 @@ public class RolePermissionCommandServiceImpl implements RolePermissionCommandSe
         rolePermissionWriter.saveAll(existed);
 
         // 새로운 매핑 생성 후 반환
-        return addPermissions(roleId, permissionIds);
+        RolePermissionListResponseDto response = addPermissions(roleId, permissionIds);
+
+        // Redis 업데이트
+        projectionHandler.onRolePermissionsChanged(role);
+
+        return response;
     }
 
     @Override
@@ -103,6 +115,8 @@ public class RolePermissionCommandServiceImpl implements RolePermissionCommandSe
 
         // 최신 상태 반환
         List<RolePermission> remained = rolePermissionReader.findAllByRole(role);
+
+        projectionHandler.onRolePermissionsChanged(role);
 
         return RolePermissionListResponseDto.fromEntities(roleId, remained);
     }

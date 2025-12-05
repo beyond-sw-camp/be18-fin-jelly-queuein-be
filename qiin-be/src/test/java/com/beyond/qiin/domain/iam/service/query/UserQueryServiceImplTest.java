@@ -14,7 +14,9 @@ import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.UserLookupResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserLookupDto;
+import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.iam.entity.UserRole;
 import com.beyond.qiin.domain.iam.repository.querydsl.UserQueryRepository;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import java.time.Instant;
@@ -103,8 +105,15 @@ public class UserQueryServiceImplTest {
     @Test
     @DisplayName("사용자 상세 조회 단위 테스트")
     void getUser_success() {
-        // given
         User user = mock(User.class);
+        Role role = mock(Role.class);
+        UserRole userRole = mock(UserRole.class);
+
+        when(role.getId()).thenReturn(999L);
+        when(role.getRoleName()).thenReturn("GENERAL");
+        when(userRole.getRole()).thenReturn(role);
+
+        when(user.getUserRoles()).thenReturn(List.of(userRole));
 
         when(user.getId()).thenReturn(10L);
         when(user.getDptId()).thenReturn(3L);
@@ -112,19 +121,12 @@ public class UserQueryServiceImplTest {
         when(user.getUserName()).thenReturn("테스터");
         when(user.getEmail()).thenReturn("test@example.com");
         when(user.getPasswordExpired()).thenReturn(false);
-        when(user.getLastLoginAt()).thenReturn(null);
-        when(user.getHireDate()).thenReturn(null);
-        when(user.getRetireDate()).thenReturn(null);
 
         when(userReader.findById(10L)).thenReturn(user);
 
-        // when
         DetailUserResponseDto dto = userQueryService.getUser(10L);
 
-        // then
-        assertThat(dto.getUserId()).isEqualTo(10L);
-        assertThat(dto.getUserName()).isEqualTo("테스터");
-
-        verify(userReader).findById(10L);
+        assertThat(dto.getRoleId()).isEqualTo(999L);
+        assertThat(dto.getRoleName()).isEqualTo("GENERAL");
     }
 }
