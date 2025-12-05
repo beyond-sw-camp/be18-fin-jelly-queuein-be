@@ -50,7 +50,7 @@ public class JwtTokenProvider {
     }
 
     /** 공통 토큰 생성 로직 */
-    private String generateAccessTokenInternal(
+    public String generateAccessTokenInternal(
             final Long userId,
             final String role,
             final String email,
