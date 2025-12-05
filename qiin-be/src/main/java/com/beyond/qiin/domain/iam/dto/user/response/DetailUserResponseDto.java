@@ -1,6 +1,9 @@
 package com.beyond.qiin.domain.iam.dto.user.response;
 
+import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.iam.entity.UserRole;
+import com.beyond.qiin.domain.iam.exception.RoleException;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +25,16 @@ public class DetailUserResponseDto {
     private final String phone;
     private final String birth;
 
+    private final Long roleId;
+    private final String roleName;
+
     public static DetailUserResponseDto fromEntity(final User user) {
+
+        Role role = user.getUserRoles().stream()
+                .findFirst()
+                .map(UserRole::getRole)
+                .orElseThrow(RoleException::roleNotFound);
+
         return DetailUserResponseDto.builder()
                 .userId(user.getId())
                 .dptId(user.getDptId())
@@ -35,6 +47,8 @@ public class DetailUserResponseDto {
                 .retireDate(user.getRetireDate())
                 .phone(user.getPhone())
                 .birth(user.getBirth())
+                .roleId(role.getId())
+                .roleName(role.getRoleName())
                 .build();
     }
 }
