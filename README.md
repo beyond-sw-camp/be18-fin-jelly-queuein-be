@@ -394,76 +394,84 @@ SettlementController 단위 테스트
 
 </details>
 
-<details> <summary><strong>inventory</strong></summary>
-<details> <summary>카테고리 드롭다운
-
-0계층 드롭다운
-<img width="1475" src="docs/inventory/0계층 드롭다운.png" />
+<details>
+  <summary><strong>inventory</strong></summary>
 
 <br>
 
-1계층 드롭다운
-<img width="1475" src="docs/inventory/1계층 드롭다운.png" />
+<details>
+  <summary><strong>카테고리 드롭다운</strong></summary>
 
-<br>
+- 0계층 드롭다운  
+  <img width="1475" src="docs/inventory/0계층 드롭다운.png" />
+  <br>
 
-카테고리 드롭다운
-<img width="1475" src="docs/inventory/카테고리 드롭다운.png" />
-</summary>
+- 1계층 드롭다운  
+  <img width="1475" src="docs/inventory/1계층 드롭다운.png" />
+  <br>
+
+- 카테고리 드롭다운  
+  <img width="1475" src="docs/inventory/카테고리 드롭다운.png" />
+  <br>
+
 </details>
-<br>
-▶ 카테고리 관리
-
-카테고리 목록 조회
-<img width="1475" src="docs/inventory/카테고리 목록 조회.png" />
 
 <br>
 
-카테고리 생성
-<img width="1475" src="docs/inventory/카테고리 생성.png" />
+<details>
+  <summary><strong>카테고리 관리</strong></summary>
+
+- 카테고리 목록 조회  
+  <img width="1475" src="docs/inventory/카테고리 목록 조회.png" />
+  <br>
+
+- 카테고리 생성  
+  <img width="1475" src="docs/inventory/카테고리 생성.png" />
+  <br>
+
+- 카테고리 수정  
+  <img width="1475" src="docs/inventory/카테고리 수정.png" />
+  <br>
+
+- 카테고리 삭제  
+  <img width="1475" src="docs/inventory/카테고리 삭제.png" />
+  <br>
+
+</details>
 
 <br>
 
-카테고리 수정
-<img width="1475" src="docs/inventory/카테고리 수정.png" />
+<details>
+  <summary><strong>자원 관리</strong></summary>
 
-<br>
+- 자원 목록 조회  
+  <img width="1475" src="docs/inventory/자원 목록 조회.png" />
+  <br>
 
-카테고리 삭제
-<img width="1475" src="docs/inventory/카테고리 삭제.png" />
+- 자원 상세 정보  
+  <img width="1475" src="docs/inventory/자원 상세 정보.png" />
+  <br>
 
-<br>
-▶ 자원 관리
+- 자원 생성  
+  <img width="1475" src="docs/inventory/자원 생성.png" />
+  <br>
 
-자원 목록 조회
-<img width="1475" src="docs/inventory/자원 목록 조회.png" />
+- 자원 수정  
+  <img width="1475" src="docs/inventory/자원 수정.png" />
+  <br>
 
-<br>
+- 자원 이동  
+  <img width="1475" src="docs/inventory/자원 이동.png" />
+  <br>
 
-자원 상세 정보
-<img width="1475" src="docs/inventory/자원 상세 정보.png" />
+- 자원 삭제  
+  <img width="1475" src="docs/inventory/자원 삭제.png" />
+  <br>
 
-<br>
+</details>
 
-자원 생성
-<img width="1475" src="docs/inventory/자원 생성.png" />
+</details>
 
-<br>
-
-자원 수정
-<img width="1475" src="docs/inventory/자원 수정.png" />
-
-<br>
-
-자원 이동
-<img width="1475" src="docs/inventory/자원 이동.png" />
-
-<br>
-
-자원 삭제
-<img width="1475" src="docs/inventory/자원 삭제.png" />
-
-<br> </details>
 
 
 <details> <summary><strong>accounting</strong></summary> <br> <details> <summary><strong>목표 사용률</strong></summary>
