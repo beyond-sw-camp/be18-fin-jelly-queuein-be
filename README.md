@@ -117,101 +117,198 @@
   </details>
   <br>
 
-## <a id="requirements"></a>7. 백엔드 단위 테스트
+<a id="requirements"></a>7. 백엔드 단위 테스트
+<details> <summary><strong>IAM - Auth</strong></summary>
 
-<details>
-  <summary><strong>IAM</strong></summary>
-
-<details>
-<summary><strong>auth</strong></summary>
-
-로그인 화면
-<img width="1475" src="docs/iam/auth/로그인화면.png" />
-
-<br>
-
-비밀번호 변경 후 재로그인 화면
-<img width="1475" src="docs/iam/auth/비밀번호변경후재로그인.png" />
-
-<br>
-
-임시 비밀번호 발급 화면
-<img width="1475" src="docs/iam/auth/임시비밀번호발급.png" />
-
-<br>
-
-임시 비밀번호 변경 화면
-<img width="1475" src="docs/iam/auth/임시비밀번호변경.png" />
+JwtTokenProviderTest 단위 테스트
+<img width="1475" src="docs/backend_images/iam/auth/JwtTokenProviderTest.png" />
 
 <br> </details>
-<br>
-<details>
-  <summary><strong>user</strong></summary>
+<details> <summary><strong>IAM - User</strong></summary>
 
-- UserController 단위 테스트
-  <img width="1475" src="docs/backend_images/iam/controller/UserControllerTest.png" />
+UserController 단위 테스트
+<img width="1475" src="docs/backend_images/iam/controller/UserControllerTest.png" />
 
 <br>
 
-- UserCommandServiceImpl 단위 테스트
-  <img width="1475" src="docs/backend_images/iam/service/command/UserServiceServiceImplTest.png" />
+UserCommandServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/iam/service/command/UserServiceServiceImplTest.png" />
 
 <br>
 
-- UserQueryServiceImplTest 단위 테스트  
-  <img width="1475" src="docs/backend_images/iam/service/query/UserQueryServiceImplTest.png" />
+UserQueryServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/iam/service/query/UserQueryServiceImplTest.png" />
+
+<br> </details>
+<details> <summary><strong>IAM - Role</strong></summary>
+
+RoleController 단위 테스트
+<img width="1475" src="docs/backend_images/iam/controller/RoleControllerTest.png" />
 
 <br>
 
+RoleCommandServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/iam/service/command/RoleCommandServiceImplTest.png" />
+
+<br>
+
+RolePermissionCommandServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/iam/service/command/RolePermissionCommandServiceImplTest.png" />
+
+<br>
+
+RoleQueryServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/iam/service/query/RoleQueryServiceImplTest.png" />
+
+<br> </details>
+<details> <summary><strong>IAM - Permission</strong></summary>
+
+PermissionController 단위 테스트
+<img width="1475" src="docs/backend_images/iam/controller/PermissionControllerTest.png" />
+
+<br>
+
+PermissionCommandServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/iam/service/command/PermissionCommandServiceImplTest.png" />
+
+<br>
+
+PermissionQueryServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/iam/service/query/PermissionQueryServiceImplTest.png" />
+
+<br> </details>
+<details> <summary><strong>Booking - Reservation</strong></summary>
+Query
+
+IsReservableForDayTest 단위 테스트
+<img width="1475" src="docs/backend_images/booking/service/query/IsReservableForDayTest.png" />
+
+<br>
+Command
+
+UpdateReservationForAssetTestTest 단위 테스트
+<img width="1475" src="docs/backend_images/booking/service/command/UpdateReservationForAssetTestTest.png" />
+
+<br>
+
+StartReservationTest 단위 테스트
+<img width="1475" src="docs/backend_images/booking/service/command/StartReservationTest.png" />
+
+<br>
+
+ReservationTimeValidationTest 단위 테스트
+<img width="1475" src="docs/backend_images/booking/service/command/ReservationTimeValidationTest.png" />
+
+<br>
+
+InstantConfirmReservationTest 단위 테스트
+<img width="1475" src="docs/backend_images/booking/service/command/InstantConfirmReservationTest.png" />
+
+<br>
+
+EndReservationTest 단위 테스트
+<img width="1475" src="docs/backend_images/booking/service/command/EndReservationTest.png" />
+
+<br>
+
+ApproveReservationTest 단위 테스트
+<img width="1475" src="docs/backend_images/booking/service/command/ApproveReservationTest.png" />
+
+<br>
 </details>
+<details> <summary><strong>Inventory - Asset</strong></summary>
+Command
+
+AssetCommandServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/inventory/service/command/AssetCommandServiceImplTest.png" />
 
 <br>
+Query
 
-<details>
-  <summary><strong>role</strong></summary>
-
-- RoleController 단위 테스트
-  <img width="1475" src="docs/backend_images/iam/controller/RoleControllerTest.png" />
+AssetQueryServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/inventory/service/query/AssetQueryServiceImplTest.png" />
 
 <br>
-
-- RoleServiceServiceImplTest 단위 테스트
-  <img width="1475" src="docs/backend_images/iam/service/command/RoleCommandServiceImplTest.png" />
-
-<br>
-
-- RolePermissionServiceServiceImplTest 단위 테스트
-  <img width="1475" src="docs/backend_images/iam/service/command/RolePermissionCommandServiceImplTest.png" />
-
-<br>
-- RoleQueryServiceImplTest 단위 테스트
-  <img width="1475" src="docs/backend_images/iam/service/query/RoleQueryServiceImplTest.png" />
-
-<br>
-
 </details>
+<details> <summary><strong>Inventory - Category</strong></summary>
+Command
+
+CategoryCommandServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/inventory/service/command/CategoryCommandServiceImplTest.png" />
+
+<br>
+Query
+
+CategoryQueryServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/inventory/service/query/CategoryQueryServiceImplTest.png" />
+
+<br>
+</details>
+<details> <summary><strong>Accounting</strong></summary>
+Query
+
+SettlementPerformanceQueryServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/accounting/service/query/SettlementPerformanceQueryServiceImplTest.png" />
 
 <br>
 
-<details>
-  <summary><strong>permission</strong></summary>
-
-- PermissionController 단위 테스트
-  <img width="1475" src="docs/backend_images/iam/controller/PermissionControllerTest.png" />
-
-- PermissionCommandServiceImplTest 단위 테스트
-  <img width="1475" src="docs/backend_images/iam/service/command/PermissionCommandServiceImplTest.png" />
-
-
-- PermissionQueryServiceImplTest 단위 테스트
-  <img width="1475" src="docs/backend_images/iam/service/query/PermissionQueryServiceImplTest.png" />
+SettlementQuarterQueryServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/accounting/service/query/SettlementQuarterQueryServiceImplTest.png" />
 
 <br>
 
-</details>
+UsageHistoryQueryServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/accounting/service/query/UsageHistoryQueryServiceImplTest.png" />
 
-</details>
+<br>
 
+UsageHistoryTrendQueryServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/accounting/service/query/UsageHistoryTrendQueryServiceImplTest.png" />
+
+<br>
+
+UsageTargetQueryServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/accounting/service/query/UsageTargetQueryServiceImplTest.png" />
+
+<br>
+Command
+
+UserHistoryCommandServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/accounting/service/command/UserHistoryCommandServiceImplTest.png" />
+
+<br>
+
+UsageTargetCommandServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/accounting/service/command/UsageTargetCommandServiceImplTest.png" />
+
+<br>
+
+UsageHistoryCommandServiceImpl 테스트
+<img width="1475" src="docs/backend_images/accounting/service/command/UsageHistoryCommandServiceImpl.png" />
+
+<br>
+
+SettlementCommandServiceImplTest 단위 테스트
+<img width="1475" src="docs/backend_images/accounting/service/command/SettlementCommandServiceImplTest.png" />
+
+<br>
+Controller
+
+UsageTargetController 단위 테스트
+<img width="1475" src="docs/backend_images/accounting/controller/UsageTargetController.png" />
+
+<br>
+
+UsageHistoryControllerTest 단위 테스트
+<img width="1475" src="docs/backend_images/accounting/controller/UsageHistoryControllerTest.png" />
+
+<br>
+
+SettlementController 단위 테스트
+<img width="1475" src="docs/backend_images/accounting/controller/SettlementController.png" />
+
+<br>
+</details>
 
 ## <a id="requirements"></a>8. UI/UX 단위 테스트
 
@@ -296,3 +393,74 @@
 </details>
 
 </details>
+
+<details> <summary><strong>inventory</strong></summary>
+▶ 카테고리 드롭다운
+
+0계층 드롭다운
+<img width="1475" src="docs/inventory/0계층 드롭다운.png" />
+
+<br>
+
+1계층 드롭다운
+<img width="1475" src="docs/inventory/1계층 드롭다운.png" />
+
+<br>
+
+카테고리 드롭다운
+<img width="1475" src="docs/inventory/카테고리 드롭다운.png" />
+
+<br>
+▶ 카테고리 관리
+
+카테고리 목록 조회
+<img width="1475" src="docs/inventory/카테고리 목록 조회.png" />
+
+<br>
+
+카테고리 생성
+<img width="1475" src="docs/inventory/카테고리 생성.png" />
+
+<br>
+
+카테고리 수정
+<img width="1475" src="docs/inventory/카테고리 수정.png" />
+
+<br>
+
+카테고리 삭제
+<img width="1475" src="docs/inventory/카테고리 삭제.png" />
+
+<br>
+▶ 자원 관리
+
+자원 목록 조회
+<img width="1475" src="docs/inventory/자원 목록 조회.png" />
+
+<br>
+
+자원 상세 정보
+<img width="1475" src="docs/inventory/자원 상세 정보.png" />
+
+<br>
+
+자원 생성
+<img width="1475" src="docs/inventory/자원 생성.png" />
+
+<br>
+
+자원 수정
+<img width="1475" src="docs/inventory/자원 수정.png" />
+
+<br>
+
+자원 이동
+<img width="1475" src="docs/inventory/자원 이동.png" />
+
+<br>
+
+자원 삭제
+<img width="1475" src="docs/inventory/자원 삭제.png" />
+
+<br> </details>
+
