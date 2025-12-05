@@ -63,7 +63,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    @PreAuthorize("hasAuthority('IAM_USER_UPDATE')")
     public ResponseEntity<Void> updateUser(
             @PathVariable final Long userId, @Valid @RequestBody final UpdateUserByAdminRequestDto request) {
 
@@ -112,7 +112,7 @@ public class UserController {
 
     // 사용자 목록 조회 (MASTER, ADMIN, MANAGER)
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
+    @PreAuthorize("hasAuthority('IAM_USER_READ')")
     public PageResponseDto<RawUserListResponseDto> searchUsers(
             @ModelAttribute final GetUsersSearchCondition condition, final Pageable pageable) {
 
@@ -128,7 +128,7 @@ public class UserController {
 
     // 사용자 상세 조회
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
+    @PreAuthorize("hasAuthority('IAM_USER_READ')")
     public DetailUserResponseDto getUser(@PathVariable final Long userId) {
         return userQueryService.getUser(userId);
     }
