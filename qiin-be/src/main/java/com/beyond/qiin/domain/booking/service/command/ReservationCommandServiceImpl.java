@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.service.command;
 
 import com.beyond.qiin.common.annotation.DistributedLock;
+import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandService;
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
@@ -42,6 +43,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final AssetCommandService assetCommandService;
     private final ReservationEventPublisher reservationEventPublisher;
     private final AttendantJpaRepository attendantJpaRepository;
+    private final UsageHistoryCommandService usageHistoryCommandService;
+    
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
@@ -180,6 +183,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Reservation reservation = reservationReader.getReservationById(reservationId);
         reservation.end(); // status complete, 실제 종료 시간 추가
         reservationWriter.save(reservation);
+
+        Asset asset = reservation.getAsset();
+
+        usageHistoryCommandService.createUsageHistory(asset, reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
