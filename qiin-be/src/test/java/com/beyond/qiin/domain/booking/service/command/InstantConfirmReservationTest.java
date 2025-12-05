@@ -7,6 +7,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandService;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
@@ -52,6 +53,9 @@ public class InstantConfirmReservationTest {
     @Mock
     private AttendantJpaRepository attendantJpaRepository;
 
+    @Mock
+    private UsageHistoryCommandService usageHistoryCommandService;
+
     private Long userId;
     private Long assetId;
     private Instant startAt;
@@ -67,7 +71,8 @@ public class InstantConfirmReservationTest {
                 attendantWriter,
                 assetCommandService,
                 reservationEventPublisher,
-                attendantJpaRepository);
+                attendantJpaRepository,
+                usageHistoryCommandService);
 
         userId = 1L;
         assetId = 100L;
