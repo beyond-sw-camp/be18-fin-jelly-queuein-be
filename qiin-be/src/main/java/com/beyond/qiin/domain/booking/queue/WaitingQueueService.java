@@ -24,11 +24,10 @@ public class WaitingQueueService {
     // 사용자가 선착순 예약에 접근 시 : 토큰 활성화 여부를 체크해 토큰 대기열 정보 반환 - 상태 계산, 수정 동시에 불가
     @Transactional
     @DistributedLock(key = "'waitingQueueLock")
-    public WaitingQueue intoQueue(User user, String token) {
+    public WaitingQueue intoQueue(User user) {
 
         // token 발급
-        if (token == null)
-            token = jwtUtils.generateAccessTokenInternal(
+        String token = jwtUtils.generateAccessTokenInternal(
                     user.getId(),
                     null, // role 불필요
                     user.getEmail(),

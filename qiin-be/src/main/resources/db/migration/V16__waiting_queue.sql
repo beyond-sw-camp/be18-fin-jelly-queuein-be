@@ -5,8 +5,12 @@ CREATE TABLE waiting_queue (
                                status INT NOT NULL,
                                waiting_num BIGINT NOT NULL,
                                expired_at TIMESTAMP(6) NOT NULL,
-                               created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
-                               updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL,
+                               created_by BIGINT NOT NULL DEFAULT 0,
+                               created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+                               updated_by BIGINT NOT NULL DEFAULT 0,
+                               updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                               deleted_by BIGINT,
+                               deleted_at TIMESTAMP(6),
                                CONSTRAINT uq_token UNIQUE (token)
 );
 

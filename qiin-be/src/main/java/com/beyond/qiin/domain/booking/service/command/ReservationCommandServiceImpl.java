@@ -12,6 +12,8 @@ import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
+import com.beyond.qiin.domain.booking.queue.WaitingQueue;
+import com.beyond.qiin.domain.booking.queue.WaitingQueueService;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
@@ -44,6 +46,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final ReservationEventPublisher reservationEventPublisher;
     private final AttendantJpaRepository attendantJpaRepository;
     private final UsageHistoryCommandService usageHistoryCommandService;
+    private final WaitingQueueService waitingQueueService;
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
@@ -85,7 +88,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @DistributedLock(
             key =
                     "'reservation:' + #assetId + ':' + #createReservationRequestDto.startAt + ':' + #createReservationRequestDto.endAt")
-    public ReservationResponseDto instantConfirmReservation(
+    public ReservationResponseDto reserveReservationWithLock(
             final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
 
         Asset asset = assetCommandService.getAssetById(assetId);
@@ -112,9 +115,22 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         attendantWriter.saveAll(attendants);
         reservationEventPublisher.publishCreated(reservation);
-
         return ReservationResponseDto.fromEntity(reservation);
     }
+
+    @Override
+    @Transactional
+    public ReservationResponseDto instantConfirmReservation(Long userId, Long assetId, CreateReservationRequestDto dto) {
+
+        User user = userReader.findById(userId);
+
+        // 먼저 대기 큐에 들어감
+        WaitingQueue queue = waitingQueueService.intoQueue(user);
+
+        // 활성화 큐에 들어간 경우 락 획득 및 사용
+        return reserveReservationWithLock(user.getId(), assetId, dto);
+    }
+
 
     @Override
     @Transactional
