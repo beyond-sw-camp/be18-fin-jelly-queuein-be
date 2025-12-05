@@ -136,6 +136,7 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                 .leftJoin(reservation.applicant, applicant)
                 .leftJoin(reservation.respondent, respondent)
                 .where(builder)
+                .orderBy(reservation.id.desc())
                 .fetch();
     }
 }
