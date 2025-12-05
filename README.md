@@ -465,3 +465,45 @@ SettlementController 단위 테스트
 
 <br> </details>
 
+
+<details> <summary><strong>accounting</strong></summary> <br> <details> <summary><strong>목표 사용률</strong></summary>
+
+목표 사용률 등록
+<img width="1475" src="docs/accounting/목표 사용률 등록.png" />
+
+<br>
+
+목표 사용률 조회
+<img width="1475" src="docs/accounting/목표 사용률 조회.png" />
+
+<br>
+</details> <br> <details> <summary><strong>분기 정산</strong></summary>
+
+분기 정산
+<img width="1475" src="docs/accounting/분기 정산.png" />
+
+<br>
+</details> <br> <details> <summary><strong>사용 추이</strong></summary>
+
+사용 추이
+<img width="1475" src="docs/accounting/사용 추이.png" />
+
+<br>
+</details> <br> <details> <summary><strong>운영 성과 분석</strong></summary>
+
+운영 성과 분석
+<img width="1475" src="docs/accounting/운영 성과 분석.png" />
+
+<br>
+</details> <br> <details> <summary><strong>자원 사용 기록</strong></summary>
+
+자원 사용 기록
+<img width="1475" src="docs/accounting/자원 사용 기록.png" />
+
+<br>
+
+자원 사용 기록 상세 모달
+<img width="1475" src="docs/accounting/자원 사용 기록 상세 모달.png" />
+
+<br>
+</details> </details>
