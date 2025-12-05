@@ -117,7 +117,95 @@
   </details>
   <br>
 
-## <a id="requirements"></a>7. UI/UX 단위 테스트
+## <a id="requirements"></a>7. 백엔드 단위 테스트
+
+<details>
+  <summary><strong>IAM</strong></summary>
+
+<details>
+<summary><strong>auth</strong></summary>
+
+로그인 화면
+<img width="1475" src="docs/iam/auth/로그인화면.png" />
+
+<br>
+
+비밀번호 변경 후 재로그인 화면
+<img width="1475" src="docs/iam/auth/비밀번호변경후재로그인.png" />
+
+<br>
+
+임시 비밀번호 발급 화면
+<img width="1475" src="docs/iam/auth/임시비밀번호발급.png" />
+
+<br>
+
+임시 비밀번호 변경 화면
+<img width="1475" src="docs/iam/auth/임시비밀번호변경.png" />
+
+<br> </details>
+<br>
+<details>
+  <summary><strong>user</strong></summary>
+
+- UserController 단위 테스트
+  <img width="1475" src="docs/backend_images/iam/controller/UserControllerTest.png" />
+
+<br>
+
+- UserCommandServiceImpl 단위 테스트
+  <img width="1475" src="docs/backend_images/iam/service/command/UserServiceServiceImplTest.png" />
+
+<br>
+
+- 사용자 수정 (관리자용)  
+  <img width="1475" src="docs/iam/user/사용자수정_관리자용.png" />
+
+<br>
+
+</details>
+
+<br>
+
+<details>
+  <summary><strong>role</strong></summary>
+
+- RoleController 단위 테스트
+  <img width="1475" src="docs/backend_images/iam/controller/RoleControllerTest.png" />
+
+<br>
+
+- RoleServiceServiceImplTest 단위 테스트
+  <img width="1475" src="docs/backend_images/iam/service/command/RoleCommandServiceImplTest.png" />
+
+<br>
+
+- RoleServiceServiceImplTest 단위 테스트
+  <img width="1475" src="docs/backend_images/iam/service/command/RolePermissionCommandServiceImplTest.png" />
+
+<br>
+
+</details>
+
+<br>
+
+<details>
+  <summary><strong>permission</strong></summary>
+
+- PermissionController 단위 테스트
+  <img width="1475" src="docs/backend_images/iam/controller/PermissionControllerTest.png" />
+
+- RoleServiceServiceImplTest 단위 테스트
+  <img width="1475" src="docs/backend_images/iam/service/command/RolePermissionCommandServiceImplTest.png" />
+
+<br>
+
+</details>
+
+</details>
+
+
+## <a id="requirements"></a>8. UI/UX 단위 테스트
 
 <details>
   <summary><strong>IAM</strong></summary>
