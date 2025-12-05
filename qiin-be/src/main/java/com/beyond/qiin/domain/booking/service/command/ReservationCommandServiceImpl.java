@@ -41,7 +41,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final AssetCommandService assetCommandService;
     //    private final ReservationEventPublisher reservationEventPublisher;
     private final AttendantJpaRepository attendantJpaRepository;
-
+    private final UsageHistoryCommandService usageHistoryCommandService;
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     // TODO : 선착순, 승인 예약 중복 처리
