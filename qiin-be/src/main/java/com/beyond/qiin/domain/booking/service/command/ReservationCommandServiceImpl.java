@@ -120,7 +120,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
     @Override
     @Transactional
-    public ReservationResponseDto instantConfirmReservation(Long userId, Long assetId, CreateReservationRequestDto dto) {
+    public ReservationResponseDto instantConfirmReservation(
+            Long userId, Long assetId, CreateReservationRequestDto dto) {
 
         User user = userReader.findById(userId);
 
@@ -130,7 +131,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         // 활성화 큐에 들어간 경우 락 획득 및 사용
         return reserveReservationWithLock(user.getId(), assetId, dto);
     }
-
 
     @Override
     @Transactional

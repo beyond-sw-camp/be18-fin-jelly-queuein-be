@@ -28,13 +28,13 @@ public class WaitingQueueService {
 
         // token 발급
         String token = jwtUtils.generateAccessTokenInternal(
-                    user.getId(),
-                    null, // role 불필요
-                    user.getEmail(),
-                    null, // permission 불필요
-                    AUTO_EXPIRED_TIME, // WaitingQueue 용 TTL
-                    WAITING_QUEUE_TOKEN // 타입 구분
-                    );
+                user.getId(),
+                null, // role 불필요
+                user.getEmail(),
+                null, // permission 불필요
+                AUTO_EXPIRED_TIME, // WaitingQueue 용 TTL
+                WAITING_QUEUE_TOKEN // 타입 구분
+                );
 
         // 현재 활성 유저 수 확인
         long activeTokenCnt = waitingQueueRepository.getActiveCnt();

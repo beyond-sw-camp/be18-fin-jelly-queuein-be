@@ -4,7 +4,6 @@ import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservation
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
-import com.beyond.qiin.domain.iam.entity.User;
 
 public interface ReservationCommandService {
 
@@ -12,12 +11,12 @@ public interface ReservationCommandService {
             final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
 
     ReservationResponseDto reserveReservationWithLock(
-        final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
+            final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
 
-    ReservationResponseDto instantConfirmReservation(final Long userId, final Long assetId, final CreateReservationRequestDto dto);
+    ReservationResponseDto instantConfirmReservation(
+            final Long userId, final Long assetId, final CreateReservationRequestDto dto);
 
-
-        ReservationResponseDto approveReservation(
+    ReservationResponseDto approveReservation(
             final Long userId,
             final Long reservationId,
             final ConfirmReservationRequestDto confirmReservationRequestDto);
