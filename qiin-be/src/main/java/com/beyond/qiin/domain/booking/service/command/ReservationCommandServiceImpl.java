@@ -1,7 +1,6 @@
 package com.beyond.qiin.domain.booking.service.command;
 
 import com.beyond.qiin.common.annotation.DistributedLock;
-import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandService;
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
@@ -9,7 +8,6 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationRespon
 import com.beyond.qiin.domain.booking.entity.Attendant;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
-import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
