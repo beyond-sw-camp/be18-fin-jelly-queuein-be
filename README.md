@@ -557,5 +557,5 @@ SettlementController 단위 테스트
   <br>
 </details>
 
-## <a id="requirements"></a>9. [API 명세서](https://ijn7tz4u5x.apidog.io/)
-
+## <a id="requirements"></a>9. API 명세서
+[API 명세서](https://ijn7tz4u5x.apidog.io/)
