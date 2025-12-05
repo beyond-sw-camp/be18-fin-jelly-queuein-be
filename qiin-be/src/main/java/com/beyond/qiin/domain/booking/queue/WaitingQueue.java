@@ -24,29 +24,27 @@ import lombok.NoArgsConstructor;
 @AttributeOverride(name = "id", column = @Column(name = "waiting_queue_id"))
 public class WaitingQueue extends BaseEntity {
 
-  @Column(name = "user_id", nullable = false)
-  private Long userId;         // 유저 식별자
+    @Column(name = "user_id", nullable = false)
+    private Long userId; // 유저 식별자
 
-  @Column(name = "token", nullable = false)
-  private String token;        // JWT 또는 고유 토큰
+    @Column(name = "token", nullable = false)
+    private String token; // JWT 또는 고유 토큰
 
-  @Column(name = "status", nullable = false)
-  private int status;
+    @Column(name = "status", nullable = false)
+    private int status;
 
-  @Transient
-  private WaitingQueueStatus waitingQueueStatus;       // WAIT / ACTIVE
+    @Transient
+    private WaitingQueueStatus waitingQueueStatus; // WAIT / ACTIVE
 
-  @Column(name = "waiting_num", nullable = false)
-  private Long waitingNum;     // 대기 순번
+    @Column(name = "waiting_num", nullable = false)
+    private Long waitingNum; // 대기 순번
 
-  @Column(name = "expired_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
-  private Instant expireAt;      //만료시간
+    @Column(name = "expired_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
+    private Instant expireAt; // 만료시간
 
-  //총 가능한 활동자 개수
-  public static long calculateActiveCnt(long activeTokenCnt) {
-    long available = MAX_ACTIVE_USERS - activeTokenCnt;
-    return available > 0 ? available : 0;
-  }
-
-
+    // 총 가능한 활동자 개수
+    public static long calculateActiveCnt(long activeTokenCnt) {
+        long available = MAX_ACTIVE_USERS - activeTokenCnt;
+        return available > 0 ? available : 0;
+    }
 }
