@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    default: ${SPRING_PROFILES_ACTIVE}
+    default: ${SPRING_PROFILES_ACTIVE:test}
 
   # JPA 공통 설정
   jpa:
