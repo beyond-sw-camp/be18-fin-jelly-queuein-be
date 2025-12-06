@@ -2,7 +2,6 @@ package com.beyond.qiin.domain.booking.service.command;
 
 import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.AUTO_EXPIRED_TIME;
 import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.ENTER_10_SECONDS;
-import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.WAITING_QUEUE_TOKEN;
 
 import com.beyond.qiin.common.annotation.DistributedLock;
 import com.beyond.qiin.domain.booking.entity.WaitingQueue;
@@ -12,6 +11,7 @@ import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import java.time.Instant;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,14 +33,7 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
     public WaitingQueue intoQueue(User user) {
         log.info("[QUEUE-ENTER] userId={}", user.getId());
         // token 발급
-        String token = jwtUtils.generateAccessTokenInternal(
-                user.getId(),
-                null, // role 불필요
-                user.getEmail(),
-                null, // permission 불필요
-                AUTO_EXPIRED_TIME, // WaitingQueue 용 TTL
-                WAITING_QUEUE_TOKEN // 타입 구분
-                );
+        String token = UUID.randomUUID().toString();
 
         // 현재 활성 유저 수 확인
         long activeTokenCnt = waitingQueueRepository.getActiveCnt();
