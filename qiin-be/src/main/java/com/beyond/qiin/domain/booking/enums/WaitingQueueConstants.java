@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.booking.queue;
+package com.beyond.qiin.domain.booking.enums;
 
 public class WaitingQueueConstants {
     public static final long AUTO_EXPIRED_TIME = 10 * 1000L; // 10초

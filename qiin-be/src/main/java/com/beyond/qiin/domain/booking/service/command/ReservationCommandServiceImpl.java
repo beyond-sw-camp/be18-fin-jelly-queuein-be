@@ -11,12 +11,10 @@ import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
-import com.beyond.qiin.domain.booking.queue.ReservationLockService;
-import com.beyond.qiin.domain.booking.queue.WaitingQueue;
-import com.beyond.qiin.domain.booking.queue.WaitingQueueErrorCode;
-import com.beyond.qiin.domain.booking.queue.WaitingQueueException;
-import com.beyond.qiin.domain.booking.queue.WaitingQueueService;
-import com.beyond.qiin.domain.booking.queue.WaitingQueueStatus;
+import com.beyond.qiin.domain.booking.entity.WaitingQueue;
+import com.beyond.qiin.domain.booking.exception.WaitingQueueErrorCode;
+import com.beyond.qiin.domain.booking.exception.WaitingQueueException;
+import com.beyond.qiin.domain.booking.enums.WaitingQueueStatus;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
@@ -92,7 +90,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             Long userId, Long assetId, CreateReservationRequestDto dto) {
 
         User user = userReader.findById(userId);
-        log.info("[INSTANT-RESERVE] userId={}, assetId={} - entering queue", userId, assetId);
+        log.info("[INSTANT-RESERVE] userId={}, assetId={} - entering facade", userId, assetId);
         // 먼저 대기 큐에 들어감
         WaitingQueue queue = waitingQueueService.intoQueue(user);
         if (queue.getStatus() == WaitingQueueStatus.WAITING.getCode()) {

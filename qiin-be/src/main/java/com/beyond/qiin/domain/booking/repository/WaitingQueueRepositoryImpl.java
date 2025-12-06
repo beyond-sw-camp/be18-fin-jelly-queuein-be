@@ -1,10 +1,11 @@
-package com.beyond.qiin.domain.booking.queue;
+package com.beyond.qiin.domain.booking.repository;
 
-import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.ACTIVE_KEY;
-import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.AUTO_EXPIRED_TIME;
-import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.ENTER_10_SECONDS;
-import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.WAIT_KEY;
+import static com.beyond.qiin.domain.booking.enums.WaitingQueueConstants.ACTIVE_KEY;
+import static com.beyond.qiin.domain.booking.enums.WaitingQueueConstants.AUTO_EXPIRED_TIME;
+import static com.beyond.qiin.domain.booking.enums.WaitingQueueConstants.ENTER_10_SECONDS;
+import static com.beyond.qiin.domain.booking.enums.WaitingQueueConstants.WAIT_KEY;
 
+import com.beyond.qiin.domain.booking.entity.WaitingQueue;
 import com.beyond.qiin.domain.iam.entity.User;
 import java.util.Optional;
 import java.util.Set;

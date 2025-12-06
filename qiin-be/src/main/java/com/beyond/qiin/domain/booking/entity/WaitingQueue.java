@@ -1,8 +1,9 @@
-package com.beyond.qiin.domain.booking.queue;
+package com.beyond.qiin.domain.booking.entity;
 
-import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.MAX_ACTIVE_USERS;
+import static com.beyond.qiin.domain.booking.enums.WaitingQueueConstants.MAX_ACTIVE_USERS;
 
 import com.beyond.qiin.common.BaseEntity;
+import com.beyond.qiin.domain.booking.enums.WaitingQueueStatus;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

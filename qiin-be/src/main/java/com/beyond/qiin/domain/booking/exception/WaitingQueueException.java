@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.booking.queue;
+package com.beyond.qiin.domain.booking.exception;
 
 import com.beyond.qiin.common.exception.BaseException;
 

@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.booking.queue;
+package com.beyond.qiin.domain.booking.service.command;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;

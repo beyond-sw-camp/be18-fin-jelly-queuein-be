@@ -1,5 +1,6 @@
-package com.beyond.qiin.domain.booking.queue;
+package com.beyond.qiin.domain.booking.facade;
 
+import com.beyond.qiin.domain.booking.service.command.WaitingQueueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -1,5 +1,6 @@
-package com.beyond.qiin.domain.booking.queue;
+package com.beyond.qiin.domain.booking.repository;
 
+import com.beyond.qiin.domain.booking.entity.WaitingQueue;
 import com.beyond.qiin.domain.iam.entity.User;
 import java.util.Optional;
 import java.util.Set;
