@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.booking.repository;
+package com.beyond.qiin.infra.redis.reservation;
 
 import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.ACTIVE_KEY;
 import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.REDIS_NAMESPACE;

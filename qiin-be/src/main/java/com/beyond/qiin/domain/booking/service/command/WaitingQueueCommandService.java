@@ -5,13 +5,13 @@ import com.beyond.qiin.domain.iam.entity.User;
 
 public interface WaitingQueueCommandService {
 
-    WaitingQueue intoQueue(User user);
+    WaitingQueue intoQueue(final User user);
 
-    WaitingQueue intoActiveQueue(User user, String token);
+    WaitingQueue intoActiveQueue(final User user, final String token);
 
-    WaitingQueue intoWaitingQueue(User user, String token);
+    WaitingQueue intoWaitingQueue(final User user, final String token);
 
     void activateTokens();
 
-    void forceExpireToken(String token);
+    void forceExpireToken(final String token);
 }

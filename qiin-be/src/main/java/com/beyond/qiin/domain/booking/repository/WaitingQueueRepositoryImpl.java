@@ -7,6 +7,7 @@ import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.WAI
 
 import com.beyond.qiin.domain.booking.entity.WaitingQueue;
 import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.infra.redis.reservation.WaitingQueueRedisRepository;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -43,17 +44,17 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepository {
     // 대기열 - 순서 유지 필요
     @Override
     public void deleteWaitingQueue(User user, String token) {
-        waitingQueueRedisRepository.zSetRemove(WAIT_KEY, token + ":" + user.getId());
+        waitingQueueRedisRepository.zSetRemove(WAIT_KEY, token);
     }
 
     @Override
     public Long getWaitingNum(User user, String token) {
-        return waitingQueueRedisRepository.zSetRank(WAIT_KEY, token + ":" + user.getId());
+        return waitingQueueRedisRepository.zSetRank(WAIT_KEY, token);
     }
 
     @Override
     public void saveWaitingQueue(User user, String token) {
-        waitingQueueRedisRepository.zSetAdd(WAIT_KEY, token + ":" + user.getId(), System.currentTimeMillis());
+        waitingQueueRedisRepository.zSetAdd(WAIT_KEY, token, System.currentTimeMillis());
     }
 
     @Override
