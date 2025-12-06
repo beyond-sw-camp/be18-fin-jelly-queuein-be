@@ -12,7 +12,6 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.month_reservation
 import com.beyond.qiin.domain.booking.dto.reservation.response.month_reservation.MonthReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.month_reservation.MonthReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.reservable_asset.ReservableAssetResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.user_reservation.GetUserReservationResponseDto;
@@ -66,7 +65,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final ReservableAssetsQueryRepository reservableAssetsQueryRepository;
     private final AppliedReservationsQueryRepository appliedReservationsQueryRepository;
     private final AssetQueryRepository assetQueryRepository;
-
 
     // 예약 상세 조회 (api용)
     @Override
@@ -140,10 +138,10 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return PageResponseDto.from(page);
     }
 
-    //TODO : 예약 가능한 자원 조회를 위해 우선 모든 자원 조회
-    //해당 날에 예약 가능인지에 대한 판별 필요
+    // TODO : 예약 가능한 자원 조회를 위해 우선 모든 자원 조회
+    // 해당 날에 예약 가능인지에 대한 판별 필요
     public PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(
-        final AssetSearchCondition condition, final Pageable pageable) {
+            final AssetSearchCondition condition, final Pageable pageable) {
         Page<RawDescendantAssetResponseDto> rawPage = assetQueryRepository.searchDescendants(condition, pageable);
 
         Page<DescendantAssetResponseDto> dtoPage = rawPage.map(DescendantAssetResponseDto::fromEntity);
@@ -159,7 +157,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         userReader.findById(userId);
 
-        //asset query repo 사용하기 위한 condition 생성
+        // asset query repo 사용하기 위한 condition 생성
         AssetSearchCondition assetSearchCondition = new AssetSearchCondition();
         assetSearchCondition.setKeyword(condition.getAssetName());
         assetSearchCondition.setType(condition.getAssetType());
@@ -168,34 +166,33 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         assetSearchCondition.setOneDepth(condition.getLayerOne());
         assetSearchCondition.setCategoryId(condition.getCategoryId());
 
-        //자원 목록 가져옴
-        Page<RawDescendantAssetResponseDto> rawList = assetQueryRepository.searchDescendants(assetSearchCondition, pageable);
+        // 자원 목록 가져옴
+        Page<RawDescendantAssetResponseDto> rawList =
+                assetQueryRepository.searchDescendants(assetSearchCondition, pageable);
 
-        //해당 날짜의 예약 가능성 확인용
+        // 해당 날짜의 예약 가능성 확인용
         LocalDate date = condition.getDate();
 
-        List<ReservableAssetResponseDto> content =
-            rawList.getContent().stream()
+        List<ReservableAssetResponseDto> content = rawList.getContent().stream()
                 .filter(raw -> isAssetReservableOnDate(raw.getAssetId(), date))
                 .filter(raw -> assetQueryService.isAvailable(raw.getAssetId()))
                 .map(this::toReservableAssetResponse) // Raw -> Reservable 로 변환
                 .toList();
-        Page<ReservableAssetResponseDto> page =
-            new PageImpl<>(content, pageable, content.size());
+        Page<ReservableAssetResponseDto> page = new PageImpl<>(content, pageable, content.size());
 
         return PageResponseDto.from(page);
     }
 
     public ReservableAssetResponseDto toReservableAssetResponse(RawDescendantAssetResponseDto raw) {
         return ReservableAssetResponseDto.builder()
-            .isReservable(true)
-            .assetId(raw.getAssetId())
-            .assetType(AssetType.fromCode(raw.getType()).toName())
-            .assetType(AssetType.fromCode(raw.getStatus()).toName())
-            .assetName(raw.getName())
-            .categoryName(raw.getCategoryName())
-            //.needsApproval(raw.getNeedsApproval())
-            .build();
+                .isReservable(true)
+                .assetId(raw.getAssetId())
+                .assetType(AssetType.fromCode(raw.getType()).toName())
+                .assetType(AssetType.fromCode(raw.getStatus()).toName())
+                .assetName(raw.getName())
+                .categoryName(raw.getCategoryName())
+                // .needsApproval(raw.getNeedsApproval())
+                .build();
     }
 
     // 주별 일정 조회
