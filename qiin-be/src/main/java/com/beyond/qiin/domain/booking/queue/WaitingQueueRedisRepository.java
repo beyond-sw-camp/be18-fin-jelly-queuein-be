@@ -2,7 +2,6 @@ package com.beyond.qiin.domain.booking.queue;
 
 import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.ACTIVE_KEY;
 import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.REDIS_NAMESPACE;
-import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.WAIT_KEY;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -85,9 +84,9 @@ public class WaitingQueueRedisRepository {
         long count = 0;
 
         var scanOptions = ScanOptions.scanOptions()
-            .match(REDIS_NAMESPACE + ACTIVE_KEY + ":*")
-            .count(100)
-            .build();
+                .match(REDIS_NAMESPACE + ACTIVE_KEY + ":*")
+                .count(100)
+                .build();
 
         var connection = redisTemplate.getConnectionFactory().getConnection();
 
@@ -101,24 +100,23 @@ public class WaitingQueueRedisRepository {
         return count;
     }
 
-
     public void deleteKey(String key) {
         redisTemplate.delete(REDIS_NAMESPACE + key);
     }
 
     // 현재 활성 토큰에 대한 계산
-//    public Long countActiveTokens() {
-//        // 레디스 서버에서 원자적 계산 (race condition 차단)
-//        String luaScript =
-//            "local keys = redis.call('keys', ARGV[1]) \n" +
-//                "return table.getn(keys)";
-//        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
-//        redisScript.setScriptText(luaScript);
-//        redisScript.setResultType(Long.class);
-//        return redisTemplate.execute(redisScript, Collections.emptyList(), ACTIVE_COUNT_KEY);
-//    }
-//    public Long countActiveTokensWithoutLua() {
-//        return redisTemplate.opsForSet()
-//            .size(REDIS_NAMESPACE + ACTIVE_KEY); //등록한 redis key
-//    }
+    //    public Long countActiveTokens() {
+    //        // 레디스 서버에서 원자적 계산 (race condition 차단)
+    //        String luaScript =
+    //            "local keys = redis.call('keys', ARGV[1]) \n" +
+    //                "return table.getn(keys)";
+    //        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
+    //        redisScript.setScriptText(luaScript);
+    //        redisScript.setResultType(Long.class);
+    //        return redisTemplate.execute(redisScript, Collections.emptyList(), ACTIVE_COUNT_KEY);
+    //    }
+    //    public Long countActiveTokensWithoutLua() {
+    //        return redisTemplate.opsForSet()
+    //            .size(REDIS_NAMESPACE + ACTIVE_KEY); //등록한 redis key
+    //    }
 }

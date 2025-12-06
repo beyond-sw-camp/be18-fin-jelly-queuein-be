@@ -7,6 +7,6 @@ public class WaitingQueueConstants {
     public static final String WAIT_KEY = "waiting:wait";
     public static final int MAX_ACTIVE_USERS = 5;
     public static final String REDIS_NAMESPACE = "hhplus:";
-//    public static final String ACTIVE_COUNT_KEY = "hhplus:waiting:active:*";
+    //    public static final String ACTIVE_COUNT_KEY = "hhplus:waiting:active:*";
     public static final String WAITING_QUEUE_TOKEN = "WAITING_QUEUE_TOKEN";
 }
