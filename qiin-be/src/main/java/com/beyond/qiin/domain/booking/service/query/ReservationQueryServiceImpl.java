@@ -30,6 +30,11 @@ import com.beyond.qiin.domain.booking.util.AvailableTimeSlotCalculator;
 import com.beyond.qiin.domain.booking.vo.DateRange;
 import com.beyond.qiin.domain.booking.vo.TimeSlot;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
+import com.beyond.qiin.domain.inventory.dto.asset.request.search_condition.AssetSearchCondition;
+import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
+import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
+import com.beyond.qiin.domain.inventory.enums.AssetType;
+import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryRepository;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -60,6 +65,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final UserReservationsQueryRepository userReservationsQueryRepository;
     private final ReservableAssetsQueryRepository reservableAssetsQueryRepository;
     private final AppliedReservationsQueryRepository appliedReservationsQueryRepository;
+    private final AssetQueryRepository assetQueryRepository;
+
 
     // 예약 상세 조회 (api용)
     @Override
@@ -133,6 +140,17 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return PageResponseDto.from(page);
     }
 
+    //TODO : 예약 가능한 자원 조회를 위해 우선 모든 자원 조회
+    //해당 날에 예약 가능인지에 대한 판별 필요
+    public PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(
+        final AssetSearchCondition condition, final Pageable pageable) {
+        Page<RawDescendantAssetResponseDto> rawPage = assetQueryRepository.searchDescendants(condition, pageable);
+
+        Page<DescendantAssetResponseDto> dtoPage = rawPage.map(DescendantAssetResponseDto::fromEntity);
+
+        return PageResponseDto.from(dtoPage);
+    }
+
     // 예약 가능 자원 목록 조회
     @Override
     @Transactional(readOnly = true)
@@ -141,30 +159,43 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         userReader.findById(userId);
 
-        List<RawReservableAssetResponseDto> rawList = reservableAssetsQueryRepository.search(condition);
+        //asset query repo 사용하기 위한 condition 생성
+        AssetSearchCondition assetSearchCondition = new AssetSearchCondition();
+        assetSearchCondition.setKeyword(condition.getAssetName());
+        assetSearchCondition.setType(condition.getAssetType());
+        assetSearchCondition.setStatus(condition.getAssetStatus());
+        assetSearchCondition.setRoot(condition.getLayerZero());
+        assetSearchCondition.setOneDepth(condition.getLayerOne());
+        assetSearchCondition.setCategoryId(condition.getCategoryId());
 
+        //자원 목록 가져옴
+        Page<RawDescendantAssetResponseDto> rawList = assetQueryRepository.searchDescendants(assetSearchCondition, pageable);
+
+        //해당 날짜의 예약 가능성 확인용
         LocalDate date = condition.getDate();
 
-        List<ReservableAssetResponseDto> reservableAssets = new ArrayList<>();
-
-        for (RawReservableAssetResponseDto raw : rawList) {
-
-            boolean isReservable = isAssetReservableOnDate(raw.getAssetId(), date);
-            boolean isAssetAvailable = assetQueryService.isAvailable(raw.getAssetId());
-
-            if (isReservable && isAssetAvailable) {
-                reservableAssets.add(ReservableAssetResponseDto.fromRaw(raw)); // 생성 조건이 true이므로 인자로 받지 않음
-            }
-        }
-
-        int startIdx = (int) pageable.getOffset();
-        int endIdx = Math.min(startIdx + pageable.getPageSize(), reservableAssets.size());
-
-        List<ReservableAssetResponseDto> pageContent = reservableAssets.subList(startIdx, endIdx);
-
-        Page<ReservableAssetResponseDto> page = new PageImpl<>(pageContent, pageable, reservableAssets.size());
+        List<ReservableAssetResponseDto> content =
+            rawList.getContent().stream()
+                .filter(raw -> isAssetReservableOnDate(raw.getAssetId(), date))
+                .filter(raw -> assetQueryService.isAvailable(raw.getAssetId()))
+                .map(this::toReservableAssetResponse) // Raw -> Reservable 로 변환
+                .toList();
+        Page<ReservableAssetResponseDto> page =
+            new PageImpl<>(content, pageable, content.size());
 
         return PageResponseDto.from(page);
+    }
+
+    public ReservableAssetResponseDto toReservableAssetResponse(RawDescendantAssetResponseDto raw) {
+        return ReservableAssetResponseDto.builder()
+            .isReservable(true)
+            .assetId(raw.getAssetId())
+            .assetType(AssetType.fromCode(raw.getType()).toName())
+            .assetType(AssetType.fromCode(raw.getStatus()).toName())
+            .assetName(raw.getName())
+            .categoryName(raw.getCategoryName())
+            //.needsApproval(raw.getNeedsApproval())
+            .build();
     }
 
     // 주별 일정 조회
