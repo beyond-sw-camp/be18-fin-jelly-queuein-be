@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.booking.service.command;
 
-import com.beyond.qiin.common.annotation.DistributedLock;
 import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandService;
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
@@ -12,8 +11,12 @@ import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
+import com.beyond.qiin.domain.booking.queue.ReservationLockService;
 import com.beyond.qiin.domain.booking.queue.WaitingQueue;
+import com.beyond.qiin.domain.booking.queue.WaitingQueueErrorCode;
+import com.beyond.qiin.domain.booking.queue.WaitingQueueException;
 import com.beyond.qiin.domain.booking.queue.WaitingQueueService;
+import com.beyond.qiin.domain.booking.queue.WaitingQueueStatus;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
@@ -47,6 +50,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final AttendantJpaRepository attendantJpaRepository;
     private final UsageHistoryCommandService usageHistoryCommandService;
     private final WaitingQueueService waitingQueueService;
+    private final ReservationLockService reservationLockService;
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
@@ -82,54 +86,25 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         return ReservationResponseDto.fromEntity(reservation);
     }
 
-    // 선착순 예약 분산락 키 : 자원 id로만 두기 제한적
-    @Override
-    @Transactional
-    @DistributedLock(
-            key =
-                    "'reservation:' + #assetId + ':' + #createReservationRequestDto.startAt + ':' + #createReservationRequestDto.endAt")
-    public ReservationResponseDto reserveReservationWithLock(
-            final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto) {
-
-        Asset asset = assetCommandService.getAssetById(assetId);
-        User applicant = userReader.findById(userId);
-        userReader.validateAllExist(createReservationRequestDto.getAttendantIds()); // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
-        List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
-        assetCommandService.isAvailable(assetId);
-        // 해당 시간에 사용 가능한 자원인지 확인
-        validateReservationAvailability(
-                null, asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
-
-        // 선착순 자원은 자동 승인
-        Reservation reservation =
-                Reservation.create(createReservationRequestDto, applicant, asset, ReservationStatus.APPROVED);
-        reservation.setIsApproved(true); // 승인됨
-
-        List<Attendant> attendants = attendantUsers.stream()
-                .map(user -> Attendant.create(user, reservation))
-                .collect(Collectors.toList());
-
-        reservation.addAttendants(attendants);
-
-        reservationWriter.save(reservation);
-
-        attendantWriter.saveAll(attendants);
-        reservationEventPublisher.publishCreated(reservation);
-        return ReservationResponseDto.fromEntity(reservation);
-    }
-
     @Override
     @Transactional
     public ReservationResponseDto instantConfirmReservation(
             Long userId, Long assetId, CreateReservationRequestDto dto) {
 
         User user = userReader.findById(userId);
-
+        log.info("[INSTANT-RESERVE] userId={}, assetId={} - entering queue", userId, assetId);
         // 먼저 대기 큐에 들어감
         WaitingQueue queue = waitingQueueService.intoQueue(user);
+        if (queue.getStatus() == WaitingQueueStatus.WAITING.getCode()) {
+            log.info("[INSTANT-RESERVE] userId={} is waiting. waitingNum={}", userId, queue.getWaitingNum());
+
+            throw new WaitingQueueException(WaitingQueueErrorCode.IN_WATING_QUEUE);
+        }
+
+        log.info("[INSTANT-RESERVE] try reserve with lock - userId={}, assetId={}", userId, assetId);
 
         // 활성화 큐에 들어간 경우 락 획득 및 사용
-        return reserveReservationWithLock(user.getId(), assetId, dto);
+        return reservationLockService.reserveReservationWithLock(user.getId(), assetId, dto);
     }
 
     @Override

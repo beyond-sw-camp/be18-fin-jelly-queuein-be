@@ -26,6 +26,14 @@ services:
     ports:
       - "6379:6379"
 
+#  openresty:
+#    image: openresty/openresty:alpine
+#    ports:
+#      - "80:80"
+#    volumes:
+#      - ./nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
+#      - ./nginx/lua:/usr/local/openresty/nginx/lua
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper

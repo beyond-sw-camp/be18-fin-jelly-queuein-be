@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class WaitingQueueFacade {
+public class WaitingQueueFacade { // 스케줄러 결합도 감소 용도
 
     private final WaitingQueueService waitingQueueService;
 

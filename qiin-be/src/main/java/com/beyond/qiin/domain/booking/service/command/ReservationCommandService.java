@@ -10,8 +10,8 @@ public interface ReservationCommandService {
     ReservationResponseDto applyReservation(
             final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
 
-    ReservationResponseDto reserveReservationWithLock(
-            final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
+    //    ReservationResponseDto reserveReservationWithLock(
+    //            final Long userId, final Long assetId, final CreateReservationRequestDto createReservationRequestDto);
 
     ReservationResponseDto instantConfirmReservation(
             final Long userId, final Long assetId, final CreateReservationRequestDto dto);

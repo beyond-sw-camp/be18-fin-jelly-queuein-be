@@ -1,16 +1,15 @@
 package com.beyond.qiin.domain.booking.queue;
 
-import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.ACTIVE_COUNT_KEY;
+import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.ACTIVE_KEY;
 import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.REDIS_NAMESPACE;
+import static com.beyond.qiin.domain.booking.queue.WaitingQueueConstants.WAIT_KEY;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisConnectionUtils;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -36,7 +35,7 @@ public class WaitingQueueRedisRepository {
 
     // batch로 활성화해 삭제 가능
     public void zSetRemoveRange(String key, int start, int end) {
-        redisTemplate.opsForZSet().remove(REDIS_NAMESPACE + key, start, end);
+        redisTemplate.opsForZSet().removeRange(REDIS_NAMESPACE + key, start, end);
     }
 
     // set 자료구조에 값 추가
@@ -63,6 +62,7 @@ public class WaitingQueueRedisRepository {
         redisTemplate.expire(REDIS_NAMESPACE + key, timeout, unit);
     }
 
+    // set의 해당 구간 사용자들을 가져오는 용도
     public Set<String> zSetGetRange(String key, long start, long end) {
         return redisTemplate.opsForZSet().range(REDIS_NAMESPACE + key, start, end);
     }
@@ -80,17 +80,21 @@ public class WaitingQueueRedisRepository {
     }
 
     // 현재 활성 토큰에 대한 계산
-    public Long countActiveTokens() {
-        // 레디스 서버에서 원자적 계산 (race condition 차단)
-        String luaScript = "local count = 0" + "for _, key in ipairs(redis.call('keys', ARGV[1])) do"
-                + "count = count + 1"
-                + "end"
-                + "return count";
-        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
-        redisScript.setScriptText(luaScript);
-        redisScript.setResultType(Long.class);
-        return redisTemplate.execute(redisScript, Collections.emptyList(), ACTIVE_COUNT_KEY);
+//    public Long countActiveTokens() {
+//        // 레디스 서버에서 원자적 계산 (race condition 차단)
+//        String luaScript =
+//            "local keys = redis.call('keys', ARGV[1]) \n" +
+//                "return table.getn(keys)";
+//        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
+//        redisScript.setScriptText(luaScript);
+//        redisScript.setResultType(Long.class);
+//        return redisTemplate.execute(redisScript, Collections.emptyList(), ACTIVE_COUNT_KEY);
+//    }
+    public Long countActiveTokensWithoutLua() {
+        return redisTemplate.opsForSet()
+            .size(REDIS_NAMESPACE + ACTIVE_KEY);
     }
+
 
     public void deleteKey(String key) {
         redisTemplate.delete(REDIS_NAMESPACE + key);

@@ -11,9 +11,11 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WaitingQueueService {
@@ -23,9 +25,9 @@ public class WaitingQueueService {
 
     // 사용자가 선착순 예약에 접근 시 : 토큰 활성화 여부를 체크해 토큰 대기열 정보 반환 - 상태 계산, 수정 동시에 불가
     @Transactional
-    @DistributedLock(key = "'waitingQueueLock")
+    @DistributedLock(key = "'waitingQueueLock'")
     public WaitingQueue intoQueue(User user) {
-
+        log.info("[QUEUE-ENTER] userId={}", user.getId());
         // token 발급
         String token = jwtUtils.generateAccessTokenInternal(
                 user.getId(),
@@ -42,6 +44,12 @@ public class WaitingQueueService {
         // 활성화시킬 수 있는 수 계산
         long availableActiveTokenCnt = WaitingQueue.calculateActiveCnt(activeTokenCnt);
 
+        log.info(
+                "[QUEUE-STATUS] userId={}, activeCnt={}, availableCnt={}",
+                user.getId(),
+                activeTokenCnt,
+                availableActiveTokenCnt);
+
         if (availableActiveTokenCnt > 0) { // 활성화시킬 수 있는 수가 남아있다면
             return intoActiveQueue(user, token); // 활성화 정보 반환(현재 자원 사용 가능)
         }
@@ -52,6 +60,7 @@ public class WaitingQueueService {
         // 활성 유저열에 추가
         waitingQueueRepository.saveActiveQueue(user, token);
 
+        log.info("[QUEUE-ACTIVE] userId={}, token={}", user.getId(), token);
         // ttl 설정 - 일정 시간 동안의 예약 기능 사용
         waitingQueueRepository.setTimeOut(token, AUTO_EXPIRED_TIME, TimeUnit.MILLISECONDS);
 
@@ -72,7 +81,8 @@ public class WaitingQueueService {
         // 대기 순서 확인
         Long waitingNum = waitingQueueRepository.getWaitingNum(user, token);
         if (waitingNum == null) {
-            // 대기 순서 없음 == 대기열에 없는 유저
+            log.info("[QUEUE-WAIT-NEW] userId={}, token={}", user.getId(), token);
+            // 사용자에게 대기 순서 없음 == 대기열에 없는 유저
             // 대기열에 추가
             waitingQueueRepository.saveWaitingQueue(user, token);
 
@@ -81,6 +91,13 @@ public class WaitingQueueService {
         }
         // 대기 잔여  시간 계산 (10초당 활성 전환 수)
         long leftWaitingNum = (long) Math.ceil((double) (waitingNum - 1) / ENTER_10_SECONDS) * 10;
+
+        log.info(
+                "[QUEUE-WAIT] userId={}, token={}, waitingNum={}, left={}",
+                user.getId(),
+                token,
+                waitingNum,
+                leftWaitingNum);
 
         return WaitingQueue.builder()
                 .userId(user.getId())
@@ -94,14 +111,16 @@ public class WaitingQueueService {
     // 대기열에서 활성 큐로 토큰을 전환하는 스케줄러용 로직
     // n초당 m명씩 active token으로 전환
     public void activateTokens() {
+
         // 대기열에서 순서대로 정해진 유저만큼 가져오기
         Set<String> waitingTokens = waitingQueueRepository.getWaitingTokens();
-
+        log.info("[QUEUE-SCHEDULER] promoteTokens size={}", waitingTokens.size());
         // 대기열에서 가져온 만큼 삭제
         waitingQueueRepository.deleteWaitingTokens();
 
         // 활성화된 큐로 유저들 변경
         waitingQueueRepository.saveActiveQueues(waitingTokens);
+        log.info("[QUEUE-SCHEDULER] promotion completed");
     }
 
     // active token 만료
