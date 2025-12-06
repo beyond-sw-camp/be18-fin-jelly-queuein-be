@@ -1,6 +1,6 @@
 package com.beyond.qiin.domain.booking.entity;
 
-import static com.beyond.qiin.domain.booking.enums.WaitingQueueConstants.MAX_ACTIVE_USERS;
+import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.MAX_ACTIVE_USERS;
 
 import com.beyond.qiin.common.BaseEntity;
 import com.beyond.qiin.domain.booking.enums.WaitingQueueStatus;

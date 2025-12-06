@@ -1,8 +1,8 @@
 package com.beyond.qiin.domain.booking.service.command;
 
-import static com.beyond.qiin.domain.booking.enums.WaitingQueueConstants.AUTO_EXPIRED_TIME;
-import static com.beyond.qiin.domain.booking.enums.WaitingQueueConstants.ENTER_10_SECONDS;
-import static com.beyond.qiin.domain.booking.enums.WaitingQueueConstants.WAITING_QUEUE_TOKEN;
+import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.AUTO_EXPIRED_TIME;
+import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.ENTER_10_SECONDS;
+import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.WAITING_QUEUE_TOKEN;
 
 import com.beyond.qiin.common.annotation.DistributedLock;
 import com.beyond.qiin.domain.booking.entity.WaitingQueue;
