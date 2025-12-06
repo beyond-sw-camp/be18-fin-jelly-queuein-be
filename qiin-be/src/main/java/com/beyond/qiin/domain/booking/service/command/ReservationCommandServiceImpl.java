@@ -7,14 +7,14 @@ import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationR
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.entity.Attendant;
 import com.beyond.qiin.domain.booking.entity.Reservation;
+import com.beyond.qiin.domain.booking.entity.WaitingQueue;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
+import com.beyond.qiin.domain.booking.enums.WaitingQueueStatus;
 import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
-import com.beyond.qiin.domain.booking.entity.WaitingQueue;
 import com.beyond.qiin.domain.booking.exception.WaitingQueueErrorCode;
 import com.beyond.qiin.domain.booking.exception.WaitingQueueException;
-import com.beyond.qiin.domain.booking.enums.WaitingQueueStatus;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
