@@ -8,7 +8,6 @@ import com.beyond.qiin.domain.booking.entity.WaitingQueue;
 import com.beyond.qiin.domain.booking.enums.WaitingQueueStatus;
 import com.beyond.qiin.domain.booking.repository.WaitingQueueRepository;
 import com.beyond.qiin.domain.iam.entity.User;
-import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
@@ -73,7 +72,6 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
                 .waitingNum(0L) // 활성 큐는 대기 순번 없음 → 0 또는 필요값
                 .expireAt(Instant.now().plusMillis(AUTO_EXPIRED_TIME))
                 .build();
-
     }
 
     @Override
@@ -100,7 +98,6 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
                 waitingNum,
                 leftWaitingNum);
 
-
         WaitingQueue waitingQueue = WaitingQueue.builder()
                 .userId(user.getId())
                 .token(token)
@@ -109,7 +106,7 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
                 .expireAt(Instant.now().plusMillis(AUTO_EXPIRED_TIME))
                 .build();
 
-        waitingQueueRepository.saveQueue(waitingQueue); //대기 정보만 저장
+        waitingQueueRepository.saveQueue(waitingQueue); // 대기 정보만 저장
         return waitingQueue;
     }
 
