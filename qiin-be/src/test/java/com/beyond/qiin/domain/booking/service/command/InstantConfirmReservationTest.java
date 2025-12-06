@@ -7,13 +7,11 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandService;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
-import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
-import com.beyond.qiin.domain.booking.support.ReservationReader;
+import com.beyond.qiin.domain.booking.support.ReservationValidator;
 import com.beyond.qiin.domain.booking.support.ReservationWriter;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
@@ -30,13 +28,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class InstantConfirmReservationTest {
 
-    private ReservationCommandServiceImpl reservationCommandService;
+    private ReservationLockServiceImpl reservationLockService;
 
     @Mock
     private UserReader userReader;
 
     @Mock
-    private ReservationReader reservationReader;
+    private ReservationValidator reservationValidator;
 
     @Mock
     private ReservationWriter reservationWriter;
@@ -50,12 +48,6 @@ public class InstantConfirmReservationTest {
     @Mock
     private ReservationEventPublisher reservationEventPublisher;
 
-    @Mock
-    private AttendantJpaRepository attendantJpaRepository;
-
-    @Mock
-    private UsageHistoryCommandService usageHistoryCommandService;
-
     private Long userId;
     private Long assetId;
     private Instant startAt;
@@ -63,16 +55,13 @@ public class InstantConfirmReservationTest {
 
     @BeforeEach
     void setUp() {
-
-        reservationCommandService = new ReservationCommandServiceImpl(
+        reservationLockService = new ReservationLockServiceImpl(
+                assetCommandService,
                 userReader,
-                reservationReader,
                 reservationWriter,
                 attendantWriter,
-                assetCommandService,
                 reservationEventPublisher,
-                attendantJpaRepository,
-                usageHistoryCommandService);
+                reservationValidator);
 
         userId = 1L;
         assetId = 100L;
@@ -82,7 +71,6 @@ public class InstantConfirmReservationTest {
 
     @Test
     void instantConfirmReservation_basicMockTest() {
-        // 요청 dto
         CreateReservationRequestDto requestDto = CreateReservationRequestDto.builder()
                 .startAt(startAt)
                 .endAt(endAt)
@@ -95,16 +83,22 @@ public class InstantConfirmReservationTest {
                 User.builder().userName("참석자1").build(),
                 User.builder().userName("참석자2").build());
 
+        // Mock 동작 정의
         when(assetCommandService.getAssetById(assetId)).thenReturn(asset);
         when(userReader.findById(userId)).thenReturn(applicant);
         doNothing().when(userReader).validateAllExist(requestDto.getAttendantIds());
         when(userReader.findAllByIds(requestDto.getAttendantIds())).thenReturn(attendants);
         when(assetCommandService.isAvailable(assetId)).thenReturn(true);
 
-        //
-        ReservationResponseDto result =
-                reservationCommandService.instantConfirmReservation(userId, assetId, requestDto);
+        // Validator mock
+        doNothing()
+                .when(reservationValidator)
+                .validateReservationAvailability(null, asset.getId(), requestDto.getStartAt(), requestDto.getEndAt());
 
+        // 실행
+        ReservationResponseDto result = reservationLockService.reserveReservationWithLock(userId, assetId, requestDto);
+
+        // 검증
         assertThat(result).isNotNull();
         assertThat(result.getAssetName()).isEqualTo(asset.getName());
         assertEquals("APPROVED", result.getStatus());
@@ -118,5 +112,7 @@ public class InstantConfirmReservationTest {
         verify(reservationWriter).save(any());
         verify(attendantWriter).saveAll(any());
         verify(reservationEventPublisher).publishCreated(any());
+        verify(reservationValidator)
+                .validateReservationAvailability(null, asset.getId(), requestDto.getStartAt(), requestDto.getEndAt());
     }
 }

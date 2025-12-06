@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class WaitingQueueService {
+public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandService {
 
     private final JwtTokenProvider jwtUtils; // 토큰 발급
     private final WaitingQueueRepository waitingQueueRepository; // 대기열, 할성 큐 관리
@@ -29,6 +29,7 @@ public class WaitingQueueService {
     // 사용자가 선착순 예약에 접근 시 : 토큰 활성화 여부를 체크해 토큰 대기열 정보 반환 - 상태 계산, 수정 동시에 불가
     @Transactional
     @DistributedLock(key = "'waitingQueueLock'")
+    @Override
     public WaitingQueue intoQueue(User user) {
         log.info("[QUEUE-ENTER] userId={}", user.getId());
         // token 발급
@@ -59,7 +60,9 @@ public class WaitingQueueService {
         return intoWaitingQueue(user, token); // 대기열 정보 반환(아직 자원 사용 불가)
     }
 
-    private WaitingQueue intoActiveQueue(User user, String token) {
+    @Override
+    @Transactional
+    public WaitingQueue intoActiveQueue(User user, String token) {
         // 활성 유저열에 추가
         waitingQueueRepository.saveActiveQueue(user, token);
 
@@ -80,7 +83,9 @@ public class WaitingQueueService {
                 .build();
     }
 
-    private WaitingQueue intoWaitingQueue(User user, String token) {
+    @Override
+    @Transactional
+    public WaitingQueue intoWaitingQueue(User user, String token) {
         // 대기 순서 확인
         Long waitingNum = waitingQueueRepository.getWaitingNum(user, token);
         if (waitingNum == null) {
@@ -113,6 +118,8 @@ public class WaitingQueueService {
 
     // 대기열에서 활성 큐로 토큰을 전환하는 스케줄러용 로직
     // n초당 m명씩 active token으로 전환
+    @Override
+    @Transactional
     public void activateTokens() {
 
         // 대기열에서 순서대로 정해진 유저만큼 가져오기
@@ -127,6 +134,8 @@ public class WaitingQueueService {
     }
 
     // active token 만료
+    @Override
+    @Transactional
     public void forceExpireToken(String token) {
         waitingQueueRepository.deleteExpiredToken(token);
     }

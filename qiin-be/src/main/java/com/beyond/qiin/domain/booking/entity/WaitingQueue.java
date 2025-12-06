@@ -48,4 +48,25 @@ public class WaitingQueue extends BaseEntity {
         long available = MAX_ACTIVE_USERS - activeTokenCnt;
         return available > 0 ? available : 0;
     }
+    //    TODO : 지금 상태에선 없는 게 더 깔끔해보임
+    //    public static WaitingQueue createWaiting(User user, String token, long leftWaitingNum, long autoExpireTimeMs)
+    // {
+    //        return WaitingQueue.builder()
+    //            .userId(user.getId())
+    //            .token(token)
+    //            .status(WaitingQueueStatus.WAITING.getCode())
+    //            .waitingNum(leftWaitingNum)
+    //            .expireAt(Instant.now().plusMillis(autoExpireTimeMs))
+    //            .build();
+    //    }
+    //
+    //    public static WaitingQueue createActive(User user, String token, long autoExpireTimeMs) {
+    //        return WaitingQueue.builder()
+    //            .userId(user.getId())
+    //            .token(token)
+    //            .status(WaitingQueueStatus.ACTIVE.getCode())
+    //            .waitingNum(0L)
+    //            .expireAt(Instant.now().plusMillis(autoExpireTimeMs))
+    //            .build();
+    //    }
 }

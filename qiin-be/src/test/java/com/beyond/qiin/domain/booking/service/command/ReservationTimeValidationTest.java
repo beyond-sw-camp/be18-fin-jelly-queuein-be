@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
+import com.beyond.qiin.domain.booking.support.ReservationValidator;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +23,7 @@ class ReservationTimeValidationTest {
     ReservationReader reservationReader;
 
     @InjectMocks
-    ReservationCommandServiceImpl reservationService;
+    ReservationValidator reservationValidator;
 
     private Reservation res(String start, String end, Long id) {
         Reservation r = Reservation.builder()
@@ -36,7 +37,7 @@ class ReservationTimeValidationTest {
 
     private boolean check(String start, String end, List<Reservation> existing) {
         when(reservationReader.getActiveReservationsByAssetId(1L)).thenReturn(existing);
-        return reservationService.isReservationTimeAvailable(null, 1L, Instant.parse(start), Instant.parse(end));
+        return reservationValidator.isReservationTimeAvailable(null, 1L, Instant.parse(start), Instant.parse(end));
     }
 
     @DisplayName("완전 비겹침 - 왼쪽")

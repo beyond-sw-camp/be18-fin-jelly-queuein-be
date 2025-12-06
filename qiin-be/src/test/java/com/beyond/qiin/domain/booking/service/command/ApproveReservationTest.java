@@ -11,6 +11,7 @@ import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
+import com.beyond.qiin.domain.booking.support.ReservationValidator;
 import com.beyond.qiin.domain.booking.support.ReservationWriter;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
@@ -29,6 +30,9 @@ public class ApproveReservationTest {
     @Spy
     @InjectMocks
     private ReservationCommandServiceImpl reservationCommandService;
+
+    @Mock
+    private ReservationValidator reservationValidator;
 
     @Mock
     private UserReader userReader;
