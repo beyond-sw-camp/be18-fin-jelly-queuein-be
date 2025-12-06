@@ -88,7 +88,7 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
             // 대기 순번 반환
             waitingNum = waitingQueueRepository.getWaitingNum(user, token);
         }
-        // 대기 잔여  시간 계산 (10초당 활성 전환 수)
+        // 대기 잔여 시간 계산 (10초당 활성 전환 수)
         long leftWaitingNum = (long) Math.ceil((double) (waitingNum - 1) / ENTER_10_SECONDS) * 10;
 
         log.info(
@@ -102,7 +102,7 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
                 .userId(user.getId())
                 .token(token)
                 .status(WaitingQueueStatus.WAITING.getCode())
-                .waitingNum(leftWaitingNum)
+                .waitingNum(waitingNum)
                 .expireAt(Instant.now().plusMillis(AUTO_EXPIRED_TIME))
                 .build();
 
