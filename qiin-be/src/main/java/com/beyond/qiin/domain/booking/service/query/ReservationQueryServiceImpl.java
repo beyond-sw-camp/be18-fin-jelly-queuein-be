@@ -191,7 +191,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
                 .assetType(AssetType.fromCode(raw.getStatus()).toName())
                 .assetName(raw.getName())
                 .categoryName(raw.getCategoryName())
-                // .needsApproval(raw.getNeedsApproval())
+                .needsApproval(raw.getNeedApproval())
                 .build();
     }
 
