@@ -8,8 +8,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisConnectionUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -38,7 +40,7 @@ public class WaitingQueueRedisRepository {
         redisTemplate.opsForZSet().removeRange(REDIS_NAMESPACE + key, start, end);
     }
 
-    // set 자료구조에 값 추가
+    // set 자료구조에 값 추가 - 활성 사용자의 순서는 x
     public Long setAdd(String key, String value) {
         return redisTemplate.opsForSet().add(REDIS_NAMESPACE + key, value);
     }
@@ -52,12 +54,12 @@ public class WaitingQueueRedisRepository {
         });
     }
 
-    // set 안에 특정 값 있는지 확인
+    // set 안에 특정 값(member) 있는지 확인
     public Boolean setIsMember(String key, String value) {
         return redisTemplate.opsForSet().isMember(REDIS_NAMESPACE + key, value);
     }
 
-    // key에 ttl 설정(timeout : 숫자값, unit : 시간 단위)
+    // key에 ttl 설정(timeout : 숫자값, unit : 시간 단위) -> 일시적 데이터
     public void setTtl(String key, long timeout, TimeUnit unit) {
         redisTemplate.expire(REDIS_NAMESPACE + key, timeout, unit);
     }
@@ -79,6 +81,31 @@ public class WaitingQueueRedisRepository {
         }
     }
 
+    public long countActiveTokens() {
+        long count = 0;
+
+        var scanOptions = ScanOptions.scanOptions()
+            .match(REDIS_NAMESPACE + ACTIVE_KEY + ":*")
+            .count(100)
+            .build();
+
+        var connection = redisTemplate.getConnectionFactory().getConnection();
+
+        try (Cursor<byte[]> cursor = connection.scan(scanOptions)) {
+            while (cursor.hasNext()) {
+                cursor.next(); // key 값은 중요하지 않음
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+
+    public void deleteKey(String key) {
+        redisTemplate.delete(REDIS_NAMESPACE + key);
+    }
+
     // 현재 활성 토큰에 대한 계산
 //    public Long countActiveTokens() {
 //        // 레디스 서버에서 원자적 계산 (race condition 차단)
@@ -90,13 +117,8 @@ public class WaitingQueueRedisRepository {
 //        redisScript.setResultType(Long.class);
 //        return redisTemplate.execute(redisScript, Collections.emptyList(), ACTIVE_COUNT_KEY);
 //    }
-    public Long countActiveTokensWithoutLua() {
-        return redisTemplate.opsForSet()
-            .size(REDIS_NAMESPACE + ACTIVE_KEY);
-    }
-
-
-    public void deleteKey(String key) {
-        redisTemplate.delete(REDIS_NAMESPACE + key);
-    }
+//    public Long countActiveTokensWithoutLua() {
+//        return redisTemplate.opsForSet()
+//            .size(REDIS_NAMESPACE + ACTIVE_KEY); //등록한 redis key
+//    }
 }

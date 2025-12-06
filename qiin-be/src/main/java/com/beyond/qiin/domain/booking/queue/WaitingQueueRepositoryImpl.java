@@ -25,7 +25,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepository {
 
     @Override
     public long getActiveCnt() {
-        return waitingQueueRedisRepository.countActiveTokensWithoutLua();
+        return waitingQueueRedisRepository.countActiveTokens();
     }
 
     @Override
