@@ -1,12 +1,16 @@
-package com.beyond.qiin.domain.booking.service.command;
+package com.beyond.qiin.domain.waiting_queue.service;
 
-import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.AUTO_EXPIRED_TIME;
-import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.ENTER_10_SECONDS;
+import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.AUTO_EXPIRED_TIME;
+import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.ENTER_10_SECONDS;
 
 import com.beyond.qiin.common.annotation.DistributedLock;
-import com.beyond.qiin.domain.booking.entity.WaitingQueue;
-import com.beyond.qiin.domain.booking.enums.WaitingQueueStatus;
-import com.beyond.qiin.domain.booking.repository.WaitingQueueRepository;
+import com.beyond.qiin.domain.iam.support.user.UserReader;
+import com.beyond.qiin.domain.waiting_queue.dto.WaitingQueueResponseDto;
+import com.beyond.qiin.domain.waiting_queue.entity.WaitingQueue;
+import com.beyond.qiin.domain.waiting_queue.enums.WaitingQueueStatus;
+import com.beyond.qiin.domain.waiting_queue.exception.WaitingQueueErrorCode;
+import com.beyond.qiin.domain.waiting_queue.exception.WaitingQueueException;
+import com.beyond.qiin.domain.waiting_queue.repository.WaitingQueueRepository;
 import com.beyond.qiin.domain.iam.entity.User;
 import java.time.Instant;
 import java.util.Set;
@@ -23,12 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandService {
 
     private final WaitingQueueRepository waitingQueueRepository; // 대기열, 할성 큐 관리
-
+    private final UserReader userReader;
     // 사용자가 선착순 예약에 접근 시 : 토큰 활성화 여부를 체크해 토큰 대기열 정보 반환 - 상태 계산, 수정 동시에 불가
     @Transactional
     @DistributedLock(key = "'waitingQueueLock'")
     @Override
-    public WaitingQueue intoQueue(final User user) {
+    public WaitingQueueResponseDto intoQueue(final Long userId) {
+        User user = userReader.findById(userId);
         log.info("[QUEUE-ENTER] userId={}", user.getId());
         // token 발급
         String token = UUID.randomUUID().toString() + ":" + user.getId();
@@ -53,7 +58,7 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
 
     @Override
     @Transactional
-    public WaitingQueue intoActiveQueue(final User user, final String token) {
+    public WaitingQueueResponseDto intoActiveQueue(final User user, final String token) {
         // 활성 유저열에 추가
         waitingQueueRepository.saveActiveQueue(user, token);
 
@@ -65,18 +70,17 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
         waitingQueueRepository.deleteWaitingQueue(user, token);
 
         // 활성화 정보 반환
-        return WaitingQueue.builder()
-                .userId(user.getId())
-                .token(token)
-                .status(WaitingQueueStatus.ACTIVE.getCode())
-                .waitingNum(0L) // 활성 큐는 대기 순번 없음 → 0 또는 필요값
-                .expireAt(Instant.now().plusMillis(AUTO_EXPIRED_TIME))
-                .build();
+        return WaitingQueueResponseDto.from(
+                user.getId(),
+                token,
+                WaitingQueueStatus.ACTIVE.name(),
+                0L); // 활성 큐는 대기 순번 없음 → 0 또는 필요값
+
     }
 
     @Override
     @Transactional
-    public WaitingQueue intoWaitingQueue(final User user, final String token) {
+    public WaitingQueueResponseDto intoWaitingQueue(final User user, final String token) {
         // 대기 순서 확인
         Long waitingNum = waitingQueueRepository.getWaitingNum(user, token);
         if (waitingNum == null) {
@@ -103,11 +107,13 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
                 .token(token)
                 .status(WaitingQueueStatus.WAITING.getCode())
                 .waitingNum(waitingNum)
-                .expireAt(Instant.now().plusMillis(AUTO_EXPIRED_TIME))
+                .expiredAt(Instant.now().plusMillis(AUTO_EXPIRED_TIME))
                 .build();
 
         waitingQueueRepository.saveQueue(waitingQueue); // 대기 정보만 저장
-        return waitingQueue;
+
+        WaitingQueueResponseDto waitingQueueResponseDto = WaitingQueueResponseDto.from(user.getId(), token, WaitingQueueStatus.WAITING.name(), waitingNum);
+        return waitingQueueResponseDto;
     }
 
     // 대기열에서 활성 큐로 토큰을 전환하는 스케줄러용 로직
@@ -125,6 +131,22 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
         // 활성화된 큐로 유저들 변경
         waitingQueueRepository.saveActiveQueues(waitingTokens);
         log.info("[QUEUE-SCHEDULER] promotion completed");
+    }
+
+    //TODO : check status
+    public WaitingQueueResponseDto checkStatus(String token) {
+
+        boolean isActive = waitingQueueRepository.isActive(token);
+        if (isActive) {
+            return WaitingQueueResponseDto.active(token);
+        }
+
+        Long waitingNum = waitingQueueRepository.getWaitingNum(user, token);
+        if (waitingNum != null) {
+            return WaitingQueueResponseDto.waiting(token, waitingNum);
+        }
+
+        return WaitingQueueResponseDto.expired(token);
     }
 
     // active token 만료

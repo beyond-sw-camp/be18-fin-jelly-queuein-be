@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.booking.enums;
+package com.beyond.qiin.domain.waiting_queue.enums;
 
 import java.util.Arrays;
 import java.util.Map;

@@ -1,9 +1,9 @@
-package com.beyond.qiin.domain.booking.entity;
+package com.beyond.qiin.domain.waiting_queue.entity;
 
-import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.MAX_ACTIVE_USERS;
+import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.MAX_ACTIVE_USERS;
 
 import com.beyond.qiin.common.BaseEntity;
-import com.beyond.qiin.domain.booking.enums.WaitingQueueStatus;
+import com.beyond.qiin.domain.waiting_queue.enums.WaitingQueueStatus;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,7 +41,7 @@ public class WaitingQueue extends BaseEntity {
     private Long waitingNum; // 대기 순번
 
     @Column(name = "expired_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
-    private Instant expireAt; // 만료시간
+    private Instant expiredAt; // 만료시간
 
     // 총 가능한 활동자 개수
     public static long calculateActiveCnt(long activeTokenCnt) {

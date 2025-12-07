@@ -1,6 +1,6 @@
-package com.beyond.qiin.domain.booking.event;
+package com.beyond.qiin.domain.waiting_queue.event;
 
-import com.beyond.qiin.domain.booking.facade.WaitingQueueFacade;
+import com.beyond.qiin.domain.waiting_queue.facade.WaitingQueueFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

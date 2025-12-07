@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.booking.exception;
+package com.beyond.qiin.domain.waiting_queue.exception;
 
 import com.beyond.qiin.common.exception.ErrorCode;
 import lombok.Getter;

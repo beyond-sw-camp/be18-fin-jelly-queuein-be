@@ -1,5 +1,6 @@
 package com.beyond.qiin.domain.booking.service.command;
 
+import com.beyond.qiin.common.annotation.DistributedLock;
 import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandService;
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
@@ -7,14 +8,10 @@ import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationR
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.entity.Attendant;
 import com.beyond.qiin.domain.booking.entity.Reservation;
-import com.beyond.qiin.domain.booking.entity.WaitingQueue;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
-import com.beyond.qiin.domain.booking.enums.WaitingQueueStatus;
 import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
-import com.beyond.qiin.domain.booking.exception.WaitingQueueErrorCode;
-import com.beyond.qiin.domain.booking.exception.WaitingQueueException;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
@@ -24,6 +21,7 @@ import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
+import com.beyond.qiin.domain.waiting_queue.service.WaitingQueueCommandService;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -48,7 +46,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final AttendantJpaRepository attendantJpaRepository;
     private final UsageHistoryCommandService usageHistoryCommandService;
     private final WaitingQueueCommandService waitingQueueCommandService;
-    private final ReservationLockService reservationLockService;
     private final ReservationValidator reservationValidator;
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
@@ -87,23 +84,38 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
     @Override
     @Transactional
+    @DistributedLock(
+        key =
+            "'reservation:' + #assetId + ':' + #createReservationRequestDto.startAt + ':' + #createReservationRequestDto.endAt")
     public ReservationResponseDto instantConfirmReservation(
-            Long userId, Long assetId, CreateReservationRequestDto dto) {
+            Long userId, Long assetId, CreateReservationRequestDto createReservationRequestDto)
+    {
 
-        User user = userReader.findById(userId);
-        log.info("[INSTANT-RESERVE] userId={}, assetId={} - entering facade", userId, assetId);
-        // 먼저 대기 큐에 들어감
-        WaitingQueue queue = waitingQueueCommandService.intoQueue(user);
-        if (queue.getStatus() == WaitingQueueStatus.WAITING.getCode()) {
-            log.info("[INSTANT-RESERVE] userId={} is waiting. waitingNum={}", userId, queue.getWaitingNum());
+        Asset asset = assetCommandService.getAssetById(assetId);
+        User applicant = userReader.findById(userId);
+        userReader.validateAllExist(createReservationRequestDto.getAttendantIds()); // 참여자 목록의 사용자들이 모두 존재하는지에 대한 확인
+        List<User> attendantUsers = userReader.findAllByIds(createReservationRequestDto.getAttendantIds());
+        assetCommandService.isAvailable(assetId);
+        // 해당 시간에 사용 가능한 자원인지 확인
+        reservationValidator.validateReservationAvailability(
+            null, asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
 
-            throw new WaitingQueueException(WaitingQueueErrorCode.IN_WATING_QUEUE);
-        }
+        // 선착순 자원은 자동 승인
+        Reservation reservation =
+            Reservation.create(createReservationRequestDto, applicant, asset, ReservationStatus.APPROVED);
+        reservation.setIsApproved(true); // 승인됨
 
-        log.info("[INSTANT-RESERVE] try reserve with lock - userId={}, assetId={}", userId, assetId);
+        List<Attendant> attendants = attendantUsers.stream()
+            .map(user -> Attendant.create(user, reservation))
+            .collect(Collectors.toList());
 
-        // 활성화 큐에 들어간 경우 락 획득 및 사용
-        return reservationLockService.reserveReservationWithLock(user.getId(), assetId, dto);
+        reservation.addAttendants(attendants);
+
+        reservationWriter.save(reservation);
+
+        attendantWriter.saveAll(attendants);
+        reservationEventPublisher.publishCreated(reservation);
+        return ReservationResponseDto.fromEntity(reservation);
     }
 
     @Override

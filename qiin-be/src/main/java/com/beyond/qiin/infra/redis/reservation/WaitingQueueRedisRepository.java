@@ -1,7 +1,7 @@
 package com.beyond.qiin.infra.redis.reservation;
 
-import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.ACTIVE_KEY;
-import static com.beyond.qiin.domain.booking.constants.WaitingQueueConstants.REDIS_NAMESPACE;
+import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.ACTIVE_KEY;
+import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.REDIS_NAMESPACE;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
