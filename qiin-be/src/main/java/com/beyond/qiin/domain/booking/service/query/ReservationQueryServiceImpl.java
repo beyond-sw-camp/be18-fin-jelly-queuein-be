@@ -40,6 +40,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -131,21 +132,16 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         int startIdx = (int) pageable.getOffset();
         int endIdx = Math.min(startIdx + pageable.getPageSize(), appliedReservations.size());
 
+        if (startIdx >= appliedReservations.size()) {
+            return PageResponseDto.from(
+                new PageImpl<>(Collections.emptyList(), pageable, appliedReservations.size())
+            );
+        }
+
         Page<GetAppliedReservationResponseDto> page =
                 new PageImpl<>(appliedReservations.subList(startIdx, endIdx), pageable, appliedReservations.size());
 
         return PageResponseDto.from(page);
-    }
-
-    // TODO : 예약 가능한 자원 조회를 위해 우선 모든 자원 조회
-    // 해당 날에 예약 가능인지에 대한 판별 필요
-    public PageResponseDto<DescendantAssetResponseDto> getDescendantAssetList(
-            final AssetSearchCondition condition, final Pageable pageable) {
-        Page<RawDescendantAssetResponseDto> rawPage = assetQueryRepository.searchDescendants(condition, pageable);
-
-        Page<DescendantAssetResponseDto> dtoPage = rawPage.map(DescendantAssetResponseDto::fromEntity);
-
-        return PageResponseDto.from(dtoPage);
     }
 
     // 예약 가능 자원 목록 조회
@@ -166,18 +162,28 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         assetSearchCondition.setCategoryId(condition.getCategoryId());
 
         // 자원 목록 가져옴
-        Page<RawDescendantAssetResponseDto> rawList =
-                assetQueryRepository.searchDescendants(assetSearchCondition, pageable);
+        List<RawDescendantAssetResponseDto> rawList =
+                assetQueryRepository.searchDescendantsNoPaging(assetSearchCondition);
 
         // 해당 날짜의 예약 가능성 확인용
         LocalDate date = condition.getDate();
 
-        List<ReservableAssetResponseDto> content = rawList.getContent().stream()
-                .filter(raw -> isAssetReservableOnDate(raw.getAssetId(), date))
-                .filter(raw -> assetQueryService.isAvailable(raw.getAssetId()))
-                .map(this::toReservableAssetResponse) // Raw -> Reservable 로 변환
-                .toList();
-        Page<ReservableAssetResponseDto> page = new PageImpl<>(content, pageable, content.size());
+        List<ReservableAssetResponseDto> filtered = rawList.stream()
+            .filter(raw -> isAssetReservableOnDate(raw.getAssetId(), date))
+            .filter(raw -> assetQueryService.isAvailable(raw.getAssetId()))
+            .map(this::toReservableAssetResponse)
+            .toList();
+
+        int total = filtered.size();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), total);
+
+        List<ReservableAssetResponseDto> pageContent =
+            start >= total ? List.of() : filtered.subList(start, end);
+
+        Page<ReservableAssetResponseDto> page =
+            new PageImpl<>(pageContent, pageable, total);
 
         return PageResponseDto.from(page);
     }
