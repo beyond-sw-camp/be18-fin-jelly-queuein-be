@@ -5,8 +5,8 @@ import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstan
 import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.ENTER_10_SECONDS;
 import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.WAIT_KEY;
 
-import com.beyond.qiin.domain.waiting_queue.entity.WaitingQueue;
 import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.waiting_queue.entity.WaitingQueue;
 import com.beyond.qiin.infra.redis.reservation.WaitingQueueRedisRepository;
 import java.util.Optional;
 import java.util.Set;

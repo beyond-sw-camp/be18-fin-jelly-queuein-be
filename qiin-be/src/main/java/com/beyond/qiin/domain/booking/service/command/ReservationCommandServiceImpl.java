@@ -85,11 +85,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     @Override
     @Transactional
     @DistributedLock(
-        key =
-            "'reservation:' + #assetId + ':' + #createReservationRequestDto.startAt + ':' + #createReservationRequestDto.endAt")
+            key =
+                    "'reservation:' + #assetId + ':' + #createReservationRequestDto.startAt + ':' + #createReservationRequestDto.endAt")
     public ReservationResponseDto instantConfirmReservation(
-            Long userId, Long assetId, CreateReservationRequestDto createReservationRequestDto)
-    {
+            Long userId, Long assetId, CreateReservationRequestDto createReservationRequestDto) {
 
         Asset asset = assetCommandService.getAssetById(assetId);
         User applicant = userReader.findById(userId);
@@ -98,16 +97,16 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         assetCommandService.isAvailable(assetId);
         // 해당 시간에 사용 가능한 자원인지 확인
         reservationValidator.validateReservationAvailability(
-            null, asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
+                null, asset.getId(), createReservationRequestDto.getStartAt(), createReservationRequestDto.getEndAt());
 
         // 선착순 자원은 자동 승인
         Reservation reservation =
-            Reservation.create(createReservationRequestDto, applicant, asset, ReservationStatus.APPROVED);
+                Reservation.create(createReservationRequestDto, applicant, asset, ReservationStatus.APPROVED);
         reservation.setIsApproved(true); // 승인됨
 
         List<Attendant> attendants = attendantUsers.stream()
-            .map(user -> Attendant.create(user, reservation))
-            .collect(Collectors.toList());
+                .map(user -> Attendant.create(user, reservation))
+                .collect(Collectors.toList());
 
         reservation.addAttendants(attendants);
 

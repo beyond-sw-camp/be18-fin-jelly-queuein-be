@@ -1,32 +1,32 @@
-//package com.beyond.qiin.domain.booking.service.command;
+// package com.beyond.qiin.domain.booking.service.command;
 //
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.Mockito.doNothing;
-//import static org.mockito.Mockito.verify;
-//import static org.mockito.Mockito.when;
+// import static org.assertj.core.api.Assertions.assertThat;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
+// import static org.mockito.ArgumentMatchers.any;
+// import static org.mockito.Mockito.doNothing;
+// import static org.mockito.Mockito.verify;
+// import static org.mockito.Mockito.when;
 //
-//import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
-//import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
-//import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
-//import com.beyond.qiin.domain.booking.support.AttendantWriter;
-//import com.beyond.qiin.domain.booking.support.ReservationValidator;
-//import com.beyond.qiin.domain.booking.support.ReservationWriter;
-//import com.beyond.qiin.domain.iam.entity.User;
-//import com.beyond.qiin.domain.iam.support.user.UserReader;
-//import com.beyond.qiin.domain.inventory.entity.Asset;
-//import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
-//import java.time.Instant;
-//import java.util.List;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
+// import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
+// import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
+// import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
+// import com.beyond.qiin.domain.booking.support.AttendantWriter;
+// import com.beyond.qiin.domain.booking.support.ReservationValidator;
+// import com.beyond.qiin.domain.booking.support.ReservationWriter;
+// import com.beyond.qiin.domain.iam.entity.User;
+// import com.beyond.qiin.domain.iam.support.user.UserReader;
+// import com.beyond.qiin.domain.inventory.entity.Asset;
+// import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
+// import java.time.Instant;
+// import java.util.List;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.api.extension.ExtendWith;
+// import org.mockito.Mock;
+// import org.mockito.junit.jupiter.MockitoExtension;
 //
-//@ExtendWith(MockitoExtension.class)
-//public class InstantConfirmReservationTest {
+// @ExtendWith(MockitoExtension.class)
+// public class InstantConfirmReservationTest {
 //
 //    private ReservationLockServiceImpl reservationLockService;
 //
@@ -96,7 +96,8 @@
 //                .validateReservationAvailability(null, asset.getId(), requestDto.getStartAt(), requestDto.getEndAt());
 //
 //        // 실행
-//        ReservationResponseDto result = reservationLockService.reserveReservationWithLock(userId, assetId, requestDto);
+//        ReservationResponseDto result = reservationLockService.reserveReservationWithLock(userId, assetId,
+// requestDto);
 //
 //        // 검증
 //        assertThat(result).isNotNull();
@@ -115,4 +116,4 @@
 //        verify(reservationValidator)
 //                .validateReservationAvailability(null, asset.getId(), requestDto.getStartAt(), requestDto.getEndAt());
 //    }
-//}
+// }

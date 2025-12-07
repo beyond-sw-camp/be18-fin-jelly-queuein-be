@@ -1,25 +1,15 @@
 package com.beyond.qiin.domain.waiting_queue.controller;
 
-import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
-import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.waiting_queue.dto.WaitingQueueResponseDto;
-import com.beyond.qiin.domain.waiting_queue.entity.WaitingQueue;
 import com.beyond.qiin.domain.waiting_queue.service.WaitingQueueCommandService;
-import com.beyond.qiin.security.CustomUserDetails;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.resolver.AccessToken;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.retry.annotation.CircuitBreaker;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,40 +18,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/waiting-queues")
 public class WaitingQueueController {
-  private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
-  private final WaitingQueueCommandService waitingQueueCommandService;
+    private final WaitingQueueCommandService waitingQueueCommandService;
 
-  @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
-  @PostMapping
-  public ResponseEntity<WaitingQueueResponseDto> enterWaitingQueue(
-      @AccessToken final String accessToken) {
-    final Long userId = jwtTokenProvider.getUserId(accessToken);
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PostMapping
+    public ResponseEntity<WaitingQueueResponseDto> enterWaitingQueue(@AccessToken final String accessToken) {
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
 
-    WaitingQueueResponseDto waitingQueueResponseDto =
-        waitingQueueCommandService.intoQueue(userId);
-    return ResponseEntity.status(201).body(waitingQueueResponseDto);
-  }
+        WaitingQueueResponseDto waitingQueueResponseDto = waitingQueueCommandService.intoQueue(userId);
+        return ResponseEntity.status(201).body(waitingQueueResponseDto);
+    }
 
-  //프론트에서 폴링 용도(대기 진입 후 활성까지)
-  @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
-  @GetMapping("/status")
-  public ResponseEntity<WaitingQueueResponseDto> getStatus(
-      @AccessToken final String accessToken,
-      @RequestParam final String token
-      ) {
+    // 프론트에서 폴링 용도(대기 진입 후 활성까지)
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @GetMapping("/status")
+    public ResponseEntity<WaitingQueueResponseDto> getStatus(
+            @AccessToken final String accessToken, @RequestParam final String token) {
 
-    return ResponseEntity.ok(waitingQueueCommandService.checkStatus(token));
-  }
+        return ResponseEntity.ok(waitingQueueCommandService.checkStatus(token));
+    }
 
-  //관리자의 강제 만료 처리 용도
-  @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
-  @DeleteMapping
-  public ResponseEntity<Void> expire(
-      @AccessToken final String accessToken,
-      @RequestParam final String token
-      ) {
-    waitingQueueCommandService.forceExpireToken(token);
-    return ResponseEntity.noContent().build();
-  }
+    // 관리자의 강제 만료 처리 용도
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
+    @DeleteMapping
+    public ResponseEntity<Void> expire(@AccessToken final String accessToken, @RequestParam final String token) {
+        waitingQueueCommandService.forceExpireToken(token);
+        return ResponseEntity.noContent().build();
+    }
 }

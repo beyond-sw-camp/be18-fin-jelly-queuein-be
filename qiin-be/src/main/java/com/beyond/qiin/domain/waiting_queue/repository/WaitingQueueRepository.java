@@ -1,7 +1,7 @@
 package com.beyond.qiin.domain.waiting_queue.repository;
 
-import com.beyond.qiin.domain.waiting_queue.entity.WaitingQueue;
 import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.waiting_queue.entity.WaitingQueue;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;

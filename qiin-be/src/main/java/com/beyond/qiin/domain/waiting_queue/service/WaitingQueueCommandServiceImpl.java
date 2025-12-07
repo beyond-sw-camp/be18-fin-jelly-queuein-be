@@ -4,14 +4,12 @@ import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstan
 import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.ENTER_10_SECONDS;
 
 import com.beyond.qiin.common.annotation.DistributedLock;
+import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.waiting_queue.dto.WaitingQueueResponseDto;
 import com.beyond.qiin.domain.waiting_queue.entity.WaitingQueue;
 import com.beyond.qiin.domain.waiting_queue.enums.WaitingQueueStatus;
-import com.beyond.qiin.domain.waiting_queue.exception.WaitingQueueErrorCode;
-import com.beyond.qiin.domain.waiting_queue.exception.WaitingQueueException;
 import com.beyond.qiin.domain.waiting_queue.repository.WaitingQueueRepository;
-import com.beyond.qiin.domain.iam.entity.User;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
@@ -71,11 +69,7 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
 
         // 활성화 정보 반환
         return WaitingQueueResponseDto.from(
-                user.getId(),
-                token,
-                WaitingQueueStatus.ACTIVE.name(),
-                0L); // 활성 큐는 대기 순번 없음 → 0 또는 필요값
-
+                user.getId(), token, WaitingQueueStatus.ACTIVE.name(), 0L); // 활성 큐는 대기 순번 없음 → 0 또는 필요값
     }
 
     @Override
@@ -112,7 +106,8 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
 
         waitingQueueRepository.saveQueue(waitingQueue); // 대기 정보만 저장
 
-        WaitingQueueResponseDto waitingQueueResponseDto = WaitingQueueResponseDto.from(user.getId(), token, WaitingQueueStatus.WAITING.name(), waitingNum);
+        WaitingQueueResponseDto waitingQueueResponseDto =
+                WaitingQueueResponseDto.from(user.getId(), token, WaitingQueueStatus.WAITING.name(), waitingNum);
         return waitingQueueResponseDto;
     }
 
@@ -133,7 +128,7 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
         log.info("[QUEUE-SCHEDULER] promotion completed");
     }
 
-    //TODO : check status
+    // TODO : check status
     public WaitingQueueResponseDto checkStatus(String token) {
 
         boolean isActive = waitingQueueRepository.isActive(token);
