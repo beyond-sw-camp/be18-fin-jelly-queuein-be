@@ -11,6 +11,7 @@ import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -108,23 +109,23 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
             }
         }
 
-        BooleanBuilder closureOn = new BooleanBuilder();
-        closureOn.and(closure.assetClosureId.descendantId.eq(asset.id));
+        BooleanBuilder closureFilter = new BooleanBuilder();
+        boolean useClosure = false;
 
-        // 0계층 / 1계층 (AssetClosure 기반)
         if (condition.getLayerZero() != null) {
-            closureOn
-                    .and(closure.depth.eq(0))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
+            useClosure = true;
+            closureFilter.and(closure.depth.eq(0))
+                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
         }
 
         if (condition.getLayerOne() != null) {
-            closureOn
-                    .and(closure.depth.eq(1))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
+            useClosure = true;
+            closureFilter.and(closure.depth.eq(1))
+                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
         }
 
-        List<RawUserReservationResponseDto> content = query.select(Projections.constructor(
+
+        JPAQuery<RawUserReservationResponseDto> contentQuery = query.select(Projections.constructor(
                         RawUserReservationResponseDto.class,
                         reservation.id,
                         reservation.startAt,
@@ -139,27 +140,39 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                         category.name.as("categoryName"),
                         asset.type,
                         asset.status))
-                .from(reservation)
-                .join(asset)
-                .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(category)
-                .on(category.id.eq(asset.category.id))
-                .leftJoin(closure)
-                .on(closureOn)
-                .where(builder)
-                .orderBy(reservation.id.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+            .from(reservation)
+            .join(asset).on(asset.id.eq(reservation.asset.id))
+            .leftJoin(category).on(category.id.eq(asset.category.id));
 
-        Long total = query.select(reservation.count())
-                .from(reservation)
-                .join(asset)
-                .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(closure)
-                .on(closureOn)
-                .where(builder)
-                .fetchOne();
+        if (useClosure) {
+            contentQuery.leftJoin(closure)
+                .on(closure.assetClosureId.descendantId.eq(asset.id))
+                .where(builder.and(closureFilter));
+        } else {
+            contentQuery.where(builder);
+        }
+
+        List<RawUserReservationResponseDto> content = contentQuery
+            .orderBy(reservation.id.desc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        JPAQuery<Long> totalQuery = query
+            .select(reservation.countDistinct())
+            .from(reservation)
+            .join(asset).on(asset.id.eq(reservation.asset.id))
+            .leftJoin(category).on(category.id.eq(asset.category.id));
+
+        if (useClosure) {
+            totalQuery.leftJoin(closure)
+                .on(closure.assetClosureId.descendantId.eq(asset.id))
+                .where(builder.and(closureFilter));
+        } else {
+            totalQuery.where(builder);
+        }
+
+        Long total = totalQuery.fetchOne();
 
         return new PageImpl<>(content, pageable, total);
     }

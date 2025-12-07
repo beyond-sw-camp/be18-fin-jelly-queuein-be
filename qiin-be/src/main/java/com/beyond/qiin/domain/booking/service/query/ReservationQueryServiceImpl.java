@@ -22,7 +22,6 @@ import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
 import com.beyond.qiin.domain.booking.repository.querydsl.AppliedReservationsQueryRepository;
-import com.beyond.qiin.domain.booking.repository.querydsl.ReservableAssetsQueryRepository;
 import com.beyond.qiin.domain.booking.repository.querydsl.UserReservationsQueryRepository;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
 import com.beyond.qiin.domain.booking.util.AvailableTimeSlotCalculator;
@@ -62,7 +61,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final ReservationReader reservationReader;
     private final AssetQueryService assetQueryService;
     private final UserReservationsQueryRepository userReservationsQueryRepository;
-    private final ReservableAssetsQueryRepository reservableAssetsQueryRepository;
+//    private final ReservableAssetsQueryRepository reservableAssetsQueryRepository;
     private final AppliedReservationsQueryRepository appliedReservationsQueryRepository;
     private final AssetQueryRepository assetQueryRepository;
 
