@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum WaitingQueueStatus {
     WAITING(0), // 대기 중
-    ACTIVE(1); // 활성 상태
+    ACTIVE(1),
+    EXPIRED(2); // 활성 상태
 
     private final int code;
 

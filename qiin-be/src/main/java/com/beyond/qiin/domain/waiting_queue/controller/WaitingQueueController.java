@@ -40,6 +40,18 @@ public class WaitingQueueController {
         return ResponseEntity.ok(waitingQueueCommandService.checkStatus(token));
     }
 
+    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
+    @PostMapping("/enter")
+    public ResponseEntity<WaitingQueueResponseDto> enterService(
+            @AccessToken final String accessToken, @RequestParam final String token) {
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
+        // ACTIVE 상태인지 검증(입장 권한 부여), 입장 처리(토큰 소모, 입장 확정)
+        WaitingQueueResponseDto dto = waitingQueueCommandService.enterService(userId, token);
+
+        return ResponseEntity.ok(dto);
+    }
+
     // 관리자의 강제 만료 처리 용도
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @DeleteMapping

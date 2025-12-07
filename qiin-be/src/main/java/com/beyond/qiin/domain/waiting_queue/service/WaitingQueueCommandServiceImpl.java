@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.waiting_queue.service;
 
-import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.AUTO_EXPIRED_TIME;
+import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.AUTO_ACTIVE_EXPIRE_TIME;
+import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.AUTO_WAIT_EXPIRE_TIME;
 import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.ENTER_10_SECONDS;
 
 import com.beyond.qiin.common.annotation.DistributedLock;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 
 @Slf4j
 @Service
@@ -62,14 +64,13 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
 
         log.info("[QUEUE-ACTIVE] userId={}, token={}", user.getId(), token);
         // ttl 설정 - 일정 시간 동안의 예약 기능 사용
-        waitingQueueRepository.setTimeOut(token, AUTO_EXPIRED_TIME, TimeUnit.MILLISECONDS);
+        waitingQueueRepository.setTimeOut(token, AUTO_ACTIVE_EXPIRE_TIME, TimeUnit.MILLISECONDS);
 
         // 대기열에서 토큰 정보 제거
         waitingQueueRepository.deleteWaitingQueue(user, token);
 
         // 활성화 정보 반환
-        return WaitingQueueResponseDto.from(
-                user.getId(), token, WaitingQueueStatus.ACTIVE.name(), 0L); // 활성 큐는 대기 순번 없음 → 0 또는 필요값
+        return WaitingQueueResponseDto.intoActive(token); // 활성 큐는 대기 순번 없음 → 0 또는 필요값
     }
 
     @Override
@@ -101,13 +102,12 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
                 .token(token)
                 .status(WaitingQueueStatus.WAITING.getCode())
                 .waitingNum(waitingNum)
-                .expiredAt(Instant.now().plusMillis(AUTO_EXPIRED_TIME))
+                .expiredAt(Instant.now().plusMillis(AUTO_WAIT_EXPIRE_TIME))
                 .build();
 
         waitingQueueRepository.saveQueue(waitingQueue); // 대기 정보만 저장
 
-        WaitingQueueResponseDto waitingQueueResponseDto =
-                WaitingQueueResponseDto.from(user.getId(), token, WaitingQueueStatus.WAITING.name(), waitingNum);
+        WaitingQueueResponseDto waitingQueueResponseDto = WaitingQueueResponseDto.intoWait(token, waitingNum);
         return waitingQueueResponseDto;
     }
 
@@ -129,19 +129,25 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
     }
 
     // TODO : check status
+    @Override
+    @Transactional
     public WaitingQueueResponseDto checkStatus(String token) {
 
-        boolean isActive = waitingQueueRepository.isActive(token);
-        if (isActive) {
-            return WaitingQueueResponseDto.active(token);
-        }
+        // active 상태인지 확인
+        WaitingQueueStatus status = validateToken(token);
+        return WaitingQueueResponseDto.from(status);
+    }
 
-        Long waitingNum = waitingQueueRepository.getWaitingNum(user, token);
-        if (waitingNum != null) {
-            return WaitingQueueResponseDto.waiting(token, waitingNum);
-        }
+    @Override
+    @Transactional
+    public WaitingQueueResponseDto enterService(String token) {
 
-        return WaitingQueueResponseDto.expired(token);
+        WaitingQueueStatus status = validateToken(token);
+
+        if (status != WaitingQueueStatus.ACTIVE) throw new Unauthorized();
+
+        deleteActiveToken(token);
+        return successDto();
     }
 
     // active token 만료
@@ -149,5 +155,21 @@ public class WaitingQueueCommandServiceImpl implements WaitingQueueCommandServic
     @Transactional
     public void forceExpireToken(final String token) {
         waitingQueueRepository.deleteExpiredToken(token);
+    }
+
+    private WaitingQueueStatus validateToken(String token) {
+
+        if (waitingQueueRepository.isActive(token)) {
+            long ttl = waitingQueueRepository.getActiveTTL(token);
+            return (ttl > 0) ? WaitingQueueStatus.ACTIVE : WaitingQueueStatus.EXPIRED;
+        }
+
+        Long rank = waitingQueueRepository.getWaitingRank(token);
+        if (rank != null) {
+            long ttl = waitingQueueRepository.getWaitTTL(token);
+            return (ttl > 0) ? WaitingQueueStatus.WAITING : WaitingQueueStatus.EXPIRED;
+        }
+
+        return WaitingQueueStatus.EXPIRED;
     }
 }

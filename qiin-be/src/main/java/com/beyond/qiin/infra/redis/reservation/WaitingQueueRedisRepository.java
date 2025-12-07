@@ -39,6 +39,18 @@ public class WaitingQueueRedisRepository {
         redisTemplate.opsForZSet().removeRange(REDIS_NAMESPACE + key, start, end);
     }
 
+    public boolean isActive(String token) {
+        return redisTemplate.hasKey(REDIS_NAMESPACE + ACTIVE_KEY + ":" + token);
+    }
+
+    public long getActiveTTL(String token) {
+        return redisTemplate.getExpire(REDIS_NAMESPACE + ACTIVE_KEY + ":" + token, TimeUnit.MILLISECONDS);
+    }
+
+    public void setActiveTTL(String token, long ttlMs) {
+        redisTemplate.expire(REDIS_NAMESPACE + ACTIVE_KEY + ":" + token, ttlMs, TimeUnit.MILLISECONDS);
+    }
+
     // set 자료구조에 값 추가 - 활성 사용자의 순서는 x
     public Long setAdd(String key, String value) {
         return redisTemplate.opsForSet().add(REDIS_NAMESPACE + key, value);
@@ -56,6 +68,14 @@ public class WaitingQueueRedisRepository {
     // set 안에 특정 값(member) 있는지 확인
     public Boolean setIsMember(String key, String value) {
         return redisTemplate.opsForSet().isMember(REDIS_NAMESPACE + key, value);
+    }
+
+    public void setWaitTTL(String token, long ttl) {
+        redisTemplate.expire(REDIS_NAMESPACE + "WAIT_TTL:" + token, ttl, TimeUnit.MILLISECONDS);
+    }
+
+    public long getWaitTTL(String token) {
+        return redisTemplate.getExpire(REDIS_NAMESPACE + "WAIT_TTL:" + token, TimeUnit.MILLISECONDS);
     }
 
     // key에 ttl 설정(timeout : 숫자값, unit : 시간 단위) -> 일시적 데이터

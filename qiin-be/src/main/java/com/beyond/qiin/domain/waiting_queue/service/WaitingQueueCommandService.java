@@ -11,6 +11,8 @@ public interface WaitingQueueCommandService {
 
     WaitingQueueResponseDto intoWaitingQueue(final User user, final String token);
 
+    WaitingQueueResponseDto checkStatus(String token);
+
     void activateTokens();
 
     void forceExpireToken(final String token);

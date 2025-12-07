@@ -1,11 +1,10 @@
 package com.beyond.qiin.domain.waiting_queue.repository;
 
 import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.ACTIVE_KEY;
-import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.AUTO_EXPIRED_TIME;
+import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.AUTO_ACTIVE_EXPIRE_TIME;
 import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.ENTER_10_SECONDS;
 import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.WAIT_KEY;
 
-import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.waiting_queue.entity.WaitingQueue;
 import com.beyond.qiin.infra.redis.reservation.WaitingQueueRedisRepository;
 import java.util.Optional;
@@ -31,7 +30,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepository {
     }
 
     @Override
-    public void saveActiveQueue(User user, String token) {
+    public void saveActiveQueue(String token) {
         // 활성 큐 prefix(대기 열과 구분용)
         waitingQueueRedisRepository.setAdd(ACTIVE_KEY + ":" + token, String.valueOf(user.getId()));
     }
@@ -43,17 +42,17 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepository {
 
     // 대기열 - 순서 유지 필요
     @Override
-    public void deleteWaitingQueue(User user, String token) {
+    public void deleteWaitingQueue(String token) {
         waitingQueueRedisRepository.zSetRemove(WAIT_KEY, token);
     }
 
     @Override
-    public Long getWaitingNum(User user, String token) {
+    public Long getWaitingNum(String token) {
         return waitingQueueRedisRepository.zSetRank(WAIT_KEY, token);
     }
 
     @Override
-    public void saveWaitingQueue(User user, String token) {
+    public void saveWaitingQueue(String token) {
         waitingQueueRedisRepository.zSetAdd(WAIT_KEY, token, System.currentTimeMillis());
     }
 
@@ -69,11 +68,33 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepository {
 
     @Override
     public void saveActiveQueues(Set<String> tokens) {
-        waitingQueueRedisRepository.setAddRangeWithTtl(ACTIVE_KEY, tokens, AUTO_EXPIRED_TIME, TimeUnit.MILLISECONDS);
+        waitingQueueRedisRepository.setAddRangeWithTtl(
+                ACTIVE_KEY, tokens, AUTO_ACTIVE_EXPIRE_TIME, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void deleteExpiredToken(String token) {
         waitingQueueRedisRepository.deleteKey(ACTIVE_KEY + ":" + token);
+    }
+
+    public void setWaitTTL(String token, long ttlMs) {
+        waitingQueueRedisRepository.setTtl(WAIT_TTL_KEY + ":" + token, ttlMs, TimeUnit.MILLISECONDS);
+    }
+
+    public long getWaitTTL(String token) {
+        return waitingQueueRedisRepository.getTTL(WAIT_TTL_KEY + ":" + token);
+    }
+
+    public boolean isActive(String token) {
+        return waitingQueueRedisRepository.exists(ACTIVE_KEY + ":" + token);
+    }
+
+    public long getActiveTTL(String token) {
+        return waitingQueueRedisRepository.getTTL(ACTIVE_KEY + ":" + token);
+    }
+
+    public void deleteWaitingQueue(String token) {
+        waitingQueueRedisRepository.zSetRemove(WAIT_KEY, token);
+        waitingQueueRedisRepository.deleteKey(WAIT_TTL_KEY + ":" + token);
     }
 }
