@@ -105,16 +105,17 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
 
         if (condition.getLayerZero() != null) {
             useClosure = true;
-            closureFilter.and(closure.depth.eq(0))
-                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
+            closureFilter
+                    .and(closure.depth.eq(0))
+                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
         }
 
         if (condition.getLayerOne() != null) {
             useClosure = true;
-            closureFilter.and(closure.depth.eq(1))
-                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
+            closureFilter
+                    .and(closure.depth.eq(1))
+                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
         }
-
 
         // 조회
         var queryBuilder = query.select(Projections.constructor(
@@ -136,18 +137,15 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                 .leftJoin(reservation.applicant, applicant)
                 .leftJoin(reservation.respondent, respondent);
 
-
         if (useClosure) {
-            queryBuilder.leftJoin(closure)
-                .on(closure.assetClosureId.descendantId.eq(asset.id))
-                .where(builder.and(closureFilter));
+            queryBuilder
+                    .leftJoin(closure)
+                    .on(closure.assetClosureId.descendantId.eq(asset.id))
+                    .where(builder.and(closureFilter));
         } else {
             queryBuilder.where(builder);
         }
 
-        return queryBuilder
-            .orderBy(reservation.id.desc())
-            .fetch();
+        return queryBuilder.orderBy(reservation.id.desc()).fetch();
     }
-
 }

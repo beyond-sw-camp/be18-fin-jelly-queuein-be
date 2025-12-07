@@ -114,16 +114,17 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
 
         if (condition.getLayerZero() != null) {
             useClosure = true;
-            closureFilter.and(closure.depth.eq(0))
-                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
+            closureFilter
+                    .and(closure.depth.eq(0))
+                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
         }
 
         if (condition.getLayerOne() != null) {
             useClosure = true;
-            closureFilter.and(closure.depth.eq(1))
-                .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
+            closureFilter
+                    .and(closure.depth.eq(1))
+                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
         }
-
 
         JPAQuery<RawUserReservationResponseDto> contentQuery = query.select(Projections.constructor(
                         RawUserReservationResponseDto.class,
@@ -140,34 +141,39 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                         category.name.as("categoryName"),
                         asset.type,
                         asset.status))
-            .from(reservation)
-            .join(asset).on(asset.id.eq(reservation.asset.id))
-            .leftJoin(category).on(category.id.eq(asset.category.id));
+                .from(reservation)
+                .join(asset)
+                .on(asset.id.eq(reservation.asset.id))
+                .leftJoin(category)
+                .on(category.id.eq(asset.category.id));
 
         if (useClosure) {
-            contentQuery.leftJoin(closure)
-                .on(closure.assetClosureId.descendantId.eq(asset.id))
-                .where(builder.and(closureFilter));
+            contentQuery
+                    .leftJoin(closure)
+                    .on(closure.assetClosureId.descendantId.eq(asset.id))
+                    .where(builder.and(closureFilter));
         } else {
             contentQuery.where(builder);
         }
 
         List<RawUserReservationResponseDto> content = contentQuery
-            .orderBy(reservation.id.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+                .orderBy(reservation.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
-        JPAQuery<Long> totalQuery = query
-            .select(reservation.countDistinct())
-            .from(reservation)
-            .join(asset).on(asset.id.eq(reservation.asset.id))
-            .leftJoin(category).on(category.id.eq(asset.category.id));
+        JPAQuery<Long> totalQuery = query.select(reservation.countDistinct())
+                .from(reservation)
+                .join(asset)
+                .on(asset.id.eq(reservation.asset.id))
+                .leftJoin(category)
+                .on(category.id.eq(asset.category.id));
 
         if (useClosure) {
-            totalQuery.leftJoin(closure)
-                .on(closure.assetClosureId.descendantId.eq(asset.id))
-                .where(builder.and(closureFilter));
+            totalQuery
+                    .leftJoin(closure)
+                    .on(closure.assetClosureId.descendantId.eq(asset.id))
+                    .where(builder.and(closureFilter));
         } else {
             totalQuery.where(builder);
         }
