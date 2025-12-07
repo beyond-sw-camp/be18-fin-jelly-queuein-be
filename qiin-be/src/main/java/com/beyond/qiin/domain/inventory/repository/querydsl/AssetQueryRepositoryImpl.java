@@ -244,12 +244,11 @@ public class AssetQueryRepositoryImpl implements AssetQueryRepository {
         if (condition.getOneDepth() != null) {
             needsClosureJoin = true;
             builder.and(assetClosure.assetClosureId.ancestorId.eq(Long.valueOf(condition.getOneDepth())))
-                .and(assetClosure.depth.gt(0));
-        }
-        else if (condition.getRoot() != null) {
+                    .and(assetClosure.depth.gt(0));
+        } else if (condition.getRoot() != null) {
             needsClosureJoin = true;
             builder.and(assetClosure.assetClosureId.ancestorId.eq(Long.valueOf(condition.getRoot())))
-                .and(assetClosure.depth.gt(0));
+                    .and(assetClosure.depth.gt(0));
         }
 
         if (condition.getCategoryId() != null) {
@@ -261,35 +260,35 @@ public class AssetQueryRepositoryImpl implements AssetQueryRepository {
         }
 
         if (condition.getStatus() != null) {
-            builder.and(asset.status.eq(AssetStatus.fromName(condition.getStatus()).getCode()));
+            builder.and(
+                    asset.status.eq(AssetStatus.fromName(condition.getStatus()).getCode()));
         }
 
         if (condition.getKeyword() != null && !condition.getKeyword().isEmpty()) {
-            builder.and(asset.name.containsIgnoreCase(condition.getKeyword())
-                .or(asset.description.containsIgnoreCase(condition.getKeyword())));
+            builder.and(asset.name
+                    .containsIgnoreCase(condition.getKeyword())
+                    .or(asset.description.containsIgnoreCase(condition.getKeyword())));
         }
 
         var query = jpaQueryFactory
-            .select(Projections.constructor(
-                RawDescendantAssetResponseDto.class,
-                asset.id,
-                asset.name,
-                category.name,
-                asset.status,
-                asset.type,
-                asset.needsApproval,
-                asset.status.eq(0),
-                asset.version))
-            .from(asset)
-            .leftJoin(category).on(category.id.eq(asset.category.id));
+                .select(Projections.constructor(
+                        RawDescendantAssetResponseDto.class,
+                        asset.id,
+                        asset.name,
+                        category.name,
+                        asset.status,
+                        asset.type,
+                        asset.needsApproval,
+                        asset.status.eq(0),
+                        asset.version))
+                .from(asset)
+                .leftJoin(category)
+                .on(category.id.eq(asset.category.id));
 
         if (needsClosureJoin) {
             query.leftJoin(assetClosure).on(assetClosure.assetClosureId.descendantId.eq(asset.id));
         }
 
-        return query.where(builder)
-            .orderBy(asset.name.asc())
-            .fetch();
+        return query.where(builder).orderBy(asset.name.asc()).fetch();
     }
-
 }

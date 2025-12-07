@@ -29,7 +29,6 @@ import com.beyond.qiin.domain.booking.vo.DateRange;
 import com.beyond.qiin.domain.booking.vo.TimeSlot;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.dto.asset.request.search_condition.AssetSearchCondition;
-import com.beyond.qiin.domain.inventory.dto.asset.response.DescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryRepository;
@@ -133,9 +132,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         int endIdx = Math.min(startIdx + pageable.getPageSize(), appliedReservations.size());
 
         if (startIdx >= appliedReservations.size()) {
-            return PageResponseDto.from(
-                new PageImpl<>(Collections.emptyList(), pageable, appliedReservations.size())
-            );
+            return PageResponseDto.from(new PageImpl<>(Collections.emptyList(), pageable, appliedReservations.size()));
         }
 
         Page<GetAppliedReservationResponseDto> page =
@@ -169,21 +166,19 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         LocalDate date = condition.getDate();
 
         List<ReservableAssetResponseDto> filtered = rawList.stream()
-            .filter(raw -> isAssetReservableOnDate(raw.getAssetId(), date))
-            .filter(raw -> assetQueryService.isAvailable(raw.getAssetId()))
-            .map(this::toReservableAssetResponse)
-            .toList();
+                .filter(raw -> isAssetReservableOnDate(raw.getAssetId(), date))
+                .filter(raw -> assetQueryService.isAvailable(raw.getAssetId()))
+                .map(this::toReservableAssetResponse)
+                .toList();
 
         int total = filtered.size();
 
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), total);
 
-        List<ReservableAssetResponseDto> pageContent =
-            start >= total ? List.of() : filtered.subList(start, end);
+        List<ReservableAssetResponseDto> pageContent = start >= total ? List.of() : filtered.subList(start, end);
 
-        Page<ReservableAssetResponseDto> page =
-            new PageImpl<>(pageContent, pageable, total);
+        Page<ReservableAssetResponseDto> page = new PageImpl<>(pageContent, pageable, total);
 
         return PageResponseDto.from(page);
     }
