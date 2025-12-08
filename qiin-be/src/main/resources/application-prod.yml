@@ -65,3 +65,12 @@ logging:
   level:
     root: WARN
     com.beyond.qiin: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health   # /actuator/health 활성화
+  endpoint:
+    health:
+      show-details: never   # 상세정보 숨김 (보안)
