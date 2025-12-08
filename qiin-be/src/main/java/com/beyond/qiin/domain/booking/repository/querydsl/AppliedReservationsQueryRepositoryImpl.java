@@ -82,9 +82,8 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
             }
         }
 
-        // 카테고리 이름
-        if (condition.getCategoryName() != null) {
-            builder.and(category.name.eq(condition.getCategoryName()));
+        if (condition.getCategoryId() != null) {
+            builder.and(asset.category.id.eq(condition.getCategoryId()));
         }
 
         // 자원 유형(int) - 변환된 값 사용
@@ -101,20 +100,16 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
         }
 
         BooleanBuilder closureFilter = new BooleanBuilder();
-        boolean useClosure = false;
-
-        if (condition.getLayerZero() != null) {
-            useClosure = true;
-            closureFilter
-                    .and(closure.depth.eq(0))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
-        }
+        boolean needsClosureJoin = false;
 
         if (condition.getLayerOne() != null) {
-            useClosure = true;
-            closureFilter
-                    .and(closure.depth.eq(1))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
+            needsClosureJoin = true;
+            builder.and(closure.assetClosureId.ancestorId.eq(Long.valueOf(condition.getLayerOne())))
+                    .and(closure.depth.gt(0)); // 자기 자신 제외
+        } else if (condition.getLayerZero() != null) {
+            needsClosureJoin = true;
+            builder.and(closure.assetClosureId.ancestorId.eq(Long.valueOf(condition.getLayerZero())))
+                    .and(closure.depth.gt(0)); // 자기 자신 제외
         }
 
         // 조회
@@ -137,15 +132,10 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                 .leftJoin(reservation.applicant, applicant)
                 .leftJoin(reservation.respondent, respondent);
 
-        if (useClosure) {
-            queryBuilder
-                    .leftJoin(closure)
-                    .on(closure.assetClosureId.descendantId.eq(asset.id))
-                    .where(builder.and(closureFilter));
-        } else {
-            queryBuilder.where(builder);
+        if (needsClosureJoin) {
+            queryBuilder.leftJoin(closure).on(closure.assetClosureId.descendantId.eq(asset.id));
         }
 
-        return queryBuilder.orderBy(reservation.id.desc()).fetch();
+        return queryBuilder.where(builder).orderBy(reservation.id.desc()).fetch();
     }
 }

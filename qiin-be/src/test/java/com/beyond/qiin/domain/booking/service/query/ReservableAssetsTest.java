@@ -2,6 +2,7 @@ package com.beyond.qiin.domain.booking.service.query;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
@@ -67,10 +68,8 @@ public class ReservableAssetsTest {
 
         Page<RawDescendantAssetResponseDto> rawPage = new PageImpl<>(List.of(raw1, raw2), pageable, 2);
 
-        when(assetQueryRepository.searchDescendants(any(), any())).thenReturn(rawPage);
-
-        when(assetQueryService.isAvailable(10L)).thenReturn(true);
-        when(assetQueryService.isAvailable(20L)).thenReturn(true);
+        when(assetQueryRepository.searchDescendantsAsList(any())).thenReturn(List.of(raw1, raw2));
+        when(assetQueryService.isAvailable(anyLong())).thenReturn(true);
 
         PageResponseDto<ReservableAssetResponseDto> result =
                 reservationQueryService.getReservableAssets(userId, condition, pageable);
