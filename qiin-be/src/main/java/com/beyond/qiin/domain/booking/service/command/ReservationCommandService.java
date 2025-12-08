@@ -32,7 +32,5 @@ public interface ReservationCommandService {
     ReservationResponseDto updateReservation(
             final Long userId, final Long reservationId, final UpdateReservationRequestDto createReservationRequestDto);
 
-    void updateReservationsForAsset(final Long assetId, final Integer assetStatus);
-
     void softDeleteReservation(final Long userId, final Long reservationId);
 }
