@@ -81,13 +81,13 @@ public class Asset extends BaseEntity {
     @Column(name = "version", nullable = false)
     private Long version;
 
-    public void apply(Category category, UpdateAssetRequestDto requestDto, int statusCode, int typeCode) {
+    public void apply(Category category, UpdateAssetRequestDto requestDto, Integer statusCode, Integer typeCode) {
         if (category != null) this.category = category;
         if (requestDto.getName() != null) this.name = requestDto.getName();
         if (requestDto.getDescription() != null) this.description = requestDto.getDescription();
         if (requestDto.getImage() != null) this.image = requestDto.getImage();
-        if (requestDto.getStatus() != null) this.status = statusCode;
-        if (requestDto.getType() != null) this.type = typeCode;
+        if (requestDto.getStatus() != null && statusCode != null){ this.status = statusCode;}
+        if (requestDto.getType() != null && typeCode != null) this.type = typeCode;
         if (requestDto.getAccessLevel() != null) this.accessLevel = requestDto.getAccessLevel();
         if (requestDto.getApprovalStatus() != null) this.needsApproval = requestDto.getApprovalStatus();
         if (requestDto.getCostPerHour() != null) this.costPerHour = requestDto.getCostPerHour();
