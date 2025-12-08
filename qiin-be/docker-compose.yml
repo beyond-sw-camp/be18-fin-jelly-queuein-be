@@ -96,6 +96,7 @@ services:
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
     restart: on-failure
 
 volumes:
