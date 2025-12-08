@@ -2,6 +2,7 @@ package com.beyond.qiin.infra.redis.reservation;
 
 import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.ACTIVE_KEY;
 import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.REDIS_NAMESPACE;
+import static com.beyond.qiin.domain.waiting_queue.constants.WaitingQueueConstants.WAIT_KEY;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -12,6 +13,7 @@ import org.springframework.data.redis.core.RedisConnectionUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Repository;
+// TODO : wait ttl, setAddRangeTTL
 
 @Repository
 @RequiredArgsConstructor
@@ -40,11 +42,11 @@ public class WaitingQueueRedisRepository {
     }
 
     public boolean isActive(String token) {
-        return redisTemplate.hasKey(REDIS_NAMESPACE + ACTIVE_KEY + ":" + token);
+        return redisTemplate.hasKey(REDIS_NAMESPACE + ACTIVE_KEY + ":" + token); // 전체 토큰을 통한 조회
     }
 
     public long getActiveTTL(String token) {
-        return redisTemplate.getExpire(REDIS_NAMESPACE + ACTIVE_KEY + ":" + token, TimeUnit.MILLISECONDS);
+        return redisTemplate.getExpire(REDIS_NAMESPACE + ACTIVE_KEY + ":" + token, TimeUnit.MILLISECONDS); // 반환값 단위 지정
     }
 
     public void setActiveTTL(String token, long ttlMs) {
@@ -61,7 +63,7 @@ public class WaitingQueueRedisRepository {
         value.forEach(token -> {
             String[] tokenInfo = token.split(":");
             redisTemplate.opsForSet().add(REDIS_NAMESPACE + key + ":" + tokenInfo[0], tokenInfo[1]);
-            setTtl(key + ":" + tokenInfo[0], timeout, unit);
+            setActiveTTL(key + ":" + tokenInfo[0], timeout, unit);
         });
     }
 
@@ -71,16 +73,11 @@ public class WaitingQueueRedisRepository {
     }
 
     public void setWaitTTL(String token, long ttl) {
-        redisTemplate.expire(REDIS_NAMESPACE + "WAIT_TTL:" + token, ttl, TimeUnit.MILLISECONDS);
+        redisTemplate.expire(REDIS_NAMESPACE + WAIT_KEY + ":" + token, ttl, TimeUnit.MILLISECONDS);
     }
 
     public long getWaitTTL(String token) {
-        return redisTemplate.getExpire(REDIS_NAMESPACE + "WAIT_TTL:" + token, TimeUnit.MILLISECONDS);
-    }
-
-    // key에 ttl 설정(timeout : 숫자값, unit : 시간 단위) -> 일시적 데이터
-    public void setTtl(String key, long timeout, TimeUnit unit) {
-        redisTemplate.expire(REDIS_NAMESPACE + key, timeout, unit);
+        return redisTemplate.getExpire(REDIS_NAMESPACE + WAIT_KEY + ":" + token, TimeUnit.MILLISECONDS);
     }
 
     // set의 해당 구간 사용자들을 가져오는 용도

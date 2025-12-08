@@ -32,12 +32,12 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepository {
     @Override
     public void saveActiveQueue(String token) {
         // 활성 큐 prefix(대기 열과 구분용)
-        waitingQueueRedisRepository.setAdd(ACTIVE_KEY + ":" + token, String.valueOf(user.getId()));
+        waitingQueueRedisRepository.setAdd(ACTIVE_KEY + ":" + token);
     }
 
     @Override
     public void setTimeOut(String key, long timeout, TimeUnit unit) {
-        waitingQueueRedisRepository.setTtl(ACTIVE_KEY + ":" + key, timeout, unit);
+        waitingQueueRedisRepository.setActiveTTL(ACTIVE_KEY + ":" + key, timeout, unit);
     }
 
     // 대기열 - 순서 유지 필요
