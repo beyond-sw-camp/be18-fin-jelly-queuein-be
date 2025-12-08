@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.inventory.service.command;
 
 import com.beyond.qiin.domain.booking.service.command.ReservationCommandService;
+import com.beyond.qiin.domain.booking.support.ReservationWriter;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
@@ -41,7 +42,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
     private final AssetDetailRedisAdapter assetDetailRedisAdapter;
 
-    private final ReservationCommandService reservationCommandService;
+    private final ReservationWriter reservationWriter;
 
     // 생성
     @Override
@@ -143,7 +144,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
         asset.apply(newCategory, requestDto, statusCode, typeCode);
 
         // 자원 상태 변경에 따른 예약 상태 변경
-        reservationCommandService.updateReservationsForAsset(assetId, statusCode);
+        reservationWriter.updateReservationsForAsset(assetId, statusCode);
 
         // 레디스 삭제
         assetDetailRedisAdapter.delete(assetId);
