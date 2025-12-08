@@ -18,12 +18,11 @@ import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryRepository;
+import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
-import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

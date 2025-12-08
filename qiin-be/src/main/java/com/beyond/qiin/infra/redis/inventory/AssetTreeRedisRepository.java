@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AssetTreeRedisRepository extends CrudRepository<AssetTreeReadModel, Long> {
 
-//    Long Id(Long id);
+    //    Long Id(Long id);
 }
