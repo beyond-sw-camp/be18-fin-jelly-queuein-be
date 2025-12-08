@@ -1,5 +1,7 @@
 package com.beyond.qiin.security.config;
 
+import static com.beyond.qiin.security.constants.SecurityWhitelist.*;
+
 import com.beyond.qiin.security.jwt.JwtFilter;
 import java.util.Arrays;
 import java.util.List;
@@ -23,8 +25,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import static com.beyond.qiin.security.constants.SecurityWhitelist.*;
 
 @Configuration
 @EnableWebSecurity
