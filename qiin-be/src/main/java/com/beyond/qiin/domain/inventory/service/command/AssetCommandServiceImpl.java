@@ -1,6 +1,5 @@
 package com.beyond.qiin.domain.inventory.service.command;
 
-import com.beyond.qiin.domain.booking.service.command.ReservationCommandService;
 import com.beyond.qiin.domain.booking.support.ReservationWriter;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
