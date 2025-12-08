@@ -26,6 +26,7 @@ import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.CategoryJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRepository;
+import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -57,6 +58,9 @@ class AssetCommandServiceImplTest {
 
     @Mock
     private UserReader userReader;
+
+    @Mock
+    private AssetDetailRedisAdapter assetDetailRedisAdapter;
 
     @InjectMocks
     private AssetCommandServiceImpl service;

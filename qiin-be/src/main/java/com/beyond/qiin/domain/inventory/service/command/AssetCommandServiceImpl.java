@@ -16,6 +16,7 @@ import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.CategoryJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRepository;
+import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class AssetCommandServiceImpl implements AssetCommandService {
     private final CategoryJpaRepository categoryJpaRepository;
 
     private final UserReader userReader;
+    private final AssetDetailRedisAdapter assetDetailRedisAdapter;
 
     // 생성
     @Override
@@ -89,6 +91,8 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
             assetClosureJpaRepository.save(AssetClosure.of(ancestorId, assetId, depth));
         }
+        // 레디스 삭제
+        assetDetailRedisAdapter.delete(asset.getId());
 
         return CreateAssetResponseDto.fromEntity(asset, parentId);
     }
@@ -113,13 +117,29 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             categoryCommandService.validateCategoryId(requestDto.getCategoryId());
         }
 
-        int statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
-        int typeCode = AssetType.fromName(requestDto.getType()).toCode();
+        // status가 null이면 null 전달
+        Integer statusCode = null;
+        if (requestDto.getStatus() != null && !requestDto.getStatus().isBlank()) {
+            statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
+        }
 
-        Category category =
-                categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
+        // type이 null이면 null 전달
+        Integer typeCode = null;
+        if (requestDto.getType() != null && !requestDto.getType().isBlank()) {
+            typeCode = AssetType.fromName(requestDto.getType()).toCode();
+        }
+        //        int statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
+        //        int typeCode = AssetType.fromName(requestDto.getType()).toCode();
 
-        asset.apply(category, requestDto, statusCode, typeCode);
+        Category newCategory = null;
+        if (requestDto.getCategoryId() != null) {
+            newCategory =
+                    categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
+        }
+        asset.apply(newCategory, requestDto, statusCode, typeCode);
+
+        // 레디스 삭제
+        assetDetailRedisAdapter.delete(assetId);
 
         return UpdateAssetResponseDto.fromEntity(asset);
     }
@@ -147,6 +167,9 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         // 계층 구조 삭제
         assetClosureQueryRepository.deleteAllByDescendantId(assetId);
+
+        // 레디스 삭제
+        assetDetailRedisAdapter.delete(assetId);
     }
 
     @Override
@@ -208,6 +231,9 @@ public class AssetCommandServiceImpl implements AssetCommandService {
             }
         }
 
+        // 레디스 삭제
+        assetDetailRedisAdapter.delete(assetId);
+
         //        for (Long id : subtreeIds) {
         //            System.out.println("subtree id 생성: " + id);
         //            // if문 써서 값이 없으면 넣기
@@ -235,6 +261,9 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         // 2) 기존 부모 계층과 subtree 연결된 링크 삭제
         assetClosureQueryRepository.deleteOldAncestorLinks(subtreeIds);
+
+        // 레디스 삭제
+        assetDetailRedisAdapter.delete(assetId);
     }
 
     //// 일반 메소드들 모음
