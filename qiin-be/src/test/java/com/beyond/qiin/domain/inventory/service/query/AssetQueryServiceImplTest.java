@@ -22,6 +22,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+
+import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +43,9 @@ class AssetQueryServiceImplTest {
 
     @Mock
     private AssetClosureQueryRepository assetClosureQueryRepository;
+
+    @Mock
+    private AssetDetailRedisAdapter assetDetailRedisAdapter;
 
     @InjectMocks
     private AssetQueryServiceImpl service;

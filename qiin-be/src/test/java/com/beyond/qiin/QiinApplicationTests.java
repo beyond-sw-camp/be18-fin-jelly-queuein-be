@@ -2,8 +2,11 @@ package com.beyond.qiin;
 
 import com.beyond.qiin.config.TestRedisConfig;
 import com.beyond.qiin.infra.redis.iam.role.RoleRedisRepository;
+import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
+import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisRepository;
 import com.beyond.qiin.infra.redis.reservation.ReservationRedisRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -27,6 +30,9 @@ class QiinApplicationTests {
 
     @MockBean
     private ReservationRedisRepository reservationRedisRepository;
+
+    @MockBean
+    private AssetDetailRedisRepository assetDetailRedisRepository;
 
     @Test
     void contextLoads() {}

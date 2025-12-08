@@ -29,6 +29,8 @@ import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRep
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+
+import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,6 +59,9 @@ class AssetCommandServiceImplTest {
 
     @Mock
     private UserReader userReader;
+
+    @Mock
+    private AssetDetailRedisAdapter assetDetailRedisAdapter;
 
     @InjectMocks
     private AssetCommandServiceImpl service;
