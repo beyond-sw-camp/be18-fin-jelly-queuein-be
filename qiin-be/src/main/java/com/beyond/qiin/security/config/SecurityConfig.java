@@ -1,6 +1,11 @@
 package com.beyond.qiin.security.config;
 
+import static com.beyond.qiin.security.constants.SecurityWhitelist.AUTH;
+import static com.beyond.qiin.security.constants.SecurityWhitelist.INTERNAL;
+
 import com.beyond.qiin.security.jwt.JwtFilter;
+import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,12 +26,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static com.beyond.qiin.security.constants.SecurityWhitelist.AUTH;
-import static com.beyond.qiin.security.constants.SecurityWhitelist.INTERNAL;
 
 @Configuration
 @EnableWebSecurity
