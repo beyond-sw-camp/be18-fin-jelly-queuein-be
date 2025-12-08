@@ -29,6 +29,7 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
     WHERE r.applicant.id = :userId
       AND r.startAt <= :to
       AND r.endAt >= :from
+      AND r.status IN (1, 2, 5)
 """)
     List<Reservation> findByUserIdAndYearMonth(Long userId, Instant from, Instant to);
 
@@ -37,6 +38,7 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
     select r from Reservation r
     where r.applicant.id = :userId
       and r.startAt between :start and :end
+      and r.status in (1, 2, 5)
     order by r.startAt asc
 """)
     List<Reservation> findByUserIdAndWeek(Long userId, Instant start, Instant end);

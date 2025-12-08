@@ -9,7 +9,6 @@ import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.G
 import com.beyond.qiin.domain.booking.dto.reservation.response.applied_reservation.GetAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawAppliedReservationResponseDto;
 import com.beyond.qiin.domain.booking.repository.querydsl.AppliedReservationsQueryRepository;
-import com.beyond.qiin.domain.booking.repository.querydsl.ReservableAssetsQueryRepository;
 import com.beyond.qiin.domain.booking.repository.querydsl.UserReservationsQueryRepository;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -45,9 +44,6 @@ public class GetAppliedReservationsTest {
 
     @Mock
     private UserReservationsQueryRepository userReservationsQueryRepository;
-
-    @Mock
-    private ReservableAssetsQueryRepository reservableAssetsQueryRepository;
 
     @Test
     void getReservationApplies_returnsPagedDto() {
