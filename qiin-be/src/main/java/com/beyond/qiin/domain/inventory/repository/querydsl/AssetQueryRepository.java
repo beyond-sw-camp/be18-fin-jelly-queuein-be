@@ -38,5 +38,5 @@ public interface AssetQueryRepository {
     // 검색 필터용
     Page<RawDescendantAssetResponseDto> searchDescendants(AssetSearchCondition condition, Pageable pageable);
 
-    List<RawDescendantAssetResponseDto> searchDescendantsNoPaging(AssetSearchCondition condition);
+    List<RawDescendantAssetResponseDto> searchDescendantsAsList(AssetSearchCondition condition);
 }

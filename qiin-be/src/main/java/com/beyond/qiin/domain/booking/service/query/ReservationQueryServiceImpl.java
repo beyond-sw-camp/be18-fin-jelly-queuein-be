@@ -160,7 +160,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         // 자원 목록 가져옴
         List<RawDescendantAssetResponseDto> rawList =
-                assetQueryRepository.searchDescendantsNoPaging(assetSearchCondition);
+                assetQueryRepository.searchDescendantsAsList(assetSearchCondition);
 
         // 해당 날짜의 예약 가능성 확인용
         LocalDate date = condition.getDate();
