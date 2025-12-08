@@ -1,10 +1,10 @@
-//package com.beyond.qiin.domain.notification.service;
+// package com.beyond.qiin.domain.notification.service;
 //
-//import com.beyond.qiin.domain.notification.entity.Notification;
-//import com.beyond.qiin.infra.event.reservation.ReservationCreatedPayload;
-//import com.beyond.qiin.infra.event.reservation.ReservationUpdatedPayload;
+// import com.beyond.qiin.domain.notification.entity.Notification;
+// import com.beyond.qiin.infra.event.reservation.ReservationCreatedPayload;
+// import com.beyond.qiin.infra.event.reservation.ReservationUpdatedPayload;
 //
-//public interface NotificationCommandService {
+// public interface NotificationCommandService {
 //  Notification notifyCreated(ReservationCreatedPayload payload);
 //
 //  Notification notifyUpdated(ReservationUpdatedPayload payload);
@@ -14,4 +14,4 @@
 //  void softDelete(Long notificationId, Long userId);
 //
 //  void hardDelete(Long notificationId, Long userId);
-//}
+// }
