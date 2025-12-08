@@ -125,7 +125,7 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     //        }
 
     private TreeAssetResponseDto buildTreeFromMap(
-            Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
+            final Long assetId, final Map<Long, Asset> assetMap, final Map<Long, List<Long>> childrenMap) {
 
         Asset asset = assetMap.get(assetId);
 
@@ -173,7 +173,7 @@ public class AssetQueryServiceImpl implements AssetQueryService {
                 .toList();
     }
 
-    private TreeAssetResponseDto buildTree(Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
+    private TreeAssetResponseDto buildTree(final Long assetId, final Map<Long, Asset> assetMap, final Map<Long, List<Long>> childrenMap) {
 
         Asset asset = assetMap.get(assetId);
 
