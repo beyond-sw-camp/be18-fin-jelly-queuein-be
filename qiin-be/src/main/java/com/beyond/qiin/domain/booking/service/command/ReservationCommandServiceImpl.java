@@ -266,10 +266,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     // 자원 상태 변경 시 예약 상태 변경
     @Override
     @Transactional
-    public void updateReservationsForAsset(Long assetId, int assetStatus) {
+    public void updateReservationsForAsset(final Long assetId, final Integer assetStatus) {
         // 1 = UNAVAILABLE, 2 = MAINTENANCE
         if (assetStatus != 1 && assetStatus != 2) return;
-
+        if (assetStatus == null) return;
         // pending, approved, using 대상(0, 1, 2)
         List<Reservation> reservations = reservationWriter.findFutureUsableReservations(assetId);
 
