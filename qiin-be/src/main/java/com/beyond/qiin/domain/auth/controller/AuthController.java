@@ -7,6 +7,7 @@ import com.beyond.qiin.security.resolver.AccessToken;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthCommandService authCommandService;
+
+    @Value("${JWT_REFRESH_TOKEN_EXPIRATION}")
+    private long refreshTokenExpirationMs;
+
+    private long cookieExpirySeconds() {
+        return refreshTokenExpirationMs / 1000;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResult> login(@Valid @RequestBody final LoginRequestDto request) {
