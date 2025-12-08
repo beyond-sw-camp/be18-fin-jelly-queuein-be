@@ -86,7 +86,9 @@ public class Asset extends BaseEntity {
         if (requestDto.getName() != null) this.name = requestDto.getName();
         if (requestDto.getDescription() != null) this.description = requestDto.getDescription();
         if (requestDto.getImage() != null) this.image = requestDto.getImage();
-        if (requestDto.getStatus() != null && statusCode != null){ this.status = statusCode;}
+        if (requestDto.getStatus() != null && statusCode != null) {
+            this.status = statusCode;
+        }
         if (requestDto.getType() != null && typeCode != null) this.type = typeCode;
         if (requestDto.getAccessLevel() != null) this.accessLevel = requestDto.getAccessLevel();
         if (requestDto.getApprovalStatus() != null) this.needsApproval = requestDto.getApprovalStatus();

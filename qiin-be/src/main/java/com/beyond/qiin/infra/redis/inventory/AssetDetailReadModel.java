@@ -1,5 +1,7 @@
 package com.beyond.qiin.infra.redis.inventory;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,9 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
-
-import java.math.BigDecimal;
-import java.time.Instant;
 
 @Getter
 @NoArgsConstructor // redis 에서 필요

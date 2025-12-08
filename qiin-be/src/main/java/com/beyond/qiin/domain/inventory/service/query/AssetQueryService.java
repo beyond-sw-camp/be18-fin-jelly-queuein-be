@@ -24,8 +24,8 @@ public interface AssetQueryService {
             final AssetSearchCondition condition, final Pageable pageable);
 
     //    부분 트리 방식임
-        TreeAssetResponseDto getAssetTree(final Long assetId);
-//        List<TreeAssetResponseDto> getFullAssetTree();
+    TreeAssetResponseDto getAssetTree(final Long assetId);
+    //        List<TreeAssetResponseDto> getFullAssetTree();
 
     // 전체 트리 조회
     List<TreeAssetResponseDto> getFullAssetTree();

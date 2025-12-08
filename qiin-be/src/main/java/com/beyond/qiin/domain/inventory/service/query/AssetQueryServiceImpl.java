@@ -15,16 +15,14 @@ import com.beyond.qiin.domain.inventory.exception.AssetException;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryRepository;
+import com.beyond.qiin.infra.redis.inventory.AssetDetailReadModel;
+import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.beyond.qiin.infra.redis.inventory.AssetDetailReadModel;
-import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
-import com.beyond.qiin.infra.redis.inventory.AssetTreeReadModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -86,59 +84,59 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     // 부분 트리 방식임
     // 레디스 부분 트리 저장 용
     // 현재로서는 서브트리 조회 api가 없으므로 레디스 저장도 할 수가 없음
-        @Override
-        @Transactional(readOnly = true)
-        public TreeAssetResponseDto getAssetTree(final Long assetId) {
+    @Override
+    @Transactional(readOnly = true)
+    public TreeAssetResponseDto getAssetTree(final Long assetId) {
 
-            Asset rootAsset = assetQueryRepository.findById(assetId).orElseThrow(AssetException::notFound);
+        Asset rootAsset = assetQueryRepository.findById(assetId).orElseThrow(AssetException::notFound);
 
-            List<AssetClosure> closures = assetQueryRepository.findSubtree(assetId);
+        List<AssetClosure> closures = assetQueryRepository.findSubtree(assetId);
 
-            List<Long> descendantIds = closures.stream()
-                    .map(c -> c.getAssetClosureId().getDescendantId())
-                    .distinct()
-                    .toList();
+        List<Long> descendantIds = closures.stream()
+                .map(c -> c.getAssetClosureId().getDescendantId())
+                .distinct()
+                .toList();
 
-            List<Asset> assets = assetQueryRepository.findByIds(descendantIds);
+        List<Asset> assets = assetQueryRepository.findByIds(descendantIds);
 
-            Map<Long, Asset> assetMap = assets.stream().collect(Collectors.toMap(Asset::getId, a -> a));
+        Map<Long, Asset> assetMap = assets.stream().collect(Collectors.toMap(Asset::getId, a -> a));
 
-            Map<Long, List<Long>> childrenMap = new HashMap<>();
+        Map<Long, List<Long>> childrenMap = new HashMap<>();
 
-            for (AssetClosure c : closures) {
-                if (c.getDepth() == 1) {
-                    Long parentId = c.getAssetClosureId().getAncestorId();
-                    Long childId = c.getAssetClosureId().getDescendantId();
+        for (AssetClosure c : closures) {
+            if (c.getDepth() == 1) {
+                Long parentId = c.getAssetClosureId().getAncestorId();
+                Long childId = c.getAssetClosureId().getDescendantId();
 
-                    childrenMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(childId);
-                }
+                childrenMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(childId);
             }
-
-            return buildTreeFromMap(assetId, assetMap, childrenMap);
         }
 
-//        @Override
-//        @Transactional(readOnly = true)
-//        public List<TreeAssetResponseDto> getFullAssetTree() {
-//
-//            List<Long> rootIds = assetQueryRepository.findRootAssetIds();
-//
-//            return rootIds.stream().map(this::getAssetTree).toList();
-//        }
+        return buildTreeFromMap(assetId, assetMap, childrenMap);
+    }
 
-        private TreeAssetResponseDto buildTreeFromMap(
-                Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
+    //        @Override
+    //        @Transactional(readOnly = true)
+    //        public List<TreeAssetResponseDto> getFullAssetTree() {
+    //
+    //            List<Long> rootIds = assetQueryRepository.findRootAssetIds();
+    //
+    //            return rootIds.stream().map(this::getAssetTree).toList();
+    //        }
 
-            Asset asset = assetMap.get(assetId);
+    private TreeAssetResponseDto buildTreeFromMap(
+            Long assetId, Map<Long, Asset> assetMap, Map<Long, List<Long>> childrenMap) {
 
-            List<Long> childIds = childrenMap.getOrDefault(assetId, List.of());
+        Asset asset = assetMap.get(assetId);
 
-            List<TreeAssetResponseDto> children = childIds.stream()
-                    .map(childId -> buildTreeFromMap(childId, assetMap, childrenMap))
-                    .toList();
+        List<Long> childIds = childrenMap.getOrDefault(assetId, List.of());
 
-            return TreeAssetResponseDto.of(asset.getId(), asset.getName(), children);
-        }
+        List<TreeAssetResponseDto> children = childIds.stream()
+                .map(childId -> buildTreeFromMap(childId, assetMap, childrenMap))
+                .toList();
+
+        return TreeAssetResponseDto.of(asset.getId(), asset.getName(), children);
+    }
 
     @Override
     @Transactional(readOnly = true)

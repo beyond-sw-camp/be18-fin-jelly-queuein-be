@@ -16,9 +16,8 @@ import com.beyond.qiin.domain.inventory.repository.AssetClosureJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.AssetJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.CategoryJpaRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRepository;
-import java.util.List;
-
 import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,21 +119,22 @@ public class AssetCommandServiceImpl implements AssetCommandService {
 
         // status가 null이면 null 전달
         Integer statusCode = null;
-        if(requestDto.getStatus() != null && !requestDto.getStatus().isBlank()){
+        if (requestDto.getStatus() != null && !requestDto.getStatus().isBlank()) {
             statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
         }
 
         // type이 null이면 null 전달
         Integer typeCode = null;
-        if(requestDto.getType() != null && !requestDto.getType().isBlank()){
+        if (requestDto.getType() != null && !requestDto.getType().isBlank()) {
             typeCode = AssetType.fromName(requestDto.getType()).toCode();
         }
-//        int statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
-//        int typeCode = AssetType.fromName(requestDto.getType()).toCode();
+        //        int statusCode = AssetStatus.fromName(requestDto.getStatus()).toCode();
+        //        int typeCode = AssetType.fromName(requestDto.getType()).toCode();
 
         Category newCategory = null;
         if (requestDto.getCategoryId() != null) {
-            newCategory = categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
+            newCategory =
+                    categoryJpaRepository.findById(requestDto.getCategoryId()).orElseThrow(CategoryException::notFound);
         }
         asset.apply(newCategory, requestDto, statusCode, typeCode);
 
