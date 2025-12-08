@@ -4,12 +4,14 @@ import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.request.ChangePwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.ChangeTempPwRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
-import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateMyInfoRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserByAdminRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.search_condition.GetUsersSearchCondition;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.UserLookupResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
+import com.beyond.qiin.domain.iam.dto.user_role.request.UpdateUserRoleRequestDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
 import com.beyond.qiin.security.resolver.CurrentUserId;
@@ -44,17 +46,37 @@ public class UserController {
 
     // 사용자 생성
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    @PreAuthorize("hasAuthority('IAM_USER_CREATE')")
     public ResponseEntity<CreateUserResponseDto> createUser(@Valid @RequestBody final CreateUserRequestDto request) {
         return ResponseEntity.ok(userCommandService.createUser(request));
     }
 
-    // 사용자 수정
+    // 사용자 역할 수정
+    @PatchMapping("/{userId}/role")
+    @PreAuthorize("hasAuthority('IAM_USER_UPDATE')")
+    public ResponseEntity<Void> updateUserRole(
+            @PathVariable final Long userId,
+            @RequestBody @Valid final UpdateUserRoleRequestDto request,
+            @CurrentUserId final Long updaterId) {
+        userCommandService.updateUserRole(userId, request.getRoleId(), updaterId);
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
+    @PreAuthorize("hasAuthority('IAM_USER_UPDATE')")
     public ResponseEntity<Void> updateUser(
-            @PathVariable final Long userId, @Valid @RequestBody final UpdateUserRequestDto request) {
+            @PathVariable final Long userId, @Valid @RequestBody final UpdateUserByAdminRequestDto request) {
+
         userCommandService.updateUser(userId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    // 본인정보 수정
+    @PatchMapping("/me")
+    public ResponseEntity<Void> updateMe(
+            @Valid @RequestBody final UpdateMyInfoRequestDto request, @CurrentUserId final Long userId) {
+
+        userCommandService.updateMyInfo(userId, request);
         return ResponseEntity.ok().build();
     }
 
@@ -78,7 +100,7 @@ public class UserController {
 
     // 사용자 삭제
     @DeleteMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    @PreAuthorize("hasAuthority('IAM_USER_DELETE')")
     public ResponseEntity<Void> deleteUser(@PathVariable final Long userId, @CurrentUserId final Long deleterId) {
         userCommandService.deleteUser(userId, deleterId);
         return ResponseEntity.noContent().build();
@@ -90,7 +112,7 @@ public class UserController {
 
     // 사용자 목록 조회 (MASTER, ADMIN, MANAGER)
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
+    @PreAuthorize("hasAuthority('IAM_USER_READ')")
     public PageResponseDto<RawUserListResponseDto> searchUsers(
             @ModelAttribute final GetUsersSearchCondition condition, final Pageable pageable) {
 
@@ -106,7 +128,7 @@ public class UserController {
 
     // 사용자 상세 조회
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN','MANAGER')")
+    @PreAuthorize("hasAuthority('IAM_USER_READ')")
     public DetailUserResponseDto getUser(@PathVariable final Long userId) {
         return userQueryService.getUser(userId);
     }

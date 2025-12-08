@@ -18,6 +18,14 @@ public class RoleProjectionHandler {
         redisAdapter.save(role);
     }
 
+    public void onRolePermissionsChanged(final Role role) {
+        redisAdapter.save(role);
+    }
+
+    public void onUserRoleChanged(final Role role) {
+        redisAdapter.save(role);
+    }
+
     public void onRoleDeleted(final Role role) {
         redisAdapter.delete(role.getId());
     }

@@ -33,7 +33,7 @@ public class PermissionController {
     // -------------------------------------------
     // 권한 생성
     @PostMapping
-    @PreAuthorize("hasAuthority('MASTER')")
+    @PreAuthorize("hasAuthority('IAM_PERMISSION_CREATE')")
     public ResponseEntity<PermissionResponseDto> createPermission(
             @Valid @RequestBody final CreatePermissionRequestDto request) {
         return ResponseEntity.ok(permissionCommandService.createPermission(request));
@@ -41,7 +41,7 @@ public class PermissionController {
 
     // 권한 수정
     @PutMapping("/{permissionId}")
-    @PreAuthorize("hasAuthority('MASTER')")
+    @PreAuthorize("hasAuthority('IAM_PERMISSION_UPDATE')")
     public ResponseEntity<PermissionResponseDto> updatePermission(
             @PathVariable final Long permissionId, @Valid @RequestBody final UpdatePermissionRequestDto request) {
         return ResponseEntity.ok(permissionCommandService.updatePermission(permissionId, request));
@@ -49,7 +49,7 @@ public class PermissionController {
 
     // 권한 삭제
     @DeleteMapping("/{permissionId}")
-    @PreAuthorize("hasAuthority('MASTER')")
+    @PreAuthorize("hasAuthority('IAM_PERMISSION_DELETE')")
     public ResponseEntity<Void> deletePermission(
             @PathVariable final Long permissionId, @CurrentUserId final Long deleterId) {
         permissionCommandService.deletePermission(permissionId, deleterId);
@@ -62,14 +62,14 @@ public class PermissionController {
 
     // 권한 상세 조회
     @GetMapping("/{permissionId}")
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    @PreAuthorize("hasAuthority('IAM_PERMISSION_READ')")
     public ResponseEntity<PermissionResponseDto> getPermission(@PathVariable final Long permissionId) {
         return ResponseEntity.ok(permissionQueryService.getPermission(permissionId));
     }
 
     // 권한 목록 조회
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('MASTER','ADMIN')")
+    @PreAuthorize("hasAuthority('IAM_PERMISSION_READ')")
     public ResponseEntity<PermissionListResponseDto> getPermissions() {
         return ResponseEntity.ok(permissionQueryService.getPermissions());
     }

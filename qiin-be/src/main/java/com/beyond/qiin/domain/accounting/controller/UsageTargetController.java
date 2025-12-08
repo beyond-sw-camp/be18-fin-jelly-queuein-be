@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/accounting/usage-targets")
+@RequestMapping("/api/v1/accounting/usage-targets")
 @RequiredArgsConstructor
 public class UsageTargetController {
 

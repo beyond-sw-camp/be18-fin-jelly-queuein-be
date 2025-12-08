@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.service.command;
 
 import com.beyond.qiin.common.annotation.DistributedLock;
+import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandService;
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
@@ -42,6 +43,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final AssetCommandService assetCommandService;
     private final ReservationEventPublisher reservationEventPublisher;
     private final AttendantJpaRepository attendantJpaRepository;
+    private final UsageHistoryCommandService usageHistoryCommandService;
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
@@ -160,6 +162,12 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         // 지금 사용 불가한 자원이면 제외
         assetCommandService.isAvailable(reservation.getAsset().getId());
 
+        // 시작 시간부터 사용 가능
+        Instant now = Instant.now();
+        if (now.isBefore(reservation.getStartAt())) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_TIME_NOT_YET);
+        }
+
         reservation.start(); // status using, 실제 시작 시간 추가
         reservationWriter.save(reservation);
         return ReservationResponseDto.fromEntity(reservation);
@@ -174,6 +182,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Reservation reservation = reservationReader.getReservationById(reservationId);
         reservation.end(); // status complete, 실제 종료 시간 추가
         reservationWriter.save(reservation);
+
+        Asset asset = reservation.getAsset();
+
+        usageHistoryCommandService.createUsageHistory(asset, reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -284,9 +296,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             throw new ReservationException(ReservationErrorCode.RESERVATION_CANCEL_NOT_ALLOWED);
     }
 
-    // todo : 날짜 기반으로 추가
+    // test 가능하도록 package private 허용
     // 자원에 대한 예약 가능의 유무 -  비즈니스 책임이므로 command service로
-    private boolean isReservationTimeAvailable(
+    boolean isReservationTimeAvailable(
             final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
 
         List<Reservation> reservations = reservationReader.getActiveReservationsByAssetId(assetId);

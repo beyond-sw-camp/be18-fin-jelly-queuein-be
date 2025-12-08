@@ -125,7 +125,9 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                         reservation.status,
                         reservation.isApproved,
                         reservation.reason,
-                        reservation.version))
+                        reservation.version,
+                        reservation.startAt,
+                        reservation.endAt))
                 .from(reservation)
                 .join(reservation.asset, asset)
                 .leftJoin(asset.category, category)
@@ -134,6 +136,7 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
                 .leftJoin(reservation.applicant, applicant)
                 .leftJoin(reservation.respondent, respondent)
                 .where(builder)
+                .orderBy(reservation.id.desc())
                 .fetch();
     }
 }

@@ -10,10 +10,7 @@ import com.beyond.qiin.domain.inventory.entity.QCategory;
 import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -150,7 +147,7 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                 .leftJoin(closure)
                 .on(closureOn)
                 .where(builder)
-                .orderBy(getOrderSpecifiers(pageable))
+                .orderBy(reservation.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -165,19 +162,5 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total);
-    }
-
-    private OrderSpecifier<?>[] getOrderSpecifiers(Pageable pageable) {
-        return pageable.getSort().stream()
-                .map(order -> {
-                    String property = order.getProperty(); // "startAt", "status" ...
-
-                    Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-
-                    PathBuilder<?> path = new PathBuilder<>(QReservation.class, "reservation");
-
-                    return new OrderSpecifier(direction, path.get(property));
-                })
-                .toArray(OrderSpecifier[]::new);
     }
 }

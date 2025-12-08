@@ -20,6 +20,8 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.
 import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.WeekReservationResponseDto;
 import com.beyond.qiin.domain.booking.entity.Reservation;
+import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
+import com.beyond.qiin.domain.booking.exception.ReservationException;
 import com.beyond.qiin.domain.booking.repository.querydsl.AppliedReservationsQueryRepository;
 import com.beyond.qiin.domain.booking.repository.querydsl.ReservableAssetsQueryRepository;
 import com.beyond.qiin.domain.booking.repository.querydsl.UserReservationsQueryRepository;
@@ -104,7 +106,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
             final Long userId, final GetAppliedReservationSearchCondition condition, Pageable pageable) {
 
         userReader.findById(userId);
-        LocalDate date = condition.getDate();
 
         List<RawAppliedReservationResponseDto> rawList = appliedReservationsQueryRepository.search(condition);
 
@@ -112,13 +113,15 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         for (RawAppliedReservationResponseDto raw : rawList) {
 
-            boolean isReservable = isAssetReservableOnDate(raw.getAssetId(), date);
             boolean isAssetAvailable = assetQueryService.isAvailable(raw.getAssetId());
 
-            if (isReservable && isAssetAvailable) {
-                appliedReservations.add(
-                        GetAppliedReservationResponseDto.fromRaw(raw, isReservable)); // 생성 조건이 true이므로 인자로 받지 않음
-            }
+            // 해당 시간대에 예약 가능 유무 판별
+            boolean isReservableTime = isReservationTimeAvailable(
+                    raw.getReservationId(), raw.getAssetId(), raw.getStartAt(), raw.getEndAt());
+
+            // 모든 신청 내역을 보여주되 가능한지에 대해 정보 제공
+            boolean isReservable = isAssetAvailable && isReservableTime;
+            appliedReservations.add(GetAppliedReservationResponseDto.fromRaw(raw, isReservable));
         }
 
         int startIdx = (int) pageable.getOffset();
@@ -302,7 +305,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return isReservableForDay(date, reservations);
     }
 
-    private boolean isReservableForDay(LocalDate date, List<Reservation> reservations) {
+    boolean isReservableForDay(LocalDate date, List<Reservation> reservations) {
 
         ZoneId zone = ZoneId.of("Asia/Seoul");
 
@@ -341,5 +344,44 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         // 하루 전체를 덮었는지 확인
         return !(coveredStart.equals(dayStart) && coveredEnd.equals(dayEnd));
+    }
+
+    // api x 비즈니스 메서드
+    private void validateReservationAvailability(
+            final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
+        if (!isReservationTimeAvailable(reservationId, assetId, startAt, endAt))
+            throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
+    }
+
+    // test 가능하도록 package private 허용
+    // 자원에 대한 예약 가능의 유무 -  비즈니스 책임이므로 command service로
+    boolean isReservationTimeAvailable(
+            final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
+
+        List<Reservation> reservations = reservationReader.getActiveReservationsByAssetId(assetId);
+
+        for (Reservation reservation : reservations) {
+
+            if (reservationId != null) { // 생성시는 null
+                if (reservation.getId().equals(reservationId)) {
+                    continue;
+                }
+            }
+
+            Instant existingStart = reservation.getStartAt();
+            Instant existingEnd = reservation.getEndAt();
+
+            // 딱 맞닿는 경우는 허용
+            if (startAt.equals(existingEnd) || endAt.equals(existingStart)) {
+                continue;
+            }
+
+            // 겹침 체크
+            boolean overlaps = startAt.isBefore(existingEnd) && endAt.isAfter(existingStart);
+
+            if (overlaps) return false;
+        }
+
+        return true;
     }
 }
