@@ -22,13 +22,19 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     private final ObjectMapper objectMapper;
 
     // 각 crud 행위에 따른 메서드 구분
+    // 참여자들을 payload으로 담게 되면 빠른 조회 가능(부정확) => 생성 시
     @Override
     @Transactional
     public void notifyCreated(ReservationCreatedPayload payload) {
         Notification notification = makeCreateNotification(payload);
 
-        sseService.send(payload.getApplicantId(), notification);
-        notification.markDelivered();
+        sendNotification(payload.getApplicantId(), notification);
+
+        // 참여자들에게 알림 전송
+        payload.getAttendantIds().forEach(userId -> {
+            Notification inviteNotification = makeInviteNotification(payload, userId);
+            sendNotification(userId, inviteNotification);
+        });
     }
 
     @Override
@@ -36,8 +42,11 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     public void notifyUpdated(ReservationUpdatedPayload payload) {
 
         Notification notification = makeUpdateNotification(payload);
+        sendNotification(payload.getApplicantId(), notification);
+    }
 
-        sseService.send(payload.getApplicantId(), notification);
+    private void sendNotification(Long receiverId, Notification notification) {
+        sseService.send(receiverId, notification);
         notification.markDelivered();
     }
 
@@ -60,6 +69,33 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                 payload.getApplicantId(),
                 payload.getReservationId(),
                 NotificationType.RESERVATION_CREATED,
+                message,
+                payloadJson);
+        notificationJpaRepository.save(notification);
+
+        return notification;
+    }
+
+    // TODO : 실제 reservation의 attendant id들은 user id가 아니라 이 기준으로 전송을 할 수 업승ㅁ
+    // payload안에 넣어주던가 아니면 여기서 가공 로직 거쳐서 실제 사용자들 적용해줘야함
+    @Override
+    public Notification makeInviteNotification(ReservationCreatedPayload payload, Long attendantId) {
+        String payloadJson;
+        try {
+            payloadJson = objectMapper.writeValueAsString(payload);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Notification payload 직렬화 실패", e);
+        }
+
+        // notification type 지정
+        NotificationType type = NotificationType.RESERVATION_INVITED;
+
+        // 메시지 생성
+        String message = type.formatMessage(payload.getStartAt(), payload.getEndAt());
+        Notification notification = Notification.create(
+                attendantId, /// receiverId
+                payload.getReservationId(),
+                type,
                 message,
                 payloadJson);
         notificationJpaRepository.save(notification);
@@ -117,9 +153,9 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     }
 
     // TODO :
-    // 생성 시 관련자들에게 invite 가도록만 추가 -> reservation 조회 -> 참여자 목록 조회(유효 검증)
-    // 참여자들을 payload으로 담게 되면 빠른 조회 가능(부정확)
-    // 참여자들을 payload으로 담지 않으면 정확, 느림(검증 한번 더 하기 때문)
+    // 생성 시 참여자들에게 invite 가도록만 추가 -> reservation 조회 -> 참여자 목록 조회(유효 검증)
+
+    // 참여자들을 payload으로 담지 않으면 정확, 느림(검증 한번 더 하기 때문) => 수정 시
     public NotificationType toNotificationType(String reservationStatus) {
         NotificationType type =
                 switch (reservationStatus) {

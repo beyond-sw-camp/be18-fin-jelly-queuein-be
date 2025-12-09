@@ -1,6 +1,8 @@
 package com.beyond.qiin.infra.event.reservation;
 
 import com.beyond.qiin.domain.booking.entity.Reservation;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +28,9 @@ public class ReservationCreatedPayload {
 
     private String status; // 예약 상태
 
+    @Builder.Default
+    private List<Long> attendantIds = new ArrayList<>();
+
     // Reservation 생성 엔티티 -> Payload 변환
     public static ReservationCreatedPayload from(Reservation reservation) {
         return ReservationCreatedPayload.builder()
@@ -35,6 +40,8 @@ public class ReservationCreatedPayload {
                 .startAt(reservation.getStartAt().toString())
                 .endAt(reservation.getEndAt().toString())
                 .isApproved(reservation.getIsApproved())
+                .attendantIds(
+                        reservation.getAttendants().stream().map(p -> p.getId()).toList())
                 .status(reservation.getStatus().name())
                 .build();
     }

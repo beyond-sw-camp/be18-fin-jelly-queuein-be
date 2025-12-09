@@ -13,6 +13,8 @@ public interface NotificationCommandService {
 
     Notification makeUpdateNotification(ReservationUpdatedPayload payload);
 
+    Notification makeInviteNotification(ReservationCreatedPayload payload, Long attendantId);
+
     void markAsRead(Long notificationId, Long userId);
 
     void softDelete(Long notificationId, Long userId);
