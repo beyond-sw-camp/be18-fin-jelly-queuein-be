@@ -16,7 +16,7 @@ public class ReservableAssetSearchCondition {
 
     private String assetName;
     private String assetType;
-    private String categoryName;
+    private Long categoryId;
     private String assetStatus;
     private String layerZero;
     private String layerOne;

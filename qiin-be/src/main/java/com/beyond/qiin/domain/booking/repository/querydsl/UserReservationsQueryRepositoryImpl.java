@@ -1,5 +1,7 @@
 package com.beyond.qiin.domain.booking.repository.querydsl;
 
+import static com.beyond.qiin.domain.inventory.entity.QAsset.asset;
+
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.raw.RawUserReservationResponseDto;
 import com.beyond.qiin.domain.booking.entity.QReservation;
@@ -11,6 +13,7 @@ import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -91,8 +94,8 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
         }
 
         // 카테고리 이름 기반 검색 → Category 조인
-        if (condition.getCategoryName() != null) {
-            builder.and(category.name.eq(condition.getCategoryName()));
+        if (condition.getCategoryId() != null) {
+            builder.and(asset.category.id.eq(condition.getCategoryId()));
         }
 
         // 자원 상태 (assetStatus) 필터링
@@ -108,23 +111,25 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
             }
         }
 
-        BooleanBuilder closureOn = new BooleanBuilder();
-        closureOn.and(closure.assetClosureId.descendantId.eq(asset.id));
+        BooleanBuilder closureBuilder = new BooleanBuilder();
+        boolean needsClosureJoin = false;
 
-        // 0계층 / 1계층 (AssetClosure 기반)
-        if (condition.getLayerZero() != null) {
-            closureOn
-                    .and(closure.depth.eq(0))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerZero())));
-        }
-
+        // 1depth 우선 적용
         if (condition.getLayerOne() != null) {
-            closureOn
-                    .and(closure.depth.eq(1))
-                    .and(closure.assetClosureId.ancestorId.eq(Long.parseLong(condition.getLayerOne())));
+            needsClosureJoin = true;
+            closureBuilder
+                    .and(closure.assetClosureId.ancestorId.eq(Long.valueOf(condition.getLayerOne())))
+                    .and(closure.depth.gt(0)); // 자기 자신 제외
+        }
+        // root(0depth)
+        else if (condition.getLayerZero() != null) {
+            needsClosureJoin = true;
+            closureBuilder
+                    .and(closure.assetClosureId.ancestorId.eq(Long.valueOf(condition.getLayerZero())))
+                    .and(closure.depth.gt(0)); // 자기 자신 제외
         }
 
-        List<RawUserReservationResponseDto> content = query.select(Projections.constructor(
+        JPAQuery<RawUserReservationResponseDto> contentQuery = query.select(Projections.constructor(
                         RawUserReservationResponseDto.class,
                         reservation.id,
                         reservation.startAt,
@@ -143,23 +148,39 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
                 .join(asset)
                 .on(asset.id.eq(reservation.asset.id))
                 .leftJoin(category)
-                .on(category.id.eq(asset.category.id))
-                .leftJoin(closure)
-                .on(closureOn)
-                .where(builder)
+                .on(category.id.eq(asset.category.id));
+
+        if (needsClosureJoin) {
+            contentQuery
+                    .leftJoin(closure)
+                    .on(closure.assetClosureId.descendantId.eq(asset.id))
+                    .where(builder.and(closureBuilder));
+        } else {
+            contentQuery.where(builder);
+        }
+
+        List<RawUserReservationResponseDto> content = contentQuery
                 .orderBy(reservation.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long total = query.select(reservation.count())
+        JPAQuery<Long> totalQuery = query.select(reservation.countDistinct())
                 .from(reservation)
                 .join(asset)
                 .on(asset.id.eq(reservation.asset.id))
-                .leftJoin(closure)
-                .on(closureOn)
-                .where(builder)
-                .fetchOne();
+                .leftJoin(category)
+                .on(category.id.eq(asset.category.id));
+
+        if (needsClosureJoin) {
+            totalQuery
+                    .leftJoin(closure)
+                    .on(closure.assetClosureId.descendantId.eq(asset.id))
+                    .where(builder.and(closureBuilder));
+        } else {
+            totalQuery.where(builder);
+        }
+        Long total = totalQuery.fetchOne();
 
         return new PageImpl<>(content, pageable, total);
     }
