@@ -198,7 +198,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
-        validateReservationCanceling(reservation); // 30분 전인 경우 허용
+        //        validateReservationCanceling(reservation); // 30분 전인 경우 허용
         reservation.cancel();
 
         reservationWriter.save(reservation);

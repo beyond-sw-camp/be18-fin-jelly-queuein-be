@@ -251,7 +251,8 @@ public class Reservation extends BaseEntity {
 
     // 예약 승인
     public void approve(final User respondent, final String reason) {
-        if (this.getStatus() != ReservationStatus.PENDING) // (this.status != 0)
+        if (this.getStatus() != ReservationStatus.PENDING
+                || this.getStatus() != ReservationStatus.REJECTED) // (this.status != 0)
         throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.APPROVED); // this.status = 1;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
@@ -261,7 +262,8 @@ public class Reservation extends BaseEntity {
 
     // 예약 거절
     public void reject(final User respondent, final String reason) {
-        if (this.getStatus() != ReservationStatus.PENDING) // (this.status != 0)
+        if (this.getStatus() != ReservationStatus.PENDING
+                || this.getStatus() != ReservationStatus.APPROVED) // (this.status != 0)
         throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.REJECTED); // this.status = 3;
         this.reason = reason; // 사용자 입력이므로 null 받으면 null임(빈칸은 프론트에서 ""으로 옴)
