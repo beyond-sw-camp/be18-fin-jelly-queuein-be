@@ -65,11 +65,7 @@ public class Notification extends BaseEntity {
     private Instant createdAt;
 
     public static Notification create(
-            Long userId,
-            Long aggregateId,
-            NotificationType type,
-            String message,
-            String payloadJson) {
+            Long userId, Long aggregateId, NotificationType type, String message, String payloadJson) {
         return Notification.builder()
                 .receiverId(userId)
                 .aggregateId(aggregateId)

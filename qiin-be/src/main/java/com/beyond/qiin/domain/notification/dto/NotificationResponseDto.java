@@ -8,6 +8,4 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class NotificationResponseDto {
-
-}
+public class NotificationResponseDto {}

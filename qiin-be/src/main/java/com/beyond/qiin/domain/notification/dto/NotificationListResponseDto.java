@@ -12,6 +12,6 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class NotificationListResponseDto {
-  @Default
-  List<NotificationResponseDto> notifications = new ArrayList<>();
+    @Default
+    List<NotificationResponseDto> notifications = new ArrayList<>();
 }
