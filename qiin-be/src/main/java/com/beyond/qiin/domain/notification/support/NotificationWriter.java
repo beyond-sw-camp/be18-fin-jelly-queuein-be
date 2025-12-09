@@ -7,7 +7,5 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class NotificationWriter {
-  private final NotificationJpaRepository notificationJpaRepository;
-
-
+    private final NotificationJpaRepository notificationJpaRepository;
 }

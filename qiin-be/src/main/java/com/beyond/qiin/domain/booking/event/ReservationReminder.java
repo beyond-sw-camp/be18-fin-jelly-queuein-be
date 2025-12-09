@@ -15,42 +15,37 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ReservationReminder {
 
-  private final ReservationReader reservationReader;
+    private final ReservationReader reservationReader;
 
-  private final NotificationWriter notificationWriter;
+    private final NotificationWriter notificationWriter;
 
-  @Scheduled(fixedDelay = 5000)
-  public void sendUpcomingReservationNotifications() {
-    Instant now = Instant.now();
-    Instant reminderTime = now.plusSeconds(600); // 10분 전 알림
+    @Scheduled(fixedDelay = 5000)
+    public void sendUpcomingReservationNotifications() {
+        Instant now = Instant.now();
+        Instant reminderTime = now.plusSeconds(600); // 10분 전 알림
 
-    // 예약 조회: reminderTime까지 시작 예정인 예약
-    List<Reservation> upcomingReservations = reservationReader.findReservationsStartingBetween(
-        now, reminderTime);
+        // 예약 조회: reminderTime까지 시작 예정인 예약
+        List<Reservation> upcomingReservations = reservationReader.findReservationsStartingBetween(now, reminderTime);
 
-    for (Reservation reservation : upcomingReservations) {
-      List<Long> userIds = new ArrayList<>();
-      userIds.add(reservation.getApplicant().getId());
-      userIds.addAll(reservation.getAttendants().stream()
-          .map(a -> a.getUser().getId())
-          .toList());
+        for (Reservation reservation : upcomingReservations) {
+            List<Long> userIds = new ArrayList<>();
+            userIds.add(reservation.getApplicant().getId());
+            userIds.addAll(reservation.getAttendants().stream()
+                    .map(a -> a.getUser().getId())
+                    .toList());
 
-      for (Long userId : userIds) {
-        //TODO : send가 writer 안으로 들어가는 건 아닌 거 같은데
-        //어쨋든 이 component에서 적용하려면
-        notificationWriter.sendNotification(
-            userId,
-            Notification.create(
-                userId,
-                reservation.getId(),
-                NotificationType.RESERVATION_UPCOMING,
-                "예약이 곧 시작됩니다: " + reservation.getStartAt(),
-                "{}"
-            )
-        );
-
-      }
+            for (Long userId : userIds) {
+                // TODO : send가 writer 안으로 들어가는 건 아닌 거 같은데
+                // 어쨋든 이 component에서 적용하려면
+                notificationWriter.sendNotification(
+                        userId,
+                        Notification.create(
+                                userId,
+                                reservation.getId(),
+                                NotificationType.RESERVATION_UPCOMING,
+                                "예약이 곧 시작됩니다: " + reservation.getStartAt(),
+                                "{}"));
+            }
+        }
     }
-  }
-
 }
