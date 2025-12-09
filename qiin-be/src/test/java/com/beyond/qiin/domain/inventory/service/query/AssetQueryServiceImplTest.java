@@ -18,6 +18,7 @@ import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetClosureQueryRepository;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryRepository;
+import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -41,6 +42,9 @@ class AssetQueryServiceImplTest {
 
     @Mock
     private AssetClosureQueryRepository assetClosureQueryRepository;
+
+    @Mock
+    private AssetDetailRedisAdapter assetDetailRedisAdapter;
 
     @InjectMocks
     private AssetQueryServiceImpl service;

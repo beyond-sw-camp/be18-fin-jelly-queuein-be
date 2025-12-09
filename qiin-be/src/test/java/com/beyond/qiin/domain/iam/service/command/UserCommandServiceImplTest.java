@@ -10,7 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
-import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateMyInfoRequestDto;
+import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserByAdminRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -23,6 +24,7 @@ import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
 import com.beyond.qiin.infra.mail.MailService;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,8 +33,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
-;
-;
 
 @DisplayName("UserCommandServiceImpl 단위 테스트")
 public class UserCommandServiceImplTest {
@@ -102,17 +102,42 @@ public class UserCommandServiceImplTest {
     }
 
     @Test
-    @DisplayName("사용자 수정 단위 테스트")
+    @DisplayName("관리자가 사용자 정보 수정 단위 테스트")
     void updateUser_success() {
-        UpdateUserRequestDto req = mock(UpdateUserRequestDto.class);
-        User user = mock(User.class);
 
+        UpdateUserByAdminRequestDto req = mock(UpdateUserByAdminRequestDto.class);
+
+        User user = mock(User.class);
+        Role generalRole = mock(Role.class);
+        UserRole userRole = mock(UserRole.class);
+
+        // 역할명 설정
+        when(generalRole.getRoleName()).thenReturn("GENERAL");
+        when(userRole.getRole()).thenReturn(generalRole);
+        when(user.getUserRoles()).thenReturn(List.of(userRole));
+
+        // UserReader mocking
         when(userReader.findById(1L)).thenReturn(user);
 
         userCommandService.updateUser(1L, req);
 
         verify(user).updateUser(req);
         verify(userWriter).save(user);
+    }
+
+    @Test
+    @DisplayName("본인 정보 수정")
+    void updateMyInfo_success() {
+
+        UpdateMyInfoRequestDto req = mock(UpdateMyInfoRequestDto.class);
+        User me = mock(User.class);
+
+        when(userReader.findById(1L)).thenReturn(me);
+
+        userCommandService.updateMyInfo(1L, req);
+
+        verify(me).updateMyInfo(req);
+        verify(userWriter).save(me);
     }
 
     @Test

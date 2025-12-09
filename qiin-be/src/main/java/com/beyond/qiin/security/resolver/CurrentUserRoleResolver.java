@@ -1,6 +1,7 @@
 package com.beyond.qiin.security.resolver;
 
 import com.beyond.qiin.domain.auth.exception.AuthException;
+import java.util.List;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,6 +14,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 public class CurrentUserRoleResolver implements HandlerMethodArgumentResolver {
+
+    private static final List<String> PERMISSION_PREFIXES = List.of("IAM_", "INVENTORY_", "BOOKING_");
 
     @Override
     public boolean supportsParameter(final MethodParameter parameter) {
@@ -34,7 +37,7 @@ public class CurrentUserRoleResolver implements HandlerMethodArgumentResolver {
 
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .filter(a -> a.startsWith("ROLE_"))
+                .filter(a -> PERMISSION_PREFIXES.stream().noneMatch(a::startsWith))
                 .findFirst()
                 .orElseThrow(AuthException::unauthorized);
     }

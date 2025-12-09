@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.service.command;
 
 import com.beyond.qiin.common.annotation.DistributedLock;
+import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandService;
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
@@ -42,6 +43,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final AssetCommandService assetCommandService;
     private final ReservationEventPublisher reservationEventPublisher;
     private final AttendantJpaRepository attendantJpaRepository;
+    private final UsageHistoryCommandService usageHistoryCommandService;
 
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
@@ -181,6 +183,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.end(); // status complete, 실제 종료 시간 추가
         reservationWriter.save(reservation);
 
+        Asset asset = reservation.getAsset();
+
+        usageHistoryCommandService.createUsageHistory(asset, reservation);
+
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -255,21 +261,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         }
         reservation.softDeleteAll(userId); // 예약, 참여자 둘다 soft delete 처리
         reservationWriter.save(reservation);
-    }
-
-    // 자원 상태 변경 시 예약 상태 변경
-    @Override
-    @Transactional
-    public void updateReservationsForAsset(Long assetId, int assetStatus) {
-        // 1 = UNAVAILABLE, 2 = MAINTENANCE
-        if (assetStatus != 1 && assetStatus != 2) return;
-
-        // pending, approved, using 대상(0, 1, 2)
-        List<Reservation> reservations = reservationWriter.findFutureUsableReservations(assetId);
-
-        for (Reservation reservation : reservations) {
-            reservation.markUnavailable("자원 사용 불가 상태에 따른 자동 취소");
-        }
     }
 
     // 하드 딜리트

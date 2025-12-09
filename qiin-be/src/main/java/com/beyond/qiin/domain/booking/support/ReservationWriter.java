@@ -5,6 +5,7 @@ import com.beyond.qiin.domain.booking.repository.ReservationJpaRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -14,6 +15,20 @@ public class ReservationWriter {
 
     public void save(Reservation reservation) {
         reservationJpaRepository.save(reservation);
+    }
+
+    // 자원 상태 변경 시 예약 상태 변경
+    @Transactional
+    public void updateReservationsForAsset(final Long assetId, final Integer assetStatus) {
+        // 1 = UNAVAILABLE, 2 = MAINTENANCE
+        if (assetStatus != 1 && assetStatus != 2) return;
+        if (assetStatus == null) return;
+        // pending, approved, using 대상(0, 1, 2)
+        List<Reservation> reservations = findFutureUsableReservations(assetId);
+
+        for (Reservation reservation : reservations) {
+            reservation.markUnavailable("자원 사용 불가 상태에 따른 자동 취소");
+        }
     }
 
     public void hardDelete(Long reservationId) {

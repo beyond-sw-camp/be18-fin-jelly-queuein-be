@@ -1,5 +1,6 @@
 package com.beyond.qiin.config;
 
+import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
 import org.mockito.Mockito;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -50,5 +51,10 @@ public class TestRedisConfig {
     @Bean
     public StringRedisTemplate stringRedisTemplate() {
         return Mockito.mock(StringRedisTemplate.class);
+    }
+
+    @Bean
+    public AssetDetailRedisAdapter assetDetailRedisAdapter() {
+        return Mockito.mock(AssetDetailRedisAdapter.class);
     }
 }
