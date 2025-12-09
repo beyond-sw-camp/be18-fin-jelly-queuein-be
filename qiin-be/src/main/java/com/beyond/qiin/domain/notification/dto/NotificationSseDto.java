@@ -13,7 +13,7 @@ public class NotificationSseDto {
     private Long notificationId;
     private String title;
     private String message;
-    private String type; //status는 불필요(pending, sent, failed)
+    private String type; // status는 불필요(pending, sent, failed)
     private Instant createdAt;
 
     public static NotificationSseDto of(

@@ -3,8 +3,6 @@ package com.beyond.qiin.domain.notification.service;
 import com.beyond.qiin.domain.notification.dto.NotificationSseDto;
 import com.beyond.qiin.domain.notification.entity.Notification;
 import com.beyond.qiin.domain.notification.enums.NotificationType;
-import com.beyond.qiin.domain.notification.exception.NotificationErrorCode;
-import com.beyond.qiin.domain.notification.exception.NotificationException;
 import com.beyond.qiin.domain.notification.repository.NotificationJpaRepository;
 import java.time.Instant;
 import java.util.Map;
@@ -45,17 +43,17 @@ public class SseServiceImpl implements SseService {
     }
 
     @Override
-    public void send(Long userId, Notification notification) { //db 조회 -> 병목 현상 가능하므로 entity 전체 보냄
+    public void send(Long userId, Notification notification) { // db 조회 -> 병목 현상 가능하므로 entity 전체 보냄
         SseEmitter emitter = emitters.get(userId);
         if (emitter == null) return;
 
         try {
             NotificationSseDto dto = NotificationSseDto.of(
-                notification.getId(),
-                notification.getTitle(),
-                notification.getMessage(),
-                NotificationType.from(notification.getType()).name(),
-                notification.getCreatedAt());
+                    notification.getId(),
+                    notification.getTitle(),
+                    notification.getMessage(),
+                    NotificationType.from(notification.getType()).name(),
+                    notification.getCreatedAt());
             emitter.send(SseEmitter.event()
                     .name("NOTIFICATION") // sse event 이름
                     .data(dto));

@@ -21,7 +21,7 @@ import org.hibernate.type.SqlTypes;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@Entity 
+@Entity
 @Table(
         name = "outbox",
         indexes = {

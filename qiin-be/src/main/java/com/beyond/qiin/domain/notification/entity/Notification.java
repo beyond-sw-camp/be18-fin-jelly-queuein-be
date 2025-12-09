@@ -52,11 +52,8 @@ public class Notification extends BaseEntity {
     private NotificationType notificationType;
 
     @Lob // large object(긴 문자열)
-    @Column(
-        name = "payload",
-        nullable = false,
-        columnDefinition = "LONGTEXT")
-    private String payload; //메타데이터 보관용도
+    @Column(name = "payload", nullable = false, columnDefinition = "LONGTEXT")
+    private String payload; // 메타데이터 보관용도
 
     @Column(name = "is_read", nullable = false)
     private boolean isRead;
