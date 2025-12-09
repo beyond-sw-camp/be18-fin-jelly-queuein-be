@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.beyond.qiin.domain.booking.support.ReservationWriter;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.dto.asset.request.CreateAssetRequestDto;
 import com.beyond.qiin.domain.inventory.dto.asset.request.UpdateAssetRequestDto;
@@ -61,6 +62,9 @@ class AssetCommandServiceImplTest {
 
     @Mock
     private AssetDetailRedisAdapter assetDetailRedisAdapter;
+
+    @Mock
+    private ReservationWriter reservationWriter;
 
     @InjectMocks
     private AssetCommandServiceImpl service;
