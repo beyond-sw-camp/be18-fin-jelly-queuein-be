@@ -9,6 +9,7 @@
 // import com.beyond.qiin.domain.notification.exception.NotificationErrorCode;
 // import com.beyond.qiin.domain.notification.exception.NotificationException;
 // import com.beyond.qiin.infra.event.reservation.ReservationCreatedPayload;
+// import com.beyond.qiin.infra.event.reservation.ReservationPayload;
 // import com.beyond.qiin.infra.event.reservation.ReservationUpdatedPayload;
 // import lombok.RequiredArgsConstructor;
 // import org.springframework.stereotype.Service;
@@ -20,44 +21,6 @@
 //
 //  private final NotificationJpaRepository notificationJpaRepository;
 //  private final SseService sseService;
-//
-//  //선착순 생성 시
-//  @Override
-//  @Transactional
-//  public Notification notifyCreated(ReservationCreatedPayload payload) {
-//
-//    Long userId = payload.getApplicantId();
-//    Long reservationId = payload.getReservationId();
-//
-//    String title = "예약이 생성되었습니다";
-//
-//    String message = String.format(
-//        "자원(ID: %d)의 예약이 생성되었습니다.\n시간: %s ~ %s\n상태: %s",
-//        payload.getReservationId(),
-//        payload.getAssetId(),
-//        payload.getStartAt(),
-//        payload.getEndAt(),
-//        payload.getStatus()
-//    );
-//
-//    String payloadJson = toJson(payload); // ObjectMapper 사용
-//
-//    Notification notification = Notification.create(
-//        userId,
-//        reservationId,
-//        NotificationType.RESERVATION_CREATED, //TODO : payload.status 에 따른 분기
-//        title,
-//        message,
-//        payloadJson,
-//        NotificationStatus.PENDING
-//    );
-//
-//    notificationJpaRepository.save(notification);
-//
-//    sseService.send(userId, notification.getId(), title, message, NotificationType.RESERVATION_CREATED.name(),
-// notification.getCreatedAt());
-//    return notification;
-//  }
 //
 //  @Override
 //  @Transactional
@@ -89,76 +52,55 @@
 //    notificationJpaRepository.deleteById(notificationId);
 //  }
 //
-//   public Notification notifyReservationCreated(ReservationUpdatedPayload payload) {
-//     return createReservationNotification(
-//         userId,
-//         aggregateId,
-//         payload,
-//         NotificationType.RESERVATION_CREATED
-//     );
+//
+//   public void notifyCreated(ReservationCreatedPayload payload) {
+//     Notification notification = createNotification(payload, NotificationType.RESERVATION_CREATED);
+//
+//     sseService.send(userId, notification.getId(), title, message, NotificationType.RESERVATION_CREATED.name(),
+//         notification.getCreatedAt());
+//  }
+//
+//   public void notifyUpdated(ReservationUpdatedPayload payload) {
+//     Notification notification = createUpdatedNotification(payload, NotificationType.RESERVATION_CREATED);
+//
+//     sseService.send(userId, notification.getId(), title, message, NotificationType.RESERVATION_CREATED.name(),
+//         notification.getCreatedAt());
 //   }
 //
-//   public Notification notifyReservationInvited(ReservationUpdatedPayload payload) {
-//     return createReservationNotification(
-//         userId,
-//         aggregateId,
-//         payload,
-//         NotificationType.RESERVATION_INVITED
-//     );
-//   }
+//   private Notification createNotification(Object payload, NotificationType type) {
+//     String payloadJson = objectMapper.writeValueAsString(payload);
+//     String message = type.formatMessage(payload.getStartAt(), payload.getEndAt());
 //
-//   public Notification notifyReservation10MinBefore(ReservationUpdatedPayload payload) {
-//     return createReservationNotification(
-//         userId,
-//         aggregateId,
-//         payload,
-//         NotificationType.RESERVATION_10_MIN_BEFORE
-//     );
-//   }
-//
-//
-//
-//   public Notification createReservationNotification(
-//       Long userId,
-//       Long aggregateId,
-//       ReservationUpdatedPayload payload,
-//       NotificationType type
-//   ) {
-//     String message = type.formatMessage(
-//         payload.getStartAt(),
-//         payload.getEndAt()
-//     );
-//
-//     String payloadJson = createPayloadByType(type, payload);
-//
-//     return Notification.create(
-//         userId,
-//         aggregateId,
-//         NotificationStatus.PENDING,
-//         type.name(),   // title 통일
+//     Notification notification = Notification.create(
+//         payload.getApplicantId(),
+//         payload.getReservationId(),
+//         type.name(),
 //         message,
 //         payloadJson,
-//         type
+//         NotificationStatus.PENDING
 //     );
+//     notificationJpaRepository.save(notification);
+//
+//     return notification;
 //   }
 //
 //   //TODO : payload 통일
 //   //status별로 notification 생성하도록 메서드 일원화
 //   //생성 시 관련자들에게 invite 가도록만 추가
 //   //created 자체는 그냥 approved이긴 함(생성한 건 알림을 주지 말까?)
-//   private String convertStatusToNotificationType(String status) {
-//     return switch (status) {
+//   public Notification createUpdatedNotification(ReservationUpdatedPayload payload) {
+//     NotificationType type = switch (payload.getStatus()) {
 //       case "APPROVED" -> NotificationType.RESERVATION_APPROVED;
 //       case "REJECTED" -> NotificationType.RESERVATION_REJECTED;
 //       case "UNAVAILABLE" -> NotificationType.RESERVATION_UNAVAILABLE;
-//
-//       case "RESERVATION_INVITED" -> NotificationType.RESERVATION_INVITED;
-//       case "RESERVATION_PLANNED" -> NotificationType.RESERVATION_PLANNED;
-//
-//       case "CREATED" -> NotificationType.RESERVATION_CREATED;
+//       default -> throw new NotificationException(
+//           NotificationErrorCode.NOTIFICATION_NOT_FOUND,
+//           "Unknown reservation status: " + payload.getStatus()
+//       );
 //     };
-//   }
 //
+//     return createNotification(payload, type);
+//   }
 //
 //
 //
