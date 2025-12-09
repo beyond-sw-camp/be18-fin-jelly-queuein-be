@@ -74,7 +74,13 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         attendantWriter.saveAll(attendants);
 
-        reservationEventPublisher.publishCreated(reservation);
+        //승인 예약은 승인 이후 예약 알림
+//        List<Long> attendantUserIds = attendants.stream()
+//            .map(a -> a.getUser().getId())
+//            .toList(); //각 attendantUserId 에 대해 넣지 못하는 문제 userId를 인자로 지정하게 해줘야하나
+//
+//
+//        reservationEventPublisher.publishCreated(reservation, attendantUserIds);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -111,7 +117,12 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservationWriter.save(reservation);
 
         attendantWriter.saveAll(attendants);
-        reservationEventPublisher.publishCreated(reservation);
+
+        List<Long> attendantUserIds = attendants.stream()
+            .map(a -> a.getUser().getId())
+            .toList(); //각 attendantUserId 에 대해 넣지 못하는 문제 userId를 인자로 지정하게 해줘야하나
+
+        reservationEventPublisher.publishCreated(reservation, attendantUserIds);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -131,7 +142,13 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservation.approve(respondent, confirmReservationRequestDto.getReason()); // status approved
         reservationWriter.save(reservation);
-        reservationEventPublisher.publishUpdated(reservation);
+
+        List<Long> attendantUserIds = reservation.getAttendants().stream()
+            .map(a -> a.getUser().getId())
+            .toList(); //각 attendantUserId 에 대해 넣지 못하는 문제 userId를 인자로 지정하게 해줘야하나
+
+
+        reservationEventPublisher.publishUpdated(reservation, attendantUserIds);
         return ReservationResponseDto.fromEntity(reservation);
     }
 

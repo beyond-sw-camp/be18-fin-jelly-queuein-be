@@ -29,10 +29,11 @@ public class ReservationCreatedPayload {
     private String status; // 예약 상태
 
     @Builder.Default
-    private List<Long> attendantIds = new ArrayList<>();
+    private List<Long> attendantUserIds = new ArrayList<>();
 
     // Reservation 생성 엔티티 -> Payload 변환
-    public static ReservationCreatedPayload from(Reservation reservation) {
+    public static ReservationCreatedPayload from(
+        Reservation reservation, List<Long> attendantUserIds) {
         return ReservationCreatedPayload.builder()
                 .reservationId(reservation.getId())
                 .assetId(reservation.getAsset().getId())
@@ -40,8 +41,7 @@ public class ReservationCreatedPayload {
                 .startAt(reservation.getStartAt().toString())
                 .endAt(reservation.getEndAt().toString())
                 .isApproved(reservation.getIsApproved())
-                .attendantIds(
-                        reservation.getAttendants().stream().map(p -> p.getId()).toList())
+                .attendantUserIds(attendantUserIds)
                 .status(reservation.getStatus().name())
                 .build();
     }

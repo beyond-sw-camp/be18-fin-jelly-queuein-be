@@ -31,10 +31,15 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         sendNotification(payload.getApplicantId(), notification);
 
         // 참여자들에게 알림 전송
-        payload.getAttendantIds().forEach(userId -> {
-            Notification inviteNotification = makeInviteNotification(payload, userId);
-            sendNotification(userId, inviteNotification);
-        });
+
+        if (payload != null && payload.getAttendantUserIds() != null) {
+            payload.getAttendantUserIds().forEach(userId -> {
+                if (userId != null) {
+                    Notification inviteNotification = makeInviteNotification(payload, userId);
+                    sendNotification(userId, inviteNotification);
+                }
+            });
+        }
     }
 
     @Override
@@ -43,6 +48,16 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
         Notification notification = makeUpdateNotification(payload);
         sendNotification(payload.getApplicantId(), notification);
+
+        if (payload != null && payload.getAttendantUserIds() != null) {
+            payload.getAttendantUserIds().forEach(userId -> {
+                if (userId != null) {
+                    //TODO : 초대하는 게 updated 에도 있고 created에도 있어서 결국 중복
+                    Notification inviteNotification = makeInviteNotification(payload, userId);
+                    sendNotification(userId, inviteNotification);
+                }
+            });
+        }
     }
 
     private void sendNotification(Long receiverId, Notification notification) {
@@ -68,7 +83,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         Notification notification = Notification.create(
                 payload.getApplicantId(),
                 payload.getReservationId(),
-                NotificationType.RESERVATION_CREATED,
+                type,
                 message,
                 payloadJson);
         notificationJpaRepository.save(notification);
@@ -76,8 +91,6 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         return notification;
     }
 
-    // TODO : 실제 reservation의 attendant id들은 user id가 아니라 이 기준으로 전송을 할 수 업승ㅁ
-    // payload안에 넣어주던가 아니면 여기서 가공 로직 거쳐서 실제 사용자들 적용해줘야함
     @Override
     public Notification makeInviteNotification(ReservationCreatedPayload payload, Long attendantId) {
         String payloadJson;
@@ -117,7 +130,13 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         // 메시지 생성
         String message = type.formatMessage(payload.getStartAt(), payload.getEndAt());
         Notification notification =
-                Notification.create(payload.getApplicantId(), payload.getReservationId(), type, message, payloadJson);
+                Notification.create(
+                    payload.getApplicantId(),
+                    payload.getReservationId(),
+                    type,
+                    message,
+                    payloadJson);
+
         notificationJpaRepository.save(notification);
 
         return notification;
@@ -152,10 +171,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         notificationJpaRepository.deleteById(notificationId); // 실제 delete
     }
 
-    // TODO :
-    // 생성 시 참여자들에게 invite 가도록만 추가 -> reservation 조회 -> 참여자 목록 조회(유효 검증)
-
-    // 참여자들을 payload으로 담지 않으면 정확, 느림(검증 한번 더 하기 때문) => 수정 시
+    // TODO : 참여자들을 payload으로 담지 않으면 정확, 느림(검증 한번 더 하기 때문) => 수정 시
     public NotificationType toNotificationType(String reservationStatus) {
         NotificationType type =
                 switch (reservationStatus) {
@@ -170,5 +186,5 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     }
 
     // TODO : 몇분전 알림은 별도 처리 (참여자들의 경우도 마찬가지) -> 스케줄러 활용
-
+    
 }

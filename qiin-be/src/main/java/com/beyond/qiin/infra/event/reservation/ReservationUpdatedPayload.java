@@ -1,6 +1,9 @@
 package com.beyond.qiin.infra.event.reservation;
 
 import com.beyond.qiin.domain.booking.entity.Reservation;
+import io.micrometer.common.lang.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,12 +35,17 @@ public class ReservationUpdatedPayload {
 
     private String status; // 예약 상태
 
-    public static ReservationUpdatedPayload from(Reservation reservation) {
+    @Builder.Default
+    private List<Long> attendantUserIds = new ArrayList<>();
+
+    public static ReservationUpdatedPayload from(
+        Reservation reservation, @Nullable List<Long> attendantUserIds) {
 
         return ReservationUpdatedPayload.builder()
                 .reservationId(reservation.getId())
                 .assetId(reservation.getAsset().getId())
                 .applicantId(reservation.getApplicant().getId())
+                .attendantUserIds(attendantUserIds)
                 .respondentId(
                         reservation.getRespondent() != null
                                 ? reservation.getRespondent().getId()

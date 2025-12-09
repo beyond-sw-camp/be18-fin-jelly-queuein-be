@@ -6,6 +6,7 @@ import com.beyond.qiin.domain.outbox.support.OutboxEventWriter;
 import com.beyond.qiin.infra.event.reservation.ReservationCreatedPayload;
 import com.beyond.qiin.infra.event.reservation.ReservationUpdatedPayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +16,13 @@ public class ReservationEventPublisher {
     private final OutboxEventWriter outboxEventWriter;
     private final ObjectMapper objectMapper; // 객체 -> string용
 
-    public void publishCreated(Reservation reservation) {
-        ReservationCreatedPayload payload = ReservationCreatedPayload.from(reservation);
+    public void publishCreated(Reservation reservation, List<Long> attendantUserIds) {
+        ReservationCreatedPayload payload = ReservationCreatedPayload.from(reservation, attendantUserIds);
         publish("reservation-created", payload, reservation.getId()); // topic의 key
     }
 
-    public void publishUpdated(Reservation reservation) {
-        ReservationUpdatedPayload payload = ReservationUpdatedPayload.from(reservation);
+    public void publishUpdated(Reservation reservation, List<Long> attendantUserIds) {
+        ReservationUpdatedPayload payload = ReservationUpdatedPayload.from(reservation, attendantUserIds);
         publish("reservation-updated", payload, reservation.getId());
     }
 
