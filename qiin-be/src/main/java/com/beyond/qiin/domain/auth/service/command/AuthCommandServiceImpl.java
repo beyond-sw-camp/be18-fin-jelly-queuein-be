@@ -2,7 +2,6 @@ package com.beyond.qiin.domain.auth.service.command;
 
 import com.beyond.qiin.domain.auth.dto.request.LoginRequestDto;
 import com.beyond.qiin.domain.auth.dto.response.LoginResponseDto;
-import com.beyond.qiin.domain.auth.dto.response.LoginResult;
 import com.beyond.qiin.domain.auth.dto.response.LoginServiceResult;
 import com.beyond.qiin.domain.auth.dto.response.TempPwLoginResponseDto;
 import com.beyond.qiin.domain.auth.exception.AuthException;
@@ -76,7 +75,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
     @Override
     @Transactional
-    public LoginResult refresh(final String refreshToken) {
+    public LoginServiceResult refresh(final String refreshToken) {
 
         validateRefreshToken(refreshToken);
 
@@ -85,9 +84,11 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
         final UserRoleContextDto ctx = getUserRoleContext(userId);
 
-        final TokenPairDto newTokens = issueTokenPair(userId, ctx.getRole(), user.getEmail(), ctx.getPermissions());
+        // access + refresh rotate 발급 (기존 refresh 폐기 → 새로운 refresh 저장)
+        TokenPairDto newTokens = issueTokenPair(userId, ctx.getRole(), user.getEmail(), ctx.getPermissions());
 
-        return LoginResponseDto.of(user, ctx.getRole(), newTokens.getAccess());
+        return new LoginServiceResult(
+                LoginResponseDto.of(user, ctx.getRole(), newTokens.getAccess()), newTokens.getRefresh());
     }
 
     // -----------------------
