@@ -14,6 +14,8 @@ import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
 import com.beyond.qiin.domain.iam.dto.user_role.request.UpdateUserRoleRequestDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
+import com.beyond.qiin.security.resolver.CurrentUser;
+import com.beyond.qiin.security.resolver.CurrentUserContext;
 import com.beyond.qiin.security.resolver.trash.CurrentUserId;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -57,8 +59,8 @@ public class UserController {
     public ResponseEntity<Void> updateUserRole(
             @PathVariable final Long userId,
             @RequestBody @Valid final UpdateUserRoleRequestDto request,
-            @CurrentUserId final Long updaterId) {
-        userCommandService.updateUserRole(userId, request.getRoleId(), updaterId);
+            @CurrentUser final CurrentUserContext currentUser) {
+        userCommandService.updateUserRole(userId, request.getRoleId(), currentUser.getUserId());
         return ResponseEntity.ok().build();
     }
 
@@ -74,18 +76,20 @@ public class UserController {
     // 본인정보 수정
     @PatchMapping("/me")
     public ResponseEntity<Void> updateMe(
-            @Valid @RequestBody final UpdateMyInfoRequestDto request, @CurrentUserId final Long userId) {
+            @CurrentUser final CurrentUserContext currentUser,
+            @Valid @RequestBody final UpdateMyInfoRequestDto request) {
 
-        userCommandService.updateMyInfo(userId, request);
+        userCommandService.updateMyInfo(currentUser.getUserId(), request);
         return ResponseEntity.ok().build();
     }
 
     // 임시 비밀번호 수정
     @PatchMapping("/me/temp-password")
     public ResponseEntity<Void> changeTempPassword(
-            @Valid @RequestBody final ChangeTempPwRequestDto request, @CurrentUserId final Long userId) {
+            @CurrentUser final CurrentUserContext currentUser,
+            @Valid @RequestBody final ChangeTempPwRequestDto request) {
 
-        userCommandService.changeTempPassword(userId, request.getNewPassword());
+        userCommandService.changeTempPassword(currentUser.getUserId(), request.getNewPassword());
 
         return ResponseEntity.ok().build();
     }
@@ -93,8 +97,8 @@ public class UserController {
     // 본인 비밀번호 변경
     @PatchMapping("/me/password")
     public ResponseEntity<Void> changeMyPassword(
-            @Valid @RequestBody final ChangePwRequestDto request, @CurrentUserId final Long userId) {
-        userCommandService.changePassword(userId, request);
+            @CurrentUser final CurrentUserContext currentUser, @Valid @RequestBody final ChangePwRequestDto request) {
+        userCommandService.changePassword(currentUser.getUserId(), request);
         return ResponseEntity.ok().build();
     }
 
@@ -135,7 +139,7 @@ public class UserController {
 
     // 내 정보 조회
     @GetMapping("/me")
-    public DetailUserResponseDto getMe(@CurrentUserId final Long userId) {
-        return userQueryService.getUser(userId);
+    public DetailUserResponseDto getMe(@CurrentUser final CurrentUserContext currentUser) {
+        return userQueryService.getUser(currentUser.getUserId());
     }
 }

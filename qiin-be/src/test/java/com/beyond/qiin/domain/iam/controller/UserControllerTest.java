@@ -18,8 +18,10 @@ import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.UserLookupResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
+import com.beyond.qiin.domain.iam.dto.user_role.request.UpdateUserRoleRequestDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
+import com.beyond.qiin.security.resolver.CurrentUserContext;
 import java.lang.reflect.Constructor;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -40,11 +42,22 @@ class UserControllerTest {
     private UserCommandService commandService;
     private UserQueryService queryService;
 
+    // CurrentUserContext의 목 객체를 위한 상수 ID
+    private static final Long CURRENT_USER_ID = 7L;
+    private static final Long DELETER_ID = 99L;
+    private static final Long TEST_USER_ID = 5L;
+
+    private CurrentUserContext currentUserContext;
+
     @BeforeEach
     void setUp() {
         commandService = mock(UserCommandService.class);
         queryService = mock(UserQueryService.class);
         controller = new UserController(commandService, queryService);
+
+        // CurrentUserContext 객체 대신 Mock 객체를 생성하고, getUserId() 호출 시 상수 ID를 반환하도록 설정
+        currentUserContext = mock(CurrentUserContext.class);
+        when(currentUserContext.getUserId()).thenReturn(CURRENT_USER_ID);
     }
 
     private <T> T createInstance(Class<T> clazz) {
@@ -179,6 +192,20 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("updateUserRole - 성공")
+    void updateUserRole_success() {
+        Long userId = 1L;
+        Long roleId = 2L;
+        UpdateUserRoleRequestDto req = createInstance(UpdateUserRoleRequestDto.class);
+        ReflectionTestUtils.setField(req, "roleId", roleId);
+
+        ResponseEntity<Void> result = controller.updateUserRole(userId, req, currentUserContext);
+
+        verify(commandService).updateUserRole(userId, roleId, CURRENT_USER_ID);
+        assertThat(result.getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
     @DisplayName("updateUser (관리자) 단위 테스트")
     void updateUser_success() {
 
@@ -187,9 +214,9 @@ class UserControllerTest {
         ReflectionTestUtils.setField(
                 req, "retireDate", LocalDate.of(2025, 1, 1).atStartOfDay().toInstant(java.time.ZoneOffset.UTC));
 
-        ResponseEntity<Void> result = controller.updateUser(5L, req);
+        ResponseEntity<Void> result = controller.updateUser(TEST_USER_ID, req);
 
-        verify(commandService).updateUser(5L, req);
+        verify(commandService).updateUser(TEST_USER_ID, req);
         assertThat(result.getStatusCode().value()).isEqualTo(200);
     }
 
@@ -201,9 +228,9 @@ class UserControllerTest {
         ReflectionTestUtils.setField(req, "userName", "변경된이름");
         ReflectionTestUtils.setField(req, "phone", "01022223333");
 
-        ResponseEntity<Void> result = controller.updateMe(req, 7L);
+        ResponseEntity<Void> result = controller.updateMe(currentUserContext, req);
 
-        verify(commandService).updateMyInfo(7L, req);
+        verify(commandService).updateMyInfo(CURRENT_USER_ID, req);
         assertThat(result.getStatusCode().value()).isEqualTo(200);
     }
 
@@ -211,11 +238,12 @@ class UserControllerTest {
     @DisplayName("changeTempPassword - 성공")
     void changeTempPassword_success() {
         ChangeTempPwRequestDto req = createInstance(ChangeTempPwRequestDto.class);
-        ReflectionTestUtils.setField(req, "newPassword", "New1234");
+        String newPassword = "New1234";
+        ReflectionTestUtils.setField(req, "newPassword", newPassword);
 
-        ResponseEntity<Void> res = controller.changeTempPassword(req, 7L);
+        ResponseEntity<Void> res = controller.changeTempPassword(currentUserContext, req);
 
-        verify(commandService).changeTempPassword(7L, "New1234");
+        verify(commandService).changeTempPassword(CURRENT_USER_ID, newPassword);
         assertThat(res.getStatusCode().value()).isEqualTo(200);
     }
 
@@ -226,18 +254,25 @@ class UserControllerTest {
         ReflectionTestUtils.setField(req, "currentPassword", "oldpw");
         ReflectionTestUtils.setField(req, "newPassword", "newpw");
 
-        ResponseEntity<Void> res = controller.changeMyPassword(req, 8L);
+        // ChangeMyPassword는 userId=8L을 사용하므로, 별도의 Mock Context가 필요하거나, CURRENT_USER_CONTEXT를 8L로 변경해야 합니다.
+        // 여기서는 새로운 Mock Context를 사용합니다.
+        Long userIdForChangePw = 8L;
+        CurrentUserContext changePwUserContext = mock(CurrentUserContext.class);
+        when(changePwUserContext.getUserId()).thenReturn(userIdForChangePw);
 
-        verify(commandService).changePassword(8L, req);
+        ResponseEntity<Void> res = controller.changeMyPassword(changePwUserContext, req);
+
+        verify(commandService).changePassword(userIdForChangePw, req);
         assertThat(res.getStatusCode().value()).isEqualTo(200);
     }
 
     @Test
     @DisplayName("deleteUser - 성공")
     void deleteUser_success() {
-        ResponseEntity<Void> res = controller.deleteUser(4L, 99L);
+        Long userIdToDelete = 4L;
+        ResponseEntity<Void> res = controller.deleteUser(userIdToDelete, DELETER_ID);
 
-        verify(commandService).deleteUser(4L, 99L);
+        verify(commandService).deleteUser(userIdToDelete, DELETER_ID);
         assertThat(res.getStatusCode().value()).isEqualTo(204);
     }
 
@@ -260,45 +295,53 @@ class UserControllerTest {
     @Test
     @DisplayName("lookupUsers - 성공")
     void lookupUsers_success() {
+        String keyword = "홍";
         UserLookupResponseDto dto = UserLookupResponseDto.builder()
                 .userId(1L)
                 .userName("홍길동")
                 .email("hong@test.com")
                 .build();
 
-        when(queryService.lookupUsers("홍")).thenReturn(List.of(dto));
+        when(queryService.lookupUsers(keyword)).thenReturn(List.of(dto));
 
-        ResponseEntity<List<UserLookupResponseDto>> res = controller.lookupUsers("홍");
+        ResponseEntity<List<UserLookupResponseDto>> res = controller.lookupUsers(keyword);
 
         assertThat(res.getBody().get(0).getUserName()).isEqualTo("홍길동");
-        verify(queryService).lookupUsers("홍");
+        verify(queryService).lookupUsers(keyword);
     }
 
     @Test
     @DisplayName("getUser - 성공")
     void getUser_success() {
+        Long userId = 1L;
         DetailUserResponseDto dto =
-                DetailUserResponseDto.builder().userId(1L).userName("홍길동").build();
+                DetailUserResponseDto.builder().userId(userId).userName("홍길동").build();
 
-        when(queryService.getUser(1L)).thenReturn(dto);
+        when(queryService.getUser(userId)).thenReturn(dto);
 
-        DetailUserResponseDto res = controller.getUser(1L);
+        DetailUserResponseDto res = controller.getUser(userId);
 
-        verify(queryService).getUser(1L);
-        assertThat(res.getUserId()).isEqualTo(1L);
+        verify(queryService).getUser(userId);
+        assertThat(res.getUserId()).isEqualTo(userId);
     }
 
     @Test
     @DisplayName("getMe - 성공")
     void getMe_success() {
+        Long userId = 10L;
+        // getMe는 CurrentUserContext를 인수로 받습니다.
+        CurrentUserContext getMeUserContext = mock(CurrentUserContext.class);
+        when(getMeUserContext.getUserId()).thenReturn(userId);
+
         DetailUserResponseDto dto =
-                DetailUserResponseDto.builder().userId(10L).userName("나").build();
+                DetailUserResponseDto.builder().userId(userId).userName("나").build();
 
-        when(queryService.getUser(10L)).thenReturn(dto);
+        when(queryService.getUser(userId)).thenReturn(dto);
 
-        DetailUserResponseDto res = controller.getMe(10L);
+        // UserController의 getMe 메서드 시그니처에 맞게 CurrentUserContext Mock 객체를 전달
+        DetailUserResponseDto res = controller.getMe(getMeUserContext);
 
-        verify(queryService).getUser(10L);
-        assertThat(res.getUserId()).isEqualTo(10L);
+        verify(queryService).getUser(userId);
+        assertThat(res.getUserId()).isEqualTo(userId);
     }
 }
