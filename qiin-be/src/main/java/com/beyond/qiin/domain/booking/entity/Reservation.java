@@ -83,6 +83,10 @@ public class Reservation extends BaseEntity {
     @Builder.Default
     private int status = 0;
 
+    @Column(name = "is_applied', nullable = false")
+    @Builder.Default
+    private boolean isApplied = false;
+
     @Transient
     private ReservationStatus reservationStatus;
 
