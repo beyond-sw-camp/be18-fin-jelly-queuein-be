@@ -33,9 +33,6 @@ public class Notification extends BaseEntity {
     @Column(name = "aggregate_id", nullable = false)
     private Long aggregateId;
 
-    @Column(name = "title", length = 70, nullable = false)
-    private String title;
-
     @Column(name = "message", length = 2000, nullable = false)
     private String message;
 
@@ -71,19 +68,16 @@ public class Notification extends BaseEntity {
             Long userId,
             Long aggregateId,
             NotificationType type,
-            String title,
             String message,
-            String payloadJson,
-            NotificationStatus status) {
+            String payloadJson) {
         return Notification.builder()
                 .receiverId(userId)
                 .aggregateId(aggregateId)
                 .type(type.getCode())
-                .title(title)
                 .message(message)
                 .payload(payloadJson)
                 .createdAt(Instant.now())
-                .status(status.getCode())
+                .status(NotificationStatus.PENDING.getCode())
                 .isRead(false)
                 .build();
     }
