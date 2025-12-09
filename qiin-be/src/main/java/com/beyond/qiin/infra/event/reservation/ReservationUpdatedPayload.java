@@ -38,8 +38,7 @@ public class ReservationUpdatedPayload {
     @Builder.Default
     private List<Long> attendantUserIds = new ArrayList<>();
 
-    public static ReservationUpdatedPayload from(
-        Reservation reservation, @Nullable List<Long> attendantUserIds) {
+    public static ReservationUpdatedPayload from(Reservation reservation, @Nullable List<Long> attendantUserIds) {
 
         return ReservationUpdatedPayload.builder()
                 .reservationId(reservation.getId())

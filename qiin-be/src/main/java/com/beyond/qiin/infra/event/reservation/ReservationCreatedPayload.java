@@ -32,8 +32,7 @@ public class ReservationCreatedPayload {
     private List<Long> attendantUserIds = new ArrayList<>();
 
     // Reservation 생성 엔티티 -> Payload 변환
-    public static ReservationCreatedPayload from(
-        Reservation reservation, List<Long> attendantUserIds) {
+    public static ReservationCreatedPayload from(Reservation reservation, List<Long> attendantUserIds) {
         return ReservationCreatedPayload.builder()
                 .reservationId(reservation.getId())
                 .assetId(reservation.getAsset().getId())

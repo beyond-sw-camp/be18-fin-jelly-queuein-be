@@ -52,7 +52,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         if (payload != null && payload.getAttendantUserIds() != null) {
             payload.getAttendantUserIds().forEach(userId -> {
                 if (userId != null) {
-                    //TODO : 초대하는 게 updated 에도 있고 created에도 있어서 결국 중복
+                    // TODO : 초대하는 게 updated 에도 있고 created에도 있어서 결국 중복
                     Notification inviteNotification = makeInviteNotification(payload, userId);
                     sendNotification(userId, inviteNotification);
                 }
@@ -80,12 +80,8 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
         // 메시지 생성
         String message = type.formatMessage(payload.getStartAt(), payload.getEndAt());
-        Notification notification = Notification.create(
-                payload.getApplicantId(),
-                payload.getReservationId(),
-                type,
-                message,
-                payloadJson);
+        Notification notification =
+                Notification.create(payload.getApplicantId(), payload.getReservationId(), type, message, payloadJson);
         notificationJpaRepository.save(notification);
 
         return notification;
@@ -130,12 +126,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         // 메시지 생성
         String message = type.formatMessage(payload.getStartAt(), payload.getEndAt());
         Notification notification =
-                Notification.create(
-                    payload.getApplicantId(),
-                    payload.getReservationId(),
-                    type,
-                    message,
-                    payloadJson);
+                Notification.create(payload.getApplicantId(), payload.getReservationId(), type, message, payloadJson);
 
         notificationJpaRepository.save(notification);
 
@@ -186,5 +177,5 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     }
 
     // TODO : 몇분전 알림은 별도 처리 (참여자들의 경우도 마찬가지) -> 스케줄러 활용
-    
+
 }
