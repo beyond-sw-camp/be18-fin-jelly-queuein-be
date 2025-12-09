@@ -38,13 +38,14 @@ public class ReservationWriter {
             reservationEventPublisher.publishEventCreated(reservation, attendantUserIds);
         }
     }
+
     @Transactional
     public void hardDelete(Long reservationId) {
         Reservation reservation = reservationReader.getReservationById(reservationId);
         reservationJpaRepository.delete(reservation);
     }
-    
-    //TODO : reader로 옮겨야함
+
+    // TODO : reader로 옮겨야함
     @Transactional(readOnly = true)
     public List<Reservation> findFutureUsableReservations(Long assetId) {
         return reservationJpaRepository.findFutureUsableReservationsByAsset(assetId);

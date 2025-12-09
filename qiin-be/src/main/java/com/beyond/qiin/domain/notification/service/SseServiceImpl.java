@@ -2,9 +2,7 @@ package com.beyond.qiin.domain.notification.service;
 
 import com.beyond.qiin.domain.notification.dto.NotificationSseDto;
 import com.beyond.qiin.domain.notification.entity.Notification;
-import com.beyond.qiin.domain.notification.enums.NotificationType;
 import com.beyond.qiin.domain.notification.repository.NotificationJpaRepository;
-import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
@@ -40,11 +38,10 @@ public class SseServiceImpl implements SseService {
         if (emitter == null) return;
 
         try {
-            NotificationSseDto dto = NotificationSseDto.of(
-                notification);
+            NotificationSseDto dto = NotificationSseDto.of(notification);
             emitter.send(SseEmitter.event()
-                .name("NOTIFICATION") // sse event 이름
-                .data(dto));
+                    .name("NOTIFICATION") // sse event 이름
+                    .data(dto));
         } catch (Exception e) {
             emitters.remove(userId);
         }
@@ -56,14 +53,11 @@ public class SseServiceImpl implements SseService {
         if (emitter == null) return;
 
         try {
-            emitter.send(SseEmitter.event()
-                .name("CONNECT")
-                .data("connected"));
+            emitter.send(SseEmitter.event().name("CONNECT").data("connected"));
         } catch (Exception e) {
             emitters.remove(userId);
         }
     }
-
 
     @Override
     public void disconnect(Long userId) {
@@ -72,5 +66,4 @@ public class SseServiceImpl implements SseService {
             emitter.complete();
         }
     }
-
 }

@@ -1,21 +1,21 @@
-//package com.beyond.qiin.domain.booking.event;
+// package com.beyond.qiin.domain.booking.event;
 //
-//import com.beyond.qiin.domain.booking.entity.Reservation;
-//import com.beyond.qiin.domain.booking.support.ReservationReader;
-//import com.beyond.qiin.domain.notification.entity.Notification;
-//import com.beyond.qiin.domain.notification.support.NotificationWriter;
-//import java.time.Instant;
-//import java.util.ArrayList;
-//import java.util.List;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.scheduling.annotation.Scheduled;
-//import org.springframework.stereotype.Component;
+// import com.beyond.qiin.domain.booking.entity.Reservation;
+// import com.beyond.qiin.domain.booking.support.ReservationReader;
+// import com.beyond.qiin.domain.notification.entity.Notification;
+// import com.beyond.qiin.domain.notification.support.NotificationWriter;
+// import java.time.Instant;
+// import java.util.ArrayList;
+// import java.util.List;
+// import lombok.RequiredArgsConstructor;
+// import org.springframework.scheduling.annotation.Scheduled;
+// import org.springframework.stereotype.Component;
 //
-//@Component
-//@RequiredArgsConstructor
-//public class ReservationReminder {
+// @Component
+// @RequiredArgsConstructor
+// public class ReservationReminder {
 //
-     //TODO : 카프카로 변경
+     // TODO : 카프카로 변경
 
 //    private final ReservationReader reservationReader;
 //
@@ -50,4 +50,4 @@
 //            }
 //        }
 //    }
-//}
+// }

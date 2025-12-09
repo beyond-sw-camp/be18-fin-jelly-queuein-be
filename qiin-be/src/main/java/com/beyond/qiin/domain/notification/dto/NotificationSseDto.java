@@ -18,9 +18,8 @@ public class NotificationSseDto {
     private String type; // status는 불필요(pending, sent, failed)
     private Instant createdAt;
 
-    //TODO : id가 결합도 줄여주는 것은 맞으나 필드가 많아 엔티티로 대체
-    public static NotificationSseDto of(
-            Notification notification) {
+    // TODO : id가 결합도 줄여주는 것은 맞으나 필드가 많아 엔티티로 대체
+    public static NotificationSseDto of(Notification notification) {
         return NotificationSseDto.builder()
                 .notificationId(notification.getId())
                 .message(notification.getMessage())

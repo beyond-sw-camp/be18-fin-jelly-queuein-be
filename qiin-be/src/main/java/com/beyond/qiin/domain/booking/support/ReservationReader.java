@@ -35,9 +35,10 @@ public class ReservationReader {
     }
 
     @Transactional(readOnly = true)
-    public List<Reservation> findReservationsStartingBetween(Instant start, Instant end){
+    public List<Reservation> findReservationsStartingBetween(Instant start, Instant end) {
         return reservationJpaRepository.findReservationsStartingBetween(start, end);
-    };
+    }
+    ;
 
     @Transactional(readOnly = true)
     public List<Reservation> getReservationsByUserAndWeek(final Long userId, final Instant start, final Instant end) {
