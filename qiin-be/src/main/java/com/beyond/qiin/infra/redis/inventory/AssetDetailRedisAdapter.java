@@ -2,7 +2,6 @@ package com.beyond.qiin.infra.redis.inventory;
 
 import com.beyond.qiin.domain.inventory.dto.asset.response.AssetDetailResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
