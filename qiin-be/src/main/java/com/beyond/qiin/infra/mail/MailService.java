@@ -17,7 +17,7 @@ public class MailService {
     @Value("${mail.from}")
     private String from;
 
-    @Value("${LOGIN_URL}")
+    @Value("${login.url}")
     private String loginUrl;
 
     /**

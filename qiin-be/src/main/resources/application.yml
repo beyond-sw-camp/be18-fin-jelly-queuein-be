@@ -36,8 +36,8 @@ spring:
 mail:
   from: ${MAIL_FROM}
 
-LOGIN_URL: ${LOGIN_URL}
-
+login:
+  url: ${LOGIN_URL}
 
 # JWT 설정
 jwt:
