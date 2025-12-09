@@ -40,10 +40,4 @@ public class SseController {
 
         sseService.disconnect(userId);
     }
-
-    // SSE health check
-    @PostMapping("/test")
-    public void testPush(@AccessToken final String accessToken) {
-        sseService.send(jwtTokenProvider.getUserId(accessToken), "TEST", "SSE 테스트 메시지입니다.");
-    }
 }

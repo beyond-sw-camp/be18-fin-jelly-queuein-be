@@ -6,6 +6,7 @@ import com.beyond.qiin.domain.notification.enums.NotificationType;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.time.Instant;
@@ -38,8 +39,11 @@ public class Notification extends BaseEntity {
     @Column(name = "message", length = 2000, nullable = false)
     private String message;
 
-    @Column(name = "is_read", nullable = false)
-    private boolean isRead;
+    @Column(name = "status", nullable = false, length = 20)
+    private int status;
+
+    @Transient
+    private NotificationStatus notificationStatus;
 
     @Column(name = "type", nullable = false, length = 30)
     private int type;
@@ -47,11 +51,15 @@ public class Notification extends BaseEntity {
     @Transient
     private NotificationType notificationType;
 
-    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
-    private Instant createdAt;
+    @Lob // large object(긴 문자열)
+    @Column(
+        name = "payload",
+        nullable = false,
+        columnDefinition = "LONGTEXT")
+    private String payload; //메타데이터 보관용도
 
-    @Column(name = "payload", columnDefinition = "JSON", nullable = false)
-    private String payload;
+    @Column(name = "is_read", nullable = false)
+    private boolean isRead;
 
     @Column(name = "delivered_at", columnDefinition = "TIMESTAMP(6)")
     private Instant deliveredAt;
@@ -59,11 +67,8 @@ public class Notification extends BaseEntity {
     @Column(name = "read_at", columnDefinition = "TIMESTAMP(6)")
     private Instant readAt;
 
-    @Column(name = "status", nullable = false, length = 20)
-    private int status;
-
-    @Transient
-    private NotificationStatus notificationStatus;
+    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
+    private Instant createdAt;
 
     public static Notification create(
             Long userId,

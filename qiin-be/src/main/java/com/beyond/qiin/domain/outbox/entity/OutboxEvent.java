@@ -21,7 +21,7 @@ import org.hibernate.type.SqlTypes;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@Entity // TODO : flyway 추가 후
+@Entity 
 @Table(
         name = "outbox",
         indexes = {

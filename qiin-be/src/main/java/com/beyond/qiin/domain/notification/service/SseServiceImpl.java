@@ -1,6 +1,11 @@
 package com.beyond.qiin.domain.notification.service;
 
 import com.beyond.qiin.domain.notification.dto.NotificationSseDto;
+import com.beyond.qiin.domain.notification.entity.Notification;
+import com.beyond.qiin.domain.notification.enums.NotificationType;
+import com.beyond.qiin.domain.notification.exception.NotificationErrorCode;
+import com.beyond.qiin.domain.notification.exception.NotificationException;
+import com.beyond.qiin.domain.notification.repository.NotificationJpaRepository;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,7 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Service
 public class SseServiceImpl implements SseService {
     private static final Long TIMEOUT = 60L * 60 * 1000; // 1시간
-
+    private final NotificationJpaRepository notificationJpaRepository;
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     @Override
@@ -40,14 +45,19 @@ public class SseServiceImpl implements SseService {
     }
 
     @Override
-    public void send(Long userId, Long notificationId, String title, String message, String type, Instant createdAt) {
+    public void send(Long userId, Notification notification) { //db 조회 -> 병목 현상 가능하므로 entity 전체 보냄
         SseEmitter emitter = emitters.get(userId);
         if (emitter == null) return;
 
         try {
-            NotificationSseDto dto = NotificationSseDto.of(notificationId, title, message, type, createdAt);
+            NotificationSseDto dto = NotificationSseDto.of(
+                notification.getId(),
+                notification.getTitle(),
+                notification.getMessage(),
+                NotificationType.from(notification.getType()).name(),
+                notification.getCreatedAt());
             emitter.send(SseEmitter.event()
-                    .name("NOTIFICATION") // TODO
+                    .name("NOTIFICATION") // sse event 이름
                     .data(dto));
         } catch (Exception e) {
             emitters.remove(userId);
