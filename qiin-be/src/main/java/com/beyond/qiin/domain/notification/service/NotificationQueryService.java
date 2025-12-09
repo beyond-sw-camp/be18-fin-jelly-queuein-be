@@ -1,3 +1,3 @@
 package com.beyond.qiin.domain.notification.service;
 
-public class NotificationQueryService {}
+public interface NotificationQueryService {}

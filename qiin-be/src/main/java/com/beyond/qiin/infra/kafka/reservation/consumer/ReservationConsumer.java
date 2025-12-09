@@ -1,8 +1,7 @@
 package com.beyond.qiin.infra.kafka.reservation.consumer;
 
 import com.beyond.qiin.domain.notification.service.NotificationCommandService;
-import com.beyond.qiin.infra.event.reservation.ReservationCreatedPayload;
-import com.beyond.qiin.infra.event.reservation.ReservationUpdatedPayload;
+import com.beyond.qiin.infra.event.reservation.ReservationEventPayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,27 +19,15 @@ public class ReservationConsumer {
     private final NotificationCommandService notificationService;
     private final ObjectMapper objectMapper; // kafka(string) -> notification service(자바 객체)로 역직렬화용
 
-    @KafkaListener(topics = "#{@kafkaTopicProperties.get('reservation-created')}", groupId = "reservation-group")
-    public void onCreated(String message) {
+    @KafkaListener(topics = "#{@kafkaTopicProperties.get('reservation-event')}", groupId = "reservation-group")
+    public void onEvent(String message) {
         try {
-            ReservationCreatedPayload payload = objectMapper.readValue(message, ReservationCreatedPayload.class);
-            log.info("received reservation-created payload: {}", payload);
-            notificationService.notifyCreated(payload);
+            ReservationEventPayload payload = objectMapper.readValue(message, ReservationEventPayload.class);
+            log.info("received reservation event payload: {}", payload);
+            notificationService.notifyEvent(payload);
 
         } catch (Exception e) {
-            log.error("Failed to handle reservation-created event", e);
-        }
-    }
-
-    @KafkaListener(topics = "#{@kafkaTopicProperties.get('reservation-updated')}", groupId = "reservation-group")
-    public void onUpdated(String message) {
-        try {
-            ReservationUpdatedPayload payload = objectMapper.readValue(message, ReservationUpdatedPayload.class);
-            log.info("received reservation-updated payload: {}", payload);
-            notificationService.notifyUpdated(payload);
-
-        } catch (Exception e) {
-            log.error("Failed to handle reservation-updated event", e);
+            log.error("Failed to handle reservation event", e);
         }
     }
 }

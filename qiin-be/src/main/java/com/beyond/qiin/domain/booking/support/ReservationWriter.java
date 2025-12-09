@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.support;
 
 import com.beyond.qiin.domain.booking.entity.Reservation;
+import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.repository.ReservationJpaRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationWriter {
     private final ReservationJpaRepository reservationJpaRepository;
     private final ReservationReader reservationReader;
+    private final ReservationEventPublisher reservationEventPublisher;
 
     public void save(Reservation reservation) {
         reservationJpaRepository.save(reservation);
@@ -28,14 +30,22 @@ public class ReservationWriter {
 
         for (Reservation reservation : reservations) {
             reservation.markUnavailable("자원 사용 불가 상태에 따른 자동 취소");
+
+            List<Long> attendantUserIds = reservation.getAttendants().stream()
+                    .map(a -> a.getUser().getId())
+                    .toList(); // 각 attendantUserId 에 대해 넣지 못하는 문제 userId를 인자로 지정하게 해줘야하나
+
+            reservationEventPublisher.publishEventCreated(reservation, attendantUserIds);
         }
     }
-
+    @Transactional
     public void hardDelete(Long reservationId) {
         Reservation reservation = reservationReader.getReservationById(reservationId);
         reservationJpaRepository.delete(reservation);
     }
-
+    
+    //TODO : reader로 옮겨야함
+    @Transactional(readOnly = true)
     public List<Reservation> findFutureUsableReservations(Long assetId) {
         return reservationJpaRepository.findFutureUsableReservationsByAsset(assetId);
     }

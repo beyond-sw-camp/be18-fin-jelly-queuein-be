@@ -122,7 +122,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 .map(a -> a.getUser().getId())
                 .toList(); // 각 attendantUserId 에 대해 넣지 못하는 문제 userId를 인자로 지정하게 해줘야하나
 
-        reservationEventPublisher.publishCreated(reservation, attendantUserIds);
+        reservationEventPublisher.publishEventCreated(reservation, attendantUserIds);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -147,7 +147,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 .map(a -> a.getUser().getId())
                 .toList(); // 각 attendantUserId 에 대해 넣지 못하는 문제 userId를 인자로 지정하게 해줘야하나
 
-        reservationEventPublisher.publishUpdated(reservation, attendantUserIds);
+        reservationEventPublisher.publishEventCreated(reservation, attendantUserIds);
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -163,7 +163,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.reject(respondent, confirmReservationRequestDto.getReason()); // status rejected
         reservationWriter.save(reservation);
 
-        reservationEventPublisher.publishUpdated(reservation);
+        reservationEventPublisher.publishEventCreated(reservation, null);
         return ReservationResponseDto.fromEntity(reservation);
     }
 

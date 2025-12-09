@@ -37,6 +37,7 @@ public class Notification extends BaseEntity {
     private String message;
 
     @Column(name = "status", nullable = false, length = 20)
+    @Builder.Default
     private int status = 0; // pending
 
     @Transient
@@ -50,9 +51,10 @@ public class Notification extends BaseEntity {
 
     @Lob // large object(긴 문자열)
     @Column(name = "payload", nullable = false, columnDefinition = "LONGTEXT")
-    private String payload; // 메타데이터 보관용도
+    private String payload; // 메타데이터 보관용도(예약 자체에 관한 정보와 알림 엔티티를 분리)
 
     @Column(name = "is_read", nullable = false)
+    @Builder.Default
     private boolean isRead = false;
 
     @Column(name = "delivered_at", columnDefinition = "TIMESTAMP(6)")

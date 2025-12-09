@@ -1,6 +1,7 @@
 package com.beyond.qiin.domain.booking.repository;
 
 import com.beyond.qiin.domain.booking.entity.Reservation;
+import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -82,4 +83,16 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
 
 """)
     List<Reservation> findActiveReservationsByAssetId(Long assetId);
+
+    @Query("""
+        SELECT r 
+        FROM Reservation r 
+        WHERE r.startAt BETWEEN :start AND :end
+          AND r.status = 1
+    """)
+    List<Reservation> findReservationsStartingBetween(
+        Instant start,
+        Instant end
+    );
+
 }

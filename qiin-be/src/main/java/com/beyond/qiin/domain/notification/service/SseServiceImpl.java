@@ -28,18 +28,10 @@ public class SseServiceImpl implements SseService {
         emitter.onTimeout(() -> emitters.remove(userId));
         emitter.onError(e -> emitters.remove(userId));
 
-        // TODO : 연결 성공 이벤트
-        send(userId, -1L, "연결됨", "SSE 연결 성공", NotificationType.CONNECT.name(), Instant.now());
+        // 연결 성공 이벤트
+        sendConnectEvent(userId);
 
         return emitter;
-    }
-
-    @Override
-    public void disconnect(Long userId) {
-        SseEmitter emitter = emitters.remove(userId);
-        if (emitter != null) {
-            emitter.complete();
-        }
     }
 
     @Override
@@ -49,16 +41,36 @@ public class SseServiceImpl implements SseService {
 
         try {
             NotificationSseDto dto = NotificationSseDto.of(
-                    notification.getId(),
-                    notification.getTitle(),
-                    notification.getMessage(),
-                    NotificationType.from(notification.getType()).name(),
-                    notification.getCreatedAt());
+                notification);
             emitter.send(SseEmitter.event()
-                    .name("NOTIFICATION") // sse event 이름
-                    .data(dto));
+                .name("NOTIFICATION") // sse event 이름
+                .data(dto));
         } catch (Exception e) {
             emitters.remove(userId);
         }
     }
+
+    @Override
+    public void sendConnectEvent(Long userId) {
+        SseEmitter emitter = emitters.get(userId);
+        if (emitter == null) return;
+
+        try {
+            emitter.send(SseEmitter.event()
+                .name("CONNECT")
+                .data("connected"));
+        } catch (Exception e) {
+            emitters.remove(userId);
+        }
+    }
+
+
+    @Override
+    public void disconnect(Long userId) {
+        SseEmitter emitter = emitters.remove(userId);
+        if (emitter != null) {
+            emitter.complete();
+        }
+    }
+
 }

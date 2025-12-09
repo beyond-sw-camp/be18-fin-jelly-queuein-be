@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum NotificationStatus implements EnumCode {
-    PENDING(0), // 알림 생성됨 (아직 전송 전)
-    SENT(1), // SSE 또는 Push로 전송 완료됨
+    PENDING(0), // 알림 생성됨 (전송 전)
+    SENT(1), // SSE로 전송 완료
     FAILED(2); // 전송 실패 (재시도 필요)
 
     private final int code;

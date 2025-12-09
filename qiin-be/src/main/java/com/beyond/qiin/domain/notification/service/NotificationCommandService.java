@@ -1,21 +1,9 @@
 package com.beyond.qiin.domain.notification.service;
 
-import com.beyond.qiin.domain.notification.entity.Notification;
-import com.beyond.qiin.infra.event.reservation.ReservationCreatedPayload;
-import com.beyond.qiin.infra.event.reservation.ReservationUpdatedPayload;
+import com.beyond.qiin.infra.event.reservation.ReservationEventPayload;
 
 public interface NotificationCommandService {
-    void notifyCreated(ReservationCreatedPayload payload);
-
-    void notifyUpdated(ReservationUpdatedPayload payload);
-
-    void sendNotification(Long receiverId, Notification notification);
-
-    Notification makeCreateNotification(ReservationCreatedPayload payload);
-
-    Notification makeUpdateNotification(ReservationUpdatedPayload payload);
-
-    Notification makeInviteNotification(ReservationCreatedPayload payload, Long attendantId);
+    void notifyEvent(ReservationEventPayload payload);
 
     void markAsRead(Long notificationId, Long userId);
 

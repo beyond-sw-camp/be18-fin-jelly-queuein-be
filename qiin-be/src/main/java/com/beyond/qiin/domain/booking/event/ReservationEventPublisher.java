@@ -3,8 +3,7 @@ package com.beyond.qiin.domain.booking.event;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.outbox.entity.OutboxEvent;
 import com.beyond.qiin.domain.outbox.support.OutboxEventWriter;
-import com.beyond.qiin.infra.event.reservation.ReservationCreatedPayload;
-import com.beyond.qiin.infra.event.reservation.ReservationUpdatedPayload;
+import com.beyond.qiin.infra.event.reservation.ReservationEventPayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +15,9 @@ public class ReservationEventPublisher {
     private final OutboxEventWriter outboxEventWriter;
     private final ObjectMapper objectMapper; // 객체 -> string용
 
-    public void publishCreated(Reservation reservation, List<Long> attendantUserIds) {
-        ReservationCreatedPayload payload = ReservationCreatedPayload.from(reservation, attendantUserIds);
-        publish("reservation-created", payload, reservation.getId()); // topic의 key
-    }
-
-    public void publishUpdated(Reservation reservation, List<Long> attendantUserIds) {
-        ReservationUpdatedPayload payload = ReservationUpdatedPayload.from(reservation, attendantUserIds);
-        publish("reservation-updated", payload, reservation.getId());
+    public void publishEventCreated(Reservation reservation, List<Long> attendantUserIds) {
+        ReservationEventPayload payload = ReservationEventPayload.from(reservation, attendantUserIds);
+        publish("reservation-event", payload, reservation.getId()); // topic의 key
     }
 
     private void publish(String eventType, Object payload, Long aggregateId) {

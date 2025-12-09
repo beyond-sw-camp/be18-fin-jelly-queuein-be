@@ -6,6 +6,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public interface SseService {
     SseEmitter connect(Long userId);
 
+    void sendConnectEvent(Long userId);
+
     void disconnect(Long userId);
 
     void send(Long userId, Notification notification);
