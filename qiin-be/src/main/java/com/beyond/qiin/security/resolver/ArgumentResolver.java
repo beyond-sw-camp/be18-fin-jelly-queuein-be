@@ -13,6 +13,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 @RequiredArgsConstructor
+// TODO: AccessTokenResolver로 명칭 변경
 public class ArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
