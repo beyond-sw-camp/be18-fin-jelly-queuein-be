@@ -69,7 +69,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 .collect(Collectors.toList());
 
         reservation.addAttendants(attendants);
-
+        reservation.setIsApplied(true);
         reservationWriter.save(reservation);
 
         attendantWriter.saveAll(attendants);

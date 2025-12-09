@@ -61,7 +61,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final ReservationReader reservationReader;
     private final AssetQueryService assetQueryService;
     private final UserReservationsQueryRepository userReservationsQueryRepository;
-    //    private final ReservableAssetsQueryRepository reservableAssetsQueryRepository;
     private final AppliedReservationsQueryRepository appliedReservationsQueryRepository;
     private final AssetQueryRepository assetQueryRepository;
 

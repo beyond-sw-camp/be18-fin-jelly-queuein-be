@@ -155,6 +155,10 @@ public class Reservation extends BaseEntity {
         this.status = reservationStatus.getCode();
     }
 
+    public void setIsApplied(final boolean isApplied) {
+        this.isApplied = isApplied;
+    }
+
     public void addAttendant(final Attendant attendant) {
         if (this.attendants == null) {
             this.attendants = new ArrayList<>();
