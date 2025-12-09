@@ -17,6 +17,9 @@ public class MailService {
     @Value("${mail.from}")
     private String from;
 
+    @Value("${login.url}")
+    private String loginUrl;
+
     /**
      * 임시 비밀번호 발송
      * @param to 발송 대상 이메일 주소
@@ -32,6 +35,7 @@ public class MailService {
             message.setText("안녕하세요.\n\n" + "요청하신 계정의 임시 비밀번호는 아래와 같습니다.\n\n"
                     + "임시 비밀번호: "
                     + tempPassword + "\n\n" + "보안을 위해 로그인 후 반드시 새 비밀번호로 변경해주세요.\n\n"
+                    + "로그인 하러 가기: " + loginUrl + "\n\n"
                     + "감사합니다.\nQueueIn 운영팀 드림");
 
             mailSender.send(message);
