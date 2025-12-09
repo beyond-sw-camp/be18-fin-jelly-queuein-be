@@ -37,7 +37,7 @@ public class Notification extends BaseEntity {
     private String message;
 
     @Column(name = "status", nullable = false, length = 20)
-    private int status;
+    private int status = 0; //pending
 
     @Transient
     private NotificationStatus notificationStatus;
@@ -53,7 +53,7 @@ public class Notification extends BaseEntity {
     private String payload; // 메타데이터 보관용도
 
     @Column(name = "is_read", nullable = false)
-    private boolean isRead;
+    private boolean isRead = false;
 
     @Column(name = "delivered_at", columnDefinition = "TIMESTAMP(6)")
     private Instant deliveredAt;

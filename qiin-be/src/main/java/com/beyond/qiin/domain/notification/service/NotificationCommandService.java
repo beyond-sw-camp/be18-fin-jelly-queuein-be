@@ -9,6 +9,8 @@ public interface NotificationCommandService {
 
     void notifyUpdated(ReservationUpdatedPayload payload);
 
+    void sendNotification(Long receiverId, Notification notification);
+
     Notification makeCreateNotification(ReservationCreatedPayload payload);
 
     Notification makeUpdateNotification(ReservationUpdatedPayload payload);

@@ -60,7 +60,8 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         }
     }
 
-    private void sendNotification(Long receiverId, Notification notification) {
+    @Override
+    public void sendNotification(Long receiverId, Notification notification) {
         sseService.send(receiverId, notification);
         notification.markDelivered();
     }
@@ -162,7 +163,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         notificationJpaRepository.deleteById(notificationId); // 실제 delete
     }
 
-    // TODO : 참여자들을 payload으로 담지 않으면 정확, 느림(검증 한번 더 하기 때문) => 수정 시
+    // TODO : 참여자들을 payload으로 담지 않으면 정확, 느림(검증 한번 더 하기 때문) => 수정 시 (근데 일단 통일)
     public NotificationType toNotificationType(String reservationStatus) {
         NotificationType type =
                 switch (reservationStatus) {
