@@ -1,4 +1,4 @@
-package com.beyond.qiin.security.resolver;
+package com.beyond.qiin.security.resolver.trash;
 
 import com.beyond.qiin.domain.auth.exception.AuthException;
 import java.util.List;

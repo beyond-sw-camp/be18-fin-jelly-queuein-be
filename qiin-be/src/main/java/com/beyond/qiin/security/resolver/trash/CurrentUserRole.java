@@ -1,4 +1,4 @@
-package com.beyond.qiin.security.resolver;
+package com.beyond.qiin.security.resolver.trash;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

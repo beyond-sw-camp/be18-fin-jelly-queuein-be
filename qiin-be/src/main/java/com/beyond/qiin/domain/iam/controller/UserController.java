@@ -14,7 +14,7 @@ import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
 import com.beyond.qiin.domain.iam.dto.user_role.request.UpdateUserRoleRequestDto;
 import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
-import com.beyond.qiin.security.resolver.CurrentUserId;
+import com.beyond.qiin.security.resolver.trash.CurrentUserId;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
