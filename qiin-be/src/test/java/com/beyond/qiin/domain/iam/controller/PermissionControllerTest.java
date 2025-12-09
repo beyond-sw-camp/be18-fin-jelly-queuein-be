@@ -11,6 +11,7 @@ import com.beyond.qiin.domain.iam.dto.permission.response.PermissionListResponse
 import com.beyond.qiin.domain.iam.dto.permission.response.PermissionResponseDto;
 import com.beyond.qiin.domain.iam.service.command.PermissionCommandService;
 import com.beyond.qiin.domain.iam.service.query.PermissionQueryService;
+import com.beyond.qiin.security.resolver.CurrentUserContext;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -85,7 +86,9 @@ class PermissionControllerTest {
     @DisplayName("deletePermission 단위 테스트")
     void deletePermission_success() {
 
-        ResponseEntity<Void> result = controller.deletePermission(7L, 99L);
+        CurrentUserContext currentUser = mockUser(99L);
+
+        ResponseEntity<Void> result = controller.deletePermission(7L, currentUser);
 
         verify(commandService).deletePermission(7L, 99L);
         assertThat(result.getStatusCode().value()).isEqualTo(204);
@@ -137,5 +140,18 @@ class PermissionControllerTest {
 
         assertThat(result.getBody().getPermissionId()).isEqualTo(2L);
         verify(queryService).getPermission(2L);
+    }
+
+    // -------------------------------------------------
+    // 헬퍼 메서드
+    // -------------------------------------------------
+    private CurrentUserContext mockUser(final long id) {
+        return CurrentUserContext.of(
+                id,
+                "test@queuein.store",
+                "ROLE_ADMIN",
+                List.of("IAM_PERMISSION_DELETE"), // 권한은 테스트 목적
+                "127.0.0.1",
+                "JUnit");
     }
 }

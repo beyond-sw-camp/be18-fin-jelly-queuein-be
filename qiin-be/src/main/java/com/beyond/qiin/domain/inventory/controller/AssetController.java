@@ -14,8 +14,8 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.TreeAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDto;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
-import com.beyond.qiin.security.jwt.JwtTokenProvider;
-import com.beyond.qiin.security.resolver.AccessToken;
+import com.beyond.qiin.security.resolver.CurrentUser;
+import com.beyond.qiin.security.resolver.CurrentUserContext;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +42,6 @@ public class AssetController {
 
     private final AssetQueryService assetQueryService;
 
-    private final JwtTokenProvider jwtTokenProvider;
-
     // 자원 생성
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @PostMapping
@@ -69,11 +67,10 @@ public class AssetController {
     // 자원 삭제
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @DeleteMapping("/{assetId}")
-    public ResponseEntity<Void> deleteAsset(@PathVariable Long assetId, @AccessToken final String accessToken) {
+    public ResponseEntity<Void> deleteAsset(
+            @PathVariable Long assetId, @CurrentUser final CurrentUserContext currentUser) {
 
-        final Long userId = jwtTokenProvider.getUserId(accessToken);
-
-        assetCommandService.softDeleteAsset(assetId, userId);
+        assetCommandService.softDeleteAsset(assetId, currentUser.getUserId());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }

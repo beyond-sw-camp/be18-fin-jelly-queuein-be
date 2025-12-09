@@ -10,7 +10,8 @@ import com.beyond.qiin.domain.iam.dto.role_permission.response.RolePermissionLis
 import com.beyond.qiin.domain.iam.service.command.RoleCommandService;
 import com.beyond.qiin.domain.iam.service.command.RolePermissionCommandService;
 import com.beyond.qiin.domain.iam.service.query.RoleQueryService;
-import com.beyond.qiin.security.resolver.CurrentUserId;
+import com.beyond.qiin.security.resolver.CurrentUser;
+import com.beyond.qiin.security.resolver.CurrentUserContext;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -60,8 +61,9 @@ public class RoleController {
     // 역할 삭제
     @DeleteMapping("/{roleId}")
     @PreAuthorize("hasAuthority('IAM_ROLE_DELETE')")
-    public ResponseEntity<Void> deleteRole(@PathVariable final Long roleId, @CurrentUserId final Long deleterId) {
-        roleCommandService.deleteRole(roleId, deleterId);
+    public ResponseEntity<Void> deleteRole(
+            @PathVariable final Long roleId, @CurrentUser final CurrentUserContext currentUser) {
+        roleCommandService.deleteRole(roleId, currentUser.getUserId());
         return ResponseEntity.noContent().build();
     }
 
@@ -85,10 +87,10 @@ public class RoleController {
     public ResponseEntity<RolePermissionListResponseDto> replacePermissions(
             @PathVariable final Long roleId,
             @RequestBody final ReplaceRolePermissionsRequestDto request,
-            @CurrentUserId final Long userId) {
+            @CurrentUser final CurrentUserContext currentUser) {
 
-        RolePermissionListResponseDto updated =
-                rolePermissionCommandService.replacePermissions(roleId, request.getPermissionIds(), userId);
+        RolePermissionListResponseDto updated = rolePermissionCommandService.replacePermissions(
+                roleId, request.getPermissionIds(), currentUser.getUserId());
 
         return ResponseEntity.ok(updated);
     }
@@ -99,9 +101,9 @@ public class RoleController {
     public ResponseEntity<Void> deletePermission(
             @PathVariable final Long roleId,
             @PathVariable final Long permissionId,
-            @CurrentUserId final Long deleterId) {
+            @CurrentUser final CurrentUserContext currentUser) {
 
-        rolePermissionCommandService.removePermission(roleId, permissionId, deleterId);
+        rolePermissionCommandService.removePermission(roleId, permissionId, currentUser.getUserId());
         return ResponseEntity.ok().build();
     }
 

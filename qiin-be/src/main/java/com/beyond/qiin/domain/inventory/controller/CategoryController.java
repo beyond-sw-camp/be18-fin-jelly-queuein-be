@@ -9,8 +9,8 @@ import com.beyond.qiin.domain.inventory.dto.category.response.ManageCategoryResp
 import com.beyond.qiin.domain.inventory.dto.category.response.UpdateCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.service.command.CategoryCommandService;
 import com.beyond.qiin.domain.inventory.service.query.CategoryQueryService;
-import com.beyond.qiin.security.jwt.JwtTokenProvider;
-import com.beyond.qiin.security.resolver.AccessToken;
+import com.beyond.qiin.security.resolver.CurrentUser;
+import com.beyond.qiin.security.resolver.CurrentUserContext;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +35,6 @@ public class CategoryController {
     private final CategoryCommandService categoryCommandService;
 
     private final CategoryQueryService categoryQueryService;
-
-    private final JwtTokenProvider jwtTokenProvider;
 
     // 카테고리 생성
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
@@ -64,11 +62,10 @@ public class CategoryController {
     // 카테고리 삭제
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId, @AccessToken final String accessToken) {
+    public ResponseEntity<Void> deleteCategory(
+            @PathVariable Long categoryId, @CurrentUser final CurrentUserContext currentUser) {
 
-        final Long userId = jwtTokenProvider.getUserId(accessToken);
-
-        categoryCommandService.softDeleteCategory(categoryId, userId);
+        categoryCommandService.softDeleteCategory(categoryId, currentUser.getUserId());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }

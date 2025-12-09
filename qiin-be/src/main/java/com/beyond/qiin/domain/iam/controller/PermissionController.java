@@ -6,7 +6,8 @@ import com.beyond.qiin.domain.iam.dto.permission.response.PermissionListResponse
 import com.beyond.qiin.domain.iam.dto.permission.response.PermissionResponseDto;
 import com.beyond.qiin.domain.iam.service.command.PermissionCommandService;
 import com.beyond.qiin.domain.iam.service.query.PermissionQueryService;
-import com.beyond.qiin.security.resolver.CurrentUserId;
+import com.beyond.qiin.security.resolver.CurrentUser;
+import com.beyond.qiin.security.resolver.CurrentUserContext;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -51,8 +52,8 @@ public class PermissionController {
     @DeleteMapping("/{permissionId}")
     @PreAuthorize("hasAuthority('IAM_PERMISSION_DELETE')")
     public ResponseEntity<Void> deletePermission(
-            @PathVariable final Long permissionId, @CurrentUserId final Long deleterId) {
-        permissionCommandService.deletePermission(permissionId, deleterId);
+            @PathVariable final Long permissionId, @CurrentUser final CurrentUserContext currentUser) {
+        permissionCommandService.deletePermission(permissionId, currentUser.getUserId());
         return ResponseEntity.noContent().build();
     }
 

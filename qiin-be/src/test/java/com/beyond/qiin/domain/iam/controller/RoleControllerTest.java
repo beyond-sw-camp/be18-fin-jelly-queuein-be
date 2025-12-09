@@ -1,9 +1,8 @@
+// file: src/test/java/com/beyond/qiin/domain/iam/controller/RoleControllerTest.java
 package com.beyond.qiin.domain.iam.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.beyond.qiin.domain.iam.dto.role.request.CreateRoleRequestDto;
 import com.beyond.qiin.domain.iam.dto.role.request.UpdateRoleRequestDto;
@@ -15,6 +14,7 @@ import com.beyond.qiin.domain.iam.dto.role_permission.response.RolePermissionLis
 import com.beyond.qiin.domain.iam.service.command.RoleCommandService;
 import com.beyond.qiin.domain.iam.service.command.RolePermissionCommandService;
 import com.beyond.qiin.domain.iam.service.query.RoleQueryService;
+import com.beyond.qiin.security.resolver.CurrentUserContext;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@DisplayName("RoleControllerTest 단위 테스트")
+@DisplayName("RoleController 단위 테스트")
 class RoleControllerTest {
 
     private RoleController controller;
@@ -50,9 +50,23 @@ class RoleControllerTest {
         }
     }
 
+    private CurrentUserContext mockUser(long id) {
+        return CurrentUserContext.of(
+                id,
+                "test@queuein.store",
+                "ROLE_ADMIN",
+                List.of("IAM_ROLE_PERMISSION_REPLACE", "IAM_ROLE_PERMISSION_REMOVE"),
+                "127.0.0.1",
+                "JUnit");
+    }
+
+    // ----------------------------------------------
+    // Command Tests
+    // ----------------------------------------------
+
     @Test
-    @DisplayName("createRole - 성공")
-    void createRole_success() {
+    @DisplayName("createRole - 역할 생성 단위 테스트")
+    void createRole_unitTest() {
         CreateRoleRequestDto req = new CreateRoleRequestDto();
         ReflectionTestUtils.setField(req, "roleName", "ADMIN");
         ReflectionTestUtils.setField(req, "roleDescription", "관리자");
@@ -73,8 +87,8 @@ class RoleControllerTest {
     }
 
     @Test
-    @DisplayName("updateRole - 성공")
-    void updateRole_success() {
+    @DisplayName("updateRole - 역할 수정 단위 테스트")
+    void updateRole_unitTest() {
         UpdateRoleRequestDto req = new UpdateRoleRequestDto();
         ReflectionTestUtils.setField(req, "roleName", "MOD");
         ReflectionTestUtils.setField(req, "roleDescription", "수정됨");
@@ -95,19 +109,20 @@ class RoleControllerTest {
     }
 
     @Test
-    @DisplayName("deleteRole - 성공")
-    void deleteRole_success() {
-        ResponseEntity<Void> res = controller.deleteRole(10L, 99L);
+    @DisplayName("deleteRole - 역할 삭제 단위 테스트")
+    void deleteRole_unitTest() {
+        CurrentUserContext user = mockUser(99L);
+
+        ResponseEntity<Void> res = controller.deleteRole(10L, user);
 
         verify(roleCommandService).deleteRole(10L, 99L);
         assertThat(res.getStatusCode().value()).isEqualTo(204);
     }
 
     @Test
-    @DisplayName("addPermissions - 성공")
-    void addPermissions_success() {
+    @DisplayName("addPermissions - 역할에 권한 추가 단위 테스트")
+    void addPermissions_unitTest() {
         AddRolePermissionsRequestDto dto = createInstance(AddRolePermissionsRequestDto.class);
-
         ReflectionTestUtils.setField(dto, "permissionIds", List.of(1L, 2L));
 
         ResponseEntity<Void> result = controller.addPermissions(3L, dto);
@@ -117,11 +132,13 @@ class RoleControllerTest {
     }
 
     @Test
-    @DisplayName("replacePermissions - 성공")
-    void replacePermissions_success() {
-        ReplaceRolePermissionsRequestDto dto = createInstance(ReplaceRolePermissionsRequestDto.class);
+    @DisplayName("replacePermissions - 역할 권한 전체 교체 단위 테스트")
+    void replacePermissions_unitTest() {
 
+        ReplaceRolePermissionsRequestDto dto = createInstance(ReplaceRolePermissionsRequestDto.class);
         ReflectionTestUtils.setField(dto, "permissionIds", List.of(5L, 6L));
+
+        CurrentUserContext user = mockUser(88L);
 
         RolePermissionListResponseDto response = RolePermissionListResponseDto.builder()
                 .roleId(3L)
@@ -131,27 +148,34 @@ class RoleControllerTest {
         when(rolePermissionCommandService.replacePermissions(3L, List.of(5L, 6L), 88L))
                 .thenReturn(response);
 
-        ResponseEntity<RolePermissionListResponseDto> res = controller.replacePermissions(3L, dto, 88L);
+        ResponseEntity<RolePermissionListResponseDto> res = controller.replacePermissions(3L, dto, user);
 
         assertThat(res.getBody().getRoleId()).isEqualTo(3L);
         verify(rolePermissionCommandService).replacePermissions(3L, List.of(5L, 6L), 88L);
     }
 
     @Test
-    @DisplayName("deletePermission - 성공")
-    void deletePermission_success() {
-        ResponseEntity<Void> res = controller.deletePermission(10L, 5L, 99L);
+    @DisplayName("deletePermission - 역할의 단일 권한 삭제 단위 테스트")
+    void deletePermission_unitTest() {
+
+        CurrentUserContext user = mockUser(99L);
+
+        ResponseEntity<Void> res = controller.deletePermission(10L, 5L, user);
 
         verify(rolePermissionCommandService).removePermission(10L, 5L, 99L);
         assertThat(res.getStatusCode().value()).isEqualTo(200);
     }
 
+    // ----------------------------------------------
+    // Query Tests
+    // ----------------------------------------------
+
     @Test
-    @DisplayName("getRole - 성공")
-    void getRole_success() {
+    @DisplayName("getRole - 역할 단건 조회 단위 테스트")
+    void getRole_unitTest() {
         RoleResponseDto dto = RoleResponseDto.builder()
                 .roleId(7L)
-                .roleName("USER")
+                .roleName("GENERAL")
                 .roleDescription("사용자")
                 .permissions(List.of())
                 .build();
@@ -165,8 +189,8 @@ class RoleControllerTest {
     }
 
     @Test
-    @DisplayName("getRoleList - 성공")
-    void getRoleList_success() {
+    @DisplayName("getRoleList - 역할 목록 조회 단위 테스트")
+    void getRoleList_unitTest() {
         RoleListResponseDto dto = RoleListResponseDto.builder().roles(List.of()).build();
 
         when(roleQueryService.getRoles()).thenReturn(dto);
