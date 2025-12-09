@@ -66,7 +66,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                 .findById(notificationId)
                 .orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_NOT_FOUND)); // 예외 처리
 
-        notification.delete(userId);
+        notification.delete();
     }
 
     @Override

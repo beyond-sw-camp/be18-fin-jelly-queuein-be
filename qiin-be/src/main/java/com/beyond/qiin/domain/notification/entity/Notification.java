@@ -1,12 +1,14 @@
 package com.beyond.qiin.domain.notification.entity;
 
-import com.beyond.qiin.common.BaseEntity;
 import com.beyond.qiin.domain.notification.enums.NotificationStatus;
 import com.beyond.qiin.domain.notification.enums.NotificationType;
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.time.Instant;
@@ -23,9 +25,13 @@ import org.hibernate.annotations.SQLRestriction;
 @Builder
 @Entity
 @Table(name = "notification")
-@AttributeOverride(name = "id", column = @Column(name = "notification_id"))
 @SQLRestriction("deleted_at is null")
-public class Notification extends BaseEntity {
+public class Notification {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "notification_id")
+    private Long id;
 
     @Column(name = "receiver_id", nullable = false)
     private Long receiverId;
@@ -65,6 +71,21 @@ public class Notification extends BaseEntity {
 
     @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
     private Instant createdAt;
+
+    @Column(name = "deleted_at", nullable = false, columnDefinition = "TIMESTAMP(6)")
+    private Instant deletedAt;
+
+    @PrePersist
+    public void prePersist() { // db 반영시점
+        this.createdAt = Instant.now();
+    }
+
+    public void delete() {
+        if (this.deletedAt != null) {
+            return;
+        }
+        this.deletedAt = Instant.now();
+    }
 
     public static Notification create(
             Long userId, Long aggregateId, NotificationType type, String message, String payloadJson) {
