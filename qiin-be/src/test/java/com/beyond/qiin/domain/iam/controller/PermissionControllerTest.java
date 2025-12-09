@@ -13,11 +13,13 @@ import com.beyond.qiin.domain.iam.service.command.PermissionCommandService;
 import com.beyond.qiin.domain.iam.service.query.PermissionQueryService;
 import com.beyond.qiin.security.resolver.CurrentUserContext;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
+;
 
 @DisplayName("PermissionControllerTest 단위 테스트")
 class PermissionControllerTest {
@@ -38,7 +40,7 @@ class PermissionControllerTest {
     // -----------------------------------------------
 
     @Test
-    @DisplayName("createPermission - 성공")
+    @DisplayName("createPermission 단위 테스트")
     void createPermission_success() {
 
         CreatePermissionRequestDto request = new CreatePermissionRequestDto();
@@ -142,15 +144,16 @@ class PermissionControllerTest {
         verify(queryService).getPermission(2L);
     }
 
-    // -------------------------------------------------
-    // 헬퍼 메서드
-    // -------------------------------------------------
+    // -----------------------------------------------
+    // Helper
+    // -----------------------------------------------
+
     private CurrentUserContext mockUser(final long id) {
         return CurrentUserContext.of(
                 id,
                 "test@queuein.store",
-                "ROLE_ADMIN",
-                List.of("IAM_PERMISSION_DELETE"), // 권한은 테스트 목적
+                "ADMIN",
+                Map.of("IAM", List.of("IAM_PERMISSION_DELETE")),
                 "127.0.0.1",
                 "JUnit");
     }

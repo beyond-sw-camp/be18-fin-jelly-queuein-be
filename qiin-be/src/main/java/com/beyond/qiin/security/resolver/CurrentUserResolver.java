@@ -2,9 +2,10 @@ package com.beyond.qiin.security.resolver;
 
 import com.beyond.qiin.domain.auth.exception.AuthException;
 import com.beyond.qiin.security.CustomUserDetails;
+import com.beyond.qiin.security.util.PermissionUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -21,7 +22,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class CurrentUserResolver implements HandlerMethodArgumentResolver {
 
     @Override
-    public boolean supportsParameter(final MethodParameter parameter) {
+    public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(CurrentUser.class)
                 && parameter.getParameterType().equals(CurrentUserContext.class);
     }
@@ -44,25 +45,35 @@ public class CurrentUserResolver implements HandlerMethodArgumentResolver {
             throw AuthException.unauthorized();
         }
 
-        // 요청 정보 추출
-        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-        String ip = request != null ? request.getRemoteAddr() : null;
-        String userAgent = request != null ? request.getHeader("User-Agent") : null;
-
-        // 권한 분리: ROLE_* 와 PERMISSION_*
         List<String> authorities = user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
+        // ROLE (ROLE_MASTER → MASTER)
         String roleName = authorities.stream()
                 .filter(a -> a.startsWith("ROLE_"))
+                .map(a -> a.substring(5))
                 .findFirst()
                 .orElse(null);
 
+        // Permissions (ROLE 제외)
         List<String> permissions =
-                authorities.stream().filter(a -> !a.startsWith("ROLE_")).collect(Collectors.toList());
+                authorities.stream().filter(a -> !a.startsWith("ROLE_")).toList();
 
-        // CurrentUserContext 생성 후 반환
-        return CurrentUserContext.of(user.getUserId(), user.getEmail(), roleName, permissions, ip, userAgent);
+        // Domain Group
+        Map<String, List<String>> permissionGroups = PermissionUtils.groupPermissions(permissions);
+
+        // IP / UserAgent
+        HttpServletRequest req = webRequest.getNativeRequest(HttpServletRequest.class);
+        String ip = resolveClientIp(req);
+        String ua = req != null ? req.getHeader("User-Agent") : null;
+
+        return CurrentUserContext.of(user.getUserId(), user.getEmail(), roleName, permissionGroups, ip, ua);
+    }
+
+    private String resolveClientIp(final HttpServletRequest request) {
+        if (request == null) return null;
+        String xf = request.getHeader("X-Forwarded-For");
+        return (xf != null) ? xf.split(",")[0].trim() : request.getRemoteAddr();
     }
 }
