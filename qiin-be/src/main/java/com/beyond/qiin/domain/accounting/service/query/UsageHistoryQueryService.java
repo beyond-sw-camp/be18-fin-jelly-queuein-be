@@ -7,8 +7,6 @@ import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistory
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface UsageHistoryQueryService {
 
     PageResponseDto<UsageHistoryListResponseDto> getUsageHistoryList(
