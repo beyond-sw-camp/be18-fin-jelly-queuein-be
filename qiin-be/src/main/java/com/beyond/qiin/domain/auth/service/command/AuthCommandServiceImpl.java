@@ -3,13 +3,14 @@ package com.beyond.qiin.domain.auth.service.command;
 import com.beyond.qiin.domain.auth.dto.request.LoginRequestDto;
 import com.beyond.qiin.domain.auth.dto.response.LoginResponseDto;
 import com.beyond.qiin.domain.auth.dto.response.LoginResult;
+import com.beyond.qiin.domain.auth.dto.response.LoginServiceResult;
 import com.beyond.qiin.domain.auth.dto.response.TempPwLoginResponseDto;
-import com.beyond.qiin.domain.auth.dto.response.TokenPairResponseDto;
 import com.beyond.qiin.domain.auth.exception.AuthException;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleReader;
+import com.beyond.qiin.internal.auth.dto.TokenPairDto;
 import com.beyond.qiin.internal.auth.dto.UserRoleContextDto;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.jwt.RedisTokenRepository;
@@ -35,7 +36,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
     @Override
     @Transactional
-    public LoginResult login(final LoginRequestDto request) {
+    public LoginServiceResult login(final LoginRequestDto request) {
 
         final User user = getUserOrThrow(request.getLoginKey());
         validatePassword(request.getPassword(), user.getPassword());
@@ -43,18 +44,21 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
         final UserRoleContextDto ctx = getUserRoleContext(userId);
 
-        // access + refresh = 하나의 헬퍼에서 발급
-        TokenPairResponseDto tokens = issueTokenPair(userId, ctx.getRole(), user.getEmail(), ctx.getPermissions());
+        // access + refresh 발급
+        TokenPairDto tokens = issueTokenPair(userId, ctx.getRole(), user.getEmail(), ctx.getPermissions());
 
         user.validateTempPasswordUsage();
+
+        // 임시 PW 로그인 시
         if (user.isTempPassword() && user.isFirstLogin()) {
-            // user.updateLastLoginAt(Instant.now());
-            return TempPwLoginResponseDto.fromEntity(user, tokens.getAccess());
+            return new LoginServiceResult(
+                    TempPwLoginResponseDto.fromEntity(user, tokens.getAccess()), tokens.getRefresh());
         }
 
         user.updateLastLoginAt(Instant.now());
 
-        return LoginResponseDto.of(user, ctx.getRole(), tokens.getAccess(), tokens.getRefresh());
+        return new LoginServiceResult(
+                LoginResponseDto.of(user, ctx.getRole(), tokens.getAccess()), tokens.getRefresh());
     }
 
     @Override
@@ -81,10 +85,9 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
         final UserRoleContextDto ctx = getUserRoleContext(userId);
 
-        final TokenPairResponseDto newTokens =
-                issueTokenPair(userId, ctx.getRole(), user.getEmail(), ctx.getPermissions());
+        final TokenPairDto newTokens = issueTokenPair(userId, ctx.getRole(), user.getEmail(), ctx.getPermissions());
 
-        return LoginResponseDto.of(user, ctx.getRole(), newTokens.getAccess(), newTokens.getRefresh());
+        return LoginResponseDto.of(user, ctx.getRole(), newTokens.getAccess());
     }
 
     // -----------------------
@@ -125,7 +128,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     }
 
     // AccessToken + RefreshToken 동시 발급
-    private TokenPairResponseDto issueTokenPair(
+    private TokenPairDto issueTokenPair(
             final Long userId, final String role, final String email, final List<String> permissions) {
         final String access = jwtTokenProvider.generateAccessToken(userId, role, email, permissions);
         final String refresh = jwtTokenProvider.generateRefreshToken(userId, role);
@@ -133,6 +136,6 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         redisTokenRepository.saveRefreshToken(
                 userId, refresh, Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidityMillis()));
 
-        return TokenPairResponseDto.of(access, refresh);
+        return TokenPairDto.of(access, refresh);
     }
 }
