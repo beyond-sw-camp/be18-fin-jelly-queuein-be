@@ -16,7 +16,6 @@ import com.beyond.qiin.domain.iam.service.command.UserCommandService;
 import com.beyond.qiin.domain.iam.service.query.UserQueryService;
 import com.beyond.qiin.security.resolver.CurrentUser;
 import com.beyond.qiin.security.resolver.CurrentUserContext;
-import com.beyond.qiin.security.resolver.trash.CurrentUserId;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -105,8 +104,9 @@ public class UserController {
     // 사용자 삭제
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasAuthority('IAM_USER_DELETE')")
-    public ResponseEntity<Void> deleteUser(@PathVariable final Long userId, @CurrentUserId final Long deleterId) {
-        userCommandService.deleteUser(userId, deleterId);
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable final Long userId, @CurrentUser final CurrentUserContext currentUser) {
+        userCommandService.deleteUser(userId, currentUser.getUserId());
         return ResponseEntity.noContent().build();
     }
 

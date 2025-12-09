@@ -270,8 +270,15 @@ class UserControllerTest {
     @DisplayName("deleteUser - 성공")
     void deleteUser_success() {
         Long userIdToDelete = 4L;
-        ResponseEntity<Void> res = controller.deleteUser(userIdToDelete, DELETER_ID);
 
+        // CurrentUserContext mock 준비
+        CurrentUserContext mockUser = mock(CurrentUserContext.class);
+        when(mockUser.getUserId()).thenReturn(DELETER_ID);
+
+        // Controller 호출
+        ResponseEntity<Void> res = controller.deleteUser(userIdToDelete, mockUser);
+
+        // 검증
         verify(commandService).deleteUser(userIdToDelete, DELETER_ID);
         assertThat(res.getStatusCode().value()).isEqualTo(204);
     }
