@@ -15,12 +15,15 @@ public class MonthReservationDailyResponseDto {
 
     private final Instant startAt;
 
+    private final Instant endAt;
+
     private final String assetName;
 
     public static MonthReservationDailyResponseDto fromEntity(final Reservation reservation) {
         return MonthReservationDailyResponseDto.builder()
                 .reservationId(reservation.getId())
                 .startAt(reservation.getStartAt())
+                .endAt(reservation.getEndAt())
                 .assetName(reservation.getAsset().getName())
                 .build();
     }

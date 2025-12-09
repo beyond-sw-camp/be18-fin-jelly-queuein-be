@@ -21,7 +21,7 @@ public class GetAppliedReservationSearchCondition {
     private String assetName; // 검색용이므로 unique 안하고 여러개 떠도 됨
 
     private String assetType;
-    private String categoryName;
+    private Long categoryId;
     private String assetStatus;
     private String layerZero;
     private String layerOne;
