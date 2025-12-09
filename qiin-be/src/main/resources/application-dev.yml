@@ -2,7 +2,9 @@ spring:
   config:
     activate:
       on-profile: dev
-
+  mvc:
+    async:
+      request-timeout: 3600000 #1h(sse 연결 시간)
   flyway:
     enabled: true
     baseline-on-migrate: true

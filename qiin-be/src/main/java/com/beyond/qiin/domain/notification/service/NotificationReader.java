@@ -1,7 +1,7 @@
 package com.beyond.qiin.domain.notification.service;
 
-import com.beyond.qiin.domain.notification.NotificationJpaRepository;
 import com.beyond.qiin.domain.notification.entity.Notification;
+import com.beyond.qiin.domain.notification.repository.NotificationJpaRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

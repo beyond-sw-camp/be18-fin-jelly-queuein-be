@@ -1,14 +1,11 @@
 package com.beyond.qiin.domain.notification.entity;
 
+import com.beyond.qiin.common.BaseEntity;
 import com.beyond.qiin.domain.notification.enums.NotificationStatus;
 import com.beyond.qiin.domain.notification.enums.NotificationType;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.time.Instant;
@@ -17,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,11 +22,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "notification")
-public class Notification {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notification_id")
-    private Long id;
+@AttributeOverride(name = "id", column = @Column(name = "notification_id"))
+@SQLRestriction("deleted_at is null")
+public class Notification extends BaseEntity {
 
     @Column(name = "receiver_id", nullable = false)
     private Long receiverId;
@@ -45,7 +41,6 @@ public class Notification {
     @Column(name = "is_read", nullable = false)
     private boolean isRead;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 30)
     private int type;
 
