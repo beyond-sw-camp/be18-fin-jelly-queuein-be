@@ -37,7 +37,7 @@ public class Notification extends BaseEntity {
     private String message;
 
     @Column(name = "status", nullable = false, length = 20)
-    private int status = 0; //pending
+    private int status = 0; // pending
 
     @Transient
     private NotificationStatus notificationStatus;

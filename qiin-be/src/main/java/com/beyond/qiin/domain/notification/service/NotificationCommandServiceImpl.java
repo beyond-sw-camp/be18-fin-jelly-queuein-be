@@ -52,7 +52,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         if (payload != null && payload.getAttendantUserIds() != null) {
             payload.getAttendantUserIds().forEach(userId -> {
                 if (userId != null) {
-                    // TODO : 초대하는 게 updated 에도 있고 created에도 있어서 결국 중복
+                    // TODO : 초대하는 게 updated 에도 있고 created에도 있어서 결국 중복 아 꼬여
                     Notification inviteNotification = makeInviteNotification(payload, userId);
                     sendNotification(userId, inviteNotification);
                 }
