@@ -14,7 +14,7 @@ public class MailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${MAIL_FROM}")
+    @Value("${mail.from}")
     private String from;
 
     @Value("${LOGIN_URL}")
