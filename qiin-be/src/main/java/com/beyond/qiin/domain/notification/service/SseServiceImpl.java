@@ -6,14 +6,14 @@ import com.beyond.qiin.domain.notification.repository.NotificationJpaRepository;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class SseServiceImpl implements SseService {
     private static final Long TIMEOUT = 60L * 60 * 1000; // 1시간
-    private final NotificationJpaRepository notificationJpaRepository;
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     @Override
@@ -28,6 +28,7 @@ public class SseServiceImpl implements SseService {
 
         // 연결 성공 이벤트
         sendConnectEvent(userId);
+        log.info("SSE SEND TRY → userId={}, emitter exists={}", userId, emitters.containsKey(userId));
 
         return emitter;
     }

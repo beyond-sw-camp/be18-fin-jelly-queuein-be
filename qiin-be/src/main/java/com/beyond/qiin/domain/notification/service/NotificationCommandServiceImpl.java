@@ -51,7 +51,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     public void markAsRead(Long notificationId, Long userId) {
 
         Notification notification = notificationJpaRepository
-                .findByIdAndUserId(notificationId, userId)
+                .findById(notificationId)
                 .orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_NOT_FOUND));
 
         notification.markAsRead(); // isRead, readAt

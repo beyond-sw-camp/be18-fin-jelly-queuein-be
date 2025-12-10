@@ -3,6 +3,7 @@ package com.beyond.qiin.domain.notification.controller;
 import com.beyond.qiin.domain.notification.service.SseService;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.resolver.AccessToken;
+import com.beyond.qiin.security.resolver.SseAccessToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,9 +23,9 @@ public class SseController {
     private final SseService sseService;
 
     // SSE 구독
-    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
+//    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(@AccessToken final String accessToken) {
+    public SseEmitter subscribe(@SseAccessToken String accessToken) {
 
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
