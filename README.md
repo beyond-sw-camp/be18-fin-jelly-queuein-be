@@ -1,6 +1,25 @@
 # 18-Final-Jelly-QueueIn-BE
 
-## ✨팀원✨
+---
+
+## 📑 목차
+1. [팀원](#team)
+2. [프로젝트 기획서](#plan)
+3. [요구사항 정의서](#requirements)
+4. [시스템 아키텍처](#architecture)
+5. [WBS](#wbs)
+6. [ERD](#erd)
+7. [화면 설계서](#uiux)
+8. [백엔드 단위 테스트](#backend-test)
+9. [UI/UX 단위 테스트](#uiux-test)
+10. [API 명세서](#api)
+11. [통합테스트 결과서](#integration-test)
+12. [CI/CD 계획서](#cicd)
+---
+
+<a id="team"></a>
+## ✨ 팀원
+
 <table style="width:100%;">
   <thead>
     <tr align="center">
@@ -46,8 +65,10 @@
     </tbody>
   </table>
   <br>
+
+---
   
-## <a id="requirements"></a>1. 프로젝트 기획서
+## <a id="plan"></a>1. 프로젝트 기획서
   
   <details>
     <summary>세부사항</summary>
@@ -582,3 +603,9 @@ SettlementController 단위 테스트
 
 ## <a id="requirements"></a>9. API 명세서
 [API 명세서](https://ijn7tz4u5x.apidog.io/)
+
+## <a id="requirements"></a>10. 통합테스트 결과서
+
+
+## <a id="requirements"></a>11. CICD 계획서
+[CICD 계획서](https://nice-surprise-7e8.notion.site/CI-CD-2c50b5bf3ee080b082ccfbc4bbf10f36)
