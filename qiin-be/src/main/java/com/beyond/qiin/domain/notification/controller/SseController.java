@@ -6,7 +6,6 @@ import com.beyond.qiin.security.resolver.AccessToken;
 import com.beyond.qiin.security.resolver.SseAccessToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +32,7 @@ public class SseController {
     }
 
     // SSE 구독 해제
-//    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
+    //    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @DeleteMapping("/unsubscribe")
     public void unsubscribe(@AccessToken final String accessToken) {
         final Long userId = jwtTokenProvider.getUserId(accessToken);
