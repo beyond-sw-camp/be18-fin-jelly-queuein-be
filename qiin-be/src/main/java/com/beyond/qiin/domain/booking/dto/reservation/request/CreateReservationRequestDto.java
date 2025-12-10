@@ -1,9 +1,5 @@
 package com.beyond.qiin.domain.booking.dto.reservation.request;
 
-import com.beyond.qiin.domain.booking.entity.Reservation;
-import com.beyond.qiin.domain.booking.enums.ReservationStatus;
-import com.beyond.qiin.domain.iam.entity.User;
-import com.beyond.qiin.domain.inventory.entity.Asset;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -41,24 +37,24 @@ public class CreateReservationRequestDto {
     @Builder.Default
     private List<Long> attendantIds = new ArrayList<>();
 
-//    public Reservation toEntity(
-//            final Asset asset,
-//            final User applicant,
-//            // final List<Attendant> attendants,
-//            final ReservationStatus reservationStatus) {
-//
-//        Reservation reservation = Reservation.builder()
-//                .asset(asset)
-//                .applicant(applicant)
-//                .startAt(startAt)
-//                .endAt(endAt)
-//                .description(description)
-//                .status(reservationStatus.getCode())
-//                .reservationStatus(reservationStatus)
-//                .build();
-//
-//        // reservation.addAttendants(attendants);
-//
-//        return reservation;
-//    }
+    //    public Reservation toEntity(
+    //            final Asset asset,
+    //            final User applicant,
+    //            // final List<Attendant> attendants,
+    //            final ReservationStatus reservationStatus) {
+    //
+    //        Reservation reservation = Reservation.builder()
+    //                .asset(asset)
+    //                .applicant(applicant)
+    //                .startAt(startAt)
+    //                .endAt(endAt)
+    //                .description(description)
+    //                .status(reservationStatus.getCode())
+    //                .reservationStatus(reservationStatus)
+    //                .build();
+    //
+    //        // reservation.addAttendants(attendants);
+    //
+    //        return reservation;
+    //    }
 }
