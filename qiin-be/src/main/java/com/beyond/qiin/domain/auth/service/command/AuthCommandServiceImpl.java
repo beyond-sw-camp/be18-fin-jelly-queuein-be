@@ -123,9 +123,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
     // 사용자 역할 및 권한 조회
     private UserRoleContextDto getUserRoleContext(final Long userId) {
-        String role = userRoleReader.findRoleNameByUserId(userId);
-        List<String> permissions = userRoleReader.findPermissionsByUserId(userId);
-        return UserRoleContextDto.of(role, permissions);
+        return userRoleReader.readUserRoleContext(userId);
     }
 
     // AccessToken + RefreshToken 동시 발급
