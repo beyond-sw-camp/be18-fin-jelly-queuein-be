@@ -18,6 +18,8 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.
 import com.beyond.qiin.domain.booking.service.command.ReservationCommandService;
 import com.beyond.qiin.domain.booking.service.query.ReservationQueryService;
 import com.beyond.qiin.security.CustomUserDetails;
+import com.beyond.qiin.security.jwt.JwtTokenProvider;
+import com.beyond.qiin.security.resolver.AccessToken;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -42,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class ReservationController {
+    private final JwtTokenProvider jwtTokenProvider;
 
     private final ReservationCommandService reservationCommandService;
     private final ReservationQueryService reservationQueryService;
@@ -50,11 +53,14 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PostMapping("/{assetId}/apply")
     public ResponseEntity<ReservationResponseDto> createReservationApply(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AccessToken final String accessToken,
             @PathVariable("assetId") Long assetId,
             @Valid @RequestBody CreateReservationRequestDto createReservationRequestDto) {
+
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         ReservationResponseDto createReservationResponseDto =
-                reservationCommandService.applyReservation(user.getUserId(), assetId, createReservationRequestDto);
+                reservationCommandService.applyReservation(userId, assetId, createReservationRequestDto);
         return ResponseEntity.status(201).body(createReservationResponseDto);
     }
 
