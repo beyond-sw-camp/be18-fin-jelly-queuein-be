@@ -124,7 +124,13 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             final ConfirmReservationRequestDto confirmReservationRequestDto) {
 
         User respondent = userReader.findById(userId);
+
         Reservation reservation = reservationReader.getReservationById(reservationId);
+
+        if (reservation.getApplicant().getId().equals(respondent.getId())) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_NOT_APPROVABLE);
+        }
+
         Asset asset = reservation.getAsset();
         validateReservationAvailability(
                 reservation.getId(), asset.getId(), reservation.getStartAt(), reservation.getEndAt());
@@ -166,6 +172,11 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Instant now = Instant.now();
         if (now.isBefore(reservation.getStartAt())) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_TIME_NOT_YET);
+        }
+
+        // 끝나는 시간 이후면 사용 불가
+        if (now.isAfter(reservation.getEndAt())) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_TIME_OVER);
         }
 
         reservation.start(); // status using, 실제 시작 시간 추가

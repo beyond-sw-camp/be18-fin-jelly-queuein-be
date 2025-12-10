@@ -284,6 +284,7 @@ public class Reservation extends BaseEntity {
         if (this.getStatus() != ReservationStatus.USING) // (this.status != 2)
         throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.COMPLETED); // this.status = 5;
+
         this.actualEndAt = Instant.now();
     }
 
