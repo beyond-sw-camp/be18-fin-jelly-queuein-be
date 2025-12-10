@@ -1,5 +1,10 @@
 package com.beyond.qiin.domain.inventory.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.beyond.qiin.domain.inventory.dto.category.request.CreateCategoryRequestDto;
 import com.beyond.qiin.domain.inventory.dto.category.response.CreateCategoryResponseDto;
 import com.beyond.qiin.domain.inventory.service.command.CategoryCommandService;
@@ -20,19 +25,12 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 @WebMvcTest(
         controllers = CategoryController.class,
         excludeFilters = {
-                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),
-                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class)
-        }
-)
+            @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class),
+            @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class)
+        })
 @AutoConfigureMockMvc(addFilters = false)
 class CategoryControllerTest {
 
@@ -61,27 +59,26 @@ class CategoryControllerTest {
 
         // given (요청 DTO)
         CreateCategoryRequestDto request = CreateCategoryRequestDto.builder()
-                                                                   .name("회의실")
-                                                                   .description("설명입니다.")
-                                                                   .build();
+                .name("회의실")
+                .description("설명입니다.")
+                .build();
 
         // 서비스에서 반환할 응답 DTO
         CreateCategoryResponseDto response = CreateCategoryResponseDto.builder()
-                                                                      .categoryId(1L)
-                                                                      .name("회의실")
-                                                                      .description("설명입니다.")
-                                                                      .build();
+                .categoryId(1L)
+                .name("회의실")
+                .description("설명입니다.")
+                .build();
 
-        when(categoryCommandService.createCategory(any()))
-                .thenReturn(response);
+        when(categoryCommandService.createCategory(any())).thenReturn(response);
 
         // when & then
         mockMvc.perform(post("/api/v1/assets/categories")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
-               .andExpect(status().isCreated())
-               .andExpect(jsonPath("$.categoryId").value(1L))
-               .andExpect(jsonPath("$.name").value("회의실"))
-               .andExpect(jsonPath("$.description").value("설명입니다."));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.categoryId").value(1L))
+                .andExpect(jsonPath("$.name").value("회의실"))
+                .andExpect(jsonPath("$.description").value("설명입니다."));
     }
 }
