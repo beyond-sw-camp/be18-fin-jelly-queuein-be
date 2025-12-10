@@ -68,11 +68,13 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PostMapping("/{assetId}/instant-confirm")
     public ResponseEntity<ReservationResponseDto> createReservationInstantConfirm(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AccessToken final String accessToken,
             @PathVariable("assetId") Long assetId,
             @Valid @RequestBody CreateReservationRequestDto createReservationRequestDto) {
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         ReservationResponseDto createReservationResponseDto = reservationCommandService.instantConfirmReservation(
-                user.getUserId(), assetId, createReservationRequestDto);
+                userId, assetId, createReservationRequestDto);
         return ResponseEntity.status(201).body(createReservationResponseDto);
     }
 
@@ -80,12 +82,15 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @PatchMapping("/{reservationId}/approve")
     public ResponseEntity<ReservationResponseDto> approveReservation(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AccessToken final String accessToken,
             @PathVariable("reservationId") Long reservationId,
             @Valid @RequestBody ConfirmReservationRequestDto confirmReservationRequestDto) {
+
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         // 담당자 권한인 경우
         ReservationResponseDto reservationResponseDto = reservationCommandService.approveReservation(
-                user.getUserId(), reservationId, confirmReservationRequestDto);
+                userId, reservationId, confirmReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -96,12 +101,15 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @PatchMapping("/{reservationId}/reject")
     public ResponseEntity<ReservationResponseDto> rejectReservation(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AccessToken final String accessToken,
             @PathVariable("reservationId") Long reservationId,
             @Valid @RequestBody ConfirmReservationRequestDto confirmReservationRequestDto) {
+
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         // 담당자 권한인 경우
         ReservationResponseDto reservationResponseDto = reservationCommandService.rejectReservation(
-                user.getUserId(), reservationId, confirmReservationRequestDto);
+                userId, reservationId, confirmReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -112,9 +120,12 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PatchMapping("/{reservationId}/check-in")
     public ResponseEntity<ReservationResponseDto> startUsingReservation(
-            @AuthenticationPrincipal CustomUserDetails user, @PathVariable("reservationId") Long reservationId) {
+        @AccessToken final String accessToken, @PathVariable("reservationId") Long reservationId) {
+
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         ReservationResponseDto reservationResponseDto =
-                reservationCommandService.startUsingReservation(user.getUserId(), reservationId);
+                reservationCommandService.startUsingReservation(userId, reservationId);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -125,10 +136,12 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PatchMapping("/{reservationId}/check-out")
     public ResponseEntity<ReservationResponseDto> endUsingReservation(
-            @AuthenticationPrincipal CustomUserDetails user,
+        @AccessToken final String accessToken,
             @PathVariable("reservationId") Long reservationId) { // 실제 서버로 요청 온 시각으로 시작, 종료 관리
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         ReservationResponseDto reservationResponseDto =
-                reservationCommandService.endUsingReservation(user.getUserId(), reservationId);
+                reservationCommandService.endUsingReservation(userId, reservationId);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -139,9 +152,12 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PatchMapping("/{reservationId}/cancel")
     public ResponseEntity<ReservationResponseDto> cancelReservation(
-            @AuthenticationPrincipal CustomUserDetails user, @PathVariable("reservationId") Long reservationId) {
+        @AccessToken final String accessToken, @PathVariable("reservationId") Long reservationId) {
+
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         ReservationResponseDto reservationResponseDto =
-                reservationCommandService.cancelReservation(user.getUserId(), reservationId);
+                reservationCommandService.cancelReservation(userId, reservationId);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -152,11 +168,14 @@ public class ReservationController {
     @PatchMapping("/{reservationId}")
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     public ResponseEntity<ReservationResponseDto> updateReservation(
-            @AuthenticationPrincipal CustomUserDetails user,
+        @AccessToken final String accessToken,
             @PathVariable("reservationId") Long reservationId,
             @Valid @RequestBody UpdateReservationRequestDto updateReservationRequestDto) {
+
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         ReservationResponseDto reservationResponseDto = reservationCommandService.updateReservation(
-                user.getUserId(), reservationId, updateReservationRequestDto);
+                userId, reservationId, updateReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -169,9 +188,12 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/{reservationId}")
     public ResponseEntity<ReservationDetailResponseDto> getReservation(
-            @AuthenticationPrincipal CustomUserDetails user, @PathVariable Long reservationId) {
+        @AccessToken final String accessToken, @PathVariable Long reservationId) {
+
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         ReservationDetailResponseDto reservationDetailResponseDto =
-                reservationQueryService.getReservation(user.getUserId(), reservationId);
+                reservationQueryService.getReservation(userId, reservationId);
         return ResponseEntity.ok(reservationDetailResponseDto);
     }
 
@@ -180,12 +202,15 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/me")
     public ResponseEntity<PageResponseDto<GetUserReservationResponseDto>> getUserReservations(
-            @AuthenticationPrincipal CustomUserDetails user,
+        @AccessToken final String accessToken,
             @Valid @ModelAttribute GetUserReservationSearchCondition condition,
             Pageable pageable) {
 
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
+
         PageResponseDto<GetUserReservationResponseDto> page =
-                reservationQueryService.getReservationsByUserId(user.getUserId(), condition, pageable);
+                reservationQueryService.getReservationsByUserId(userId, condition, pageable);
 
         return ResponseEntity.ok(page);
     }
@@ -194,12 +219,15 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @GetMapping("/pending")
     public ResponseEntity<PageResponseDto<GetAppliedReservationResponseDto>> getAppliedReservations(
-            @AuthenticationPrincipal CustomUserDetails user,
+        @AccessToken final String accessToken,
             @Valid @ModelAttribute GetAppliedReservationSearchCondition condition,
             Pageable pageable) {
 
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
+
         PageResponseDto<GetAppliedReservationResponseDto> page =
-                reservationQueryService.getReservationApplies(user.getUserId(), condition, pageable);
+                reservationQueryService.getReservationApplies(userId, condition, pageable);
         return ResponseEntity.ok(page);
     }
 
@@ -207,11 +235,14 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/reservable-assets")
     public ResponseEntity<PageResponseDto<ReservableAssetResponseDto>> getReservableAssets(
-            @AuthenticationPrincipal CustomUserDetails user,
+        @AccessToken final String accessToken,
             @Valid @ModelAttribute ReservableAssetSearchCondition condition,
             Pageable pageable) {
+
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         PageResponseDto<ReservableAssetResponseDto> page =
-                reservationQueryService.getReservableAssets(user.getUserId(), condition, pageable);
+                reservationQueryService.getReservableAssets(userId, condition, pageable);
         return ResponseEntity.ok(page);
     }
 
@@ -221,9 +252,12 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/monthly")
     public ResponseEntity<MonthReservationListResponseDto> getMonthlyReservations(
-            @AuthenticationPrincipal CustomUserDetails user, @RequestParam YearMonth yearMonth) {
+        @AccessToken final String accessToken, @RequestParam YearMonth yearMonth) {
+
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         MonthReservationListResponseDto monthReservationListResponseDto =
-                reservationQueryService.getMonthlyReservations(user.getUserId(), yearMonth);
+                reservationQueryService.getMonthlyReservations(userId, yearMonth);
         return ResponseEntity.ok(monthReservationListResponseDto);
     }
 
@@ -231,9 +265,12 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/weekly")
     public ResponseEntity<WeekReservationListResponseDto> getWeeklyReservations(
-            @AuthenticationPrincipal CustomUserDetails user, @RequestParam LocalDate date) {
+        @AccessToken final String accessToken, @RequestParam LocalDate date) {
+
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
         WeekReservationListResponseDto weekReservationListResponseDto =
-                reservationQueryService.getWeeklyReservations(user.getUserId(), date);
+                reservationQueryService.getWeeklyReservations(userId, date);
         return ResponseEntity.ok(weekReservationListResponseDto);
     }
     //
@@ -241,19 +278,25 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/{assetId}/available-times")
     public ResponseEntity<AssetTimeResponseDto> getAssetTimes(
-            @AuthenticationPrincipal CustomUserDetails user,
+        @AccessToken final String accessToken,
             @PathVariable("assetId") Long assetId,
             @RequestParam LocalDate date) {
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
+
         AssetTimeResponseDto assetTimeResponseDto =
-                reservationQueryService.getAssetTimes(user.getUserId(), assetId, date);
+                reservationQueryService.getAssetTimes(userId, assetId, date);
         return ResponseEntity.ok(assetTimeResponseDto);
     }
 
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> deleteReservation(
-            @AuthenticationPrincipal CustomUserDetails user, @PathVariable("reservationId") Long reservationId) {
-        reservationCommandService.softDeleteReservation(user.getUserId(), reservationId);
+        @AccessToken final String accessToken, @PathVariable("reservationId") Long reservationId) {
+        final Long userId = jwtTokenProvider.getUserId(accessToken);
+
+
+        reservationCommandService.softDeleteReservation(userId, reservationId);
         return ResponseEntity.noContent().build();
     }
 }
