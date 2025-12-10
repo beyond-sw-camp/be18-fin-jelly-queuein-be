@@ -126,14 +126,14 @@
 ### DevOps & Cloud
 
 <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> 
-<img src="https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge&logo=amazon-ec2&logoColor=white">
-<img src="https://img.shields.io/badge/AWS%20Fargate-FF9900?style=for-the-badge&logo=amazon-ecs&logoColor=white">
-<img src="https://img.shields.io/badge/AWS%20ECS-FF9900?style=for-the-badge&logo=amazon-ecs&logoColor=white">
+<img src="https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge&logo=amazonwebservices&logoColor=white">
+<img src="https://img.shields.io/badge/AWS%20Fargate-FF9900?style=for-the-badge&logo=amazonwebservices&logoColor=white">
+<img src="https://img.shields.io/badge/AWS%20ECS-FF9900?style=for-the-badge&logo=amazonwebservices&logoColor=white">
 <img src="https://img.shields.io/badge/AWS%20IAM-FF9900?style=for-the-badge&logo=amazonwebservices&logoColor=white">
 
 <img src="https://img.shields.io/badge/AWS%20SES-FF9900?style=for-the-badge&logo=amazonwebservices&logoColor=white">
 <img src="https://img.shields.io/badge/AWS%20SNS-FF9900?style=for-the-badge&logo=amazonwebservices&logoColor=white">
-<img src="https://img.shields.io/badge/AWS%20RDS-527FFF?style=for-the-badge&logo=amazon-rds&logoColor=white">
+<img src="https://img.shields.io/badge/AWS%20RDS-527FFF?style=for-the-badge&logo=amazonwebservices&logoColor=white">
 
 <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
 
