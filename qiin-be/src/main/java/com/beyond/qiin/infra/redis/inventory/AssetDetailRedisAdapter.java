@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Profile("dev")
 public class AssetDetailRedisAdapter {
 
     private final AssetDetailRedisRepository assetDetailRedisRepository;
