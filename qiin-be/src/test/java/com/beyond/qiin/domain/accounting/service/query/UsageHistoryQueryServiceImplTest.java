@@ -8,6 +8,7 @@ import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistoryListSearchRequestDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
+import com.beyond.qiin.domain.accounting.repository.UsageHistoryJpaRepository;
 import com.beyond.qiin.domain.accounting.repository.querydsl.UsageHistoryQueryAdapter;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -26,11 +27,14 @@ class UsageHistoryQueryServiceImplTest {
 
     private UsageHistoryQueryServiceImpl service;
     private UsageHistoryQueryAdapter usageHistoryQueryAdapter;
+    private UsageHistoryJpaRepository usageHistoryJpaRepository;
 
     @BeforeEach
     void setUp() {
         usageHistoryQueryAdapter = mock(UsageHistoryQueryAdapter.class);
-        service = new UsageHistoryQueryServiceImpl(usageHistoryQueryAdapter);
+        usageHistoryJpaRepository = mock(UsageHistoryJpaRepository.class);
+
+        service = new UsageHistoryQueryServiceImpl(usageHistoryQueryAdapter, usageHistoryJpaRepository);
     }
 
     // -----------------------------------------------

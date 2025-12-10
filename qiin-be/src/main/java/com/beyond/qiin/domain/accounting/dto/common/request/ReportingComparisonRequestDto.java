@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.accounting.dto.common;
+package com.beyond.qiin.domain.accounting.dto.common.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
