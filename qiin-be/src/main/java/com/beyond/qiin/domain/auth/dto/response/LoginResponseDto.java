@@ -14,10 +14,8 @@ public class LoginResponseDto implements LoginResult {
     private String role;
     private Boolean passwordExpired;
     private String accessToken;
-    private String refreshToken;
 
-    public static LoginResponseDto of(
-            final User user, final String role, final String accessToken, final String refreshToken) {
+    public static LoginResponseDto of(final User user, final String role, final String accessToken) {
         return LoginResponseDto.builder()
                 .userId(user.getId())
                 .userName(user.getUserName())
@@ -25,7 +23,6 @@ public class LoginResponseDto implements LoginResult {
                 .role(role)
                 .passwordExpired(user.getPasswordExpired())
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
                 .build();
     }
 }
