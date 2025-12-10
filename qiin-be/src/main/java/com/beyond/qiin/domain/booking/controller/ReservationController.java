@@ -17,7 +17,6 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.user_reservation.
 import com.beyond.qiin.domain.booking.dto.reservation.response.week_reservation.WeekReservationListResponseDto;
 import com.beyond.qiin.domain.booking.service.command.ReservationCommandService;
 import com.beyond.qiin.domain.booking.service.query.ReservationQueryService;
-import com.beyond.qiin.security.CustomUserDetails;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.resolver.AccessToken;
 import jakarta.validation.Valid;
@@ -28,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -73,8 +71,8 @@ public class ReservationController {
             @Valid @RequestBody CreateReservationRequestDto createReservationRequestDto) {
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
-        ReservationResponseDto createReservationResponseDto = reservationCommandService.instantConfirmReservation(
-                userId, assetId, createReservationRequestDto);
+        ReservationResponseDto createReservationResponseDto =
+                reservationCommandService.instantConfirmReservation(userId, assetId, createReservationRequestDto);
         return ResponseEntity.status(201).body(createReservationResponseDto);
     }
 
@@ -89,8 +87,8 @@ public class ReservationController {
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
         // 담당자 권한인 경우
-        ReservationResponseDto reservationResponseDto = reservationCommandService.approveReservation(
-                userId, reservationId, confirmReservationRequestDto);
+        ReservationResponseDto reservationResponseDto =
+                reservationCommandService.approveReservation(userId, reservationId, confirmReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -108,8 +106,8 @@ public class ReservationController {
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
         // 담당자 권한인 경우
-        ReservationResponseDto reservationResponseDto = reservationCommandService.rejectReservation(
-                userId, reservationId, confirmReservationRequestDto);
+        ReservationResponseDto reservationResponseDto =
+                reservationCommandService.rejectReservation(userId, reservationId, confirmReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -120,7 +118,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PatchMapping("/{reservationId}/check-in")
     public ResponseEntity<ReservationResponseDto> startUsingReservation(
-        @AccessToken final String accessToken, @PathVariable("reservationId") Long reservationId) {
+            @AccessToken final String accessToken, @PathVariable("reservationId") Long reservationId) {
 
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
@@ -136,7 +134,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PatchMapping("/{reservationId}/check-out")
     public ResponseEntity<ReservationResponseDto> endUsingReservation(
-        @AccessToken final String accessToken,
+            @AccessToken final String accessToken,
             @PathVariable("reservationId") Long reservationId) { // 실제 서버로 요청 온 시각으로 시작, 종료 관리
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
@@ -152,7 +150,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @PatchMapping("/{reservationId}/cancel")
     public ResponseEntity<ReservationResponseDto> cancelReservation(
-        @AccessToken final String accessToken, @PathVariable("reservationId") Long reservationId) {
+            @AccessToken final String accessToken, @PathVariable("reservationId") Long reservationId) {
 
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
@@ -168,14 +166,14 @@ public class ReservationController {
     @PatchMapping("/{reservationId}")
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     public ResponseEntity<ReservationResponseDto> updateReservation(
-        @AccessToken final String accessToken,
+            @AccessToken final String accessToken,
             @PathVariable("reservationId") Long reservationId,
             @Valid @RequestBody UpdateReservationRequestDto updateReservationRequestDto) {
 
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
-        ReservationResponseDto reservationResponseDto = reservationCommandService.updateReservation(
-                userId, reservationId, updateReservationRequestDto);
+        ReservationResponseDto reservationResponseDto =
+                reservationCommandService.updateReservation(userId, reservationId, updateReservationRequestDto);
 
         URI redirectUri = URI.create("/api/v1/reservations/" + reservationId);
 
@@ -188,7 +186,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/{reservationId}")
     public ResponseEntity<ReservationDetailResponseDto> getReservation(
-        @AccessToken final String accessToken, @PathVariable Long reservationId) {
+            @AccessToken final String accessToken, @PathVariable Long reservationId) {
 
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
@@ -202,12 +200,11 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/me")
     public ResponseEntity<PageResponseDto<GetUserReservationResponseDto>> getUserReservations(
-        @AccessToken final String accessToken,
+            @AccessToken final String accessToken,
             @Valid @ModelAttribute GetUserReservationSearchCondition condition,
             Pageable pageable) {
 
         final Long userId = jwtTokenProvider.getUserId(accessToken);
-
 
         PageResponseDto<GetUserReservationResponseDto> page =
                 reservationQueryService.getReservationsByUserId(userId, condition, pageable);
@@ -219,12 +216,11 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER')")
     @GetMapping("/pending")
     public ResponseEntity<PageResponseDto<GetAppliedReservationResponseDto>> getAppliedReservations(
-        @AccessToken final String accessToken,
+            @AccessToken final String accessToken,
             @Valid @ModelAttribute GetAppliedReservationSearchCondition condition,
             Pageable pageable) {
 
         final Long userId = jwtTokenProvider.getUserId(accessToken);
-
 
         PageResponseDto<GetAppliedReservationResponseDto> page =
                 reservationQueryService.getReservationApplies(userId, condition, pageable);
@@ -235,7 +231,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/reservable-assets")
     public ResponseEntity<PageResponseDto<ReservableAssetResponseDto>> getReservableAssets(
-        @AccessToken final String accessToken,
+            @AccessToken final String accessToken,
             @Valid @ModelAttribute ReservableAssetSearchCondition condition,
             Pageable pageable) {
 
@@ -252,7 +248,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/monthly")
     public ResponseEntity<MonthReservationListResponseDto> getMonthlyReservations(
-        @AccessToken final String accessToken, @RequestParam YearMonth yearMonth) {
+            @AccessToken final String accessToken, @RequestParam YearMonth yearMonth) {
 
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
@@ -265,7 +261,7 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/weekly")
     public ResponseEntity<WeekReservationListResponseDto> getWeeklyReservations(
-        @AccessToken final String accessToken, @RequestParam LocalDate date) {
+            @AccessToken final String accessToken, @RequestParam LocalDate date) {
 
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
@@ -278,23 +274,20 @@ public class ReservationController {
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @GetMapping("/{assetId}/available-times")
     public ResponseEntity<AssetTimeResponseDto> getAssetTimes(
-        @AccessToken final String accessToken,
+            @AccessToken final String accessToken,
             @PathVariable("assetId") Long assetId,
             @RequestParam LocalDate date) {
         final Long userId = jwtTokenProvider.getUserId(accessToken);
 
-
-        AssetTimeResponseDto assetTimeResponseDto =
-                reservationQueryService.getAssetTimes(userId, assetId, date);
+        AssetTimeResponseDto assetTimeResponseDto = reservationQueryService.getAssetTimes(userId, assetId, date);
         return ResponseEntity.ok(assetTimeResponseDto);
     }
 
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN','GENERAL', 'MANAGER')")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> deleteReservation(
-        @AccessToken final String accessToken, @PathVariable("reservationId") Long reservationId) {
+            @AccessToken final String accessToken, @PathVariable("reservationId") Long reservationId) {
         final Long userId = jwtTokenProvider.getUserId(accessToken);
-
 
         reservationCommandService.softDeleteReservation(userId, reservationId);
         return ResponseEntity.noContent().build();

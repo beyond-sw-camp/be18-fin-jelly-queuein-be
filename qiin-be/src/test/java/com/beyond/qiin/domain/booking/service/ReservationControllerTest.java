@@ -1,18 +1,17 @@
 package com.beyond.qiin.domain.booking.service;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.beyond.qiin.domain.booking.controller.ReservationController;
-import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.UpdateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationDetailResponseDto;
@@ -25,7 +24,6 @@ import com.beyond.qiin.security.config.SecurityConfig;
 import com.beyond.qiin.security.jwt.JwtFilter;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.jwt.RedisTokenRepository;
-import com.beyond.qiin.security.resolver.AccessToken;
 import com.beyond.qiin.security.resolver.ArgumentResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
@@ -53,237 +51,222 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 public class ReservationControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-  @MockBean
-  private ReservationCommandService reservationCommandService;
+    @MockBean
+    private ReservationCommandService reservationCommandService;
 
-  @MockBean
-  private ReservationQueryService reservationQueryService;
+    @MockBean
+    private ReservationQueryService reservationQueryService;
 
-  @MockBean
-  private JwtTokenProvider jwtTokenProvider;
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
-  @MockBean
-  private RedisTokenRepository redisTokenRepository;
+    @MockBean
+    private RedisTokenRepository redisTokenRepository;
 
-  @MockBean
-  private ArgumentResolver argumentResolver;
+    @MockBean
+    private ArgumentResolver argumentResolver;
 
-  @Test
-  @WithMockUser(
-      username = "testUser",
-      roles = {"GENERAL"})
-  void applyReservation_success() throws Exception {
-    Instant start = Instant.parse("2025-12-12T10:00:00Z");
-    Instant end = Instant.parse("2025-12-12T11:00:00Z");
+    @Test
+    @WithMockUser(
+            username = "testUser",
+            roles = {"GENERAL"})
+    void applyReservation_success() throws Exception {
+        Instant start = Instant.parse("2025-12-12T10:00:00Z");
+        Instant end = Instant.parse("2025-12-12T11:00:00Z");
 
-    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
-    CustomUserDetails mockUser = new CustomUserDetails(1L, "tester", authorities);
+        CustomUserDetails mockUser = new CustomUserDetails(1L, "tester", authorities);
 
-    CreateReservationRequestDto request = CreateReservationRequestDto.builder()
-        .applicantId(1L)
-        .startAt(start)
-        .endAt(end)
-        .description("팀 회의")
-        .attendantIds(List.of(2L, 3L))
-        .build();
+        CreateReservationRequestDto request = CreateReservationRequestDto.builder()
+                .applicantId(1L)
+                .startAt(start)
+                .endAt(end)
+                .description("팀 회의")
+                .attendantIds(List.of(2L, 3L))
+                .build();
 
-    AttendantResponseDto at1 = AttendantResponseDto.builder()
-        .attendantId(2L)
-        .attendantName("홍길동")
-        .build();
+        AttendantResponseDto at1 = AttendantResponseDto.builder()
+                .attendantId(2L)
+                .attendantName("홍길동")
+                .build();
 
-    AttendantResponseDto at2 = AttendantResponseDto.builder()
-        .attendantId(3L)
-        .attendantName("김철수")
-        .build();
+        AttendantResponseDto at2 = AttendantResponseDto.builder()
+                .attendantId(3L)
+                .attendantName("김철수")
+                .build();
 
-    ReservationResponseDto response = ReservationResponseDto.builder()
-        .reservationId(100L)
-        .assetName("회의실 A")
-        .applicantName("사용자1")
-        .startAt(start)
-        .endAt(end)
-        .actualStartAt(null)
-        .actualEndAt(null)
-        .description("팀 회의")
-        .reason(null)
-        .version(1L)
-        .isApproved(false)
-        .status("WAITING")
-        .createdAt(Instant.now())
-        .createdBy(1L)
-        .updatedAt(Instant.now())
-        .updatedBy(1L)
-        .attendants(List.of(at1, at2))
-        .build();
+        ReservationResponseDto response = ReservationResponseDto.builder()
+                .reservationId(100L)
+                .assetName("회의실 A")
+                .applicantName("사용자1")
+                .startAt(start)
+                .endAt(end)
+                .actualStartAt(null)
+                .actualEndAt(null)
+                .description("팀 회의")
+                .reason(null)
+                .version(1L)
+                .isApproved(false)
+                .status("WAITING")
+                .createdAt(Instant.now())
+                .createdBy(1L)
+                .updatedAt(Instant.now())
+                .updatedBy(1L)
+                .attendants(List.of(at1, at2))
+                .build();
 
-    when(jwtTokenProvider.getUserId(any())).thenReturn(1L);
-    when(reservationCommandService.applyReservation(any(), any(), any())).thenReturn(response);
+        when(jwtTokenProvider.getUserId(any())).thenReturn(1L);
+        when(reservationCommandService.applyReservation(any(), any(), any())).thenReturn(response);
 
-    mockMvc.perform(
-            post("/api/v1/reservations/1/apply") // assetId = 1
-                .with(authentication(new UsernamePasswordAuthenticationToken(
-                    mockUser, null, mockUser.getAuthorities())))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.reservationId").value(100L))
-        .andExpect(jsonPath("$.applicantName").value("사용자1"))
-        .andExpect(jsonPath("$.assetName").value("회의실 A"))
-        .andExpect(jsonPath("$.description").value("팀 회의"))
-        .andExpect(jsonPath("$.status").value("WAITING"))
-        // attendants 검증
-        .andExpect(jsonPath("$.attendants[0].attendantId").value(2L))
-        .andExpect(jsonPath("$.attendants[0].attendantName").value("홍길동"))
-        .andExpect(jsonPath("$.attendants[1].attendantId").value(3L))
-        .andExpect(jsonPath("$.attendants[1].attendantName").value("김철수"));
-  }
-  @Test
-  @WithMockUser(username = "testUser", roles = {"GENERAL"})
-  void getReservation_success() throws Exception {
+        mockMvc.perform(
+                        post("/api/v1/reservations/1/apply") // assetId = 1
+                                .with(authentication(new UsernamePasswordAuthenticationToken(
+                                        mockUser, null, mockUser.getAuthorities())))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.reservationId").value(100L))
+                .andExpect(jsonPath("$.applicantName").value("사용자1"))
+                .andExpect(jsonPath("$.assetName").value("회의실 A"))
+                .andExpect(jsonPath("$.description").value("팀 회의"))
+                .andExpect(jsonPath("$.status").value("WAITING"))
+                // attendants 검증
+                .andExpect(jsonPath("$.attendants[0].attendantId").value(2L))
+                .andExpect(jsonPath("$.attendants[0].attendantName").value("홍길동"))
+                .andExpect(jsonPath("$.attendants[1].attendantId").value(3L))
+                .andExpect(jsonPath("$.attendants[1].attendantName").value("김철수"));
+    }
 
-    Long reservationId = 30L;
+    @Test
+    @WithMockUser(
+            username = "testUser",
+            roles = {"GENERAL"})
+    void getReservation_success() throws Exception {
 
-    List<GrantedAuthority> authorities =
-        List.of(new SimpleGrantedAuthority("ROLE_GENERAL"));
+        Long reservationId = 30L;
 
-    CustomUserDetails mockUser = new CustomUserDetails(
-        1L,
-        "tester",
-        authorities
-    );
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_GENERAL"));
 
-    ReservationDetailResponseDto detailDto = ReservationDetailResponseDto.builder()
-        .reservationId(reservationId)
-        .assetName("회의실 B")
-        .applicantName("홍길동")
-        .description("팀 브리핑")
-        .reservationStatus("APPROVED")
-        .startAt(Instant.parse("2025-12-12T09:00:00Z"))
-        .endAt(Instant.parse("2025-12-12T10:00:00Z"))
-        .attendants(List.of())   // null 방지
-        .build();
+        CustomUserDetails mockUser = new CustomUserDetails(1L, "tester", authorities);
 
-    // jwt mocking
-    when(jwtTokenProvider.getUserId(any())).thenReturn(1L);
+        ReservationDetailResponseDto detailDto = ReservationDetailResponseDto.builder()
+                .reservationId(reservationId)
+                .assetName("회의실 B")
+                .applicantName("홍길동")
+                .description("팀 브리핑")
+                .reservationStatus("APPROVED")
+                .startAt(Instant.parse("2025-12-12T09:00:00Z"))
+                .endAt(Instant.parse("2025-12-12T10:00:00Z"))
+                .attendants(List.of()) // null 방지
+                .build();
 
-    // query mocking
-    when(reservationQueryService.getReservation(any(), any()))
-        .thenReturn(detailDto);
+        // jwt mocking
+        when(jwtTokenProvider.getUserId(any())).thenReturn(1L);
 
-    mockMvc.perform(
-            get("/api/v1/reservations/" + reservationId)
-                .header("accessToken", "mock-token")   // ★ 중요 ★
-                .with(authentication(
-                    new UsernamePasswordAuthenticationToken(
-                        mockUser, null, mockUser.getAuthorities()
-                    )
-                ))
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.reservationId").value(reservationId))
-        .andExpect(jsonPath("$.assetName").value("회의실 B"))
-        .andExpect(jsonPath("$.applicantName").value("홍길동"))
-        .andExpect(jsonPath("$.description").value("팀 브리핑"))
-        .andExpect(jsonPath("$.reservationStatus").value("APPROVED"));
-  }
+        // query mocking
+        when(reservationQueryService.getReservation(any(), any())).thenReturn(detailDto);
 
-  @Test
-  @WithMockUser(username = "testUser", roles = {"MASTER"})
-  void updateReservation_success() throws Exception {
+        mockMvc.perform(get("/api/v1/reservations/" + reservationId)
+                        .header("accessToken", "mock-token") // ★ 중요 ★
+                        .with(authentication(
+                                new UsernamePasswordAuthenticationToken(mockUser, null, mockUser.getAuthorities())))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reservationId").value(reservationId))
+                .andExpect(jsonPath("$.assetName").value("회의실 B"))
+                .andExpect(jsonPath("$.applicantName").value("홍길동"))
+                .andExpect(jsonPath("$.description").value("팀 브리핑"))
+                .andExpect(jsonPath("$.reservationStatus").value("APPROVED"));
+    }
 
-    Long reservationId = 10L;
+    @Test
+    @WithMockUser(
+            username = "testUser",
+            roles = {"MASTER"})
+    void updateReservation_success() throws Exception {
 
-    Instant newStart = Instant.parse("2025-12-12T13:00:00Z");
-    Instant newEnd = Instant.parse("2025-12-12T14:00:00Z");
+        Long reservationId = 10L;
 
-    List<GrantedAuthority> authorities =
-        List.of(new SimpleGrantedAuthority("MASTER"));
+        Instant newStart = Instant.parse("2025-12-12T13:00:00Z");
+        Instant newEnd = Instant.parse("2025-12-12T14:00:00Z");
 
-    CustomUserDetails mockUser =
-        new CustomUserDetails(1L, "testUser", authorities);
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("MASTER"));
 
-    UpdateReservationRequestDto request = UpdateReservationRequestDto.builder()
-        .version(1L)
-        .description("설명 수정됨")
-        .startAt(newStart)
-        .endAt(newEnd)
-        .attendantIds(List.of(5L, 6L))
-        .build();
+        CustomUserDetails mockUser = new CustomUserDetails(1L, "testUser", authorities);
 
-    ReservationResponseDto response = ReservationResponseDto.builder()
-        .reservationId(reservationId)
-        .assetName("회의실 A")
-        .applicantName("testerUser")
-        .description("설명 수정됨")
-        .status("PENDING")
-        .startAt(newStart)
-        .endAt(newEnd)
-        .attendants(List.of(
-            AttendantResponseDto.builder().attendantId(5L).attendantName("참여자1").build(),
-            AttendantResponseDto.builder().attendantId(6L).attendantName("참여자2").build()
-        ))
-        .build();
+        UpdateReservationRequestDto request = UpdateReservationRequestDto.builder()
+                .version(1L)
+                .description("설명 수정됨")
+                .startAt(newStart)
+                .endAt(newEnd)
+                .attendantIds(List.of(5L, 6L))
+                .build();
 
-    when(jwtTokenProvider.getUserId(any())).thenReturn(1L);
-    when(reservationCommandService.updateReservation(any(), any(), any()))
-        .thenReturn(response);
+        ReservationResponseDto response = ReservationResponseDto.builder()
+                .reservationId(reservationId)
+                .assetName("회의실 A")
+                .applicantName("testerUser")
+                .description("설명 수정됨")
+                .status("PENDING")
+                .startAt(newStart)
+                .endAt(newEnd)
+                .attendants(List.of(
+                        AttendantResponseDto.builder()
+                                .attendantId(5L)
+                                .attendantName("참여자1")
+                                .build(),
+                        AttendantResponseDto.builder()
+                                .attendantId(6L)
+                                .attendantName("참여자2")
+                                .build()))
+                .build();
 
-    mockMvc.perform(
-            patch("/api/v1/reservations/" + reservationId)
-                .with(authentication(new UsernamePasswordAuthenticationToken(
-                    mockUser, null, mockUser.getAuthorities())))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.reservationId").value(reservationId))
-        .andExpect(jsonPath("$.description").value("설명 수정됨"))
-        .andExpect(jsonPath("$.startAt").value(newStart.toString()))
-        .andExpect(jsonPath("$.endAt").value(newEnd.toString()))
-        .andExpect(jsonPath("$.attendants[0].attendantId").value(5L))
-        .andExpect(jsonPath("$.attendants[1].attendantId").value(6L));
-  }
+        when(jwtTokenProvider.getUserId(any())).thenReturn(1L);
+        when(reservationCommandService.updateReservation(any(), any(), any())).thenReturn(response);
 
+        mockMvc.perform(patch("/api/v1/reservations/" + reservationId)
+                        .with(authentication(
+                                new UsernamePasswordAuthenticationToken(mockUser, null, mockUser.getAuthorities())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.reservationId").value(reservationId))
+                .andExpect(jsonPath("$.description").value("설명 수정됨"))
+                .andExpect(jsonPath("$.startAt").value(newStart.toString()))
+                .andExpect(jsonPath("$.endAt").value(newEnd.toString()))
+                .andExpect(jsonPath("$.attendants[0].attendantId").value(5L))
+                .andExpect(jsonPath("$.attendants[1].attendantId").value(6L));
+    }
 
-  @Test
-  @WithMockUser(username = "testUser", roles = {"MASTER"})
-  void deleteReservation_success() throws Exception {
+    @Test
+    @WithMockUser(
+            username = "testUser",
+            roles = {"MASTER"})
+    void deleteReservation_success() throws Exception {
 
-    Long reservationId = 20L;
+        Long reservationId = 20L;
 
-    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("MASTER"));
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("MASTER"));
 
-    CustomUserDetails mockUser = new CustomUserDetails(
-        1L,
-        "tester",
-        authorities
-    );
+        CustomUserDetails mockUser = new CustomUserDetails(1L, "tester", authorities);
 
-    // JWT mock
-    when(jwtTokenProvider.getUserId(any())).thenReturn(1L);
+        // JWT mock
+        when(jwtTokenProvider.getUserId(any())).thenReturn(1L);
 
-    // softDeleteReservation은 void → doNothing 사용
-    doNothing().when(reservationCommandService).softDeleteReservation(any(), any());
+        // softDeleteReservation은 void → doNothing 사용
+        doNothing().when(reservationCommandService).softDeleteReservation(any(), any());
 
-    mockMvc.perform(
-            delete("/api/v1/reservations/" + reservationId)
-                .with(authentication(
-                    new UsernamePasswordAuthenticationToken(
-                        mockUser, null, mockUser.getAuthorities()
-                    )
-                ))
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        .andExpect(status().isNoContent());
-  }
-
+        mockMvc.perform(delete("/api/v1/reservations/" + reservationId)
+                        .with(authentication(
+                                new UsernamePasswordAuthenticationToken(mockUser, null, mockUser.getAuthorities())))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
 }
