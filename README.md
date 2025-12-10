@@ -3,18 +3,17 @@
 <br>
 
 ## 📑 목차
-1. [팀원](#team)
-2. [프로젝트 기획서](#plan)
-3. [요구사항 정의서](#requirements)
-4. [시스템 아키텍처](#architecture)
-5. [WBS](#wbs)
-6. [ERD](#erd)
-7. [화면 설계서](#uiux)
-8. [백엔드 단위 테스트](#backend-test)
-9. [UI/UX 단위 테스트](#uiux-test)
-10. [API 명세서](#api)
-11. [통합테스트 결과서](#integration-test)
-12. [CI/CD 계획서](#cicd)
+1. [프로젝트 기획서](#plan)
+2. [요구사항 정의서](#requirements)
+3. [시스템 아키텍처](#architecture)
+4. [WBS](#wbs)
+5. [ERD](#erd)
+6. [화면 설계서](#uiux)
+7. [백엔드 단위 테스트](#backend-test)
+8. [UI/UX 단위 테스트](#uiux-test)
+9. [API 명세서](#api)
+10. [통합테스트 결과서](#integration-test)
+11. [CI/CD 계획서](#cicd)
 
 <br>
 
@@ -88,7 +87,7 @@
   </details>
   <br>
   
-## <a id="requirements"></a>3. 시스템 아키텍처
+## <a id="architecture"></a>3. 시스템 아키텍처
   
   <details>
     <summary>세부사항</summary>
@@ -101,7 +100,7 @@
   </details>
   <br>
   
-## <a id="requirements"></a>4. WBS
+## <a id="wbs"></a>4. WBS
   
   <details>
      <summary>세부사항</summary>
@@ -114,7 +113,7 @@
   </details>
   <br>
   
-## <a id="requirements"></a>5. ERD
+## <a id="erd"></a>5. ERD
   
   <details>
     <summary>세부사항</summary>
@@ -128,7 +127,7 @@
   <br>
 
 
-## <a id="requirements"></a>6. 화면 설계서
+## <a id="uiux"></a>6. 화면 설계서
   
   <details>
     <summary>세부사항</summary>
@@ -138,7 +137,7 @@
   </details>
   <br>
 
-## <a id="requirements"></a>7. 백엔드 단위 테스트
+## <a id="backend-test"></a>7. 백엔드 단위 테스트
 <details> <summary><strong>IAM - Auth</strong></summary>
 
 JwtTokenProviderTest 단위 테스트
@@ -333,7 +332,7 @@ SettlementController 단위 테스트
 
 <br>
 
-## <a id="requirements"></a>8. UI/UX 단위 테스트
+## <a id="uiux-test"></a>8. UI/UX 단위 테스트
 
 <details>
   <summary><strong>IAM</strong></summary>
@@ -604,17 +603,17 @@ SettlementController 단위 테스트
 
 <br>
 
-## <a id="requirements"></a>9. API 명세서
+## <a id="api"></a>9. API 명세서
 [API 명세서](https://ijn7tz4u5x.apidog.io/)
 
 <br>
 
-## <a id="requirements"></a>10. 통합테스트 결과서
+## <a id="integration-test"></a>10. 통합테스트 결과서
 [통합테스트 결과서 보기](./docs/integration.md)
 
 <br>
 
-## <a id="requirements"></a>11. CICD 계획서
+## <a id="cicd"></a>11. CICD 계획서
 [CICD 계획서](https://nice-surprise-7e8.notion.site/CI-CD-2c50b5bf3ee080b082ccfbc4bbf10f36)
 
 
