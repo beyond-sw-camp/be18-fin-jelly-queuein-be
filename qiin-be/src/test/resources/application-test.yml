@@ -55,3 +55,6 @@ spring:
 
 mail:
   from: "QueueIn Test <no-reply@test.com>"
+
+login:
+  url: ${LOGIN_URL:http://localhost:5173/login}
