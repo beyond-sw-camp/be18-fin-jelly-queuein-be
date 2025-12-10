@@ -15,7 +15,8 @@
 10. [API 명세서](#api)
 11. [통합테스트 결과서](#integration-test)
 12. [CI/CD 계획서](#cicd)
----
+
+<br>
 
 <a id="team"></a>
 ## ✨ 팀원
@@ -66,7 +67,6 @@
   </table>
   <br>
 
----
   
 ## <a id="plan"></a>1. 프로젝트 기획서
   
