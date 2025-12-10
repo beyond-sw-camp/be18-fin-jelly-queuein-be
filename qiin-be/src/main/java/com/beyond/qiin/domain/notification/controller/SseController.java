@@ -33,7 +33,7 @@ public class SseController {
     }
 
     // SSE 구독 해제
-    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
+//    @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
     @DeleteMapping("/unsubscribe")
     public void unsubscribe(@AccessToken final String accessToken) {
         final Long userId = jwtTokenProvider.getUserId(accessToken);
