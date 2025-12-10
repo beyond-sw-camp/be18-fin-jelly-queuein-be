@@ -2,13 +2,13 @@ package com.beyond.qiin.domain.notification.service;
 
 import com.beyond.qiin.domain.notification.dto.NotificationSseDto;
 import com.beyond.qiin.domain.notification.entity.Notification;
-import com.beyond.qiin.domain.notification.repository.NotificationJpaRepository;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service

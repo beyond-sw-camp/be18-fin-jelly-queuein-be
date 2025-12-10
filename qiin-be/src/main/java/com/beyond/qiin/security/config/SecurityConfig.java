@@ -41,26 +41,24 @@ public class SecurityConfig {
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final AccessDeniedHandler accessDeniedHandler;
 
+    @Bean
+    @Order(1)
+    public SecurityFilterChain sseSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.securityMatcher("/api/v1/sse/**") // SSE 전용
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .exceptionHandling(e -> {
+                    e.authenticationEntryPoint(authenticationEntryPoint);
+                    e.accessDeniedHandler(sseAccessDeniedHandler());
+                })
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-  @Bean
-  @Order(1)
-  public SecurityFilterChain sseSecurityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .securityMatcher("/api/v1/sse/**")   // SSE 전용
-        .csrf(AbstractHttpConfigurer::disable)
-        .cors(Customizer.withDefaults())
-        .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .formLogin(AbstractHttpConfigurer::disable)
-        .httpBasic(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-        .exceptionHandling(e -> {
-          e.authenticationEntryPoint(authenticationEntryPoint);
-          e.accessDeniedHandler(sseAccessDeniedHandler());
-        })
-        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-    return http.build();
-  }
+        return http.build();
+    }
 
     @Bean
     @Order(2)
@@ -92,16 +90,18 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-  @Bean
-  public AccessDeniedHandler sseAccessDeniedHandler() {
-    return (request, response, accessDeniedException) -> {
-      response.setStatus(HttpStatus.FORBIDDEN.value());
-      response.setContentType("application/json;charset=UTF-8");
-      response.getWriter().write("""
+    @Bean
+    public AccessDeniedHandler sseAccessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter()
+                    .write(
+                            """
                 {"status":403,"error":"FORBIDDEN","message":"접근 권한이 없습니다."}
             """);
-    };
-  }
+        };
+    }
 
     // CORS 설정
     @Bean
