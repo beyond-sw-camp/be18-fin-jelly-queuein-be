@@ -1,7 +1,7 @@
 // file: src/main/java/com/beyond/qiin/domain/accounting/service/query/SettlementPerformanceQueryServiceImpl.java
 package com.beyond.qiin.domain.accounting.service.query;
 
-import com.beyond.qiin.domain.accounting.dto.common.ReportingComparisonRequestDto;
+import com.beyond.qiin.domain.accounting.dto.common.request.ReportingComparisonRequestDto;
 import com.beyond.qiin.domain.accounting.dto.settlement.response.SettlementPerformanceResponseDto;
 import com.beyond.qiin.domain.accounting.dto.settlement.response.raw.SettlementPerformanceRawDto;
 import com.beyond.qiin.domain.accounting.repository.querydsl.SettlementPerformanceQueryAdapter;
