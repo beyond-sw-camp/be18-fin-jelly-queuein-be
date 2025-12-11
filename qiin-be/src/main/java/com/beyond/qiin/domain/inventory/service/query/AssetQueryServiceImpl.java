@@ -227,4 +227,13 @@ public class AssetQueryServiceImpl implements AssetQueryService {
         }
         return true;
     }
+
+
+    // 챗봇 용으로 추가하는 메소드들
+
+    // 카테고리에 속한 자원 목록 조회
+    @Override
+    public List<Asset> findAssetsByCategory(final Long categoryId) {
+        return assetQueryRepository.findByCategoryId(categoryId);
+    }
 }

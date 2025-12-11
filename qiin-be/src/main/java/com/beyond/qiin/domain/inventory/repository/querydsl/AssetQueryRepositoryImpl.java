@@ -292,4 +292,19 @@ public class AssetQueryRepositoryImpl implements AssetQueryRepository {
 
         return query.where(builder).fetch();
     }
+
+    @Override
+    public List<Asset> findByCategoryId(Long categoryId) {
+        QAsset asset = QAsset.asset;
+
+        return jpaQueryFactory
+                .selectFrom(asset)
+                .join(asset.category, category).fetchJoin()
+                .where(
+                        category.id.eq(categoryId),
+                        asset.deletedAt.isNull(),
+                        category.deletedAt.isNull()
+                )
+                .fetch();
+    }
 }

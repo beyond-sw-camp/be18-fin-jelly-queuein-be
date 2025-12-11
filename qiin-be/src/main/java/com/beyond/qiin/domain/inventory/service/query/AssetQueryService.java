@@ -38,4 +38,14 @@ public interface AssetQueryService {
 
     // 자원 상태에 따른 사용 가능 여부 반환
     boolean isAvailable(final Long assetId);
+
+
+
+    // 챗봇 용으로 추가하는 메소드들
+
+    // 카테고리에 속한 자원 목록 조회
+
+    List<Asset> findAssetsByCategory (final Long categoryId);
+
+
 }
