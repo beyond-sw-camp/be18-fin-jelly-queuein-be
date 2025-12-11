@@ -71,7 +71,7 @@ public class ApproveReservationTest {
 
         Mockito.verify(reservation).approve(user, "승인 이유");
         Mockito.verify(reservationWriter).save(reservation);
-        Mockito.verify(reservationEventPublisher).publishUpdated(reservation);
+        Mockito.verify(reservationEventPublisher).publishEventCreated(reservation, null);
 
         assertNotNull(response); // DTO가 반환되는지
         assertEquals(ReservationStatus.APPROVED, reservation.getStatus());

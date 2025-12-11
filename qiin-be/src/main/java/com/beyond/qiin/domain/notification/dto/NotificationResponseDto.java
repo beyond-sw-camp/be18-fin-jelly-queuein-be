@@ -14,25 +14,25 @@ import lombok.Getter;
 @Getter
 public class NotificationResponseDto {
 
-    private Long notificationId;
+    private final Long notificationId;
 
-    private Long reservationId; // aggregateId
+    private final Long reservationId; // aggregateId
 
-    private String type; // NotificationType 이름
+    private final String type; // NotificationType 이름
 
-    private String status; // NotificationStatus 이름
+    private final String status; // NotificationStatus 이름
 
-    private String message;
+    private final String message;
 
-    private boolean isRead;
+    private final boolean isRead;
 
-    private Instant createdAt;
+    private final Instant createdAt;
 
-    private Instant deliveredAt;
+    private final Instant deliveredAt;
 
-    private Instant readAt;
+    private final Instant readAt;
 
-    public static NotificationResponseDto from(Notification n) {
+    public static NotificationResponseDto from(final Notification n) {
 
         return NotificationResponseDto.builder()
                 .notificationId(n.getId())

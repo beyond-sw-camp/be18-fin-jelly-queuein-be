@@ -4,11 +4,11 @@ import com.beyond.qiin.domain.notification.entity.Notification;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public interface SseService {
-    SseEmitter connect(Long userId);
+    SseEmitter connect(final Long userId);
 
-    void sendConnectEvent(Long userId);
+    void sendConnectEvent(final Long userId);
 
-    void disconnect(Long userId);
+    void disconnect(final Long userId);
 
-    void send(Long userId, Notification notification);
+    void send(final Long userId, final Notification notification);
 }

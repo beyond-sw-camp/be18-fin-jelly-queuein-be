@@ -12,14 +12,14 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class NotificationSseDto {
-    private Long notificationId;
-    private String title;
-    private String message;
+    private final Long notificationId;
+    private final String title;
+    private final String message;
     private String type; // status는 불필요(pending, sent, failed)
-    private Instant createdAt;
+    private final Instant createdAt;
 
     // TODO : id가 결합도 줄여주는 것은 맞으나 필드가 많아 엔티티로 대체
-    public static NotificationSseDto of(Notification notification) {
+    public static NotificationSseDto of(final Notification notification) {
         return NotificationSseDto.builder()
                 .notificationId(notification.getId())
                 .message(notification.getMessage())
