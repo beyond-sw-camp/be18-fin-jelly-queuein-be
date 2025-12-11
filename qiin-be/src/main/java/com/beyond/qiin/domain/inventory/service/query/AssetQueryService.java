@@ -8,6 +8,7 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.OneDepthAssetResponse
 import com.beyond.qiin.domain.inventory.dto.asset.response.RootAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.TreeAssetResponseDto;
 import com.beyond.qiin.domain.inventory.entity.Asset;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 
@@ -38,4 +39,21 @@ public interface AssetQueryService {
 
     // 자원 상태에 따른 사용 가능 여부 반환
     boolean isAvailable(final Long assetId);
+
+    // 챗봇 용으로 추가하는 메소드들
+
+    // 카테고리에 속한 자원 목록 조회
+    List<Asset> findAssetsByCategory(final Long categoryId);
+
+    // 사용 가능한 자원 목록 조회
+    List<Asset> findAvailableAssets(final Long categoryId, final String keyword);
+
+    // 이름으로 자원 id 찾기
+    Long findIdByName(String name);
+
+    // 부모 경로 찾기
+    List<String> findParentPath(Long assetId);
+
+    // 자원 상태 조회
+    AssetStatus findStatus(Long assetId);
 }
