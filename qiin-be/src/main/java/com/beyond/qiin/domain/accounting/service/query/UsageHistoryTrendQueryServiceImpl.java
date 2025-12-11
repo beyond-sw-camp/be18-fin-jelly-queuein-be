@@ -1,4 +1,3 @@
-// file: src/main/java/com/beyond/qiin/domain/accounting/service/query/UsageHistoryTrendQueryServiceImpl.java
 package com.beyond.qiin.domain.accounting.service.query;
 
 import com.beyond.qiin.domain.accounting.dto.common.request.ReportingComparisonRequestDto;
@@ -10,6 +9,7 @@ import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistory
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.raw.UsageHistoryTrendRawDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.raw.UsageHistoryTrendRawDto.UsageAggregate;
 import com.beyond.qiin.domain.accounting.repository.querydsl.UsageHistoryTrendQueryAdapter;
+import com.beyond.qiin.infra.redis.accounting.usage_history.UsageTrendRedisAdapter;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQueryService {
 
     private final UsageHistoryTrendQueryAdapter trendQueryAdapter;
+    private final UsageTrendRedisAdapter redisAdapter;
 
     @Override
     public UsageHistoryTrendResponseDto getUsageHistoryTrend(ReportingComparisonRequestDto request) {
@@ -31,17 +32,25 @@ public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQuery
         int baseYear = request.getBaseYear() != null ? request.getBaseYear() : currentYear - 1;
         int compareYear = request.getCompareYear() != null ? request.getCompareYear() : currentYear;
 
-        UsageHistoryTrendRawDto raw =
-                trendQueryAdapter.getTrendData(baseYear, compareYear, request.getAssetId(), request.getAssetName(), 0);
+        Long assetId = request.getAssetId();
+        String assetName = request.getAssetName();
 
-        // Null 방어: raw가 null일 경우 빈 맵을 사용
-        Map<Integer, UsageAggregate> baseData = Optional.ofNullable(raw)
+        UsageHistoryTrendRawDto raw = trendQueryAdapter.getTrendData(baseYear, compareYear, assetId, assetName, 0);
+
+        Map<Integer, UsageAggregate> baseRaw = Optional.ofNullable(raw)
                 .map(UsageHistoryTrendRawDto::getBaseYearData)
                 .orElse(Collections.emptyMap());
 
-        Map<Integer, UsageAggregate> compareData = Optional.ofNullable(raw)
+        Map<Integer, UsageAggregate> compareRaw = Optional.ofNullable(raw)
                 .map(UsageHistoryTrendRawDto::getCompareYearData)
                 .orElse(Collections.emptyMap());
+
+        // 중복 제거한 공통 메서드 사용
+        Map<Integer, UsageAggregate> baseData =
+                loadYearlyDataWithCache(baseYear, currentYear, currentMonth, assetId, assetName, baseRaw);
+
+        Map<Integer, UsageAggregate> compareData =
+                loadYearlyDataWithCache(compareYear, currentYear, currentMonth, assetId, assetName, compareRaw);
 
         List<MonthlyUsageData> monthlyList = buildMonthlyList(baseData, compareData);
 
@@ -51,24 +60,57 @@ public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQuery
 
         UsageIncreaseSummary summary = calculateIncrease(baseData, compareData, assetCount, currentMonth);
 
-        Long assetId = Optional.ofNullable(raw)
+        Long finalAssetId = Optional.ofNullable(raw)
                 .map(UsageHistoryTrendRawDto::getAssetId)
                 .orElse(null);
-        String assetName = Optional.ofNullable(raw)
+
+        String finalAssetName = Optional.ofNullable(raw)
                 .map(UsageHistoryTrendRawDto::getAssetName)
                 .orElse(null);
 
         return UsageHistoryTrendResponseDto.builder()
-                .asset(new AssetInfo(assetId, assetName))
+                .asset(new AssetInfo(finalAssetId, finalAssetName))
                 .yearRange(new YearRangeInfo(baseYear, compareYear, 12))
                 .monthlyData(monthlyList)
                 .summary(summary)
                 .build();
     }
 
-    // -------------------------------------------------------------------------
-    // 1~12월 전체 반환 (UI 표시용)
-    // -------------------------------------------------------------------------
+    // 월별 캐싱 처리 (baseYear, compareYear 공통 처리)
+    private Map<Integer, UsageAggregate> loadYearlyDataWithCache(
+            int targetYear,
+            int currentYear,
+            int currentMonth,
+            Long assetId,
+            String assetName,
+            Map<Integer, UsageAggregate> rawData) {
+        Map<Integer, UsageAggregate> result = new HashMap<>();
+
+        for (int month = 1; month <= 12; month++) {
+
+            boolean isCurrentMonth = (targetYear == currentYear && month == currentMonth);
+            String key = buildCacheKey(targetYear, month, assetId, assetName);
+
+            if (!isCurrentMonth) {
+                Object cached = redisAdapter.get(key);
+                if (cached instanceof UsageAggregate agg) {
+                    result.put(month, agg);
+                    continue;
+                }
+            }
+
+            UsageAggregate agg = rawData.getOrDefault(month, empty());
+            result.put(month, agg);
+
+            if (!isCurrentMonth) {
+                redisAdapter.save(key, agg, 0);
+            }
+        }
+
+        return result;
+    }
+
+    // UI 렌더링용 데이터 변환
     private List<MonthlyUsageData> buildMonthlyList(
             Map<Integer, UsageAggregate> baseData, Map<Integer, UsageAggregate> compareData) {
         List<MonthlyUsageData> result = new ArrayList<>();
@@ -86,29 +128,17 @@ public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQuery
         return result;
     }
 
-    private UsageAggregate empty() {
-        return UsageAggregate.builder().actualUsage(0).reservedUsage(0).build();
-    }
-
-    private double calcUsageRate(UsageAggregate agg) {
-        if (agg.getReservedUsage() == 0) return 0.0;
-        return (double) agg.getActualUsage() / agg.getReservedUsage() * 100.0;
-    }
-
-    // -------------------------------------------------------------------------
-    // summary 계산: 월별로 valid month만 비교
-    // -------------------------------------------------------------------------
+    // summary 계산
     private UsageIncreaseSummary calculateIncrease(
             Map<Integer, UsageAggregate> base, Map<Integer, UsageAggregate> compare, int assetCount, int currentMonth) {
 
         List<Integer> validMonths = IntStream.rangeClosed(1, 12)
-                .filter(m -> m < currentMonth) // 현재 월 제외
-                .filter(m -> base.getOrDefault(m, empty()).getReservedUsage() > 0) // <--- 수정
-                .filter(m -> compare.getOrDefault(m, empty()).getReservedUsage() > 0) // <--- 수정
+                .filter(m -> m < currentMonth)
+                .filter(m -> base.getOrDefault(m, empty()).getReservedUsage() > 0)
+                .filter(m -> compare.getOrDefault(m, empty()).getReservedUsage() > 0)
                 .boxed()
                 .toList();
 
-        // 유효 월 없음 → summary = 0
         if (validMonths.isEmpty()) {
             return UsageIncreaseSummary.builder()
                     .usageRateIncrease(0.0)
@@ -117,10 +147,10 @@ public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQuery
                     .build();
         }
 
-        // 합산 (여기서도 Map.getOrDefault를 사용하여 안전하게 처리)
         int baseActual = validMonths.stream()
                 .mapToInt(m -> base.getOrDefault(m, empty()).getActualUsage())
                 .sum();
+
         int compareActual = validMonths.stream()
                 .mapToInt(m -> compare.getOrDefault(m, empty()).getActualUsage())
                 .sum();
@@ -128,11 +158,11 @@ public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQuery
         int baseReserved = validMonths.stream()
                 .mapToInt(m -> base.getOrDefault(m, empty()).getReservedUsage())
                 .sum();
+
         int compareReserved = validMonths.stream()
                 .mapToInt(m -> compare.getOrDefault(m, empty()).getReservedUsage())
                 .sum();
 
-        // 비교년도 데이터가 없어도 summary=0
         if (baseReserved == 0 || compareReserved == 0) {
             return UsageIncreaseSummary.builder()
                     .usageRateIncrease(0.0)
@@ -141,7 +171,6 @@ public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQuery
                     .build();
         }
 
-        // 증가율 계산
         double usageRateIncrease = ((double) (compareReserved - baseReserved) / baseReserved) * 100.0;
 
         double baseRatio = (double) baseActual / baseReserved;
@@ -162,7 +191,30 @@ public class UsageHistoryTrendQueryServiceImpl implements UsageHistoryTrendQuery
                 .build();
     }
 
+    private UsageAggregate empty() {
+        return UsageAggregate.builder().actualUsage(0).reservedUsage(0).build();
+    }
+
+    private double calcUsageRate(UsageAggregate agg) {
+        if (agg.getReservedUsage() == 0) return 0.0;
+        return (double) agg.getActualUsage() / agg.getReservedUsage() * 100.0;
+    }
+
     private double round1(double value) {
         return Math.round(value * 10.0) / 10.0;
+    }
+
+    private String buildCacheKey(int year, int month, Long assetId, String assetName) {
+        String assetKey;
+
+        if (assetId != null) {
+            assetKey = "id-" + assetId;
+        } else if (assetName != null && !assetName.isBlank()) {
+            assetKey = "name-" + assetName.toLowerCase();
+        } else {
+            assetKey = "all";
+        }
+
+        return String.format("usageTrend:%d:%d:%s", year, month, assetKey);
     }
 }

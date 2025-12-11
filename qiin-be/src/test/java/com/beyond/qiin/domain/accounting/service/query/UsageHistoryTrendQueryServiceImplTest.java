@@ -1,13 +1,8 @@
 package com.beyond.qiin.domain.accounting.service.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import com.beyond.qiin.domain.accounting.dto.common.request.ReportingComparisonRequestDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryTrendResponseDto;
@@ -16,6 +11,7 @@ import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistory
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.raw.UsageHistoryTrendRawDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.raw.UsageHistoryTrendRawDto.UsageAggregate;
 import com.beyond.qiin.domain.accounting.repository.querydsl.UsageHistoryTrendQueryAdapter;
+import com.beyond.qiin.infra.redis.accounting.usage_history.UsageTrendRedisAdapter;
 import java.time.LocalDate;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,18 +26,22 @@ class UsageHistoryTrendQueryServiceImplTest {
 
     private final int FIXED_YEAR = 2025;
     private final int FIXED_MONTH = 6;
+
     private UsageHistoryTrendQueryServiceImpl service;
     private UsageHistoryTrendQueryAdapter trendQueryAdapter;
 
     @BeforeEach
     void setUp() {
         trendQueryAdapter = mock(UsageHistoryTrendQueryAdapter.class);
-        service = new UsageHistoryTrendQueryServiceImpl(trendQueryAdapter);
+        UsageTrendRedisAdapter redisAdapter = mock(UsageTrendRedisAdapter.class);
+
+        // 캐시는 항상 MISS 처리
+        when(redisAdapter.get(anyString())).thenReturn(null);
+        doNothing().when(redisAdapter).save(anyString(), any(), anyLong());
+
+        service = new UsageHistoryTrendQueryServiceImpl(trendQueryAdapter, redisAdapter);
     }
 
-    /**
-     * Helper: Raw 데이터를 생성합니다.
-     */
     private UsageHistoryTrendRawDto createMockRawData(int assetCount) {
         Map<Integer, UsageAggregate> baseData = Map.of(
                 1, UsageAggregate.builder().reservedUsage(1000).actualUsage(800).build(),
@@ -63,14 +63,9 @@ class UsageHistoryTrendQueryServiceImplTest {
                 .build();
     }
 
-    // -------------------------------------------------------------------------
-    // 1. 월별 추이 조회 (Monthly List) 검증
-    // -------------------------------------------------------------------------
-
     @Test
     @DisplayName("buildMonthlyList - 1월부터 12월까지의 사용률을 정확히 계산하여 반환")
     void buildMonthlyList_generatesAllMonths() {
-        // Given
         int baseYear = FIXED_YEAR - 1;
         int compareYear = FIXED_YEAR;
 
@@ -88,14 +83,11 @@ class UsageHistoryTrendQueryServiceImplTest {
         try (MockedStatic<LocalDate> mockedStatic = Mockito.mockStatic(LocalDate.class)) {
             mockedStatic.when(LocalDate::now).thenReturn(fixedDate);
 
-            // When
             UsageHistoryTrendResponseDto result = service.getUsageHistoryTrend(request);
 
-            // Then
             assertThat(result.getMonthlyData()).hasSize(12);
-            MonthlyUsageData month1 = result.getMonthlyData().get(0);
 
-            // 1월 검증
+            MonthlyUsageData month1 = result.getMonthlyData().get(0);
             assertThat(month1.getBaseYearUsageRate()).isEqualTo(80.0);
             assertThat(month1.getCompareYearUsageRate()).isEqualTo(90.0);
 
@@ -103,14 +95,9 @@ class UsageHistoryTrendQueryServiceImplTest {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // 2. Summary 계산 (calculateIncrease) 검증
-    // -------------------------------------------------------------------------
-
     @Test
     @DisplayName("calculateIncrease - 유효 월 기반 증가율 및 활용률 계산 검증")
     void calculateIncrease_calculatesSummaryCorrectly() {
-        // Given
         int assetCount = 10;
         UsageHistoryTrendRawDto mockRawData = createMockRawData(assetCount);
 
@@ -126,16 +113,11 @@ class UsageHistoryTrendQueryServiceImplTest {
             ReflectionTestUtils.setField(request, "assetId", 10L);
             ReflectionTestUtils.setField(request, "assetName", "Trend-Asset");
 
-            // Expected Calculations (0.0% / 2.0% / 0.0%)
-            double expectedActualUsageIncrease = 2.0;
-
-            // When
             UsageHistoryTrendResponseDto result = service.getUsageHistoryTrend(request);
             UsageIncreaseSummary summary = result.getSummary();
 
-            // Then
             assertThat(summary.getUsageRateIncrease()).isEqualTo(0.0);
-            assertThat(summary.getActualUsageIncrease()).isEqualTo(expectedActualUsageIncrease);
+            assertThat(summary.getActualUsageIncrease()).isEqualTo(2.0);
             assertThat(summary.getResourceUtilizationIncrease()).isEqualTo(0.0);
 
             verify(trendQueryAdapter).getTrendData(anyInt(), anyInt(), eq(10L), eq("Trend-Asset"), anyInt());
@@ -145,26 +127,24 @@ class UsageHistoryTrendQueryServiceImplTest {
     @Test
     @DisplayName("calculateIncrease - 유효 월이 없으면 Summary는 0.0 반환")
     void calculateIncrease_noValidMonths_returnsZero() {
-        // Given: Current Month = 1. Valid Months: none (m < 1)
+
         UsageHistoryTrendRawDto mockRawData = createMockRawData(1);
+
+        when(trendQueryAdapter.getTrendData(anyInt(), anyInt(), anyLong(), anyString(), anyInt()))
+                .thenReturn(mockRawData);
 
         ReportingComparisonRequestDto request = new ReportingComparisonRequestDto();
         ReflectionTestUtils.setField(request, "assetId", 10L);
         ReflectionTestUtils.setField(request, "assetName", "Trend-Asset");
 
-        when(trendQueryAdapter.getTrendData(anyInt(), anyInt(), anyLong(), anyString(), anyInt()))
-                .thenReturn(mockRawData);
-
-        final LocalDate fixedDate = LocalDate.of(FIXED_YEAR, 1, 1); // Current Month = 1
+        final LocalDate fixedDate = LocalDate.of(FIXED_YEAR, 1, 1);
 
         try (MockedStatic<LocalDate> mockedStatic = Mockito.mockStatic(LocalDate.class)) {
             mockedStatic.when(LocalDate::now).thenReturn(fixedDate);
 
-            // When
             UsageHistoryTrendResponseDto result = service.getUsageHistoryTrend(request);
             UsageIncreaseSummary summary = result.getSummary();
 
-            // Then
             assertThat(summary.getUsageRateIncrease()).isEqualTo(0.0);
             assertThat(summary.getActualUsageIncrease()).isEqualTo(0.0);
             assertThat(summary.getResourceUtilizationIncrease()).isEqualTo(0.0);
