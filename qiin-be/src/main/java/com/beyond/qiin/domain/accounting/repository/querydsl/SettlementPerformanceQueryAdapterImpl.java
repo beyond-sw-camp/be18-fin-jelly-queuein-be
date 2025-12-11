@@ -24,23 +24,23 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
     public SettlementPerformanceRawDto getMonthlyPerformance(
             int baseYear, int compareYear, Long assetId, String assetName) {
 
-        // 검색 검증
-        if (assetId == null && assetName != null && !assetName.isBlank()) {
-            validateAssetNameOrThrow(assetName);
+        // assetName을 기준으로만 자원 검색
+        if (assetName != null && !assetName.isBlank()) {
+            assetId = getAssetIdByName(assetName); // assetName을 기준으로 assetId를 찾음
         }
 
         // 기준연도 월별 SUM
-        Map<Integer, BigDecimal> base = getMonthlySum(baseYear, assetId, assetName);
+        Map<Integer, BigDecimal> base = getMonthlySum(baseYear, assetId);
 
         // 비교연도 월별 SUM
-        Map<Integer, BigDecimal> compare = getMonthlySum(compareYear, assetId, assetName);
+        Map<Integer, BigDecimal> compare = getMonthlySum(compareYear, assetId);
 
         // 화면용 Asset Name
-        String resolvedName = resolveAssetName(assetId, assetName);
+        String resolvedName = resolveAssetName(assetId); // assetId 기준으로 Asset Name을 찾음
 
         return SettlementPerformanceRawDto.builder()
-                .assetId(assetId)
-                .assetName(resolvedName)
+                .assetId(assetId) // assetId로 저장
+                .assetName(resolvedName) // assetName은 UI 용
                 .baseYearData(base)
                 .compareYearData(compare)
                 .build();
@@ -58,15 +58,14 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
     }
 
     // 월별 SUM
-    private Map<Integer, BigDecimal> getMonthlySum(int year, Long assetId, String assetName) {
+    private Map<Integer, BigDecimal> getMonthlySum(int year, Long assetId) {
 
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(settlement.createdAt.year().eq(year)); // 정산 생성년도 기준
 
+        // assetId만 사용하여 조회
         if (assetId != null) {
             builder.and(settlement.asset.id.eq(assetId));
-        } else if (assetName != null && !assetName.isBlank()) {
-            builder.and(settlement.asset.name.containsIgnoreCase(assetName));
         }
 
         var monthExpr = settlement.createdAt.month();
@@ -96,20 +95,17 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
         return result;
     }
 
-    private void validateAssetNameOrThrow(String assetName) {
-        Long count = queryFactory
-                .select(asset.id.count())
+    // 자원명을 기준으로 자원 ID를 찾기
+    public Long getAssetIdByName(String assetName) {
+        return queryFactory
+                .select(asset.id)
                 .from(asset)
                 .where(asset.name.containsIgnoreCase(assetName))
                 .fetchOne();
-
-        if (count == null || count == 0) {
-            throw new IllegalArgumentException("존재하지 않는 자원명입니다: " + assetName);
-        }
     }
 
-    private String resolveAssetName(Long assetId, String assetName) {
-
+    // 자원 ID를 기준으로 자원명 조회
+    private String resolveAssetName(Long assetId) {
         if (assetId != null) {
             return queryFactory
                     .select(asset.name)
@@ -117,16 +113,6 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
                     .where(asset.id.eq(assetId))
                     .fetchOne();
         }
-
-        if (assetName != null && !assetName.isBlank()) {
-            return queryFactory
-                    .select(asset.name)
-                    .from(asset)
-                    .where(asset.name.containsIgnoreCase(assetName))
-                    .limit(1)
-                    .fetchOne();
-        }
-
         return "전체";
     }
 }
