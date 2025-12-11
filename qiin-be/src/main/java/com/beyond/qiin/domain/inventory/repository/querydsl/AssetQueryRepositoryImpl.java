@@ -321,10 +321,7 @@ public class AssetQueryRepositoryImpl implements AssetQueryRepository {
             builder.and(asset.name.containsIgnoreCase(keyword));
         }
 
-        return jpaQueryFactory
-                .selectFrom(asset)
-                .where(builder)
-                .fetch();
+        return jpaQueryFactory.selectFrom(asset).where(builder).fetch();
     }
 
     // 이름으로 자원 찾기
@@ -333,10 +330,7 @@ public class AssetQueryRepositoryImpl implements AssetQueryRepository {
 
         Asset result = jpaQueryFactory
                 .selectFrom(asset)
-                .where(
-                        asset.name.eq(name),
-                        asset.deletedAt.isNull()
-                )
+                .where(asset.name.eq(name), asset.deletedAt.isNull())
                 .fetchOne();
 
         return Optional.ofNullable(result);
@@ -349,10 +343,7 @@ public class AssetQueryRepositoryImpl implements AssetQueryRepository {
         Long id = jpaQueryFactory
                 .select(asset.id)
                 .from(asset)
-                .where(
-                        asset.name.eq(name),
-                        asset.deletedAt.isNull()
-                )
+                .where(asset.name.eq(name), asset.deletedAt.isNull())
                 .fetchOne();
 
         return Optional.ofNullable(id);

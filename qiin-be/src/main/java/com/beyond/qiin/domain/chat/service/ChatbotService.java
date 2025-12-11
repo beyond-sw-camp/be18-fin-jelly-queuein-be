@@ -80,10 +80,12 @@ public class ChatbotService {
 
         var asset = assetQueryService.getAssetDetail(assetId);
 
-        return chatbotClient.sendMessage("""
+        return chatbotClient.sendMessage(
+                """
             아래 자원의 상세 정보를 사용자에게 자연스럽게 설명해주세요:
             %s
-            """.formatted(toJson(asset)));
+            """
+                        .formatted(toJson(asset)));
     }
 
     // 자원 상태가 예약 가능인 자원 조회
@@ -94,10 +96,12 @@ public class ChatbotService {
 
         var assets = assetQueryService.findAvailableAssets(categoryId, keyword);
 
-        return chatbotClient.sendMessage("""
+        return chatbotClient.sendMessage(
+                """
             아래는 예약 가능한 자원 목록입니다. 사용자에게 자연스럽게 설명해주세요:
             %s
-            """.formatted(toJson(assets)));
+            """
+                        .formatted(toJson(assets)));
     }
 
     // 자원의 위치 조회
@@ -105,13 +109,12 @@ public class ChatbotService {
         Long assetId = extractLong(intent.params().get("assetId"));
         String assetName = (String) intent.params().get("assetName");
 
-        Long id = (assetId != null)
-                ? assetId
-                : assetQueryService.findIdByName(assetName);
+        Long id = (assetId != null) ? assetId : assetQueryService.findIdByName(assetName);
 
         var path = assetQueryService.findParentPath(id);
 
-        return chatbotClient.sendMessage("""
+        return chatbotClient.sendMessage(
+                """
             이 자원의 전체 위치 경로를 자연스럽게 설명해주세요:
             %s
             """.formatted(toJson(path)));
@@ -126,17 +129,20 @@ public class ChatbotService {
         return chatbotClient.sendMessage("""
             이 자원의 상태를 사용자에게 이해하기 쉽게 설명해주세요:
             %s
-            """.formatted(toJson(status)));
+            """
+                .formatted(toJson(status)));
     }
 
     // 카테고리 전체 조회 목록
     private String handleListAllCategories() {
         var categories = categoryQueryService.findAllCategories();
 
-        return chatbotClient.sendMessage("""
+        return chatbotClient.sendMessage(
+                """
             아래는 전체 카테고리 목록입니다. 사용자에게 자연스럽게 요약해주세요:
             %s
-            """.formatted(toJson(categories)));
+            """
+                        .formatted(toJson(categories)));
     }
 
     private String handleUnknown() {

@@ -247,8 +247,7 @@ public class AssetQueryServiceImpl implements AssetQueryService {
     // 이름으로 자원 id 찾기
     @Override
     public Long findIdByName(String name) {
-        return assetQueryRepository.findIdByName(name)
-                                   .orElseThrow(AssetException::notFound);
+        return assetQueryRepository.findIdByName(name).orElseThrow(AssetException::notFound);
     }
 
     // 부모 경로 찾기
@@ -263,14 +262,15 @@ public class AssetQueryServiceImpl implements AssetQueryService {
 
         // 3) 조상 ID → 이름 리스트로 변환
         return closures.stream()
-                       .map(c -> assetQueryRepository.findById(c.getAssetClosureId().getAncestorId())
-                                                     .map(Asset::getName)
-                                                     .orElse("Unknown"))
-                       .toList();
+                .map(c -> assetQueryRepository
+                        .findById(c.getAssetClosureId().getAncestorId())
+                        .map(Asset::getName)
+                        .orElse("Unknown"))
+                .toList();
     }
 
     // 자원 상태 조회
-    public AssetStatus findStatus(Long assetId){
+    public AssetStatus findStatus(Long assetId) {
         Asset asset = assetQueryRepository.findById(assetId).orElseThrow(AssetException::notFound);
 
         return asset.getAssetStatus();
