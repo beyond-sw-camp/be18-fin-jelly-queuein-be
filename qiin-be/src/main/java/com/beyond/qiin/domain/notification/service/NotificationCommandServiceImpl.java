@@ -25,7 +25,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     // 참여자들을 payload으로 담게 되면 빠른 조회 가능(부정확) => 생성 시
     @Override
     @Transactional
-    public void notifyEvent(ReservationEventPayload payload) {
+    public void notifyEvent(final ReservationEventPayload payload) {
 
         String json = toJson(payload);
 
@@ -48,7 +48,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
     @Override
     @Transactional
-    public void markAsRead(Long notificationId, Long userId) {
+    public void markAsRead(final Long notificationId, final Long userId) {
 
         Notification notification = notificationJpaRepository
                 .findById(notificationId)
@@ -61,7 +61,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
     @Override
     @Transactional
-    public void softDelete(Long notificationId, Long userId) {
+    public void softDelete(final Long notificationId, final Long userId) {
         Notification notification = notificationJpaRepository
                 .findById(notificationId)
                 .orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_NOT_FOUND)); // 예외 처리
@@ -71,7 +71,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
     @Override
     @Transactional
-    public void hardDelete(Long notificationId, Long userId) {
+    public void hardDelete(final Long notificationId, final Long userId) {
         notificationJpaRepository.deleteById(notificationId); // 실제 delete
     }
 
@@ -90,7 +90,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     // TODO : 몇분전 알림은 별도 처리 (참여자들의 경우도 마찬가지) -> 스케줄러 활용
 
     // 헬퍼 메서드들
-    private void notifyAttendants(ReservationEventPayload payload, NotificationType type, String json) {
+    private void notifyAttendants(final ReservationEventPayload payload, final NotificationType type, String json) {
         payload.getAttendantUserIds()
                 .forEach(uid -> sendNotification(NotificationContext.builder()
                         .receiverId(uid)
@@ -102,7 +102,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                         .build()));
     }
 
-    private String toJson(Object payload) {
+    private String toJson(final Object payload) {
         try {
             return objectMapper.writeValueAsString(payload);
         } catch (JsonProcessingException e) {
@@ -110,7 +110,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         }
     }
 
-    private void sendNotification(NotificationContext ctx) {
+    private void sendNotification(final NotificationContext ctx) {
 
         Notification saved = createAndSaveNotification(ctx);
         sseService.send(ctx.getReceiverId(), saved);
@@ -118,7 +118,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     }
 
     // 부모 메서드의 트랜잭션을 이어받으므로 Transactional 생략
-    private Notification createAndSaveNotification(NotificationContext ctx) {
+    private Notification createAndSaveNotification(final NotificationContext ctx) {
 
         String message = ctx.getType().formatMessage(ctx.getStartAt(), ctx.getEndAt());
 

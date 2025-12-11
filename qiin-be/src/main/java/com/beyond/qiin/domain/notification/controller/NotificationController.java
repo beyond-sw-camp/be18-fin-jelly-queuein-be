@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/sse")
+@RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
 
@@ -44,7 +45,7 @@ public class NotificationController {
 
     // 사용자의 모든 알림 조회
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
-    @GetMapping
+    @GetMapping("/me")
     public ResponseEntity<PageResponseDto<NotificationResponseDto>> getAllNotifications(
             @AccessToken final String accessToken,
             @RequestParam(defaultValue = "0") int page,
@@ -70,6 +71,7 @@ public class NotificationController {
     }
 
     @PreAuthorize("hasAnyAuthority('MASTER', 'ADMIN', 'MANAGER', 'GENERAL')")
+    @DeleteMapping("/{notificationId}")
     public ResponseEntity<Void> deleteNotification(
             @PathVariable Long notificationId, @AccessToken final String accessToken) {
         final Long userId = jwtTokenProvider.getUserId(accessToken);

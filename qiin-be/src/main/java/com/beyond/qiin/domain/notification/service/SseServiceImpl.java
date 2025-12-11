@@ -17,7 +17,7 @@ public class SseServiceImpl implements SseService {
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     @Override
-    public SseEmitter connect(Long userId) {
+    public SseEmitter connect(final Long userId) {
         SseEmitter emitter = new SseEmitter(TIMEOUT);
 
         emitters.put(userId, emitter);
@@ -34,7 +34,7 @@ public class SseServiceImpl implements SseService {
     }
 
     @Override
-    public void send(Long userId, Notification notification) { // db 조회 -> 병목 현상 가능하므로 entity 전체 보냄
+    public void send(final Long userId, final Notification notification) { // db 조회 -> 병목 현상 가능하므로 entity 전체 보냄
         SseEmitter emitter = emitters.get(userId);
         if (emitter == null) return;
 
@@ -49,7 +49,7 @@ public class SseServiceImpl implements SseService {
     }
 
     @Override
-    public void sendConnectEvent(Long userId) {
+    public void sendConnectEvent(final Long userId) {
         SseEmitter emitter = emitters.get(userId);
         if (emitter == null) return;
 
@@ -61,7 +61,7 @@ public class SseServiceImpl implements SseService {
     }
 
     @Override
-    public void disconnect(Long userId) {
+    public void disconnect(final Long userId) {
         SseEmitter emitter = emitters.remove(userId);
         if (emitter != null) {
             emitter.complete();
