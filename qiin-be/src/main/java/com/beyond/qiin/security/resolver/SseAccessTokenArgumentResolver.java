@@ -29,7 +29,7 @@ public class SseAccessTokenArgumentResolver implements HandlerMethodArgumentReso
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 
         // SSE는 헤더 없음 → QueryParam만 본다
-        String token = request.getParameter("accessToken");
+        String token = request.getParameter("token");
 
         if (token == null || token.isBlank()) {
             throw AuthException.unauthorized();
