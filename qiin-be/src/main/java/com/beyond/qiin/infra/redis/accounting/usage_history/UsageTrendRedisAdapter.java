@@ -1,33 +1,41 @@
 package com.beyond.qiin.infra.redis.accounting.usage_history;
 
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
+import java.time.Duration;
 
 @Component
 @RequiredArgsConstructor
 public class UsageTrendRedisAdapter {
 
+    private final UsageHistoryTrendRedisRepository repository;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public void save(String key, Object value, long hours) {
-        redisTemplate.opsForValue().set(key, value, hours, TimeUnit.HOURS);
+    public void save(String key, double value, Long hours) {
+
+        // 1) 레코드 저장 (무기한)
+        UsageHistoryTrendReadModel model = UsageHistoryTrendReadModel.builder()
+                .key(key)
+                .usageRate(value)
+                .build();
+
+        repository.save(model);
+
+        // 2) TTL 설정 (Repository 대신 RedisTemplate로)
+        if (hours != null && hours >= 1) {
+            redisTemplate.expire(key, Duration.ofHours(hours));
+        }
     }
 
-    public Object get(String key) {
-        return redisTemplate.opsForValue().get(key);
+    public Double get(String key) {
+        return repository.findById(key)
+                .map(UsageHistoryTrendReadModel::getUsageRate)
+                .orElse(null);
     }
 
     public void delete(String key) {
-        redisTemplate.delete(key);
-    }
-
-    public void deleteByPattern(String pattern) {
-        Set<String> keys = redisTemplate.keys(pattern);
-        if (!keys.isEmpty()) {
-            redisTemplate.delete(keys);
-        }
+        repository.deleteById(key);
     }
 }

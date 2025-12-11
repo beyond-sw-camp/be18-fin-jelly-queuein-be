@@ -8,11 +8,12 @@ import com.beyond.qiin.domain.inventory.entity.QAsset;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,15 +26,21 @@ public class UsageHistoryTrendQueryAdapterImpl implements UsageHistoryTrendQuery
 
     @Override
     public UsageHistoryTrendRawDto getTrendData(
-            int baseYear, int compareYear, Long assetId, String assetName, int ignoredMonths) {
+            int baseYear,
+            int compareYear,
+            Long ignoredAssetId,
+            String assetName,
+            int ignoredMonths) {
 
-        AssetInfoResult info = resolveAsset(assetId, assetName);
+        // 자원명 → assetId + assetName + assetCount 조회
+        AssetInfoResult info = resolveAsset(assetName);
 
-        Map<Integer, UsageAggregate> base = getMonthlyUsage(baseYear, assetId, assetName);
-        Map<Integer, UsageAggregate> compare = getMonthlyUsage(compareYear, assetId, assetName);
+        // 월별 Raw 조회
+        Map<Integer, UsageAggregate> base = getMonthlyUsage(baseYear, info.assetId());
+        Map<Integer, UsageAggregate> compare = getMonthlyUsage(compareYear, info.assetId());
 
         return UsageHistoryTrendRawDto.builder()
-                .assetId(assetId)
+                .assetId(info.assetId())
                 .assetName(info.assetName())
                 .assetCount(info.assetCount())
                 .baseYearData(base)
@@ -41,48 +48,49 @@ public class UsageHistoryTrendQueryAdapterImpl implements UsageHistoryTrendQuery
                 .build();
     }
 
-    private AssetInfoResult resolveAsset(Long assetId, String assetName) {
+    // 자원 이름으로 assetId + assetName + assetCount 조회
+    private AssetInfoResult resolveAsset(String assetName) {
 
-        // 1) assetId 직접 검색
-        if (assetId != null) {
-            String name =
-                    queryFactory.select(a.name).from(a).where(a.id.eq(assetId)).fetchOne();
+        // 전체 조회
+        if (assetName == null || assetName.isBlank()) {
 
-            if (name == null) {
-                throw UsageHistoryException.invalidAssetId();
-            }
-
-            return new AssetInfoResult(name, 1);
-        }
-
-        // 2) assetName 검색
-        if (assetName != null && !assetName.isBlank()) {
-            List<String> names = queryFactory
-                    .select(a.name)
+            Long count = queryFactory
+                    .select(a.id.count())
                     .from(a)
-                    .where(a.name.containsIgnoreCase(assetName))
-                    .limit(1)
-                    .fetch();
+                    .fetchOne();
 
-            if (names.isEmpty()) {
-                throw UsageHistoryException.invalidAssetName();
-            }
-
-            return new AssetInfoResult(names.getFirst(), 1);
+            return new AssetInfoResult(null, "전체",
+                    count != null ? count.intValue() : 0);
         }
 
-        // 3) 전체 자원 기준
-        Long cnt = queryFactory.select(a.id.count()).from(a).fetchOne();
+        // 개별 자원 검색
+        Tuple result = queryFactory
+                .select(a.id, a.name)
+                .from(a)
+                .where(a.name.containsIgnoreCase(assetName))
+                .limit(1)
+                .fetchOne();
 
-        return new AssetInfoResult("전체", cnt != null ? cnt.intValue() : 0);
+        if (result == null) {
+            throw UsageHistoryException.invalidAssetName();
+        }
+
+        Long assetId = result.get(a.id);
+        String name = result.get(a.name);
+
+        return new AssetInfoResult(assetId, name, 1);
     }
 
-    private Map<Integer, UsageAggregate> getMonthlyUsage(int year, Long assetId, String assetName) {
+    // assetId 기준으로 월별 집계
+    private Map<Integer, UsageAggregate> getMonthlyUsage(int year, Long assetId) {
+
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(u.startAt.year().eq(year));
 
-        if (assetId != null) builder.and(u.asset.id.eq(assetId));
-        else if (assetName != null && !assetName.isBlank()) builder.and(u.asset.name.contains(assetName));
+        // 전체 조회일 때 조건 없음
+        if (assetId != null) {
+            builder.and(u.asset.id.eq(assetId));
+        }
 
         var monthExpr = u.startAt.month();
         var actualSumExpr = u.actualUsageTime.sumLong();
@@ -106,19 +114,21 @@ public class UsageHistoryTrendQueryAdapterImpl implements UsageHistoryTrendQuery
             map.put(
                     m,
                     UsageAggregate.builder()
-                            .actualUsage(actual == null ? 0 : actual.intValue())
-                            .reservedUsage(reserved == null ? 0 : reserved.intValue())
+                            .actualUsage(actual != null ? actual.intValue() : 0)
+                            .reservedUsage(reserved != null ? reserved.intValue() : 0)
                             .build());
         }
 
         // 항상 1~12월 채움
         for (int m = 1; m <= 12; m++) {
-            map.putIfAbsent(
-                    m, UsageAggregate.builder().actualUsage(0).reservedUsage(0).build());
+            map.putIfAbsent(m,
+                    UsageAggregate.builder().actualUsage(0).reservedUsage(0).build());
         }
 
         return map;
     }
 
-    private record AssetInfoResult(String assetName, int assetCount) {}
+    // assetCount 포함된 완전한 AssetInfoResult
+    private record AssetInfoResult(Long assetId, String assetName, int assetCount) {}
+
 }
