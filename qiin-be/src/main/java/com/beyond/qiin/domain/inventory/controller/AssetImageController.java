@@ -16,10 +16,7 @@ public class AssetImageController {
     private final S3Service s3Service;
 
     @PostMapping("/upload-url")
-    public PreSignedUrlResponse generateUploadUrl(
-            @RequestParam String extension,
-            @RequestParam String contentType
-    ) {
+    public PreSignedUrlResponse generateUploadUrl(@RequestParam String extension, @RequestParam String contentType) {
         return s3Service.generateUploadUrl(extension, contentType);
     }
 }
