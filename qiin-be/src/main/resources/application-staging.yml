@@ -4,6 +4,34 @@ spring:
     activate:
       on-profile: staging
 
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: "0"
+    locations:
+      - classpath:db/migration
+      - classpath:db/seed/dev
+
+  # Kafka 설정
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS} # Kafka 접속 정보 지정
+    producer:
+      #직렬화
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    topic:
+      topics:
+        reservation-event: reservation-event-topic
+
+    consumer:
+      auto-offset-reset: earliest
+      group-id: reservation-group
+      #역직렬화
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
