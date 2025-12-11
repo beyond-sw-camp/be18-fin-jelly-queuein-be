@@ -14,6 +14,8 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.TreeAssetResponseDto;
 import com.beyond.qiin.domain.inventory.dto.asset.response.UpdateAssetResponseDto;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
+import com.beyond.qiin.infra.s3.PreSignedUrlResponse;
+import com.beyond.qiin.infra.s3.S3Service;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.resolver.AccessToken;
 import jakarta.validation.Valid;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
