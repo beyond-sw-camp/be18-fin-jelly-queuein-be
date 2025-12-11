@@ -36,14 +36,13 @@ public interface AssetQueryRepository {
     List<Asset> findAll();
 
     // 검색 필터용
-    Page<RawDescendantAssetResponseDto> searchDescendants(final AssetSearchCondition condition,final Pageable pageable);
+    Page<RawDescendantAssetResponseDto> searchDescendants(
+            final AssetSearchCondition condition, final Pageable pageable);
 
     List<RawDescendantAssetResponseDto> searchDescendantsAsList(final AssetSearchCondition condition);
-
 
     // 챗봇 용
 
     // 카테고리에 속한 자원 목록 조회
     List<Asset> findByCategoryId(final Long categoryId);
-
 }

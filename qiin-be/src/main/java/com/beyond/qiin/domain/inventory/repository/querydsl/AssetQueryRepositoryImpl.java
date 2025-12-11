@@ -299,12 +299,9 @@ public class AssetQueryRepositoryImpl implements AssetQueryRepository {
 
         return jpaQueryFactory
                 .selectFrom(asset)
-                .join(asset.category, category).fetchJoin()
-                .where(
-                        category.id.eq(categoryId),
-                        asset.deletedAt.isNull(),
-                        category.deletedAt.isNull()
-                )
+                .join(asset.category, category)
+                .fetchJoin()
+                .where(category.id.eq(categoryId), asset.deletedAt.isNull(), category.deletedAt.isNull())
                 .fetch();
     }
 }

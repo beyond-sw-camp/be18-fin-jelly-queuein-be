@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class OpenAiMessage {
-    private String role;    // "user", "assistant", "system"
+    private String role; // "user", "assistant", "system"
     private String content;
 }

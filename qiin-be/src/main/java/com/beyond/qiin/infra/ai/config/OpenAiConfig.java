@@ -17,9 +17,9 @@ public class OpenAiConfig {
     @Bean
     public RestClient openAiRestClient() {
         return RestClient.builder()
-                         .baseUrl(baseUrl)
-                         .defaultHeader("Authorization", "Bearer " + apiKey)
-                         .defaultHeader("Content-Type", "application/json")
-                         .build();
+                .baseUrl(baseUrl)
+                .defaultHeader("Authorization", "Bearer " + apiKey)
+                .defaultHeader("Content-Type", "application/json")
+                .build();
     }
 }
