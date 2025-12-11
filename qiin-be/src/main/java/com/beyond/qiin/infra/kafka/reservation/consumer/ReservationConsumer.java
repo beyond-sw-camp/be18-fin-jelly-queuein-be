@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 // 메시지 수신용 -> service 계층 따로 추가할 필요 없으므로 생략
 // application 계층(notification과)의 event handler 역할(비동기) 이므로
 // event listener 대신 consumer을 활용
+
 @Profile("!test")
 @Slf4j
 @Component
