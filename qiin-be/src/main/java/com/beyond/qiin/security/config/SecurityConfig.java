@@ -9,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,26 +40,6 @@ public class SecurityConfig {
     private final AccessDeniedHandler accessDeniedHandler;
 
     @Bean
-    @Order(1)
-    public SecurityFilterChain sseSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.securityMatcher("/api/v1/sse/**") // SSE 전용
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                .exceptionHandling(e -> {
-                    e.authenticationEntryPoint(authenticationEntryPoint);
-                    e.accessDeniedHandler(sseAccessDeniedHandler());
-                })
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
     public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
@@ -69,6 +47,8 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**")
+                        .permitAll()
+                        .requestMatchers(SSE)
                         .permitAll()
                         .requestMatchers(AUTH)
                         .permitAll()
@@ -88,19 +68,6 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AccessDeniedHandler sseAccessDeniedHandler() {
-        return (request, response, accessDeniedException) -> {
-            response.setStatus(HttpStatus.FORBIDDEN.value());
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter()
-                    .write(
-                            """
-                {"status":403,"error":"FORBIDDEN","message":"접근 권한이 없습니다."}
-            """);
-        };
     }
 
     // CORS 설정
