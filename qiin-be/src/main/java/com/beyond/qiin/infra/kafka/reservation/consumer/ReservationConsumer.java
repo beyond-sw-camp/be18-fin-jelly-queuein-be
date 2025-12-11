@@ -5,12 +5,13 @@ import com.beyond.qiin.infra.event.reservation.ReservationEventPayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 // 메시지 수신용 -> service 계층 따로 추가할 필요 없으므로 생략
 // application 계층(notification과)의 event handler 역할(비동기) 이므로
 // event listener 대신 consumer을 활용
-
+@Profile("!test")
 @Slf4j
 @Component
 @RequiredArgsConstructor
