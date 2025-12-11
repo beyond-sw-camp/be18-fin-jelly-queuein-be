@@ -30,6 +30,7 @@ import com.beyond.qiin.domain.booking.vo.TimeSlot;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.dto.asset.request.search_condition.AssetSearchCondition;
 import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAssetResponseDto;
+import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryRepository;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
@@ -187,7 +188,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
                 .isReservable(true)
                 .assetId(raw.getAssetId())
                 .assetType(AssetType.fromCode(raw.getType()).toName())
-                .assetType(AssetType.fromCode(raw.getStatus()).toName())
                 .assetName(raw.getName())
                 .categoryName(raw.getCategoryName())
                 .needsApproval(raw.getNeedApproval())
