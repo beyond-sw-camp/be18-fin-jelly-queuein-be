@@ -13,5 +13,6 @@ public class UsageHistoryTrendReadModel {
 
     @Id
     private String key; // usageTrend:2024:3:id-10
+
     private double usageRate; // 딱 필요한 값 1개만 저장
 }
