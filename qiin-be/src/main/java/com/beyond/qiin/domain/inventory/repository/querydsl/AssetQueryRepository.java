@@ -45,4 +45,13 @@ public interface AssetQueryRepository {
 
     // 카테고리에 속한 자원 목록 조회
     List<Asset> findByCategoryId(final Long categoryId);
+
+    // 사용 가능한 자원 목록 조회
+    List<Asset> findAvailableAssets(final Long categoryId, final String keyword);
+
+    // 이름으로 자원 찾기
+    Optional<Asset> findByName(String name);
+
+    // 이름으로 자원 id 찾기
+    Optional<Long> findIdByName(String name);
 }
