@@ -58,3 +58,9 @@ mail:
 
 login:
   url: ${LOGIN_URL:http://localhost:5173/login}
+
+openai:
+  base-url: "http://localhost"
+  api-key: "test-key"
+  model: "gpt-4.1-mini"
+  temperature: 0.0
