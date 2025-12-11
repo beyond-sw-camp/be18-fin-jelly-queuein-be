@@ -20,8 +20,7 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     topic:
       topics:
-        reservation-created: reservation-created-topic
-        reservation-updated: reservation-updated-topic
+        reservation-event: reservation-event-topic
 
     consumer:
       auto-offset-reset: earliest
