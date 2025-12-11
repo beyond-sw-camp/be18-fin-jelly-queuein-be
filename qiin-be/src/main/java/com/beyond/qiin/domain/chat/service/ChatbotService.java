@@ -63,9 +63,6 @@ public class ChatbotService {
 
         var assets = assetQueryService.findAssetsByCategory(categoryId);
 
-        System.out.println("categoryId = " + categoryId);
-        System.out.println("assets = " + toJson(assets));
-
         return chatbotClient.sendMessage(
                 """
             다음은 카테고리 %d의 자원 목록입니다. 사용자가 이해하기 쉽게 자연스럽게 요약해주세요:
