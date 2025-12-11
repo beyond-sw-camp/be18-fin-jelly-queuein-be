@@ -127,7 +127,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         Reservation reservation = reservationReader.getReservationById(reservationId);
 
-        if (reservation.getApplicant().getId().equals(respondent.getId())) {
+        //신청자는 자신의 예약을 승인할 수 없음
+        if (reservation.getApplicant().getId().equals(userId)) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_NOT_APPROVABLE);
         }
 
@@ -282,6 +283,13 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     // api x 비즈니스 메서드
     private void validateReservationAvailability(
             final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
+        
+        //예약 시간이 현재보다 과거인 경우 
+        if (startAt.isBefore(Instant.now())) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_TIME_PASSED);
+        }
+
+        //예약 시간이 다른 예약과 중복되는 경우
         if (!isReservationTimeAvailable(reservationId, assetId, startAt, endAt))
             throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
     }
