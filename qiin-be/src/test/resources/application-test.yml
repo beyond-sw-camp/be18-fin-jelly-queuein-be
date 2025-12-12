@@ -58,3 +58,14 @@ mail:
 
 login:
   url: ${LOGIN_URL:http://localhost:5173/login}
+
+openai:
+  base-url: "http://localhost"
+  api-key: "test-key"
+  model: "gpt-4.1-mini"
+  temperature: 0.0
+
+AWS_S3_ACCESS_KEY: dummy-access
+AWS_S3_SECRET_KEY: dummy-secret
+AWS_S3_BUCKET: dummy-bucket
+AWS_REGION: ap-northeast-2
