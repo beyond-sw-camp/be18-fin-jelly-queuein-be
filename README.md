@@ -125,7 +125,79 @@
 
 ### DevOps & Cloud
 
-<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge&logo=amazon-ec2&logoColor=white"> <img src="https://img.shields.io/badge/AWS%20Fargate-FF9900?style=for-the-badge&logo=amazon-ecs&logoColor=white"> <img src="https://img.shields.io/badge/AWS%20ECS-FF9900?style=for-the-badge&logo=amazon-ecs&logoColor=white"> <img src="https://img.shields.io/badge/AWS%20IAM-FF9900?style=for-the-badge&logo=amazonwebservices&logoColor=white"> <img src="https://img.shields.io/badge/AWS%20SES-FF9900?style=for-the-badge&logo=amazonwebservices&logoColor=white"> <img src="https://img.shields.io/badge/AWS%20SNS-FF9900?style=for-the-badge&logo=amazonwebservices&logoColor=white"> <img src="https://img.shields.io/badge/AWS%20RDS-527FFF?style=for-the-badge&logo=amazon-rds&logoColor=white"> <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
+<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
+
+
+---
+
+### AWS Infra
+
+
+#### Compute
+<p>
+  <span style="display:inline-block; text-align:center; margin-right:16px;">
+    <img src="docs/readme_images/Amazon-EC2.svg" width="70"><br><sub>EC2</sub>
+  </span>
+  <span style="display:inline-block; text-align:center; margin-right:16px;">
+    <img src="docs/readme_images/AWS-Fargate.svg" width="70"><br><sub>Fargate</sub>
+  </span>
+  <span style="display:inline-block; text-align:center; margin-right:16px;">
+    <img src="docs/readme_images/Amazon-ECR.svg" width="70"><br><sub>ECR</sub>
+  </span>
+  <span style="display:inline-block; text-align:center;">
+    <img src="docs/readme_images/Amazon-MSK.svg" width="70"><br><sub>MSK</sub>
+  </span>
+</p>
+
+
+#### Storage & Database
+<p>
+  <span style="display:inline-block; text-align:center; margin-right:16px;">
+    <img src="docs/readme_images/Amazon-S3.svg" width="70"><br><sub>S3</sub>
+  </span>
+  <span style="display:inline-block; text-align:center;">
+    <img src="docs/readme_images/Amazon-RDS.svg" width="70"><br><sub>RDS</sub>
+  </span>
+</p>
+
+
+#### Messaging
+<p>
+  <span style="display:inline-block; text-align:center; margin-right:16px;">
+    <img src="docs/readme_images/Amazon-SNS.svg" width="70"><br><sub>SNS</sub>
+  </span>
+  <span style="display:inline-block; text-align:center;">
+    <img src="docs/readme_images/Amazon-SES.svg" width="70"><br><sub>SES</sub>
+  </span>
+</p>
+
+
+#### Monitoring
+<p>
+  <span style="display:inline-block; text-align:center;">
+    <img src="docs/readme_images/Amazon-CloudWatch.svg" width="70"><br><sub>CloudWatch</sub>
+  </span>
+</p>
+
+
+#### Security
+<p>
+  <span style="display:inline-block; text-align:center; margin-right:16px;">
+    <img src="docs/readme_images/AWS-IAM.svg" width="70"><br><sub>IAM</sub>
+  </span>
+  <span style="display:inline-block; text-align:center;">
+    <img src="docs/readme_images/AWS-Secrets-Manager.svg" width="70"><br><sub>Secrets Manager</sub>
+  </span>
+</p>
+
+
+#### Networking
+<p>
+  <span style="display:inline-block; text-align:center;">
+    <img src="docs/readme_images/AWS_ALB.svg" width="70"><br><sub>ALB</sub>
+  </span>
+</p>
+
 
 <br>
 
