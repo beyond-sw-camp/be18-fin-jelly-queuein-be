@@ -59,3 +59,9 @@ logging:
   level:
     root: WARN
     com.beyond.qiin: INFO
+
+openai:
+  base-url: https://api.openai.com/v1
+  api-key: ${MY_OPENAI_KEY}
+  model: gpt-4.1-mini
+  temperature: 0.2

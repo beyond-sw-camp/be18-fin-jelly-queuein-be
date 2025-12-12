@@ -15,7 +15,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Slf4j
 @Configuration
-@Profile("dev")
+@Profile({"dev", "prod"})
 public class RedisConfig {
 
     @Value("${REDIS_HOST}")
