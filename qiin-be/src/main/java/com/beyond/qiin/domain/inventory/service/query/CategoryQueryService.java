@@ -16,4 +16,7 @@ public interface CategoryQueryService {
     // id로 카테고리 가져오기
     //    Category getCategoryById(final Long categoryId);
 
+    // 챗봇이 사용함
+    // 카테고리 전체 목록 가져오기
+    List<DropdownCategoryResponseDto> findAllCategories();
 }

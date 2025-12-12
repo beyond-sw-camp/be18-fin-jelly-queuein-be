@@ -4,6 +4,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.domain.booking.entity.Reservation;
+import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.repository.ReservationJpaRepository;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
 import com.beyond.qiin.domain.booking.support.ReservationWriter;
@@ -19,6 +20,9 @@ public class UpdateReservationForAssetTest {
 
     @InjectMocks
     private ReservationWriter reservationWriter;
+
+    @Mock
+    private ReservationEventPublisher reservationEventPublisher;
 
     @Mock
     private ReservationJpaRepository reservationJpaRepository;

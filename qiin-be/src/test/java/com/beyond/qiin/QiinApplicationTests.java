@@ -1,8 +1,11 @@
 package com.beyond.qiin;
 
 import com.beyond.qiin.config.TestRedisConfig;
+import com.beyond.qiin.infra.ai.service.ChatbotClient;
 import com.beyond.qiin.infra.redis.iam.role.RoleRedisRepository;
+import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
 import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisRepository;
+import com.beyond.qiin.infra.redis.inventory.AssetTreeRedisAdapter;
 import com.beyond.qiin.infra.redis.reservation.ReservationRedisRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +34,15 @@ class QiinApplicationTests {
 
     @MockBean
     private AssetDetailRedisRepository assetDetailRedisRepository;
+
+    @MockBean
+    private AssetDetailRedisAdapter assetDetailRedisAdapter;
+
+    @MockBean
+    private AssetTreeRedisAdapter assetTreeRedisAdapter;
+
+    @MockBean
+    private ChatbotClient chatbotClient;
 
     @Test
     void contextLoads() {}
