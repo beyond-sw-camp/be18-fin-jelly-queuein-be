@@ -7,9 +7,13 @@ import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserByAdminRequestDto;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
@@ -36,12 +40,9 @@ import org.hibernate.annotations.SQLRestriction;
 // @SoftDelete(columnName = "deleted_at", strategy = SoftDeleteType.DELETED)
 public class User extends BaseEntity {
 
-    //      @ManyToOne(fetch = FetchType.LAZY)
-    //      @JoinColumn(name = "dpt_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    //      private Department department;
-
-    @Column(name = "dpt_id", nullable = false)
-    private Long dptId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dpt_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Department department;
 
     @Column(name = "user_no", length = 50, nullable = false) // UNIQUE
     private String userNo;
@@ -79,13 +80,16 @@ public class User extends BaseEntity {
     private Instant retireDate;
 
     public static User create(
-            final CreateUserRequestDto request, final String generatedUserNo, final String encryptedPassword) {
+            final CreateUserRequestDto request,
+            final Department department,
+            final String generatedUserNo,
+            final String encryptedPassword) {
 
         final Instant hireInstant =
                 request.getHireDate().atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
 
         return User.builder()
-                .dptId(request.getDptId())
+                .department(department)
                 .userNo(generatedUserNo)
                 .userName(request.getUserName())
                 .email(request.getEmail())
@@ -108,11 +112,9 @@ public class User extends BaseEntity {
         this.lastLoginAt = now;
     }
 
-    public void updateUser(final UpdateUserByAdminRequestDto request) {
-
-        // 관리자: 본인 이름/이메일/전화/생일 변경 금지
-        if (request.getDptId() != null) {
-            this.dptId = request.getDptId();
+    public void updateUser(final UpdateUserByAdminRequestDto request, final Department newDepartment) {
+        if (newDepartment != null) {
+            this.department = newDepartment;
         }
 
         if (request.getRetireDate() != null) {

@@ -46,7 +46,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                         user.id,
                         user.userName,
                         user.email,
-                        user.dptId,
+                        user.department.id,
                         role.roleName,
                         user.createdAt,
                         user.phone,
@@ -125,7 +125,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
     }
 
     private BooleanExpression dptIdEq(final Long dptId) {
-        return dptId != null ? user.dptId.eq(dptId) : null;
+        return dptId != null ? user.department.id.eq(dptId) : null;
     }
 
     private BooleanExpression roleNameContains(final String roleName) {
@@ -168,7 +168,7 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
             switch (order.getProperty()) {
                 case "userName" -> orders.add(new OrderSpecifier<>(direction, user.userName));
                 case "email" -> orders.add(new OrderSpecifier<>(direction, user.email));
-                case "dptId" -> orders.add(new OrderSpecifier<>(direction, user.dptId));
+                case "department" -> orders.add(new OrderSpecifier<>(direction, user.department.id));
                 case "roleName" -> orders.add(new OrderSpecifier<>(direction, role.roleName));
                 case "createdAt" -> orders.add(new OrderSpecifier<>(direction, user.createdAt));
             }

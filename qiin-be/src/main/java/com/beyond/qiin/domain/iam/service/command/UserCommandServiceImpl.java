@@ -5,10 +5,13 @@ import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateMyInfoRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserByAdminRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
+import com.beyond.qiin.domain.iam.entity.Department;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.entity.UserRole;
+import com.beyond.qiin.domain.iam.exception.DepartmentException;
 import com.beyond.qiin.domain.iam.exception.UserException;
+import com.beyond.qiin.domain.iam.repository.DepartmentJpaRepository;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
@@ -34,6 +37,8 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserReader userReader;
     private final RoleReader roleReader;
 
+    private final DepartmentJpaRepository departmentJpaRepository;
+
     private final UserWriter userWriter;
     private final UserRoleWriter userRoleWriter;
 
@@ -51,9 +56,12 @@ public class UserCommandServiceImpl implements UserCommandService {
         final String tempPassword = PasswordGenerator.generate();
         final String encrypted = passwordEncoder.encode(tempPassword);
 
+        Department department =
+                departmentJpaRepository.findById(request.getDptId()).orElseThrow(DepartmentException::notFound);
+
         String userNo = generateUserNo(request.getHireDate());
 
-        User user = User.create(request, userNo, encrypted);
+        User user = User.create(request, department, userNo, encrypted);
         User saved = userWriter.save(user);
 
         Role defaultRole = roleReader.findByRoleName("GENERAL");
@@ -96,7 +104,14 @@ public class UserCommandServiceImpl implements UserCommandService {
         validateAdminCannotModifyMaster(target);
 
         // 2) 수정 수행
-        target.updateUser(request);
+        Department department = null;
+        if (request.getDptId() != null) {
+            department = departmentJpaRepository
+                    .findById(request.getDptId())
+                    .orElseThrow(() -> DepartmentException.notFound());
+        }
+
+        target.updateUser(request, department);
         userWriter.save(target);
     }
 

@@ -1,3 +1,8 @@
 package com.beyond.qiin.domain.iam.service.query;
 
-public interface DepartmentQueryService {}
+import com.beyond.qiin.domain.iam.dto.department.response.DepartmentListResponseDto;
+
+public interface DepartmentQueryService {
+
+    DepartmentListResponseDto getDepartments();
+}
