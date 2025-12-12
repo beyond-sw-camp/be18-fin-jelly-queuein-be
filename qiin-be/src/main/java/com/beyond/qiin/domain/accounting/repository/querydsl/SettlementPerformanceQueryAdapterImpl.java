@@ -24,11 +24,6 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
     public SettlementPerformanceRawDto getMonthlyPerformance(
             int baseYear, int compareYear, Long assetId, String assetName) {
 
-        // assetName을 기준으로만 자원 검색
-        if (assetName != null && !assetName.isBlank()) {
-            assetId = getAssetIdByName(assetName); // assetName을 기준으로 assetId를 찾음
-        }
-
         // 기준연도 월별 SUM
         Map<Integer, BigDecimal> base = getMonthlySum(baseYear, assetId);
 
@@ -97,6 +92,10 @@ public class SettlementPerformanceQueryAdapterImpl implements SettlementPerforma
 
     // 자원명을 기준으로 자원 ID를 찾기
     public Long getAssetIdByName(String assetName) {
+        if (assetName == null || assetName.isBlank()) {
+            return null; // "전체"를 의미함
+        }
+
         return queryFactory
                 .select(asset.id)
                 .from(asset)

@@ -34,6 +34,10 @@ public class SettlementPerformanceQueryServiceImpl implements SettlementPerforma
         String assetName = req.getAssetName();
         Long assetId = resolveAssetIdFromName(assetName); // assetName으로 assetId를 찾음
 
+        if (assetName != null && !assetName.isBlank() && assetId == null) {
+            throw new IllegalArgumentException("자원명을 잘못 입력하셨습니다.");
+        }
+
         // 캐시 키 생성 (assetId 기반으로 캐시 키 생성)
         String key = "settlementPerformance:%s:%d:%d:%s"
                 .formatted("base", baseYear, compareYear, assetId != null ? "id-" + assetId : "all");
