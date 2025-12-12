@@ -3,7 +3,6 @@ package com.beyond.qiin.security.config;
 import static com.beyond.qiin.security.constants.SecurityWhitelist.*;
 
 import com.beyond.qiin.security.jwt.JwtFilter;
-import com.beyond.qiin.security.logging.HealthCheckLoggingFilter;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +41,6 @@ public class SecurityConfig {
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final AccessDeniedHandler accessDeniedHandler;
 
-    private final HealthCheckLoggingFilter healthCheckLoggingFilter;
-
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
@@ -53,6 +50,8 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**")
                         .permitAll()
+                        .requestMatchers(SSE)
+                        .permitAll()
                         .requestMatchers(ACTUATOR)
                         .permitAll()
                         .requestMatchers(AUTH)
@@ -61,12 +60,13 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest()
                         .authenticated())
+                .anonymous(Customizer.withDefaults())
                 .exceptionHandling(e -> {
                     e.authenticationEntryPoint(authenticationEntryPoint);
                     e.accessDeniedHandler(accessDeniedHandler);
                 })
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(healthCheckLoggingFilter, JwtFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 

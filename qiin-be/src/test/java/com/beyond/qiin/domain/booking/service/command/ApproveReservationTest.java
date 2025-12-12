@@ -2,11 +2,14 @@ package com.beyond.qiin.domain.booking.service.command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 
 import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
+import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
@@ -45,6 +48,9 @@ public class ApproveReservationTest {
     private AssetCommandService assetCommandService;
 
     @Mock
+    private ReservationEventPublisher reservationEventPublisher;
+
+    @Mock
     private AttendantJpaRepository attendantJpaRepository;
 
     @Test
@@ -67,6 +73,7 @@ public class ApproveReservationTest {
 
         Mockito.verify(reservation).approve(user, "승인 이유");
         Mockito.verify(reservationWriter).save(reservation);
+        Mockito.verify(reservationEventPublisher).publishEventCreated(any(Reservation.class), anyList());
 
         assertNotNull(response); // DTO가 반환되는지
         assertEquals(ReservationStatus.APPROVED, reservation.getStatus());

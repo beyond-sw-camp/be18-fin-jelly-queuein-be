@@ -5,6 +5,10 @@ spring:
   profiles:
     default: ${SPRING_PROFILES_ACTIVE:test}
 
+  mvc:
+    async:
+      request-timeout: 3600000 #1h(sse 연결 시간)
+
   # JPA 공통 설정
   jpa:
     open-in-view: false

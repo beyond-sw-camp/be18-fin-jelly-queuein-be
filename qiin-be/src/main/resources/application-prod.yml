@@ -3,12 +3,6 @@ spring:
     activate:
       on-profile: prod
 
-  # Redis 설정 추가 (Redisson/Spring Data Redis가 읽을 수 있도록 표준 키 사용)
-  data:
-    redis:
-      host: ${REDIS_HOST} # Secrets Manager에 있는 실제 Redis 엔드포인트 주소를 참조
-      port: ${REDIS_PORT} # Secrets Manager에 있는 포트 번호를 참조
-
   # Kafka 설정
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS} # Kafka 접속 정보 지정
@@ -18,12 +12,12 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     topic:
       topics:
-        reservation-created: reservation-created-topic
-        reservation-updated: reservation-updated-topic
+        reservation-event: reservation-event-topic
 
     consumer:
       auto-offset-reset: earliest
       group-id: reservation-group
+      #역직렬화
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
@@ -44,7 +38,7 @@ spring:
       hibernate:
         format_sql: false
 
-  # Flyway 설정
+  # Flyway 완전 비활성화
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -52,7 +46,7 @@ spring:
     locations:
       - classpath:db/migration  # 마이그레이션 파일 경로 설정
 
-  # Redis 캐시 완전 비활성화 (Redis 사용 자체를 막는 것이 아님)
+  # Redis 캐시 완전 비활성화
   cache:
     type: none
 
@@ -65,12 +59,3 @@ logging:
   level:
     root: WARN
     com.beyond.qiin: INFO
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health   # /actuator/health 활성화
-  endpoint:
-    health:
-      show-details: never   # 상세정보 숨김 (보안)

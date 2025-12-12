@@ -98,6 +98,12 @@ services:
       MAIL_FROM: ${MAIL_FROM}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
       LOGIN_URL: ${LOGIN_URL}
+      AWS_REGION: ${AWS_REGION}
+      AWS_S3_ACCESS_KEY: ${AWS_S3_ACCESS_KEY}
+      AWS_S3_SECRET_KEY: ${AWS_S3_SECRET_KEY}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+
+      MY_OPENAI_KEY: ${MY_OPENAI_KEY}
     restart: on-failure
 
 volumes:

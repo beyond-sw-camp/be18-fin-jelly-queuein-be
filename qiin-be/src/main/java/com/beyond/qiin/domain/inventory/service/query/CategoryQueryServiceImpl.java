@@ -40,4 +40,11 @@ public class CategoryQueryServiceImpl implements CategoryQueryService {
     //    public Category getCategoryById(final Long categoryId) {
     //
     //    }
+
+    // 챗봇이 사용함
+    // 카테고리 전체 목록 가져오기
+    @Override
+    public List<DropdownCategoryResponseDto> findAllCategories() {
+        return categoryQueryRepository.findAllForDropdown();
+    }
 }
