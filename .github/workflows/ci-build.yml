@@ -10,7 +10,6 @@ on:
       - main
       - develop
       - staging
-      - hotfix/redis-error
 
 jobs:
   build:
