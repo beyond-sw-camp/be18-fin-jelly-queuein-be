@@ -2,12 +2,12 @@ package com.beyond.qiin.domain.booking.service.query;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
 import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.ReservableAssetSearchCondition;
 import com.beyond.qiin.domain.booking.dto.reservation.response.reservable_asset.ReservableAssetResponseDto;
+import com.beyond.qiin.domain.booking.repository.querydsl.ReservationQueryRepository;
 import com.beyond.qiin.domain.booking.repository.querydsl.UserReservationsQueryRepository;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -17,6 +17,7 @@ import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryRepository
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -47,6 +48,9 @@ public class ReservableAssetsTest {
     @Mock
     private ReservationReader reservationReader;
 
+    @Mock
+    private ReservationQueryRepository reservationQueryRepository;
+
     @Test
     void getReservableAssets_filtersCorrectlyAndPages() {
         Long userId = 1L;
@@ -69,8 +73,13 @@ public class ReservableAssetsTest {
         Page<RawDescendantAssetResponseDto> rawPage = new PageImpl<>(List.of(raw1, raw2), pageable, 2);
 
         when(assetQueryRepository.searchDescendantsAsList(any())).thenReturn(List.of(raw1, raw2));
-        when(assetQueryService.isAvailable(anyLong())).thenReturn(true);
 
+        when(assetQueryRepository.findStatusMapByIds(any()))
+                .thenReturn(Map.of(
+                        10L, 0,
+                        20L, 0));
+        when(reservationQueryRepository.findByAssetIdsAndTimeRange(any(), any(), any()))
+                .thenReturn(Map.of());
         PageResponseDto<ReservableAssetResponseDto> result =
                 reservationQueryService.getReservableAssets(userId, condition, pageable);
 

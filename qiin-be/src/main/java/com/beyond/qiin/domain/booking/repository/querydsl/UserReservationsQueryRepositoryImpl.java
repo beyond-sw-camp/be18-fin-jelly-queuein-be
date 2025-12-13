@@ -58,7 +58,6 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
             String raw = condition.getReservationStatus().trim();
 
             try {
-                // "pending" → "PENDING" → ReservationStatus.PENDING
                 ReservationStatus statusEnum = ReservationStatus.valueOf(raw.toUpperCase());
 
                 // QueryDSL은 int 비교

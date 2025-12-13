@@ -1,7 +1,7 @@
 // package com.beyond.qiin.infra.outbox;
 //
-// import com.beyond.qiin.domain.outbox.entity.OutboxEvent;
-// import com.beyond.qiin.domain.outbox.support.OutboxEventWriter;
+// import com.beyond.qiin.domain.alarm.notification.entity.outbox.OutboxEvent;
+// import com.beyond.qiin.domain.alarm.notification.support.outbox.OutboxEventWriter;
 // import com.beyond.qiin.infra.kafka.KafkaProducerService;
 // import java.util.List;
 // import lombok.RequiredArgsConstructor;
