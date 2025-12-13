@@ -1,8 +1,8 @@
-package com.beyond.qiin.domain.alarm.notification.dto;
+package com.beyond.qiin.domain.alarm.dto;
 
-import com.beyond.qiin.domain.alarm.notification.entity.Notification;
-import com.beyond.qiin.domain.alarm.notification.enums.NotificationStatus;
-import com.beyond.qiin.domain.alarm.notification.enums.NotificationType;
+import com.beyond.qiin.domain.alarm.entity.Notification;
+import com.beyond.qiin.domain.alarm.enums.NotificationStatus;
+import com.beyond.qiin.domain.alarm.enums.NotificationType;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

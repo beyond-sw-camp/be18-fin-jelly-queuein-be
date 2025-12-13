@@ -1,7 +1,7 @@
-package com.beyond.qiin.domain.alarm.notification.entity;
+package com.beyond.qiin.domain.alarm.entity;
 
-import com.beyond.qiin.domain.alarm.notification.enums.NotificationStatus;
-import com.beyond.qiin.domain.alarm.notification.enums.NotificationType;
+import com.beyond.qiin.domain.alarm.enums.NotificationStatus;
+import com.beyond.qiin.domain.alarm.enums.NotificationType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

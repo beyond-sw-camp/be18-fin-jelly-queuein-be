@@ -1,8 +1,8 @@
 package com.beyond.qiin.domain.booking.event;
 
+import com.beyond.qiin.domain.alarm.entity.OutboxEvent;
+import com.beyond.qiin.domain.alarm.support.OutboxEventWriter;
 import com.beyond.qiin.domain.booking.entity.Reservation;
-import com.beyond.qiin.domain.alarm.notification.entity.OutboxEvent;
-import com.beyond.qiin.domain.alarm.notification.support.OutboxEventWriter;
 import com.beyond.qiin.infra.event.reservation.ReservationEventPayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;

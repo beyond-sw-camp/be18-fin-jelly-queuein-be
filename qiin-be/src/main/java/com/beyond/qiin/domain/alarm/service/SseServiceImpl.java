@@ -1,7 +1,7 @@
-package com.beyond.qiin.domain.alarm.notification.service;
+package com.beyond.qiin.domain.alarm.service;
 
-import com.beyond.qiin.domain.alarm.notification.dto.NotificationSseDto;
-import com.beyond.qiin.domain.alarm.notification.entity.Notification;
+import com.beyond.qiin.domain.alarm.dto.NotificationSseDto;
+import com.beyond.qiin.domain.alarm.entity.Notification;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;

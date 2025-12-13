@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.alarm.notification.service;
+package com.beyond.qiin.domain.alarm.service;
 
 import com.beyond.qiin.infra.event.reservation.ReservationEventPayload;
 

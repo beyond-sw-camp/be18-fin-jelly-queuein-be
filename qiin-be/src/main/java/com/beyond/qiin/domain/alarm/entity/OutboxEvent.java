@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.alarm.notification.entity;
+package com.beyond.qiin.domain.alarm.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

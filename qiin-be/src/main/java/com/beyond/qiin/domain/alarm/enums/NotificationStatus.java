@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.alarm.notification.enums;
+package com.beyond.qiin.domain.alarm.enums;
 
 import com.beyond.qiin.common.enums.EnumCode;
 import java.util.Arrays;

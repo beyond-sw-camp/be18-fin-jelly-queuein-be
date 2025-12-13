@@ -1,6 +1,6 @@
-package com.beyond.qiin.domain.alarm.notification.repository;
+package com.beyond.qiin.domain.alarm.repository;
 
-import com.beyond.qiin.domain.alarm.notification.entity.OutboxEvent;
+import com.beyond.qiin.domain.alarm.entity.OutboxEvent;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

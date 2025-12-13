@@ -1,6 +1,6 @@
-package com.beyond.qiin.domain.alarm.notification.service;
+package com.beyond.qiin.domain.alarm.service;
 
-import com.beyond.qiin.domain.alarm.notification.entity.Notification;
+import com.beyond.qiin.domain.alarm.entity.Notification;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public interface SseService {

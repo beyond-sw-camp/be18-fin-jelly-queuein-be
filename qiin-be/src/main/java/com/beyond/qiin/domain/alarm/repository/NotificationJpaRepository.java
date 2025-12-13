@@ -1,6 +1,6 @@
-package com.beyond.qiin.domain.alarm.notification.repository;
+package com.beyond.qiin.domain.alarm.repository;
 
-import com.beyond.qiin.domain.alarm.notification.entity.Notification;
+import com.beyond.qiin.domain.alarm.entity.Notification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,6 @@
-package com.beyond.qiin.domain.alarm.notification.util;
+package com.beyond.qiin.domain.alarm.util;
 
-import com.beyond.qiin.domain.alarm.notification.enums.NotificationType;
+import com.beyond.qiin.domain.alarm.enums.NotificationType;
 
 public class NotificationPayloadFactory {
     public static String createPayload(NotificationType type, Object data) {

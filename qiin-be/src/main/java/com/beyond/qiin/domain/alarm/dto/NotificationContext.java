@@ -1,6 +1,6 @@
-package com.beyond.qiin.domain.alarm.notification.dto;
+package com.beyond.qiin.domain.alarm.dto;
 
-import com.beyond.qiin.domain.alarm.notification.enums.NotificationType;
+import com.beyond.qiin.domain.alarm.enums.NotificationType;
 import lombok.Builder;
 import lombok.Getter;
 

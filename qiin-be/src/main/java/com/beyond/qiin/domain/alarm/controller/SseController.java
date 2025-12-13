@@ -1,6 +1,6 @@
-package com.beyond.qiin.domain.alarm.notification.controller;
+package com.beyond.qiin.domain.alarm.controller;
 
-import com.beyond.qiin.domain.alarm.notification.service.SseService;
+import com.beyond.qiin.domain.alarm.service.SseService;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.resolver.AccessToken;
 import com.beyond.qiin.security.resolver.SseAccessToken;

@@ -1,8 +1,8 @@
 package com.beyond.qiin.infra.event.reservation;
 
 import com.beyond.qiin.common.enums.EnumCode;
-import com.beyond.qiin.domain.alarm.notification.exception.NotificationErrorCode;
-import com.beyond.qiin.domain.alarm.notification.exception.NotificationException;
+import com.beyond.qiin.domain.alarm.exception.NotificationErrorCode;
+import com.beyond.qiin.domain.alarm.exception.NotificationException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;

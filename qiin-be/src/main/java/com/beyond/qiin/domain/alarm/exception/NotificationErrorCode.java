@@ -1,4 +1,4 @@
-package com.beyond.qiin.domain.alarm.notification.exception;
+package com.beyond.qiin.domain.alarm.exception;
 
 import com.beyond.qiin.common.exception.ErrorCode;
 import lombok.Getter;

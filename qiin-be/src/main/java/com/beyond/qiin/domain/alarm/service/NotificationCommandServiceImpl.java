@@ -1,11 +1,11 @@
-package com.beyond.qiin.domain.alarm.notification.service;
+package com.beyond.qiin.domain.alarm.service;
 
-import com.beyond.qiin.domain.alarm.notification.dto.NotificationContext;
-import com.beyond.qiin.domain.alarm.notification.entity.Notification;
-import com.beyond.qiin.domain.alarm.notification.enums.NotificationType;
-import com.beyond.qiin.domain.alarm.notification.exception.NotificationErrorCode;
-import com.beyond.qiin.domain.alarm.notification.exception.NotificationException;
-import com.beyond.qiin.domain.alarm.notification.repository.NotificationJpaRepository;
+import com.beyond.qiin.domain.alarm.dto.NotificationContext;
+import com.beyond.qiin.domain.alarm.entity.Notification;
+import com.beyond.qiin.domain.alarm.enums.NotificationType;
+import com.beyond.qiin.domain.alarm.exception.NotificationErrorCode;
+import com.beyond.qiin.domain.alarm.exception.NotificationException;
+import com.beyond.qiin.domain.alarm.repository.NotificationJpaRepository;
 import com.beyond.qiin.infra.event.reservation.ReservationEventPayload;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

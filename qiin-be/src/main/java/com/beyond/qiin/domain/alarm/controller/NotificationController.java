@@ -1,10 +1,10 @@
-package com.beyond.qiin.domain.alarm.notification.controller;
+package com.beyond.qiin.domain.alarm.controller;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
-import com.beyond.qiin.domain.alarm.notification.dto.NotificationResponseDto;
-import com.beyond.qiin.domain.alarm.notification.entity.Notification;
-import com.beyond.qiin.domain.alarm.notification.service.NotificationCommandService;
-import com.beyond.qiin.domain.alarm.notification.support.NotificationReader;
+import com.beyond.qiin.domain.alarm.dto.NotificationResponseDto;
+import com.beyond.qiin.domain.alarm.entity.Notification;
+import com.beyond.qiin.domain.alarm.service.NotificationCommandService;
+import com.beyond.qiin.domain.alarm.support.NotificationReader;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.resolver.AccessToken;
 import lombok.RequiredArgsConstructor;
