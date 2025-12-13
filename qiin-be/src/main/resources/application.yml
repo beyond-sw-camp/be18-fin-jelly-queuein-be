@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    default: test
+    default: ${SPRING_PROFILES_ACTIVE:test}
 
   mvc:
     async:
