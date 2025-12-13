@@ -36,36 +36,30 @@ public class SettlementPerformanceQueryServiceImpl implements SettlementPerforma
         }
 
         // DB 조회 (한 번만)
-        SettlementPerformanceRawDto raw =
-                queryAdapter.getMonthlyPerformance(baseYear, compareYear, assetId, assetName);
+        SettlementPerformanceRawDto raw = queryAdapter.getMonthlyPerformance(baseYear, compareYear, assetId, assetName);
 
-        Map<Integer, BigDecimal> baseMap =
-                Optional.ofNullable(raw)
-                        .map(SettlementPerformanceRawDto::getBaseYearData)
-                        .orElse(Collections.emptyMap());
+        Map<Integer, BigDecimal> baseMap = Optional.ofNullable(raw)
+                .map(SettlementPerformanceRawDto::getBaseYearData)
+                .orElse(Collections.emptyMap());
 
-        Map<Integer, BigDecimal> compareMap =
-                Optional.ofNullable(raw)
-                        .map(SettlementPerformanceRawDto::getCompareYearData)
-                        .orElse(Collections.emptyMap());
+        Map<Integer, BigDecimal> compareMap = Optional.ofNullable(raw)
+                .map(SettlementPerformanceRawDto::getCompareYearData)
+                .orElse(Collections.emptyMap());
 
         List<SettlementPerformanceResponseDto.MonthlyPerformance> monthlyList = new ArrayList<>();
 
         // ===== 월별 데이터 처리 =====
         for (int month = 1; month <= 12; month++) {
 
-            BigDecimal baseValue =
-                    resolveMonthlyValue(baseYear, month, assetId, baseMap, nowYear, nowMonth);
+            BigDecimal baseValue = resolveMonthlyValue(baseYear, month, assetId, baseMap, nowYear, nowMonth);
 
-            BigDecimal compareValue =
-                    resolveMonthlyValue(compareYear, month, assetId, compareMap, nowYear, nowMonth);
+            BigDecimal compareValue = resolveMonthlyValue(compareYear, month, assetId, compareMap, nowYear, nowMonth);
 
-            monthlyList.add(
-                    SettlementPerformanceResponseDto.MonthlyPerformance.builder()
-                            .month(month)
-                            .baseYearSaving(baseValue)
-                            .compareYearSaving(compareValue)
-                            .build());
+            monthlyList.add(SettlementPerformanceResponseDto.MonthlyPerformance.builder()
+                    .month(month)
+                    .baseYearSaving(baseValue)
+                    .compareYearSaving(compareValue)
+                    .build());
         }
 
         // ===== 연도 총합 =====
@@ -88,12 +82,7 @@ public class SettlementPerformanceQueryServiceImpl implements SettlementPerforma
     // 월별 캐시 처리
     // =========================
     private BigDecimal resolveMonthlyValue(
-            int year,
-            int month,
-            Long assetId,
-            Map<Integer, BigDecimal> source,
-            int nowYear,
-            int nowMonth) {
+            int year, int month, Long assetId, Map<Integer, BigDecimal> source, int nowYear, int nowMonth) {
 
         boolean isCurrentMonth = (year == nowYear && month == nowMonth);
         String assetKey = assetId != null ? "id-" + assetId : "all";
@@ -118,11 +107,7 @@ public class SettlementPerformanceQueryServiceImpl implements SettlementPerforma
     // =========================
     // 연도 총합 캐시 처리
     // =========================
-    private BigDecimal resolveYearTotal(
-            int year,
-            Long assetId,
-            Map<Integer, BigDecimal> monthlyMap,
-            int nowYear) {
+    private BigDecimal resolveYearTotal(int year, Long assetId, Map<Integer, BigDecimal> monthlyMap, int nowYear) {
 
         // 올해는 캐싱하지 않음
         if (year == nowYear) {
