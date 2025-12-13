@@ -167,6 +167,12 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         User respondent = userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
+
+        //승인자 != 신청자
+        if (reservation.getApplicant().getId().equals(userId)) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_NOT_APPROVABLE);
+        }
+
         reservation.reject(respondent, confirmReservationRequestDto.getReason()); // status rejected
         reservationWriter.save(reservation);
 
@@ -301,7 +307,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
 
         // 예약 시간이 현재보다 과거인 경우
-        if (startAt.isBefore(Instant.now())) {
+        Instant now = Instant.now();
+
+        if (!endAt.isAfter(now)) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_TIME_PASSED);
         }
 

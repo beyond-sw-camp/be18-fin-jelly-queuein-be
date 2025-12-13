@@ -17,7 +17,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -347,5 +349,11 @@ public class AssetQueryRepositoryImpl implements AssetQueryRepository {
                 .fetchOne();
 
         return Optional.ofNullable(id);
+    }
+
+    @Override
+    public Map<Long, Integer> findStatusMapByIds(List<Long> assetIds) {
+        return jpaQueryFactory.select(asset.id, asset.status).from(asset).where(asset.id.in(assetIds)).fetch().stream()
+                .collect(Collectors.toMap(tuple -> tuple.get(asset.id), tuple -> tuple.get(asset.status)));
     }
 }

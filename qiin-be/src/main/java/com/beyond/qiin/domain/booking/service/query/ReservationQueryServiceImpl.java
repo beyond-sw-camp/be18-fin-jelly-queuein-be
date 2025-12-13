@@ -22,6 +22,7 @@ import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
 import com.beyond.qiin.domain.booking.repository.querydsl.AppliedReservationsQueryRepository;
+import com.beyond.qiin.domain.booking.repository.querydsl.ReservationQueryRepository;
 import com.beyond.qiin.domain.booking.repository.querydsl.UserReservationsQueryRepository;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
 import com.beyond.qiin.domain.booking.util.AvailableTimeSlotCalculator;
@@ -63,6 +64,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final UserReservationsQueryRepository userReservationsQueryRepository;
     private final AppliedReservationsQueryRepository appliedReservationsQueryRepository;
     private final AssetQueryRepository assetQueryRepository;
+    private final ReservationQueryRepository reservationQueryRepository;
 
     // 예약 상세 조회 (api용)
     @Override
@@ -164,9 +166,41 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         // 해당 날짜의 예약 가능성 확인용
         LocalDate date = condition.getDate();
 
+        //        List<ReservableAssetResponseDto> filtered = rawList.stream()
+        //                .filter(raw -> isAssetReservableOnDate(raw.getAssetId(), date))
+        //                .filter(raw -> assetQueryService.isAvailable(raw.getAssetId()))
+        //                .map(this::toReservableAssetResponse)
+        //                .toList();
+
+        // 해당 날짜에 예약 가능한 시간이 있는 경우
+
+        // 해당 날짜에 자원 상태가 사용 가능인 경우
+
+        if (rawList.isEmpty()) {
+            return PageResponseDto.from(new PageImpl<>(List.of(), pageable, 0));
+        }
+
+        List<Long> assetIds =
+                rawList.stream().map(RawDescendantAssetResponseDto::getAssetId).toList();
+
+        ZoneId zone = ZoneId.of("Asia/Seoul");
+        Instant dayStart = date.atStartOfDay(zone).toInstant();
+        Instant dayEnd = date.plusDays(1).atStartOfDay(zone).toInstant();
+
+        Map<Long, Integer> assetStatusMap = assetQueryRepository.findStatusMapByIds(assetIds);
+
+        Map<Long, List<Reservation>> reservationMap =
+                reservationQueryRepository.findByAssetIdsAndTimeRange(assetIds, dayStart, dayEnd);
+
         List<ReservableAssetResponseDto> filtered = rawList.stream()
-                .filter(raw -> isAssetReservableOnDate(raw.getAssetId(), date))
-                .filter(raw -> assetQueryService.isAvailable(raw.getAssetId()))
+                .filter(raw -> {
+                    Integer status = assetStatusMap.get(raw.getAssetId());
+                    return status != 1 && status != 2;
+                })
+                .filter(raw -> {
+                    List<Reservation> reservations = reservationMap.getOrDefault(raw.getAssetId(), List.of());
+                    return isReservableForDay(date, reservations);
+                })
                 .map(this::toReservableAssetResponse)
                 .toList();
 
