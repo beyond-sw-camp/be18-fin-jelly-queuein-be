@@ -168,7 +168,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         User respondent = userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
 
-        //승인자 != 신청자
+        // 승인자 != 신청자
         if (reservation.getApplicant().getId().equals(userId)) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_NOT_APPROVABLE);
         }
