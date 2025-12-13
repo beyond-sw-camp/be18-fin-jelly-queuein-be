@@ -25,7 +25,19 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Build Backend (Skip Tests)
+      - name: Grant execute permission for Gradle
         run: |
           cd qiin-be
-          ./gradlew clean build -x test --no-daemon
+          chmod +x gradlew
+
+      - name: Build & Test (No Cache)
+        run: |
+          cd qiin-be
+          ./gradlew clean build --no-daemon --warning-mode all
+
+      - name: Upload Test Report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: qiin-be/build/reports/tests/test

@@ -10,6 +10,8 @@ public final class SecurityWhitelist {
 
     public static final String[] SSE = {"/api/v1/sse/**"};
 
+    public static final String[] ACTUATOR = {"/", "/actuator/health", "/actuator/info"};
+
     // 인스턴스화 방지
     private SecurityWhitelist() {}
 }

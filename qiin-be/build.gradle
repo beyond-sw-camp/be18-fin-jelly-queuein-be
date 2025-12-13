@@ -118,6 +118,9 @@ dependencies {
     implementation 'org.apache.poi:poi:5.2.5'
     implementation 'org.apache.poi:poi-ooxml:5.2.5'
 
+    // aws s3 사용하기 위한 의존성
+    implementation 'software.amazon.awssdk:s3:2.20.0'
+
 }
 
 spotless {
