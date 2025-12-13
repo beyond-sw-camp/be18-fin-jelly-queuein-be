@@ -7,11 +7,7 @@ import com.beyond.qiin.domain.accounting.repository.querydsl.SettlementPerforman
 import com.beyond.qiin.infra.redis.accounting.settlement.SettlementPerformanceMonthRedisAdapter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,85 +21,132 @@ public class SettlementPerformanceQueryServiceImpl implements SettlementPerforma
     @Override
     public SettlementPerformanceResponseDto getPerformance(ReportingComparisonRequestDto req) {
 
-        int currentYear = LocalDate.now().getYear();
+        LocalDate now = LocalDate.now();
+        int nowYear = now.getYear();
+        int nowMonth = now.getMonthValue();
 
-        int baseYear = req.getBaseYear() != null ? req.getBaseYear() : currentYear - 1;
-        int compareYear = req.getCompareYear() != null ? req.getCompareYear() : currentYear;
+        int baseYear = req.getBaseYear() != null ? req.getBaseYear() : nowYear - 1;
+        int compareYear = req.getCompareYear() != null ? req.getCompareYear() : nowYear;
 
-        // assetName을 기준으로 assetId를 찾고, Redis 캐시 조회
         String assetName = req.getAssetName();
-        Long assetId = resolveAssetIdFromName(assetName); // assetName으로 assetId를 찾음
+        Long assetId = resolveAssetIdFromName(assetName);
 
         if (assetName != null && !assetName.isBlank() && assetId == null) {
             throw new IllegalArgumentException("자원명을 잘못 입력하셨습니다.");
         }
 
-        // 캐시 키 생성 (assetId 기반으로 캐시 키 생성)
-        String key = "settlementPerformance:%s:%d:%d:%s"
-                .formatted("base", baseYear, compareYear, assetId != null ? "id-" + assetId : "all");
+        // DB 조회 (한 번만)
+        SettlementPerformanceRawDto raw =
+                queryAdapter.getMonthlyPerformance(baseYear, compareYear, assetId, assetName);
 
-        // Redis에서 캐시된 값 조회
-        BigDecimal cachedValue = redisAdapter.get(key);
+        Map<Integer, BigDecimal> baseMap =
+                Optional.ofNullable(raw)
+                        .map(SettlementPerformanceRawDto::getBaseYearData)
+                        .orElse(Collections.emptyMap());
 
-        if (cachedValue == null) {
-            // 캐시가 없다면 DB에서 성과 데이터를 조회
-            SettlementPerformanceRawDto raw =
-                    queryAdapter.getMonthlyPerformance(baseYear, compareYear, assetId, assetName);
-            Map<Integer, BigDecimal> baseMap = Optional.ofNullable(raw)
-                    .map(SettlementPerformanceRawDto::getBaseYearData)
-                    .orElse(Collections.emptyMap());
+        Map<Integer, BigDecimal> compareMap =
+                Optional.ofNullable(raw)
+                        .map(SettlementPerformanceRawDto::getCompareYearData)
+                        .orElse(Collections.emptyMap());
 
-            Map<Integer, BigDecimal> compareMap = Optional.ofNullable(raw)
-                    .map(SettlementPerformanceRawDto::getCompareYearData)
-                    .orElse(Collections.emptyMap());
+        List<SettlementPerformanceResponseDto.MonthlyPerformance> monthlyList = new ArrayList<>();
 
-            // 월별 성과 리스트 구성
-            List<SettlementPerformanceResponseDto.MonthlyPerformance> monthlyList = new ArrayList<>();
-            for (int m = 1; m <= 12; m++) {
-                monthlyList.add(SettlementPerformanceResponseDto.MonthlyPerformance.builder()
-                        .month(m)
-                        .baseYearSaving(baseMap.getOrDefault(m, BigDecimal.ZERO))
-                        .compareYearSaving(compareMap.getOrDefault(m, BigDecimal.ZERO))
-                        .build());
-            }
+        // ===== 월별 데이터 처리 =====
+        for (int month = 1; month <= 12; month++) {
 
-            // 총 절감 금액
-            BigDecimal baseYearTotal = sum(baseMap);
-            BigDecimal compareYearTotal = sum(compareMap);
-            BigDecimal accumulated = queryAdapter.getTotalSavingAllTime();
+            BigDecimal baseValue =
+                    resolveMonthlyValue(baseYear, month, assetId, baseMap, nowYear, nowMonth);
 
-            // Redis에 성과 데이터 저장
-            cachedValue = baseYearTotal; // 이 부분을 필요한 값으로 설정
-            redisAdapter.save(key, cachedValue, null); // null은 영구 저장
+            BigDecimal compareValue =
+                    resolveMonthlyValue(compareYear, month, assetId, compareMap, nowYear, nowMonth);
 
-            // 최종 응답 DTO 생성
-            return SettlementPerformanceResponseDto.builder()
-                    .asset(new SettlementPerformanceResponseDto.AssetInfo(assetId, assetName))
-                    .yearRange(new SettlementPerformanceResponseDto.YearRangeInfo(baseYear, compareYear, 12))
-                    .monthlyData(monthlyList)
-                    .summary(new SettlementPerformanceResponseDto.PerformanceSummary(
-                            baseYearTotal, compareYearTotal, accumulated))
-                    .build();
+            monthlyList.add(
+                    SettlementPerformanceResponseDto.MonthlyPerformance.builder()
+                            .month(month)
+                            .baseYearSaving(baseValue)
+                            .compareYearSaving(compareValue)
+                            .build());
         }
 
-        // 캐시된 값이 있다면 바로 반환
+        // ===== 연도 총합 =====
+        BigDecimal baseYearTotal = resolveYearTotal(baseYear, assetId, baseMap, nowYear);
+        BigDecimal compareYearTotal = resolveYearTotal(compareYear, assetId, compareMap, nowYear);
+
+        // ===== 누적 총합 (항상 DB) =====
+        BigDecimal accumulated = queryAdapter.getTotalSavingAllTime();
+
         return SettlementPerformanceResponseDto.builder()
                 .asset(new SettlementPerformanceResponseDto.AssetInfo(assetId, assetName))
                 .yearRange(new SettlementPerformanceResponseDto.YearRangeInfo(baseYear, compareYear, 12))
-                .monthlyData(new ArrayList<>()) // 월별 데이터는 이미 캐시에서 처리됨
+                .monthlyData(monthlyList)
                 .summary(new SettlementPerformanceResponseDto.PerformanceSummary(
-                        cachedValue, BigDecimal.ZERO, BigDecimal.ZERO))
+                        baseYearTotal, compareYearTotal, accumulated))
                 .build();
     }
 
-    // 총합 계산 (누적 절감 금액)
+    // =========================
+    // 월별 캐시 처리
+    // =========================
+    private BigDecimal resolveMonthlyValue(
+            int year,
+            int month,
+            Long assetId,
+            Map<Integer, BigDecimal> source,
+            int nowYear,
+            int nowMonth) {
+
+        boolean isCurrentMonth = (year == nowYear && month == nowMonth);
+        String assetKey = assetId != null ? "id-" + assetId : "all";
+        String cacheKey = "settlementPerformance:%d:%d:%s".formatted(year, month, assetKey);
+
+        if (!isCurrentMonth) {
+            BigDecimal cached = redisAdapter.get(cacheKey);
+            if (cached != null) {
+                return cached;
+            }
+        }
+
+        BigDecimal value = source.getOrDefault(month, BigDecimal.ZERO);
+
+        if (!isCurrentMonth) {
+            redisAdapter.save(cacheKey, value);
+        }
+
+        return value;
+    }
+
+    // =========================
+    // 연도 총합 캐시 처리
+    // =========================
+    private BigDecimal resolveYearTotal(
+            int year,
+            Long assetId,
+            Map<Integer, BigDecimal> monthlyMap,
+            int nowYear) {
+
+        // 올해는 캐싱하지 않음
+        if (year == nowYear) {
+            return sum(monthlyMap);
+        }
+
+        String assetKey = assetId != null ? "id-" + assetId : "all";
+        String cacheKey = "settlementPerformance:year:%d:%s".formatted(year, assetKey);
+
+        BigDecimal cached = redisAdapter.get(cacheKey);
+        if (cached != null) {
+            return cached;
+        }
+
+        BigDecimal total = sum(monthlyMap);
+        redisAdapter.save(cacheKey, total);
+        return total;
+    }
+
     private BigDecimal sum(Map<Integer, BigDecimal> map) {
         return map.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    // assetName을 기준으로 assetId를 찾기
     private Long resolveAssetIdFromName(String assetName) {
-        // 자원명으로 assetId 조회
         return queryAdapter.getAssetIdByName(assetName);
     }
 }
