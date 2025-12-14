@@ -115,6 +115,12 @@ public class UserCommandServiceImpl implements UserCommandService {
         me.updateMyInfo(request);
         userWriter.save(me);
 
+        // 프로필 이미지 삭제 명시
+        if (Boolean.TRUE.equals(request.getImageDeleted())) {
+            userProfileWriter.deleteByUser(me);
+            return;
+        }
+
         // 프사 기능
         if (request.getProfileImageKey() != null && request.getProfileImageUrl() != null) {
 

@@ -17,4 +17,6 @@ public class UpdateMyInfoRequestDto {
     private String profileImageKey;
 
     private String profileImageUrl;
+
+    private Boolean imageDeleted;
 }

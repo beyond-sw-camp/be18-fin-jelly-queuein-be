@@ -166,6 +166,21 @@ public class UserCommandServiceImplTest {
     }
 
     @Test
+    @DisplayName("이미지 삭제 성공 단위 테스트")
+    void updateMyInfo_deleteImage_success() {
+
+        UpdateMyInfoRequestDto req = mock(UpdateMyInfoRequestDto.class);
+        User me = mock(User.class);
+
+        when(userReader.findById(1L)).thenReturn(me);
+        when(req.getImageDeleted()).thenReturn(true);
+
+        userCommandService.updateMyInfo(1L, req);
+
+        verify(userProfileWriter).deleteByUser(me);
+    }
+
+    @Test
     @DisplayName("임시 비밀번호 수정실패 단위 테스트")
     void changeTempPassword_fail_notExpired() {
         User user = mock(User.class);
