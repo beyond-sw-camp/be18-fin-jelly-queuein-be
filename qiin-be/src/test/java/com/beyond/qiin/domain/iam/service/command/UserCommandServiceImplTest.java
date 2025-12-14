@@ -18,6 +18,8 @@ import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.entity.UserRole;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
+import com.beyond.qiin.domain.iam.support.user.UserProfileReader;
+import com.beyond.qiin.domain.iam.support.user.UserProfileWriter;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
@@ -44,7 +46,13 @@ public class UserCommandServiceImplTest {
     private RoleReader roleReader;
 
     @Mock
+    private UserProfileReader userProfileReader;
+
+    @Mock
     private UserWriter userWriter;
+
+    @Mock
+    private UserProfileWriter userProfileWriter;
 
     @Mock
     private UserRoleWriter userRoleWriter;
@@ -158,6 +166,21 @@ public class UserCommandServiceImplTest {
     }
 
     @Test
+    @DisplayName("이미지 삭제 성공 단위 테스트")
+    void updateMyInfo_deleteImage_success() {
+
+        UpdateMyInfoRequestDto req = mock(UpdateMyInfoRequestDto.class);
+        User me = mock(User.class);
+
+        when(userReader.findById(1L)).thenReturn(me);
+        when(req.getImageDeleted()).thenReturn(true);
+
+        userCommandService.updateMyInfo(1L, req);
+
+        verify(userProfileWriter).deleteByUser(me);
+    }
+
+    @Test
     @DisplayName("임시 비밀번호 수정실패 단위 테스트")
     void changeTempPassword_fail_notExpired() {
         User user = mock(User.class);
@@ -176,6 +199,7 @@ public class UserCommandServiceImplTest {
 
         userCommandService.deleteUser(1L, 9L);
 
+        verify(userProfileWriter).deleteByUser(user);
         verify(user).softDelete(9L);
         verify(userWriter).save(user);
     }
