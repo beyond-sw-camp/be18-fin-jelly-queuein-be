@@ -2,6 +2,7 @@ package com.beyond.qiin.domain.iam.dto.user.response;
 
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.iam.entity.UserProfile;
 import com.beyond.qiin.domain.iam.entity.UserRole;
 import com.beyond.qiin.domain.iam.exception.RoleException;
 import java.time.Instant;
@@ -28,7 +29,9 @@ public class DetailUserResponseDto {
     private final Long roleId;
     private final String roleName;
 
-    public static DetailUserResponseDto fromEntity(final User user) {
+    private final String profileImageUrl;
+
+    public static DetailUserResponseDto fromEntity(final User user, final UserProfile userProfile) {
 
         Role role = user.getUserRoles().stream()
                 .findFirst()
@@ -49,6 +52,7 @@ public class DetailUserResponseDto {
                 .birth(user.getBirth())
                 .roleId(role.getId())
                 .roleName(role.getRoleName())
+                .profileImageUrl(userProfile != null ? userProfile.getImageUrl() : null)
                 .build();
     }
 }

@@ -2,6 +2,7 @@ package com.beyond.qiin.domain.iam.repository.querydsl;
 
 import static com.beyond.qiin.domain.iam.entity.QRole.role;
 import static com.beyond.qiin.domain.iam.entity.QUser.user;
+import static com.beyond.qiin.domain.iam.entity.QUserProfile.userProfile;
 import static com.beyond.qiin.domain.iam.entity.QUserRole.userRole;
 
 import com.beyond.qiin.domain.iam.dto.user.request.search_condition.GetUsersSearchCondition;
@@ -50,10 +51,13 @@ public class UserQueryRepositoryImpl implements UserQueryRepository {
                         role.roleName,
                         user.createdAt,
                         user.phone,
-                        user.lastLoginAt))
-                .from(user);
-
-        selectQuery.leftJoin(user.userRoles, userRole).leftJoin(userRole.role, role);
+                        user.lastLoginAt,
+                        userProfile.imageUrl))
+                .from(user)
+                .leftJoin(user.userRoles, userRole)
+                .leftJoin(userRole.role, role)
+                .leftJoin(userProfile)
+                .on(userProfile.user.eq(user));
 
         selectQuery.where(
                 userNameContains(condition.getUserName()),
