@@ -1,5 +1,8 @@
 package com.beyond.qiin.config;
 
+import com.beyond.qiin.infra.redis.accounting.settlement.SettlementPerformanceMonthRedisAdapter;
+import com.beyond.qiin.infra.redis.accounting.usage_history.UsageTrendRedisAdapter;
+import com.beyond.qiin.infra.redis.accounting.usage_history.UsageTrendTopRedisAdapter;
 import com.beyond.qiin.infra.redis.inventory.AssetDetailRedisAdapter;
 import org.mockito.Mockito;
 import org.redisson.api.RedissonClient;
@@ -56,5 +59,20 @@ public class TestRedisConfig {
     @Bean
     public AssetDetailRedisAdapter assetDetailRedisAdapter() {
         return Mockito.mock(AssetDetailRedisAdapter.class);
+    }
+
+    @Bean
+    public UsageTrendRedisAdapter usageTrendRedisAdapter() {
+        return Mockito.mock(UsageTrendRedisAdapter.class);
+    }
+
+    @Bean
+    public UsageTrendTopRedisAdapter usageTrendTopRedisAdapter() {
+        return Mockito.mock(UsageTrendTopRedisAdapter.class);
+    }
+
+    @Bean
+    public SettlementPerformanceMonthRedisAdapter settlementPerformanceMonthRedisAdapter() {
+        return Mockito.mock(SettlementPerformanceMonthRedisAdapter.class);
     }
 }

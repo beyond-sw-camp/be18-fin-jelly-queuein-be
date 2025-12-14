@@ -10,10 +10,40 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UsageHistoryTrendResponseDto {
 
-    private AssetInfo asset; // ← 이거 한 줄 추가!
+    private AssetInfo asset;
     private YearRangeInfo yearRange;
+
     private List<MonthlyUsageData> monthlyData;
-    private UsageIncreaseSummary summary;
+    private Double actualUsageIncrease;
+
+    private PopularGroup<PopularCountDto> popularByCount;
+    private PopularGroup<PopularTimeDto> popularByTime;
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class PopularGroup<T> {
+        private List<T> baseYear;
+        private List<T> compareYear;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class PopularCountDto {
+        private Long assetId;
+        private String assetName;
+        private Integer count;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class PopularTimeDto {
+        private Long assetId;
+        private String assetName;
+        private Integer totalMinutes;
+    }
 
     @Getter
     @Builder
@@ -29,7 +59,6 @@ public class UsageHistoryTrendResponseDto {
     public static class YearRangeInfo {
         private int baseYear;
         private int compareYear;
-        private int months;
     }
 
     @Getter
@@ -39,14 +68,5 @@ public class UsageHistoryTrendResponseDto {
         private int month;
         private Double baseYearUsageRate;
         private Double compareYearUsageRate;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    public static class UsageIncreaseSummary {
-        private Double usageRateIncrease;
-        private Double actualUsageIncrease;
-        private Double resourceUtilizationIncrease;
     }
 }
