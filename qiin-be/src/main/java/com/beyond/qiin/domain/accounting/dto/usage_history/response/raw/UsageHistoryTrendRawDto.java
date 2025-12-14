@@ -9,7 +9,6 @@ import lombok.Getter;
 public class UsageHistoryTrendRawDto {
     private Long assetId;
     private String assetName;
-    private int assetCount;
 
     private Map<Integer, UsageAggregate> baseYearData;
     private Map<Integer, UsageAggregate> compareYearData;

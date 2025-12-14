@@ -9,4 +9,6 @@ public interface SettlementPerformanceQueryAdapter {
 
     // 누적 절감 금액
     BigDecimal getTotalSavingAllTime();
+
+    Long getAssetIdByName(String assetName);
 }
