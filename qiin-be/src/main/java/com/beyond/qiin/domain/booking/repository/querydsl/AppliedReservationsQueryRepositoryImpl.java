@@ -36,7 +36,7 @@ public class AppliedReservationsQueryRepositoryImpl implements AppliedReservatio
     public List<RawAppliedReservationResponseDto> search(GetAppliedReservationSearchCondition condition) {
 
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(reservation.status.eq(0)); // pending인 경우 == 신청된 reservations
+        builder.and(reservation.isApplied.eq(true)); // 신청된 경우
 
         // 날짜(Instant)
         if (condition.getDate() != null) {

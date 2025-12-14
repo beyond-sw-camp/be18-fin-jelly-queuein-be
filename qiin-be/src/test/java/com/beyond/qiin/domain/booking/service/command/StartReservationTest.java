@@ -47,14 +47,14 @@ public class StartReservationTest {
         // given
         Long userId = 1L;
         Long reservationId = 10L;
-
+        Instant now = Instant.now();
         User user = User.builder().userName("A").build();
         Asset asset = Asset.builder().name("회의실 A").build();
         Reservation reservation = Reservation.builder()
                 .asset(asset)
-                .startAt(Instant.parse("2025-12-04T10:00:00Z"))
                 .applicant(user)
-                .endAt(Instant.parse("2025-12-04T11:00:00Z"))
+                .startAt(now.minusSeconds(60 * 10))
+                .endAt(now.plusSeconds(60 * 50))
                 .status(ReservationStatus.APPROVED.getCode()) // 시작 가능 상태
                 .build();
 
