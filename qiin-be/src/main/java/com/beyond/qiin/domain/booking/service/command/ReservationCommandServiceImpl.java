@@ -69,7 +69,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 .collect(Collectors.toList());
 
         reservation.addAttendants(attendants);
-
+        reservation.setIsApplied(true);
         reservationWriter.save(reservation);
 
         attendantWriter.saveAll(attendants);
@@ -135,7 +135,14 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             final ConfirmReservationRequestDto confirmReservationRequestDto) {
 
         User respondent = userReader.findById(userId);
+
         Reservation reservation = reservationReader.getReservationById(reservationId);
+
+        // 신청자는 자신의 예약을 승인할 수 없음
+        if (reservation.getApplicant().getId().equals(userId)) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_NOT_APPROVABLE);
+        }
+
         Asset asset = reservation.getAsset();
         validateReservationAvailability(
                 reservation.getId(), asset.getId(), reservation.getStartAt(), reservation.getEndAt());
@@ -160,6 +167,12 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         User respondent = userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
+
+        // 승인자 != 신청자
+        if (reservation.getApplicant().getId().equals(userId)) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_NOT_APPROVABLE);
+        }
+
         reservation.reject(respondent, confirmReservationRequestDto.getReason()); // status rejected
         reservationWriter.save(reservation);
 
@@ -182,6 +195,11 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         Instant now = Instant.now();
         if (now.isBefore(reservation.getStartAt())) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_TIME_NOT_YET);
+        }
+
+        // 끝나는 시간 이후면 사용 불가
+        if (now.isAfter(reservation.getEndAt())) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_TIME_OVER);
         }
 
         reservation.start(); // status using, 실제 시작 시간 추가
@@ -214,7 +232,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         // 예약자 본인에 대한 확인
         userReader.findById(userId);
         Reservation reservation = reservationReader.getReservationById(reservationId);
-        validateReservationCanceling(reservation); // 30분 전인 경우 허용
+        //        validateReservationCanceling(reservation); // 30분 전인 경우 허용
         reservation.cancel();
 
         reservationWriter.save(reservation);
@@ -287,6 +305,15 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     // api x 비즈니스 메서드
     private void validateReservationAvailability(
             final Long reservationId, final Long assetId, final Instant startAt, final Instant endAt) {
+
+        // 예약 시간이 현재보다 과거인 경우
+        Instant now = Instant.now();
+
+        if (!endAt.isAfter(now)) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_TIME_PASSED);
+        }
+
+        // 예약 시간이 다른 예약과 중복되는 경우
         if (!isReservationTimeAvailable(reservationId, assetId, startAt, endAt))
             throw new ReservationException(ReservationErrorCode.RESERVE_TIME_DUPLICATED);
     }

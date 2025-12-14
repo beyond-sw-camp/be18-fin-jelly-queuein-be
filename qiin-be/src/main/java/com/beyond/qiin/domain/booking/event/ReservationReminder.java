@@ -2,8 +2,8 @@
 //
 // import com.beyond.qiin.domain.booking.entity.Reservation;
 // import com.beyond.qiin.domain.booking.support.ReservationReader;
-// import com.beyond.qiin.domain.notification.entity.Notification;
-// import com.beyond.qiin.domain.notification.support.NotificationWriter;
+// import com.beyond.qiin.domain.alarm.entity.notification.Notification;
+// import com.beyond.qiin.domain.alarm.support.notification.NotificationWriter;
 // import java.time.Instant;
 // import java.util.ArrayList;
 // import java.util.List;

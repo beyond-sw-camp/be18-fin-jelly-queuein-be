@@ -1,6 +1,6 @@
 package com.beyond.qiin.infra.kafka.reservation.consumer;
 
-import com.beyond.qiin.domain.notification.service.NotificationCommandService;
+import com.beyond.qiin.domain.alarm.service.NotificationCommandService;
 import com.beyond.qiin.infra.event.reservation.ReservationEventPayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

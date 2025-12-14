@@ -18,6 +18,7 @@ import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.entity.UserRole;
 import com.beyond.qiin.domain.iam.repository.querydsl.UserQueryRepository;
+import com.beyond.qiin.domain.iam.support.user.UserProfileReader;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import java.time.Instant;
 import java.util.List;
@@ -40,6 +41,9 @@ public class UserQueryServiceImplTest {
     private UserReader userReader;
 
     @Mock
+    private UserProfileReader userProfileReader;
+
+    @Mock
     private UserQueryRepository userQueryRepository;
 
     @InjectMocks
@@ -58,7 +62,7 @@ public class UserQueryServiceImplTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
 
         RawUserListResponseDto dto = new RawUserListResponseDto(
-                1L, "홍길동", "hong@example.com", 2L, "GENERAL", Instant.now(), "01012341234", null);
+                1L, "홍길동", "hong@example.com", 2L, "GENERAL", Instant.now(), "01012341234", null, null);
 
         Page<RawUserListResponseDto> page = new PageImpl<>(List.of(dto), pageable, 1);
 

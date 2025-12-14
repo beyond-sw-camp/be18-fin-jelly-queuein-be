@@ -27,12 +27,11 @@ class UsageHistoryQueryServiceImplTest {
 
     private UsageHistoryQueryServiceImpl service;
     private UsageHistoryQueryAdapter usageHistoryQueryAdapter;
-    private UsageHistoryJpaRepository usageHistoryJpaRepository;
 
     @BeforeEach
     void setUp() {
         usageHistoryQueryAdapter = mock(UsageHistoryQueryAdapter.class);
-        usageHistoryJpaRepository = mock(UsageHistoryJpaRepository.class);
+        UsageHistoryJpaRepository usageHistoryJpaRepository = mock(UsageHistoryJpaRepository.class);
 
         service = new UsageHistoryQueryServiceImpl(usageHistoryQueryAdapter, usageHistoryJpaRepository);
     }
