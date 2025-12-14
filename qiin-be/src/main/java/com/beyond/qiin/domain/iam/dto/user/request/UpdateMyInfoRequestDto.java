@@ -13,4 +13,8 @@ public class UpdateMyInfoRequestDto {
     private String phone;
 
     private String birth;
+
+    private String profileImageKey;
+
+    private String profileImageUrl;
 }
