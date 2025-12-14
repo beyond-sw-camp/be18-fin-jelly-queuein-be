@@ -14,6 +14,7 @@ import com.beyond.qiin.domain.accounting.exception.UsageHistoryException;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -31,42 +32,55 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
     private final JPAQueryFactory queryFactory;
     private static final ZoneId ZONE = ZoneId.of("Asia/Seoul");
 
+    /* ============================================================
+       자원 사용 기록 목록 조회 (N+1 / 중복 제거)
+    ============================================================ */
     @Override
     public Page<UsageHistoryListResponseDto> searchUsageHistory(
             UsageHistoryListSearchRequestDto req, Pageable pageable) {
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        /* ================================
-           날짜 검색 (LocalDate → Instant 변환)
-        ================================ */
+        /* 날짜 검색 */
         if (req.getStartDate() != null) {
-            Instant startInstant = req.getStartDate()
-                    .atStartOfDay(ZONE) // 2025-09-25 00:00 KST
-                    .toInstant(); // UTC 로 변환
-            builder.and(usageHistory.startAt.goe(startInstant));
+            Instant start = req.getStartDate()
+                    .atStartOfDay(ZONE)
+                    .toInstant();
+            builder.and(usageHistory.startAt.goe(start));
         }
 
         if (req.getEndDate() != null) {
-            Instant endInstant = req.getEndDate()
-                    .plusDays(1) // 다음날 00:00 (해당일 전부 포함)
+            Instant end = req.getEndDate()
+                    .plusDays(1)
                     .atStartOfDay(ZONE)
                     .toInstant();
-            builder.and(usageHistory.endAt.lt(endInstant));
+            builder.and(usageHistory.endAt.lt(end));
         }
 
-        /* ================================
-           키워드 검색 (자원명 or 예약자명)
-        ================================ */
+        /* 키워드 검색 (자원명 OR 예약자명)
+           - userHistory 직접 JOIN ❌
+           - EXISTS 서브쿼리 ⭕
+        */
         if (req.getKeyword() != null && !req.getKeyword().isBlank()) {
             String keyword = req.getKeyword();
-            builder.and(asset.name.containsIgnoreCase(keyword).or(user.userName.containsIgnoreCase(keyword)));
+
+            builder.and(
+                    asset.name.containsIgnoreCase(keyword)
+                            .or(
+                                    JPAExpressions
+                                            .selectOne()
+                                            .from(userHistory)
+                                            .join(userHistory.user, user)
+                                            .where(
+                                                    userHistory.usageHistory.eq(usageHistory),
+                                                    user.userName.containsIgnoreCase(keyword))
+                                            .exists()));
         }
 
         /* ================================
-           메인 조회
+           리스트 조회
         ================================ */
-        List<UsageHistoryListResponseDto> result = queryFactory
+        List<UsageHistoryListResponseDto> content = queryFactory
                 .select(Projections.constructor(
                         UsageHistoryListResponseDto.class,
                         usageHistory.id,
@@ -81,9 +95,6 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                 .from(usageHistory)
                 .join(usageHistory.asset, asset)
                 .leftJoin(usageHistory.reservation, reservation)
-                .leftJoin(userHistory)
-                .on(userHistory.usageHistory.eq(usageHistory))
-                .leftJoin(userHistory.user, user)
                 .where(builder)
                 .orderBy(usageHistory.id.desc())
                 .offset(pageable.getOffset())
@@ -91,22 +102,21 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                 .fetch();
 
         /* ================================
-           Count 조회
+           COUNT 조회 (JOIN 최소화)
         ================================ */
-        Long count = queryFactory
+        Long total = queryFactory
                 .select(usageHistory.count())
                 .from(usageHistory)
                 .join(usageHistory.asset, asset)
-                .leftJoin(usageHistory.reservation, reservation)
-                .leftJoin(userHistory)
-                .on(userHistory.usageHistory.eq(usageHistory))
-                .leftJoin(userHistory.user, user)
                 .where(builder)
                 .fetchOne();
 
-        return new PageImpl<>(result, pageable, count == null ? 0 : count);
+        return new PageImpl<>(content, pageable, total == null ? 0 : total);
     }
 
+    /* ============================================================
+       자원 사용 기록 상세 조회 (정상 동작)
+    ============================================================ */
     @Override
     public UsageHistoryDetailResponseDto getUsageHistoryDetail(final Long usageHistoryId) {
 
@@ -115,8 +125,8 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                         UsageHistoryDetailResponseDto.class,
                         usageHistory.id,
                         asset.name,
-                        Expressions.nullExpression(String.class),
-                        Expressions.nullExpression(List.class),
+                        Expressions.nullExpression(String.class),   // assetImage
+                        Expressions.nullExpression(List.class),     // reserverNames
                         settlement.totalUsageCost,
                         settlement.actualUsageCost))
                 .from(usageHistory)
@@ -130,7 +140,7 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
             throw UsageHistoryException.notFound();
         }
 
-        // 참여자 조회
+        /* 참여자 목록 (별도 쿼리, 의도된 구조) */
         List<String> names = queryFactory
                 .select(user.userName)
                 .from(userHistory)
