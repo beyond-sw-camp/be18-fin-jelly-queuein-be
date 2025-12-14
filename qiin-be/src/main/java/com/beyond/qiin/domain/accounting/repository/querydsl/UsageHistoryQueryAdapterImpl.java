@@ -43,17 +43,12 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
 
         /* 날짜 검색 */
         if (req.getStartDate() != null) {
-            Instant start = req.getStartDate()
-                    .atStartOfDay(ZONE)
-                    .toInstant();
+            Instant start = req.getStartDate().atStartOfDay(ZONE).toInstant();
             builder.and(usageHistory.startAt.goe(start));
         }
 
         if (req.getEndDate() != null) {
-            Instant end = req.getEndDate()
-                    .plusDays(1)
-                    .atStartOfDay(ZONE)
-                    .toInstant();
+            Instant end = req.getEndDate().plusDays(1).atStartOfDay(ZONE).toInstant();
             builder.and(usageHistory.endAt.lt(end));
         }
 
@@ -64,17 +59,13 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
         if (req.getKeyword() != null && !req.getKeyword().isBlank()) {
             String keyword = req.getKeyword();
 
-            builder.and(
-                    asset.name.containsIgnoreCase(keyword)
-                            .or(
-                                    JPAExpressions
-                                            .selectOne()
-                                            .from(userHistory)
-                                            .join(userHistory.user, user)
-                                            .where(
-                                                    userHistory.usageHistory.eq(usageHistory),
-                                                    user.userName.containsIgnoreCase(keyword))
-                                            .exists()));
+            builder.and(asset.name
+                    .containsIgnoreCase(keyword)
+                    .or(JPAExpressions.selectOne()
+                            .from(userHistory)
+                            .join(userHistory.user, user)
+                            .where(userHistory.usageHistory.eq(usageHistory), user.userName.containsIgnoreCase(keyword))
+                            .exists()));
         }
 
         /* ================================
@@ -125,8 +116,8 @@ public class UsageHistoryQueryAdapterImpl implements UsageHistoryQueryAdapter {
                         UsageHistoryDetailResponseDto.class,
                         usageHistory.id,
                         asset.name,
-                        Expressions.nullExpression(String.class),   // assetImage
-                        Expressions.nullExpression(List.class),     // reserverNames
+                        Expressions.nullExpression(String.class), // assetImage
+                        Expressions.nullExpression(List.class), // reserverNames
                         settlement.totalUsageCost,
                         settlement.actualUsageCost))
                 .from(usageHistory)
