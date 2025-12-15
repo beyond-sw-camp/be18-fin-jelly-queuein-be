@@ -3,7 +3,7 @@ name: CD Deploy Production (Fargate)
 
 on:
   workflow_run:
-    workflows: ["CI Build"]   # 👈 CI 이름과 정확히 일치
+    workflows: ["CI Build"]
     types:
       - completed
 
