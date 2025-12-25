@@ -2,9 +2,9 @@ package com.beyond.qiin.config;
 
 import com.beyond.qiin.security.resolver.ArgumentResolver;
 import com.beyond.qiin.security.resolver.CurrentUserIdResolver;
+import com.beyond.qiin.security.resolver.CurrentUserResolver;
 import com.beyond.qiin.security.resolver.CurrentUserRoleResolver;
 import com.beyond.qiin.security.resolver.SseAccessTokenArgumentResolver;
-import com.beyond.qiin.security.resolver.CurrentUserResolver;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
