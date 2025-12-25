@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-import com.beyond.qiin.domain.accounting.dto.common.ReportingComparisonRequestDto;
+import com.beyond.qiin.domain.accounting.dto.common.request.ReportingComparisonRequestDto;
 import com.beyond.qiin.domain.accounting.dto.settlement.request.SettlementQuarterRequestDto;
 import com.beyond.qiin.domain.accounting.dto.settlement.response.SettlementPerformanceResponseDto;
 import com.beyond.qiin.domain.accounting.dto.settlement.response.SettlementQuarterResponseDto;

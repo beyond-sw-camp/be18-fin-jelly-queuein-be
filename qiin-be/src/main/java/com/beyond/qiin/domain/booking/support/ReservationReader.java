@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -17,6 +18,7 @@ public class ReservationReader {
     private final ReservationJpaRepository reservationJpaRepository;
 
     // 자원 자체 (예외처리 포함)
+    @Transactional(readOnly = true)
     public Reservation getReservationById(final Long id) {
         Reservation reservation = reservationJpaRepository
                 .findById(id)
@@ -24,6 +26,7 @@ public class ReservationReader {
         return reservation;
     }
 
+    @Transactional(readOnly = true)
     public List<Reservation> getReservationsByUserAndYearMonth(
             final Long userId, final Instant from, final Instant to) {
 
@@ -31,6 +34,13 @@ public class ReservationReader {
         return reservations;
     }
 
+    @Transactional(readOnly = true)
+    public List<Reservation> findReservationsStartingBetween(Instant start, Instant end) {
+        return reservationJpaRepository.findReservationsStartingBetween(start, end);
+    }
+    ;
+
+    @Transactional(readOnly = true)
     public List<Reservation> getReservationsByUserAndWeek(final Long userId, final Instant start, final Instant end) {
         List<Reservation> reservations = reservationJpaRepository.findByUserIdAndWeek(userId, start, end);
 
@@ -38,12 +48,14 @@ public class ReservationReader {
     }
 
     // 자원 목록 (예외처리 포함)
+    @Transactional(readOnly = true)
     public List<Reservation> getActiveReservationsByAssetId(final Long assetId) {
         List<Reservation> reservations = reservationJpaRepository.findActiveReservationsByAssetId(assetId);
         return reservations;
     }
 
     // 자원에 대한 해당 날짜의 예약
+    @Transactional(readOnly = true)
     public List<Reservation> getReservationsByAssetAndDate(final Long assetId, final LocalDate date) {
 
         ZoneId zone = ZoneId.of("Asia/Seoul");

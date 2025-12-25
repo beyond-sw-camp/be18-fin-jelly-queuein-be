@@ -76,8 +76,8 @@ public class InstantConfirmReservationTest {
 
         userId = 1L;
         assetId = 100L;
-        startAt = Instant.parse("2025-12-04T10:00:00Z");
-        endAt = Instant.parse("2025-12-04T11:00:00Z");
+        startAt = Instant.now().plusSeconds(3600); // 1시간 뒤
+        endAt = Instant.now().plusSeconds(7200); // 2시간 뒤
     }
 
     @Test
@@ -117,6 +117,6 @@ public class InstantConfirmReservationTest {
         verify(assetCommandService).isAvailable(assetId);
         verify(reservationWriter).save(any());
         verify(attendantWriter).saveAll(any());
-        verify(reservationEventPublisher).publishCreated(any());
+        verify(reservationEventPublisher).publishEventCreated(any(), any());
     }
 }

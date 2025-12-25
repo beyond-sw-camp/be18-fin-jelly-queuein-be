@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
-import com.beyond.qiin.domain.accounting.dto.common.ReportingComparisonRequestDto;
+import com.beyond.qiin.domain.accounting.dto.common.request.ReportingComparisonRequestDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistoryListSearchRequestDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
@@ -125,27 +125,27 @@ class UsageHistoryControllerTest {
     // -----------------------------------------------
 
     @Test
-    @DisplayName("usageTrend - 성공")
-    void usageTrend_success() {
+    @DisplayName("usageTrend 성공 테스트")
+    void usageTrend_success() throws Exception {
+
         // Given
         ReportingComparisonRequestDto request = new ReportingComparisonRequestDto();
-        ReflectionTestUtils.setField(request, "baseYear", 2024);
-        ReflectionTestUtils.setField(request, "compareYear", 2025);
         ReflectionTestUtils.setField(request, "assetName", "MainServer");
+        ReflectionTestUtils.setField(request, "baseYear", 2023);
+        ReflectionTestUtils.setField(request, "compareYear", 2024);
 
         UsageHistoryTrendResponseDto mockResponse = UsageHistoryTrendResponseDto.builder()
-                .asset(UsageHistoryTrendResponseDto.AssetInfo.builder()
-                        .assetId(1L)
-                        .assetName("MainServer")
-                        .build())
-                .summary(UsageHistoryTrendResponseDto.UsageIncreaseSummary.builder()
-                        .usageRateIncrease(5.5)
-                        .build())
+                .asset(new UsageHistoryTrendResponseDto.AssetInfo(null, "MainServer"))
+                .yearRange(new UsageHistoryTrendResponseDto.YearRangeInfo(2023, 2024))
                 .monthlyData(Collections.emptyList())
+                .actualUsageIncrease(5.5)
+                .popularByCount(new UsageHistoryTrendResponseDto.PopularGroup<>(
+                        Collections.emptyList(), Collections.emptyList()))
+                .popularByTime(new UsageHistoryTrendResponseDto.PopularGroup<>(
+                        Collections.emptyList(), Collections.emptyList()))
                 .build();
 
-        when(usageHistoryTrendService.getUsageHistoryTrend(any(ReportingComparisonRequestDto.class)))
-                .thenReturn(mockResponse);
+        when(usageHistoryTrendService.getUsageHistoryTrend(any())).thenReturn(mockResponse);
 
         // When
         ResponseEntity<UsageHistoryTrendResponseDto> result = controller.usageTrend(request);
@@ -153,9 +153,6 @@ class UsageHistoryControllerTest {
         // Then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(result.getBody().getAsset().getAssetName()).isEqualTo("MainServer");
-        assertThat(result.getBody().getSummary().getUsageRateIncrease()).isEqualTo(5.5);
-
-        // Verify
-        verify(usageHistoryTrendService).getUsageHistoryTrend(request);
+        assertThat(result.getBody().getActualUsageIncrease()).isEqualTo(5.5);
     }
 }

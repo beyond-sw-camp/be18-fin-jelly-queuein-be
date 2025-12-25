@@ -6,6 +6,7 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAsse
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +37,24 @@ public interface AssetQueryRepository {
     List<Asset> findAll();
 
     // 검색 필터용
-    Page<RawDescendantAssetResponseDto> searchDescendants(AssetSearchCondition condition, Pageable pageable);
+    Page<RawDescendantAssetResponseDto> searchDescendants(
+            final AssetSearchCondition condition, final Pageable pageable);
 
-    List<RawDescendantAssetResponseDto> searchDescendantsAsList(AssetSearchCondition condition);
+    List<RawDescendantAssetResponseDto> searchDescendantsAsList(final AssetSearchCondition condition);
+
+    // 챗봇 용
+
+    // 카테고리에 속한 자원 목록 조회
+    List<Asset> findByCategoryId(final Long categoryId);
+
+    // 사용 가능한 자원 목록 조회
+    List<Asset> findAvailableAssets(final Long categoryId, final String keyword);
+
+    // 이름으로 자원 찾기
+    Optional<Asset> findByName(String name);
+
+    // 이름으로 자원 id 찾기
+    Optional<Long> findIdByName(String name);
+
+    Map<Long, Integer> findStatusMapByIds(List<Long> assetIds);
 }

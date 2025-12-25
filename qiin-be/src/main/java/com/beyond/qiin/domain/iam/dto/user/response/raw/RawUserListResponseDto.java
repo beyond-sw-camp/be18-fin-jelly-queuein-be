@@ -16,4 +16,5 @@ public class RawUserListResponseDto {
     private final Instant createdAt;
     private final String phone;
     private final Instant lastLoginAt;
+    private final String profileImageUrl;
 }

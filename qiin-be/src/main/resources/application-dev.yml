@@ -20,8 +20,7 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     topic:
       topics:
-        reservation-created: reservation-created-topic
-        reservation-updated: reservation-updated-topic
+        reservation-event: reservation-event-topic
 
     consumer:
       auto-offset-reset: earliest
@@ -50,3 +49,8 @@ spring:
       host: redis
       port: 6379
 
+openai:
+  base-url: https://api.openai.com/v1
+  api-key: ${MY_OPENAI_KEY}
+  model: gpt-4.1-mini
+  temperature: 0.2

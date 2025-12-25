@@ -6,6 +6,7 @@ import com.beyond.qiin.security.jwt.JwtFilter;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true)
+@Slf4j
 public class SecurityConfig {
 
     @Value("${CORS_ALLOWED_ORIGINS}")
@@ -48,12 +50,17 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**")
                         .permitAll()
+                        .requestMatchers(SSE)
+                        .permitAll()
+                        .requestMatchers(ACTUATOR)
+                        .permitAll()
                         .requestMatchers(AUTH)
                         .permitAll()
                         .requestMatchers(INTERNAL)
                         .permitAll()
                         .anyRequest()
                         .authenticated())
+                .anonymous(Customizer.withDefaults())
                 .exceptionHandling(e -> {
                     e.authenticationEntryPoint(authenticationEntryPoint);
                     e.accessDeniedHandler(accessDeniedHandler);
@@ -72,6 +79,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
+        log.info("[CORS-DEBUG] Raw CORS_ALLOWED_ORIGINS String: {}", corsAllowedOrigins);
+
         if (corsAllowedOrigins == null || corsAllowedOrigins.isBlank()) {
             throw new IllegalStateException(
                     "Environment variable CORS_ALLOWED_ORIGINS is missing. " + "CORS cannot operate without it.");
@@ -85,10 +94,16 @@ public class SecurityConfig {
                 .filter(o -> !o.isBlank())
                 .toList();
 
+        log.info("[CORS-DEBUG] Parsed Allowed Origins List: {}", origins);
+
         configuration.setAllowedOrigins(origins);
+        configuration.setAllowedOriginPatterns(origins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
+
+        // 쿠키 관련 헤더 클라이언트가 접근 가능하도록 허용
+        configuration.setExposedHeaders(List.of("Set-Cookie"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

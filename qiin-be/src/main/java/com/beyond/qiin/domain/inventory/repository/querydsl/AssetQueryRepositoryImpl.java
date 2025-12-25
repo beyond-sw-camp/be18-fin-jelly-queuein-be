@@ -17,7 +17,9 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -291,5 +293,67 @@ public class AssetQueryRepositoryImpl implements AssetQueryRepository {
         }
 
         return query.where(builder).fetch();
+    }
+
+    @Override
+    public List<Asset> findByCategoryId(Long categoryId) {
+        QAsset asset = QAsset.asset;
+
+        return jpaQueryFactory
+                .selectFrom(asset)
+                .join(asset.category, category)
+                .fetchJoin()
+                .where(category.id.eq(categoryId), asset.deletedAt.isNull(), category.deletedAt.isNull())
+                .fetch();
+    }
+
+    @Override
+    public List<Asset> findAvailableAssets(Long categoryId, String keyword) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(asset.status.eq(0)); // AVAILABLE ONLY
+        builder.and(asset.deletedAt.isNull());
+
+        if (categoryId != null) {
+            builder.and(asset.category.id.eq(categoryId));
+        }
+
+        if (keyword != null && !keyword.isBlank()) {
+            builder.and(asset.name.containsIgnoreCase(keyword));
+        }
+
+        return jpaQueryFactory.selectFrom(asset).where(builder).fetch();
+    }
+
+    // 이름으로 자원 찾기
+    @Override
+    public Optional<Asset> findByName(String name) {
+
+        Asset result = jpaQueryFactory
+                .selectFrom(asset)
+                .where(asset.name.eq(name), asset.deletedAt.isNull())
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
+    // 이름으로 자원 id 찾기
+    @Override
+    public Optional<Long> findIdByName(String name) {
+
+        Long id = jpaQueryFactory
+                .select(asset.id)
+                .from(asset)
+                .where(asset.name.eq(name), asset.deletedAt.isNull())
+                .fetchOne();
+
+        return Optional.ofNullable(id);
+    }
+
+    @Override
+    public Map<Long, Integer> findStatusMapByIds(List<Long> assetIds) {
+        return jpaQueryFactory.select(asset.id, asset.status).from(asset).where(asset.id.in(assetIds)).fetch().stream()
+                .collect(Collectors.toMap(tuple -> tuple.get(asset.id), tuple -> tuple.get(asset.status)));
     }
 }

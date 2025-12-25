@@ -6,7 +6,9 @@ import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.UserLookupResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
 import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.iam.entity.UserProfile;
 import com.beyond.qiin.domain.iam.repository.querydsl.UserQueryRepository;
+import com.beyond.qiin.domain.iam.support.user.UserProfileReader;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserQueryServiceImpl implements UserQueryService {
 
     private final UserReader userReader;
+    private final UserProfileReader userProfileReader;
     private final UserQueryRepository userQueryRepository;
 
     // 사용자 전체 조회
@@ -52,6 +55,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     @Transactional(readOnly = true)
     public DetailUserResponseDto getUser(final Long userId) {
         User user = userReader.findById(userId);
-        return DetailUserResponseDto.fromEntity(user);
+        UserProfile profile = userProfileReader.findByUser(user).orElse(null);
+        return DetailUserResponseDto.fromEntity(user, profile);
     }
 }

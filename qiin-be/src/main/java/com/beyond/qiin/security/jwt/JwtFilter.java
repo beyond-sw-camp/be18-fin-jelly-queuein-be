@@ -43,6 +43,12 @@ public class JwtFilter extends OncePerRequestFilter {
         final boolean hasHeader = header != null;
         final boolean isBearer = hasHeader && header.startsWith("Bearer ");
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         log.debug(
                 "[JwtFilter] 요청 URI: {}, hasAuthorization={}, authPrefix={}",
                 request.getRequestURI(),

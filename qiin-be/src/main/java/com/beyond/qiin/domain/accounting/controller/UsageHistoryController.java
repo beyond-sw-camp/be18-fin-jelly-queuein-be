@@ -1,7 +1,8 @@
 package com.beyond.qiin.domain.accounting.controller;
 
 import com.beyond.qiin.common.dto.PageResponseDto;
-import com.beyond.qiin.domain.accounting.dto.common.ReportingComparisonRequestDto;
+import com.beyond.qiin.domain.accounting.dto.common.request.ReportingComparisonRequestDto;
+import com.beyond.qiin.domain.accounting.dto.common.response.YearListResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.request.UsageHistoryListSearchRequestDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryDetailResponseDto;
 import com.beyond.qiin.domain.accounting.dto.usage_history.response.UsageHistoryListResponseDto;
@@ -39,5 +40,10 @@ public class UsageHistoryController {
     public ResponseEntity<UsageHistoryTrendResponseDto> usageTrend(@ModelAttribute ReportingComparisonRequestDto req) {
 
         return ResponseEntity.ok(usageHistoryTrendService.getUsageHistoryTrend(req));
+    }
+
+    @GetMapping("/years")
+    public ResponseEntity<YearListResponseDto> getYears() {
+        return ResponseEntity.ok(usageHistoryService.getExistingYears());
     }
 }
