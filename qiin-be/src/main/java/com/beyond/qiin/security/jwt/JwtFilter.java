@@ -78,7 +78,6 @@ public class JwtFilter extends OncePerRequestFilter {
             String email = claims.get(JwtConstants.CLAIM_EMAIL, String.class);
             List<String> permissions = claims.get(JwtConstants.CLAIM_PERMISSIONS, List.class);
 
-
             List<SimpleGrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority(role));
             permissions.forEach(p -> authorities.add(new SimpleGrantedAuthority(p)));
