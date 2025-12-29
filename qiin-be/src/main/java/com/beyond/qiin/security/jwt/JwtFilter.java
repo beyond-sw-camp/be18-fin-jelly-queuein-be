@@ -87,9 +87,6 @@ public class JwtFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
 
-            // AccessToken 저장
-            authentication.setDetails(token);
-
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (final ExpiredJwtException e) { // Access Token 만료 시

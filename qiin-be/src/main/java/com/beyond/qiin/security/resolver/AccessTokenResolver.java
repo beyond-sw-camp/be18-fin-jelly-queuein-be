@@ -1,10 +1,7 @@
 package com.beyond.qiin.security.resolver;
 
-import com.beyond.qiin.domain.auth.exception.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -28,12 +25,9 @@ public class AccessTokenResolver implements HandlerMethodArgumentResolver {
             final NativeWebRequest webRequest,
             final WebDataBinderFactory binderFactory) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw AuthException.unauthorized();
-        }
-
-        return authentication.getDetails().toString();
+        throw new UnsupportedOperationException(
+            "@AccessToken is no longer supported. " +
+                "Controllers must not depend on raw access tokens."
+        );
     }
 }

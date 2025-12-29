@@ -9,6 +9,13 @@ public final class JwtConstants {
     private JwtConstants() {} // 인스턴스화 방지
 
     // ------------------------
+    // Header Keys
+    // ------------------------
+    public static final String HEADER_AUTHORIZATION = "Authorization";
+    public static final String TOKEN_PREFIX = "Bearer ";
+    public static final int TOKEN_PREFIX_LENGTH = TOKEN_PREFIX.length(); // 7 대신 사용
+
+    // ------------------------
     // Claim Keys
     // ------------------------
     public static final String CLAIM_ROLE = "role";
