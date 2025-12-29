@@ -16,7 +16,7 @@ import com.beyond.qiin.security.config.SecurityConfig;
 import com.beyond.qiin.security.jwt.JwtFilter;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.jwt.RedisTokenRepository;
-import com.beyond.qiin.security.resolver.ArgumentResolver;
+import com.beyond.qiin.security.resolver.AccessTokenResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -62,7 +62,7 @@ class AssetControllerTest {
     private RedisTokenRepository redisTokenRepository;
 
     @MockBean
-    private ArgumentResolver argumentResolver;
+    private AccessTokenResolver accessTokenResolver;
 
     // ----------------------------------------------------------
     // 1. CREATE

@@ -28,7 +28,7 @@ import com.beyond.qiin.security.config.SecurityConfig;
 import com.beyond.qiin.security.jwt.JwtFilter;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.jwt.RedisTokenRepository;
-import com.beyond.qiin.security.resolver.ArgumentResolver;
+import com.beyond.qiin.security.resolver.AccessTokenResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.List;
@@ -77,7 +77,7 @@ public class ReservationControllerTest {
     private RedisTokenRepository redisTokenRepository;
 
     @MockBean
-    private ArgumentResolver argumentResolver;
+    private AccessTokenResolver accessTokenResolver;
 
     @Test
     @WithMockUser(

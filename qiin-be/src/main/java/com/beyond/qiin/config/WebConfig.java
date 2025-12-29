@@ -1,6 +1,6 @@
 package com.beyond.qiin.config;
 
-import com.beyond.qiin.security.resolver.ArgumentResolver;
+import com.beyond.qiin.security.resolver.AccessTokenResolver;
 import com.beyond.qiin.security.resolver.CurrentUserResolver;
 import com.beyond.qiin.security.resolver.SseAccessTokenArgumentResolver;
 import java.util.List;
@@ -13,13 +13,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final ArgumentResolver argumentResolver;
+    private final AccessTokenResolver accessTokenResolver;
     private final SseAccessTokenArgumentResolver sseAccessTokenArgumentResolver;
     private final CurrentUserResolver currentUserResolver;
 
     @Override
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(argumentResolver);
+        resolvers.add(accessTokenResolver);
         resolvers.add(currentUserResolver);
         resolvers.add(sseAccessTokenArgumentResolver);
     }
