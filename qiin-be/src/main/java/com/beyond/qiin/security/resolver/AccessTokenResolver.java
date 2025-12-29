@@ -26,8 +26,6 @@ public class AccessTokenResolver implements HandlerMethodArgumentResolver {
             final WebDataBinderFactory binderFactory) {
 
         throw new UnsupportedOperationException(
-            "@AccessToken is no longer supported. " +
-                "Controllers must not depend on raw access tokens."
-        );
+                "@AccessToken is no longer supported. " + "Controllers must not depend on raw access tokens.");
     }
 }
