@@ -1,6 +1,9 @@
 package com.beyond.qiin.domain.inventory.controller;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -17,6 +20,7 @@ import com.beyond.qiin.security.jwt.JwtFilter;
 import com.beyond.qiin.security.jwt.JwtTokenProvider;
 import com.beyond.qiin.security.jwt.RedisTokenRepository;
 import com.beyond.qiin.security.resolver.AccessTokenResolver;
+import com.beyond.qiin.security.resolver.CurrentUserContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -32,6 +36,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(
@@ -151,12 +156,21 @@ class AssetControllerTest {
     // ----------------------------------------------------------
     @Test
     @DisplayName("자원 삭제 성공")
-    void deleteAsset_success() throws Exception {
+    void deleteAsset_success() {
+        // given
+        AssetCommandService commandService = mock(AssetCommandService.class);
+        AssetQueryService queryService = mock(AssetQueryService.class);
+        AssetController controller = new AssetController(commandService, queryService);
 
-        when(jwtTokenProvider.getUserId(anyString())).thenReturn(99L);
+        CurrentUserContext currentUser = mock(CurrentUserContext.class);
+        when(currentUser.getUserId()).thenReturn(99L);
 
-        mockMvc.perform(delete("/api/v1/assets/5").header("Authorization", "Bearer test-token"))
-                .andExpect(status().isNoContent());
+        // when
+        ResponseEntity<Void> res = controller.deleteAsset(5L, currentUser);
+
+        // then
+        verify(commandService).softDeleteAsset(5L, 99L);
+        assertThat(res.getStatusCodeValue()).isEqualTo(204);
     }
 
     // ----------------------------------------------------------
