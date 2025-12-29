@@ -72,10 +72,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             Claims claims = jwtTokenProvider.getClaims(token);
+
             Long userId = Long.valueOf(claims.getSubject());
-            String role = claims.get("role", String.class);
-            final String email = claims.get("email", String.class);
-            List<String> permissions = claims.get("permissions", List.class);
+            String role = claims.get(JwtConstants.CLAIM_ROLE, String.class);
+            String email = claims.get(JwtConstants.CLAIM_EMAIL, String.class);
+            List<String> permissions = claims.get(JwtConstants.CLAIM_PERMISSIONS, List.class);
+
 
             List<SimpleGrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority(role));
