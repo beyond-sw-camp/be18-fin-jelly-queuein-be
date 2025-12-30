@@ -7,15 +7,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class RoleRedisAdapter {
 
-    private final RoleRedisRepository repository;
+    private final RoleRedisRepository roleRedisRepository;
 
     public RoleReadModel findById(final Long id) {
-        RoleReadModel model = repository.findById(id).orElse(null);
+        RoleReadModel model = roleRedisRepository.findById(id).orElse(null);
         if (model == null) {
             log.info("[Redis MISS] roleId={}", id);
         } else {
@@ -38,19 +38,19 @@ public class RoleRedisAdapter {
 
         int userCount = role.getUserRoles().size();
 
-        RoleReadModel model = RoleReadModel.builder()
+        RoleReadModel roleReadModel = RoleReadModel.builder()
                 .roleId(role.getId())
                 .roleName(role.getRoleName())
                 .roleDescription(role.getRoleDescription())
                 .permissions(permissions)
                 .userCount(userCount)
                 .build();
-        log.info("[Redis SAVE] roleId={} userCount={}", model.getRoleId(), model.getUserCount());
-        repository.save(model);
+        log.info("[Redis SAVE] roleId={} userCount={}", roleReadModel.getRoleId(), roleReadModel.getUserCount());
+        roleRedisRepository.save(roleReadModel);
     }
 
     public void delete(final Long roleId) {
         log.info("[Redis DELETE] roleId={}", roleId);
-        repository.deleteById(roleId);
+        roleRedisRepository.deleteById(roleId);
     }
 }
