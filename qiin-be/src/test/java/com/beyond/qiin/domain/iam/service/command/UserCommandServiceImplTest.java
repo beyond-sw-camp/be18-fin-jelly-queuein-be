@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,12 +14,13 @@ import com.beyond.qiin.domain.iam.dto.user.request.CreateUserRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateMyInfoRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.request.UpdateUserByAdminRequestDto;
 import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
+import com.beyond.qiin.domain.iam.entity.Department;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.entity.UserRole;
 import com.beyond.qiin.domain.iam.exception.UserException;
+import com.beyond.qiin.domain.iam.support.department.DepartmentReader;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
-import com.beyond.qiin.domain.iam.support.user.UserProfileReader;
 import com.beyond.qiin.domain.iam.support.user.UserProfileWriter;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
@@ -46,7 +48,7 @@ public class UserCommandServiceImplTest {
     private RoleReader roleReader;
 
     @Mock
-    private UserProfileReader userProfileReader;
+    private DepartmentReader departmentReader;
 
     @Mock
     private UserWriter userWriter;
@@ -84,9 +86,11 @@ public class UserCommandServiceImplTest {
         when(passwordEncoder.encode(anyString())).thenReturn("ENC_TEMP_PW");
         when(userReader.findLastUserNoByPrefix("202501")).thenReturn(Optional.empty());
 
+        Department department = mock(Department.class);
         User saved = mock(User.class);
         when(saved.getId()).thenReturn(10L);
-        when(saved.getDptId()).thenReturn(1L);
+        when(department.getId()).thenReturn(1L);
+        when(saved.getDepartment()).thenReturn(department);
         when(saved.getUserNo()).thenReturn("202501001");
         when(saved.getUserName()).thenReturn("홍길동");
         when(saved.getEmail()).thenReturn("hong@example.com");
@@ -129,7 +133,7 @@ public class UserCommandServiceImplTest {
 
         userCommandService.updateUser(1L, req);
 
-        verify(user).updateUser(req);
+        verify(user).updateUser(eq(req), isNull());
         verify(userWriter).save(user);
     }
 

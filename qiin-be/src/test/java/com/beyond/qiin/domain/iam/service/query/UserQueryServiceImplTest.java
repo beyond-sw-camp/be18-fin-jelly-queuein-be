@@ -14,14 +14,17 @@ import com.beyond.qiin.domain.iam.dto.user.response.DetailUserResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.UserLookupResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserListResponseDto;
 import com.beyond.qiin.domain.iam.dto.user.response.raw.RawUserLookupDto;
+import com.beyond.qiin.domain.iam.entity.Department;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.entity.UserRole;
 import com.beyond.qiin.domain.iam.repository.querydsl.UserQueryRepository;
+import com.beyond.qiin.domain.iam.support.department.DepartmentReader;
 import com.beyond.qiin.domain.iam.support.user.UserProfileReader;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,6 +52,9 @@ public class UserQueryServiceImplTest {
     @InjectMocks
     private UserQueryServiceImpl userQueryService;
 
+    @Mock
+    private DepartmentReader departmentReader;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -74,7 +80,7 @@ public class UserQueryServiceImplTest {
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).getUserName()).isEqualTo("홍길동");
+        assertThat(result.getContent().getFirst().getUserName()).isEqualTo("홍길동");
         verify(userQueryRepository).search(cond, pageable);
     }
 
@@ -90,7 +96,7 @@ public class UserQueryServiceImplTest {
 
         // then
         assertThat(list).hasSize(1);
-        assertThat(list.get(0).getUserName()).isEqualTo("김철수");
+        assertThat(list.getFirst().getUserName()).isEqualTo("김철수");
         verify(userQueryRepository).lookup("철수");
     }
 
@@ -109,27 +115,32 @@ public class UserQueryServiceImplTest {
     @Test
     @DisplayName("사용자 상세 조회 단위 테스트")
     void getUser_success() {
+        // given
         User user = mock(User.class);
+        Department department = mock(Department.class);
         Role role = mock(Role.class);
         UserRole userRole = mock(UserRole.class);
 
         when(role.getId()).thenReturn(999L);
         when(role.getRoleName()).thenReturn("GENERAL");
         when(userRole.getRole()).thenReturn(role);
-
         when(user.getUserRoles()).thenReturn(List.of(userRole));
 
         when(user.getId()).thenReturn(10L);
-        when(user.getDptId()).thenReturn(3L);
+        when(department.getId()).thenReturn(3L);
+        when(user.getDepartment()).thenReturn(department);
         when(user.getUserNo()).thenReturn("202501001");
         when(user.getUserName()).thenReturn("테스터");
         when(user.getEmail()).thenReturn("test@example.com");
         when(user.getPasswordExpired()).thenReturn(false);
 
         when(userReader.findById(10L)).thenReturn(user);
+        when(userProfileReader.findByUser(user)).thenReturn(Optional.empty());
 
+        // when
         DetailUserResponseDto dto = userQueryService.getUser(10L);
 
+        // then
         assertThat(dto.getRoleId()).isEqualTo(999L);
         assertThat(dto.getRoleName()).isEqualTo("GENERAL");
     }

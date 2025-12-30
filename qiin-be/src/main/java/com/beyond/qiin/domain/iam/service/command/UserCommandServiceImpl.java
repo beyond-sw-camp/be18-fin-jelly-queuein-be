@@ -10,9 +10,8 @@ import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
 import com.beyond.qiin.domain.iam.entity.UserProfile;
 import com.beyond.qiin.domain.iam.entity.UserRole;
-import com.beyond.qiin.domain.iam.exception.DepartmentException;
 import com.beyond.qiin.domain.iam.exception.UserException;
-import com.beyond.qiin.domain.iam.repository.DepartmentJpaRepository;
+import com.beyond.qiin.domain.iam.support.department.DepartmentReader;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
 import com.beyond.qiin.domain.iam.support.user.UserProfileReader;
 import com.beyond.qiin.domain.iam.support.user.UserProfileWriter;
@@ -25,7 +24,6 @@ import com.beyond.qiin.security.PasswordGenerator;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +38,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserReader userReader;
     private final UserProfileReader userProfileReader;
     private final RoleReader roleReader;
-
-    private final DepartmentJpaRepository departmentJpaRepository;
+    private final DepartmentReader departmentReader;
 
     private final UserWriter userWriter;
     private final UserProfileWriter userProfileWriter;
@@ -61,8 +58,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         final String tempPassword = PasswordGenerator.generate();
         final String encrypted = passwordEncoder.encode(tempPassword);
 
-        Department department =
-                departmentJpaRepository.findById(request.getDptId()).orElseThrow(DepartmentException::notFound);
+        Department department = departmentReader.getById(request.getDptId());
 
         String userNo = generateUserNo(request.getHireDate());
 
@@ -111,9 +107,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         // 2) 수정 수행
         Department department = null;
         if (request.getDptId() != null) {
-            department = departmentJpaRepository
-                    .findById(request.getDptId())
-                    .orElseThrow(() -> DepartmentException.notFound());
+            department = departmentReader.getById(request.getDptId());
         }
 
         target.updateUser(request, department);
@@ -206,7 +200,6 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     // 사번 생성 로직
     private String generateUserNo(final LocalDate hireDate) {
-        Instant hireInstant = hireDate.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant();
 
         String prefix = hireDate.format(DateTimeFormatter.ofPattern("yyyyMM"));
 

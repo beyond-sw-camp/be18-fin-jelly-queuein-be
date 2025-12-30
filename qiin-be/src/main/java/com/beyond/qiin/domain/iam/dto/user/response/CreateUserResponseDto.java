@@ -23,7 +23,7 @@ public class CreateUserResponseDto {
     public static CreateUserResponseDto fromEntity(final User user) {
         return CreateUserResponseDto.builder()
                 .userId(user.getId())
-                .dptId(user.getDptId())
+                .dptId(user.getDepartment().getId())
                 .userNo(user.getUserNo())
                 .userName(user.getUserName())
                 .email(user.getEmail())

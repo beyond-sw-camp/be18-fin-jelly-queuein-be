@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RegisterMasterRequestDto {
 
-    private Long dptId;
     // TODO: 사번 생성 로직으로 처리하기 or MASTER 명시
     private String userNo;
 
@@ -27,7 +26,6 @@ public class RegisterMasterRequestDto {
 
     public User toEntity(final String encryptedPassword) {
         return User.builder()
-                .dptId(this.dptId)
                 .userNo(this.userNo)
                 .userName(this.userName)
                 .email(this.email)

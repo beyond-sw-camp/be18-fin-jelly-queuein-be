@@ -40,7 +40,7 @@ public class DetailUserResponseDto {
 
         return DetailUserResponseDto.builder()
                 .userId(user.getId())
-                .dptId(user.getDptId())
+                .dptId(user.getDepartment().getId())
                 .userNo(user.getUserNo())
                 .userName(user.getUserName())
                 .email(user.getEmail())

@@ -29,4 +29,8 @@ public class Department extends BaseEntity {
     public static Department create(final CreateDepartmentRequestDto request) {
         return Department.builder().dptName(request.getDptName()).build();
     }
+
+    public void softDelete(final Long userId) {
+        super.delete(userId);
+    }
 }
