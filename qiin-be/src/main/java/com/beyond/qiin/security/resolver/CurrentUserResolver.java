@@ -22,7 +22,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class CurrentUserResolver implements HandlerMethodArgumentResolver {
 
     @Override
-    public boolean supportsParameter(MethodParameter parameter) {
+    public boolean supportsParameter(final MethodParameter parameter) {
         return parameter.hasParameterAnnotation(CurrentUser.class)
                 && parameter.getParameterType().equals(CurrentUserContext.class);
     }
