@@ -3,7 +3,6 @@ package com.beyond.qiin.common.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.api.FlywayException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -64,12 +63,8 @@ public class GlobalExceptionHandler {
 
         log.warn("[AuthorizationDeniedException] {}", ex.getMessage());
 
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(ErrorResponseDto.builder()
-                        .status(403)
-                        .error("FORBIDDEN")
-                        .message("접근 권한이 없습니다.")
-                        .build());
+        return ResponseEntity.status(CommonErrorCode.FORBIDDEN.getStatus())
+                .body(ErrorResponseDto.of(CommonErrorCode.FORBIDDEN, null));
     }
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
@@ -78,12 +73,8 @@ public class GlobalExceptionHandler {
 
         log.warn("[AccessDeniedException] {}", ex.getMessage());
 
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(ErrorResponseDto.builder()
-                        .status(403)
-                        .error("FORBIDDEN")
-                        .message("접근 권한이 없습니다.")
-                        .build());
+        return ResponseEntity.status(CommonErrorCode.FORBIDDEN.getStatus())
+                .body(ErrorResponseDto.of(CommonErrorCode.FORBIDDEN, null));
     }
 
     // 일반 예외 (Fallback)

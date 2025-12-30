@@ -1,5 +1,7 @@
 package com.beyond.qiin.security.resolver;
 
+import com.beyond.qiin.common.exception.BaseException;
+import com.beyond.qiin.common.exception.CommonErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -25,7 +27,8 @@ public class AccessTokenResolver implements HandlerMethodArgumentResolver {
             final NativeWebRequest webRequest,
             final WebDataBinderFactory binderFactory) {
 
-        throw new UnsupportedOperationException(
-                "@AccessToken is no longer supported. " + "Controllers must not depend on raw access tokens.");
+        throw new BaseException(
+                CommonErrorCode.UNPROCESSABLE_ENTITY,
+                "@AccessToken is no longer supported. Controllers must not depend on raw access tokens.") {};
     }
 }
