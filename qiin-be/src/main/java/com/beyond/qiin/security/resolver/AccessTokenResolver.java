@@ -10,6 +10,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+// TODO: 모든 컨트롤러가 @CurrentUser 기반으로 변경되면 @AccessToken 제거
 @Component
 @RequiredArgsConstructor
 public class AccessTokenResolver implements HandlerMethodArgumentResolver {
