@@ -8,11 +8,14 @@ import com.beyond.qiin.domain.iam.dto.user.response.CreateUserResponseDto;
 import com.beyond.qiin.domain.iam.entity.Department;
 import com.beyond.qiin.domain.iam.entity.Role;
 import com.beyond.qiin.domain.iam.entity.User;
+import com.beyond.qiin.domain.iam.entity.UserProfile;
 import com.beyond.qiin.domain.iam.entity.UserRole;
 import com.beyond.qiin.domain.iam.exception.DepartmentException;
 import com.beyond.qiin.domain.iam.exception.UserException;
 import com.beyond.qiin.domain.iam.repository.DepartmentJpaRepository;
 import com.beyond.qiin.domain.iam.support.role.RoleReader;
+import com.beyond.qiin.domain.iam.support.user.UserProfileReader;
+import com.beyond.qiin.domain.iam.support.user.UserProfileWriter;
 import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.iam.support.user.UserWriter;
 import com.beyond.qiin.domain.iam.support.userrole.UserRoleWriter;
@@ -35,11 +38,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommandServiceImpl implements UserCommandService {
 
     private final UserReader userReader;
+    private final UserProfileReader userProfileReader;
     private final RoleReader roleReader;
 
     private final DepartmentJpaRepository departmentJpaRepository;
 
     private final UserWriter userWriter;
+    private final UserProfileWriter userProfileWriter;
     private final UserRoleWriter userRoleWriter;
 
     private final PasswordEncoder passwordEncoder;
@@ -123,8 +128,26 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         // MASTER 자신 정보 수정은 허용
         me.updateMyInfo(request);
-
         userWriter.save(me);
+
+        // 프로필 이미지 삭제 명시
+        if (Boolean.TRUE.equals(request.getImageDeleted())) {
+            userProfileWriter.deleteByUser(me);
+            return;
+        }
+
+        // 프사 기능
+        if (request.getProfileImageKey() != null && request.getProfileImageUrl() != null) {
+
+            userProfileReader
+                    .findByUser(me)
+                    .ifPresentOrElse(
+                            // 이미 프로필이 있으면 갱신
+                            profile -> profile.updateImage(request.getProfileImageKey(), request.getProfileImageUrl()),
+                            // 없으면 생성
+                            () -> userProfileWriter.save(UserProfile.create(
+                                    me, request.getProfileImageKey(), request.getProfileImageUrl())));
+        }
     }
 
     // 임시 비밀번호 수정
@@ -169,6 +192,9 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     public void deleteUser(final Long userId, final Long deleterId) {
         User user = userReader.findById(userId);
+
+        // 개인정보는 하드딜리트
+        userProfileWriter.deleteByUser(user);
 
         user.softDelete(deleterId);
         userWriter.save(user);

@@ -6,6 +6,7 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAsse
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.entity.AssetClosure;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,4 +55,6 @@ public interface AssetQueryRepository {
 
     // 이름으로 자원 id 찾기
     Optional<Long> findIdByName(String name);
+
+    Map<Long, Integer> findStatusMapByIds(List<Long> assetIds);
 }
