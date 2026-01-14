@@ -13,21 +13,18 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReservationLifeCycleScheduler {
 
-  private final ReservationJpaRepository reservationJpaRepository;
-  @Scheduled(fixedDelay = 60000) // 1분
-  @Transactional
-  public void completeExpiredReservations() {
+    private final ReservationJpaRepository reservationJpaRepository;
 
-    Instant now = Instant.now();
+    @Scheduled(fixedDelay = 60000) // 1분
+    @Transactional
+    public void completeExpiredReservations() {
 
-    List<Reservation> expired =
-        reservationJpaRepository
-            .findUsingOrStartedButExpired(now);
+        Instant now = Instant.now();
 
-    for (Reservation r : expired) {
-      r.end();
+        List<Reservation> expired = reservationJpaRepository.findUsingOrStartedButExpired(now);
+
+        for (Reservation r : expired) {
+            r.end();
+        }
     }
-    
-  }
-
 }

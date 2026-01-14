@@ -92,7 +92,8 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
     """)
     List<Reservation> findReservationsStartingBetween(Instant start, Instant end);
 
-    @Query("""
+    @Query(
+            """
         select r from Reservation r
         where r.status in (1, 2)
           and r.endAt < :now

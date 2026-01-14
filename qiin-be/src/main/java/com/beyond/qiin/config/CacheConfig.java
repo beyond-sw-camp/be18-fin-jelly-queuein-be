@@ -1,4 +1,3 @@
 package com.beyond.qiin.config;
 
-public class CacheConfig {
-}
+public class CacheConfig {}
