@@ -10,18 +10,19 @@ spring:
       #직렬화
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    topic:
-      topics:
-        reservation-event: reservation-event-topic
+
+    topics:
+      reservation-event: reservation.event.topic
+      reservation-event-dlt: reservation.event.topic.dlt
 
     consumer:
       auto-offset-reset: earliest
-      group-id: reservation-group
+      group-id: reservation-group-prod
       #역직렬화
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "*"
+        spring.json.trusted.packages: com.beyond.qiin
 
   # DB 설정: Spring 표준 키 사용 (Doppler에 있는 키와 매칭)
   datasource:

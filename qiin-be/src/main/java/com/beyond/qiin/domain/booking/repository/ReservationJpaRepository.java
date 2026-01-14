@@ -91,4 +91,11 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
           AND r.status = 1
     """)
     List<Reservation> findReservationsStartingBetween(Instant start, Instant end);
+
+    @Query("""
+        select r from Reservation r
+        where r.status in (1, 2)
+          and r.endAt < :now
+    """)
+    List<Reservation> findUsingOrStartedButExpired(Instant now);
 }

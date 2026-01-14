@@ -281,8 +281,9 @@ public class Reservation extends BaseEntity {
 
     // 사용 종료
     public void end() {
-        if (this.getStatus() != ReservationStatus.USING) // (this.status != 2)
-        throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
+        //status가 USING이 아니더라도 시간이 지났으면 자동 종료 필요하므로
+        //if (this.getStatus() != ReservationStatus.USING) // (this.status != 2)
+        //throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED);
         this.setStatus(ReservationStatus.COMPLETED); // this.status = 5;
 
         this.actualEndAt = Instant.now();

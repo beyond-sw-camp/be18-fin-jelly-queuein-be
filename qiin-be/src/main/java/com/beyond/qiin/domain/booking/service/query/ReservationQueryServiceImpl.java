@@ -45,6 +45,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.cache.annotation.Cacheable; //jakarta.persistence는 jpa 2차 캐시용
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -80,6 +82,10 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     }
 
     // 사용자 이름으로 예약 목록 조회
+    @Cacheable(
+            value = "user-reservations",
+            key = "'user:' + #userId + ':' + #CacheKeyGenerator.cacheKey() + ':' + #pageable.pageNumber + ':' + #pageable.pageSize"
+    )
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<GetUserReservationResponseDto> getReservationsByUserId(

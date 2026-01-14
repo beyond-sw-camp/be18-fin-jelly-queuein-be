@@ -121,6 +121,9 @@ dependencies {
     // aws s3 사용하기 위한 의존성
     implementation 'software.amazon.awssdk:s3:2.20.0'
 
+    //retry 용 (kafka에서 사용)
+    implementation 'org.springframework.retry:spring-retry'
+
 }
 
 spotless {
