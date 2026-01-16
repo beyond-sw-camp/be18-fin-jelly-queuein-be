@@ -9,7 +9,6 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationRespon
 import com.beyond.qiin.domain.booking.entity.Attendant;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
-import com.beyond.qiin.domain.booking.event.ReservationCacheEvictListener;
 import com.beyond.qiin.domain.booking.event.ReservationExternalEventPublisher;
 import com.beyond.qiin.domain.booking.event.ReservationInternalEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
@@ -83,7 +82,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         //
         //        reservationExternalEventPublisher.publishCreated(reservation, attendantUserIds);
 
-        //캐싱 적용
+        // 캐싱 적용
         publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
@@ -126,10 +125,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 .map(a -> a.getUser().getId())
                 .toList(); // 각 attendantUserId 에 대해 넣지 못하는 문제 userId를 인자로 지정하게 해줘야하나
 
-        //outbox
+        // outbox
         reservationExternalEventPublisher.publishEventCreated(reservation, attendantUserIds);
 
-        //캐싱 적용
+        // 캐싱 적용
         publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
@@ -164,7 +163,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservationExternalEventPublisher.publishEventCreated(reservation, attendantUserIds);
 
-        //캐싱 적용
+        // 캐싱 적용
         publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
@@ -190,7 +189,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservationExternalEventPublisher.publishEventCreated(reservation, null);
 
-        //캐싱 적용
+        // 캐싱 적용
         publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
@@ -221,7 +220,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.start(); // status using, 실제 시작 시간 추가
         reservationWriter.save(reservation);
 
-        //캐싱 적용
+        // 캐싱 적용
         publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
@@ -241,7 +240,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         usageHistoryCommandService.createUsageHistory(asset, reservation);
 
-        //캐싱 적용
+        // 캐싱 적용
         publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
@@ -260,7 +259,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservationWriter.save(reservation);
 
-        //캐싱 적용
+        // 캐싱 적용
         publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
@@ -307,7 +306,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservationWriter.save(reservation);
 
-        //캐싱 적용
+        // 캐싱 적용
         publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
@@ -400,8 +399,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 reservation.getApplicant().getId(),
                 reservation.getAttendants().stream()
                         .map(a -> a.getUser().getId())
-                        .toList()
-        );
+                        .toList());
     }
-
 }

@@ -22,9 +22,7 @@ public class ReservationCacheEvictListener {
         redisReservationAdapter.evictUserReservationCache(event.applicantUserId());
 
         if (event.attendantUserIds() != null && !event.attendantUserIds().isEmpty()) {
-            event.attendantUserIds()
-                    .forEach(redisReservationAdapter::evictUserReservationCache);
+            event.attendantUserIds().forEach(redisReservationAdapter::evictUserReservationCache);
         }
     }
-
 }

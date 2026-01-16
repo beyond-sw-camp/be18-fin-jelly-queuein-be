@@ -189,7 +189,6 @@ public class Reservation extends BaseEntity {
         attendants.forEach(a -> a.delete(userId)); // 참여자들 soft delete
     }
 
-
     public boolean isDeleted() {
         return getDeletedAt() != null;
     }
