@@ -17,15 +17,15 @@ public class RedisCacheConfig {
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
 
-        // 1. 기본 TTL
+        // 기본 TTL
         RedisCacheConfiguration defaultConfig =
                 RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30));
 
-        // 2. user-reservations 전용 TTL
+        // user-reservations 전용 TTL
         RedisCacheConfiguration userReservationsConfig =
                 defaultConfig.entryTtl(Duration.ofMinutes(5)); // evict 하므로 ttl 5분
 
-        // 3. 캐시별 설정 등록
+        // 캐시별 설정 등록
         Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
         cacheConfigs.put("user-reservations", userReservationsConfig);
 

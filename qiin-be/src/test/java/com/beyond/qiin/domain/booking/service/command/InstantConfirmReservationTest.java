@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandService;
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
-import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
+import com.beyond.qiin.domain.booking.event.ReservationExternalEventPublisher;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
@@ -48,7 +48,7 @@ public class InstantConfirmReservationTest {
     private AssetCommandService assetCommandService;
 
     @Mock
-    private ReservationEventPublisher reservationEventPublisher;
+    private ReservationExternalEventPublisher reservationExternalEventPublisher;
 
     @Mock
     private AttendantJpaRepository attendantJpaRepository;
@@ -70,7 +70,7 @@ public class InstantConfirmReservationTest {
                 reservationWriter,
                 attendantWriter,
                 assetCommandService,
-                reservationEventPublisher,
+                reservationExternalEventPublisher,
                 attendantJpaRepository,
                 usageHistoryCommandService);
 
@@ -117,6 +117,6 @@ public class InstantConfirmReservationTest {
         verify(assetCommandService).isAvailable(assetId);
         verify(reservationWriter).save(any());
         verify(attendantWriter).saveAll(any());
-        verify(reservationEventPublisher).publishEventCreated(any(), any());
+        verify(reservationExternalEventPublisher).publishEventCreated(any(), any());
     }
 }

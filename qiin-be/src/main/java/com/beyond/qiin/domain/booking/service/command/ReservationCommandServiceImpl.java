@@ -9,7 +9,9 @@ import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationRespon
 import com.beyond.qiin.domain.booking.entity.Attendant;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
-import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
+import com.beyond.qiin.domain.booking.event.ReservationCacheEvictListener;
+import com.beyond.qiin.domain.booking.event.ReservationExternalEventPublisher;
+import com.beyond.qiin.domain.booking.event.ReservationInternalEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
@@ -41,7 +43,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final ReservationWriter reservationWriter;
     private final AttendantWriter attendantWriter;
     private final AssetCommandService assetCommandService;
-    private final ReservationEventPublisher reservationEventPublisher;
+    private final ReservationExternalEventPublisher reservationExternalEventPublisher;
+    private final ReservationInternalEventPublisher reservationInternalEventPublisher;
     private final AttendantJpaRepository attendantJpaRepository;
     private final UsageHistoryCommandService usageHistoryCommandService;
 
@@ -78,7 +81,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         //            .toList(); //각 attendantUserId 에 대해 넣지 못하는 문제 userId를 인자로 지정하게 해줘야하나
         //
         //
-        //        reservationEventPublisher.publishCreated(reservation, attendantUserIds);
+        //        reservationExternalEventPublisher.publishCreated(reservation, attendantUserIds);
+
+        //캐싱 적용
+        publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -120,7 +126,11 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 .map(a -> a.getUser().getId())
                 .toList(); // 각 attendantUserId 에 대해 넣지 못하는 문제 userId를 인자로 지정하게 해줘야하나
 
-        reservationEventPublisher.publishEventCreated(reservation, attendantUserIds);
+        //outbox
+        reservationExternalEventPublisher.publishEventCreated(reservation, attendantUserIds);
+
+        //캐싱 적용
+        publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -152,7 +162,11 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
                 .map(a -> a.getUser().getId())
                 .toList(); // 각 attendantUserId 에 대해 넣지 못하는 문제 userId를 인자로 지정하게 해줘야하나
 
-        reservationEventPublisher.publishEventCreated(reservation, attendantUserIds);
+        reservationExternalEventPublisher.publishEventCreated(reservation, attendantUserIds);
+
+        //캐싱 적용
+        publishCacheEvictEvent(reservation);
+
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -174,7 +188,11 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.reject(respondent, confirmReservationRequestDto.getReason()); // status rejected
         reservationWriter.save(reservation);
 
-        reservationEventPublisher.publishEventCreated(reservation, null);
+        reservationExternalEventPublisher.publishEventCreated(reservation, null);
+
+        //캐싱 적용
+        publishCacheEvictEvent(reservation);
+
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -202,6 +220,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         reservation.start(); // status using, 실제 시작 시간 추가
         reservationWriter.save(reservation);
+
+        //캐싱 적용
+        publishCacheEvictEvent(reservation);
+
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -219,6 +241,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         usageHistoryCommandService.createUsageHistory(asset, reservation);
 
+        //캐싱 적용
+        publishCacheEvictEvent(reservation);
+
         return ReservationResponseDto.fromEntity(reservation);
     }
 
@@ -234,6 +259,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservation.cancel();
 
         reservationWriter.save(reservation);
+
+        //캐싱 적용
+        publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -278,6 +306,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         }
 
         reservationWriter.save(reservation);
+
+        //캐싱 적용
+        publishCacheEvictEvent(reservation);
 
         return ReservationResponseDto.fromEntity(reservation);
     }
@@ -363,4 +394,14 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         }
         return false;
     }
+
+    private void publishCacheEvictEvent(Reservation reservation) {
+        reservationInternalEventPublisher.publishChanged(
+                reservation.getApplicant().getId(),
+                reservation.getAttendants().stream()
+                        .map(a -> a.getUser().getId())
+                        .toList()
+        );
+    }
+
 }

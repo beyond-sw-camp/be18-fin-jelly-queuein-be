@@ -1,38 +1,42 @@
 package com.beyond.qiin.infra.redis.reservation;
 
-import com.beyond.qiin.domain.booking.entity.Reservation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ReservationRedisAdapter {
 
-    private final ReservationRedisRepository redisRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public void save(Reservation reservation) {
+    // 캐시 삭제
+    public void evictUserReservationCache(Long userId) {
+        if (userId == null) return; // 실제
 
-        ReservationReadModel model = ReservationReadModel.builder()
-                .id(reservation.getId())
-                .assetName(reservation.getAsset().getName())
-                .applicantName(reservation.getApplicant().getUserName())
-                .respondentName(
-                        reservation.getRespondent() != null
-                                ? reservation.getRespondent().getUserName()
-                                : null)
-                .isApproved(reservation.getIsApproved())
-                .statusCode(reservation.getStatus().getCode())
-                .startAt(reservation.getStartAt().getEpochSecond())
-                .endAt(reservation.getEndAt().getEpochSecond())
-                .attendantCount(reservation.getAttendants().size())
-                .reason(reservation.getReason())
-                .description(reservation.getDescription())
-                .build();
+        String pattern = "user-reservations::user:" + userId + ":*";
 
-        redisRepository.save(model);
+        redisTemplate.execute((RedisCallback<Void>) connection -> {
+            Cursor<byte[]> cursor = connection.scan(
+                    ScanOptions.scanOptions().match(pattern).count(100).build());
+
+            while (cursor.hasNext()) {
+                byte[] key = cursor.next();
+                connection.del(key);
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Evicted cache key={}", new String(key, StandardCharsets.UTF_8));
+                }
+            }
+
+            return null;
+        });
     }
 
-    public void delete(Long id) {
-        redisRepository.deleteById(id);
-    }
 }

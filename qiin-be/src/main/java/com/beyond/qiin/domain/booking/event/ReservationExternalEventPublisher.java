@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ReservationEventPublisher {
+public class ReservationExternalEventPublisher {
     private final OutboxEventWriter outboxEventWriter;
     private final ObjectMapper objectMapper; // 객체 -> string용
 

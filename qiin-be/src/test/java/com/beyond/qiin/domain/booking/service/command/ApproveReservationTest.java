@@ -9,7 +9,7 @@ import com.beyond.qiin.domain.booking.dto.reservation.request.ConfirmReservation
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
-import com.beyond.qiin.domain.booking.event.ReservationEventPublisher;
+import com.beyond.qiin.domain.booking.event.ReservationExternalEventPublisher;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
@@ -50,7 +50,7 @@ public class ApproveReservationTest {
     private AssetCommandService assetCommandService;
 
     @Mock
-    private ReservationEventPublisher reservationEventPublisher;
+    private ReservationExternalEventPublisher reservationExternalEventPublisher;
 
     @Mock
     private AttendantJpaRepository attendantJpaRepository;
@@ -86,7 +86,7 @@ public class ApproveReservationTest {
 
         Mockito.verify(reservation).approve(user, "승인 이유");
         Mockito.verify(reservationWriter).save(reservation);
-        Mockito.verify(reservationEventPublisher).publishEventCreated(any(Reservation.class), anyList());
+        Mockito.verify(reservationExternalEventPublisher).publishEventCreated(any(Reservation.class), anyList());
 
         assertNotNull(response);
         assertEquals(ReservationStatus.APPROVED, reservation.getStatus());
