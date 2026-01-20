@@ -7,11 +7,16 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandService;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
+import com.beyond.qiin.domain.booking.event.ReservationExternalEventPublisher;
+import com.beyond.qiin.domain.booking.event.ReservationInternalEventPublisher;
 import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
 import com.beyond.qiin.domain.booking.exception.ReservationException;
+import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
+import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
 import com.beyond.qiin.domain.booking.support.ReservationWriter;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -19,15 +24,15 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class StartReservationTest {
-    @InjectMocks
+
     private ReservationCommandServiceImpl reservationCommandService;
 
     @Mock
@@ -41,6 +46,35 @@ public class StartReservationTest {
 
     @Mock
     private AssetCommandService assetCommandService;
+
+    @Mock
+    private AttendantWriter attendantWriter;
+
+    @Mock
+    private ReservationExternalEventPublisher reservationExternalEventPublisher;
+
+    @Mock
+    private ReservationInternalEventPublisher reservationInternalEventPublisher;
+
+    @Mock
+    private AttendantJpaRepository attendantJpaRepository;
+
+    @Mock
+    private UsageHistoryCommandService usageHistoryCommandService;
+
+    @BeforeEach
+    void setUp() {
+        reservationCommandService = new ReservationCommandServiceImpl(
+                userReader,
+                reservationReader,
+                reservationWriter,
+                attendantWriter,
+                assetCommandService,
+                reservationExternalEventPublisher,
+                reservationInternalEventPublisher,
+                attendantJpaRepository,
+                usageHistoryCommandService);
+    }
 
     @Test
     void startUsingReservation_success() {

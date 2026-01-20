@@ -11,6 +11,7 @@ import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandServ
 import com.beyond.qiin.domain.booking.dto.reservation.request.CreateReservationRequestDto;
 import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.event.ReservationExternalEventPublisher;
+import com.beyond.qiin.domain.booking.event.ReservationInternalEventPublisher;
 import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
 import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
@@ -56,6 +57,9 @@ public class InstantConfirmReservationTest {
     @Mock
     private UsageHistoryCommandService usageHistoryCommandService;
 
+    @Mock
+    private ReservationInternalEventPublisher reservationInternalEventPublisher;
+
     private Long userId;
     private Long assetId;
     private Instant startAt;
@@ -71,6 +75,7 @@ public class InstantConfirmReservationTest {
                 attendantWriter,
                 assetCommandService,
                 reservationExternalEventPublisher,
+                reservationInternalEventPublisher,
                 attendantJpaRepository,
                 usageHistoryCommandService);
 

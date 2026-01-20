@@ -1,13 +1,17 @@
 package com.beyond.qiin.domain.booking.service.command;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.beyond.qiin.domain.accounting.service.command.UsageHistoryCommandService;
+import com.beyond.qiin.domain.booking.dto.reservation.response.ReservationResponseDto;
 import com.beyond.qiin.domain.booking.entity.Reservation;
 import com.beyond.qiin.domain.booking.enums.ReservationStatus;
-import com.beyond.qiin.domain.booking.exception.ReservationErrorCode;
-import com.beyond.qiin.domain.booking.exception.ReservationException;
+import com.beyond.qiin.domain.booking.event.ReservationExternalEventPublisher;
+import com.beyond.qiin.domain.booking.event.ReservationInternalEventPublisher;
+import com.beyond.qiin.domain.booking.repository.AttendantJpaRepository;
+import com.beyond.qiin.domain.booking.support.AttendantWriter;
 import com.beyond.qiin.domain.booking.support.ReservationReader;
 import com.beyond.qiin.domain.booking.support.ReservationWriter;
 import com.beyond.qiin.domain.iam.entity.User;
@@ -15,15 +19,15 @@ import com.beyond.qiin.domain.iam.support.user.UserReader;
 import com.beyond.qiin.domain.inventory.entity.Asset;
 import com.beyond.qiin.domain.inventory.service.command.AssetCommandService;
 import java.time.Instant;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class EndReservationTest {
-    @InjectMocks
+
     private ReservationCommandServiceImpl reservationCommandService;
 
     @Mock
@@ -38,9 +42,38 @@ public class EndReservationTest {
     @Mock
     private AssetCommandService assetCommandService;
 
-    // 사용 시작하지 않은 예약을 사용 종료 불가
+    @Mock
+    private AttendantWriter attendantWriter;
+
+    @Mock
+    private ReservationExternalEventPublisher reservationExternalEventPublisher;
+
+    @Mock
+    private ReservationInternalEventPublisher reservationInternalEventPublisher;
+
+    @Mock
+    private AttendantJpaRepository attendantJpaRepository;
+
+    @Mock
+    private UsageHistoryCommandService usageHistoryCommandService;
+
+    @BeforeEach
+    void setUp() {
+        reservationCommandService = new ReservationCommandServiceImpl(
+                userReader,
+                reservationReader,
+                reservationWriter,
+                attendantWriter,
+                assetCommandService,
+                reservationExternalEventPublisher,
+                reservationInternalEventPublisher,
+                attendantJpaRepository,
+                usageHistoryCommandService);
+    }
+
+    // 사용 시작과 상관없이 예약 자원 사용 종료 가능
     @Test
-    void endUsingReservation_fail() {
+    void endUsingReservation_success() {
         Long userId = 1L;
         Long reservationId = 10L;
 
@@ -57,10 +90,16 @@ public class EndReservationTest {
         when(userReader.findById(userId)).thenReturn(user);
         when(reservationReader.getReservationById(reservationId)).thenReturn(reservation);
 
-        // when & then
-        ReservationException exception = assertThrows(
-                ReservationException.class, () -> reservationCommandService.endUsingReservation(userId, reservationId));
+        // when
+        ReservationResponseDto response = reservationCommandService.endUsingReservation(userId, reservationId);
 
-        assertEquals(ReservationErrorCode.RESERVATION_STATUS_CHANGE_NOT_ALLOWED, exception.getErrorCode());
+        // then
+        assertNotNull(response);
+        assertEquals(ReservationStatus.COMPLETED.name(), response.getStatus());
+
+        assertNotNull(response.getActualEndAt());
+
+        verify(reservationWriter).save(reservation);
+        verify(usageHistoryCommandService).createUsageHistory(asset, reservation);
     }
 }
