@@ -83,8 +83,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     // 사용자 이름으로 예약 목록 조회
     @Cacheable(
             value = "user-reservations",
-            key =
-                    "'user:' + #userId + ':' + #CacheKeyGenerator.cacheKey() + ':' + #pageable.pageNumber + ':' + #pageable.pageSize")
+            keyGenerator = "userReservationKeyGenerator",
+            condition = "@environment.getProperty('spring.cache.enabled') == 'true'")
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<GetUserReservationResponseDto> getReservationsByUserId(

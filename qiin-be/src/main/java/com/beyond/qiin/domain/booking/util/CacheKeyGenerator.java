@@ -1,20 +1,17 @@
 package com.beyond.qiin.domain.booking.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
+import java.lang.reflect.Method;
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
-public class CacheKeyGenerator {
-    private final ObjectMapper objectMapper;
+@Component("userReservationKeyGenerator")
+public class CacheKeyGenerator implements KeyGenerator {
+    @Override
+    public Object generate(Object target, Method method, Object... params) {
+        Long userId = (Long) params[0];
+        Pageable pageable = (Pageable) params[2];
 
-    public String generate(Object condition) {
-        try {
-            return objectMapper.writeValueAsString(condition);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException(e);
-        }
+        return "user:" + userId + ":" + pageable.getPageNumber() + ":" + pageable.getPageSize();
     }
 }

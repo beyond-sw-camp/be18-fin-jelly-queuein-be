@@ -3,6 +3,9 @@ spring:
     activate:
       on-profile: dev
 
+  cache:
+    enabled: true #false
+
   flyway:
     enabled: true
     baseline-on-migrate: true
