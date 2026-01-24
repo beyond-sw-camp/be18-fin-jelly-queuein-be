@@ -1,11 +1,10 @@
 package com.beyond.qiin.domain.booking.util;
 
+import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.stream.Collectors;
-
-import com.beyond.qiin.domain.booking.dto.reservation.request.search_condition.GetUserReservationSearchCondition;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -15,8 +14,7 @@ public class CacheKeyGenerator implements KeyGenerator {
     @Override
     public Object generate(Object target, Method method, Object... params) {
         Long userId = (Long) params[0];
-        GetUserReservationSearchCondition condition =
-                (GetUserReservationSearchCondition) params[1];
+        GetUserReservationSearchCondition condition = (GetUserReservationSearchCondition) params[1];
         Pageable pageable = (Pageable) params[2];
 
         String conditionString = buildConditionString(condition);
@@ -26,13 +24,7 @@ public class CacheKeyGenerator implements KeyGenerator {
 
         return String.format(
                 "reservation:user:%d:cond:%s:page:%d:size:%d:sort:%s",
-                userId,
-                conditionHash,
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                sortKey
-        );
-
+                userId, conditionHash, pageable.getPageNumber(), pageable.getPageSize(), sortKey);
     }
 
     private String sortKey(Pageable pageable) {
@@ -42,15 +34,15 @@ public class CacheKeyGenerator implements KeyGenerator {
     }
 
     private String buildConditionString(GetUserReservationSearchCondition c) {
-        return String.join("|",
+        return String.join(
+                "|",
                 "date=" + c.getDate(),
                 "status=" + c.getReservationStatus(),
                 "approved=" + c.getIsApproved(),
                 "assetType=" + c.getAssetType(),
                 "categoryId=" + c.getCategoryId(),
                 "assetStatus=" + c.getAssetStatus(),
-                "layerZero=" + c.getLayerZero()
-        );
+                "layerZero=" + c.getLayerZero());
     }
 
     private String hash(String input) {

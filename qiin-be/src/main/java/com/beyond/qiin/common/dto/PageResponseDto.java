@@ -11,7 +11,7 @@ import org.springframework.data.domain.Sort;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor //cache용 jackson의 직렬화 용도
+@NoArgsConstructor // cache용 jackson의 직렬화 용도
 public class PageResponseDto<T> {
 
     private int page; // 현재 페이지 (0부터 시작)
