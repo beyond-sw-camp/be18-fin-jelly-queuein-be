@@ -3,14 +3,15 @@ package com.beyond.qiin.common.dto;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@NoArgsConstructor //cache용 jackson의 직렬화 용도
 public class PageResponseDto<T> {
 
     private int page; // 현재 페이지 (0부터 시작)
@@ -42,6 +43,7 @@ public class PageResponseDto<T> {
     // 정렬 정보 DTO
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class SortInfo {
 
         private String property; // 정렬 기준 컬럼

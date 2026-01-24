@@ -1,6 +1,9 @@
 package com.beyond.qiin.config;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,13 +24,20 @@ public class RedisCacheConfig {
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
 
+        ObjectMapper redisObjectMapper = new ObjectMapper();
+        redisObjectMapper.activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+
+        // time 지원
+        redisObjectMapper.registerModule(new JavaTimeModule());
+
         // 기본 설정 (TTL + JSON 직렬화)
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(30))
                 .serializeKeysWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
-                        new GenericJackson2JsonRedisSerializer(objectMapper)));
+                        new GenericJackson2JsonRedisSerializer(redisObjectMapper)));
 
         // user-reservations 전용 TTL
         RedisCacheConfiguration userReservationsConfig = defaultConfig.entryTtl(Duration.ofMinutes(5));
@@ -39,13 +49,5 @@ public class RedisCacheConfig {
                 .cacheDefaults(defaultConfig)
                 .withInitialCacheConfigurations(cacheConfigs)
                 .build();
-    }
-
-    @Bean
-    public RedisCacheConfiguration redisCacheConfiguration(ObjectMapper objectMapper) {
-
-        return RedisCacheConfiguration.defaultCacheConfig()
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
-                        new GenericJackson2JsonRedisSerializer(objectMapper)));
     }
 }

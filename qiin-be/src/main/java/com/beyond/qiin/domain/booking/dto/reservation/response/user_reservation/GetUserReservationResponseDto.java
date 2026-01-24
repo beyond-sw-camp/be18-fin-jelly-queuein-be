@@ -5,41 +5,39 @@ import com.beyond.qiin.domain.booking.enums.ReservationStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetStatus;
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import java.time.Instant;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 // 사용자의 예약에 대한 현황 목록 조회용
 @Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class GetUserReservationResponseDto {
 
-    private final Long reservationId;
+    private Long reservationId; // cache 용 no args를 포함하면서 final 제외
 
-    private final String assetType;
+    private String assetType;
 
-    private final String assetName;
+    private String assetName;
 
-    private final String categoryName;
+    private String categoryName;
 
-    private final String assetStatus;
+    private String assetStatus;
 
-    private final Boolean isApproved;
+    private Boolean isApproved;
 
-    private final Instant startAt;
+    private Instant startAt;
 
-    private final Instant endAt;
+    private Instant endAt;
 
-    private final String reservationStatus;
+    private String reservationStatus;
 
-    private final Long version;
+    private Long version;
 
     // 응답 시 필수 x
-    private final Instant actualStartAt;
+    private Instant actualStartAt;
 
-    private final Instant actualEndAt;
+    private Instant actualEndAt;
 
     public static GetUserReservationResponseDto fromRaw(final RawUserReservationResponseDto raw) {
         return GetUserReservationResponseDto.builder()

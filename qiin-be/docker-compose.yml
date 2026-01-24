@@ -25,6 +25,9 @@ services:
     restart: always
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly no
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
@@ -110,3 +113,4 @@ services:
 
 volumes:
   mariadb_data:
+  redis-data:

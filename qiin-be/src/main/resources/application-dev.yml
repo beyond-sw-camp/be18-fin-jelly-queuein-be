@@ -4,7 +4,7 @@ spring:
       on-profile: dev
 
   cache:
-    enabled: true #false
+    enabled: false
 
   flyway:
     enabled: true
