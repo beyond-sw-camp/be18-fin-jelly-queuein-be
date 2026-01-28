@@ -45,6 +45,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+      format_sql: true #sql 보는 용
     show-sql: true
 
   # Redis 및 Kafka는 Docker Compose 서비스 이름으로 설정 (Host만 재정의)
@@ -58,3 +59,7 @@ openai:
   api-key: ${MY_OPENAI_KEY}
   model: gpt-4.1-mini
   temperature: 0.2
+
+logging:
+  level:
+    org.hibernate.SQL: debug #실행 sql문 보는 용

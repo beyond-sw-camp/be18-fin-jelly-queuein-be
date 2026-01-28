@@ -34,17 +34,6 @@ import com.beyond.qiin.domain.inventory.dto.asset.response.raw.RawDescendantAsse
 import com.beyond.qiin.domain.inventory.enums.AssetType;
 import com.beyond.qiin.domain.inventory.repository.querydsl.AssetQueryRepository;
 import com.beyond.qiin.domain.inventory.service.query.AssetQueryService;
-import java.time.DayOfWeek;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -53,6 +42,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -92,15 +85,6 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         // 사용자 있는지 확인
         userReader.findById(userId);
 
-        log.info(
-                "date={}, status={}, approved={}, assetName={}, assetType={}, layerZero={}",
-                condition.getDate(),
-                condition.getReservationStatus(),
-                condition.getIsApproved(),
-                condition.getAssetName(),
-                condition.getAssetType(),
-                condition.getLayerZero());
-
         Page<RawUserReservationResponseDto> rawPage =
                 userReservationsQueryRepository.search(userId, condition, pageable);
 
@@ -109,7 +93,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return PageResponseDto.from(page);
     }
 
-    // 신청 예약 목록 조회
+    // 신청 예약 목록 조회(관리자용)
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<GetAppliedReservationResponseDto> getReservationApplies(

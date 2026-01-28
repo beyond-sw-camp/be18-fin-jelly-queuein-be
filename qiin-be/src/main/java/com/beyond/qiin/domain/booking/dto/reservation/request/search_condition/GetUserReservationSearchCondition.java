@@ -10,16 +10,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class GetUserReservationSearchCondition {
-    @NotNull
-    private LocalDate date;
+
+    private LocalDate fromDate;
+
+    private LocalDate toDate;
 
     private String reservationStatus;
     private String isApproved;
-
-    private String assetName;
-    private String assetType;
     private Long categoryId;
-    private String assetStatus;
-    private String layerZero;
-    private String layerOne;
 }

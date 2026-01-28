@@ -73,3 +73,5 @@ Temporary Items
 gradle.properties
 /qiin-be/src/main/generated/
 /qiin-be/src/jmeter/
+
+/qiin-be/jemter-data/
