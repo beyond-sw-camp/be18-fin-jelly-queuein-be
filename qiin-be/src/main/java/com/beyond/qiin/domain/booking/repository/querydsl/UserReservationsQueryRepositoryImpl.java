@@ -10,15 +10,14 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -39,17 +38,19 @@ public class UserReservationsQueryRepositoryImpl implements UserReservationsQuer
         builder.and(reservation.applicant.id.eq(userId));
 
         // 날짜(Instant)
-        //시작
+        // 시작
         if (condition.getFromDate() != null) {
-            Instant from = condition.getFromDate()
+            Instant from = condition
+                    .getFromDate()
                     .atStartOfDay(ZoneId.of("Asia/Seoul"))
                     .toInstant();
             builder.and(reservation.startAt.goe(from));
         }
 
-        //종료
+        // 종료
         if (condition.getToDate() != null) {
-            Instant to = condition.getToDate()
+            Instant to = condition
+                    .getToDate()
                     .plusDays(1)
                     .atStartOfDay(ZoneId.of("Asia/Seoul"))
                     .toInstant();
